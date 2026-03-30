@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import Login from './pages/Login';
 
 // A sleek, full-screen loading spinner for when the app is verifying tokens
 const FullPageLoader = () => (
@@ -66,6 +67,11 @@ function App() {
 
         {/* DEFAULT FALLBACK (Catch-all for random URLs) */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+        <Route 
+            path="/login" 
+            element={ <PublicRoute> <Login /> </PublicRoute> } 
+        />
         
       </Routes>
     </BrowserRouter>
