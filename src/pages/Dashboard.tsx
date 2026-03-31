@@ -1,19 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
-    Trophy, Target, BookOpen, LogOut, Code2, AlertCircle, 
-    Globe, Medal, Clock, CheckCircle2, TrendingUp
+    Target, BookOpen, LogOut, Code2, AlertCircle, 
+    Medal, Clock, CheckCircle2, TrendingUp
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { StudentService } from '../services/endpoints';
 import type { StudentSummaryDTO } from '../types';
 
-// Helper function to safely parse MongoDB's weird timestamp objects
-const parseMongoDate = (mongoDate: any): string => {
-    if (!mongoDate) return 'Unknown Date';
-    if (typeof mongoDate === 'string') return new Date(mongoDate).toLocaleDateString();
-    if (mongoDate.$numberLong) return new Date(parseInt(mongoDate.$numberLong) * 1000).toLocaleDateString();
-    if (mongoDate.$date) return new Date(mongoDate.$date).toLocaleDateString();
+// Properly handles LeetCode's Unix timestamps (which are in seconds, not milliseconds)
+const formatLeetcodeDate = (timestamp: number | string | any): string => {
+    if (!timestamp) return 'Unknown Date';
+    
+    // If Spring Boot sends it as a flat number (seconds)
+    if (typeof timestamp === 'number') {
+        // Multiply by 1000 to convert seconds to milliseconds for JS Dates
+        return new Date(timestamp * 1000).toLocaleDateString();
+    }
+    
+    // Fallback for strings
+    if (typeof timestamp === 'string') return new Date(timestamp).toLocaleDateString();
+    
     return 'Invalid Date';
 };
 
@@ -53,7 +60,7 @@ export default function Dashboard() {
         );
     }
 
-    // Safely extract stats, prioritizing the raw MongoDB array, falling back to lightweight DTO fields
+    // Safely extract stats, prioritizing the arrays
     const totalSolved = dashboardData?.problemStats?.find(s => s.difficulty === 'All')?.count 
                         || dashboardData?.totalSolved || 0;
     
@@ -153,30 +160,30 @@ export default function Dashboard() {
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <span className="font-medium text-green-600">Easy</span>
-                                        <span className="text-slate-600 font-medium">{easyStats?.count || 0} <span className="text-slate-400 font-normal">/ Beats {easyStats?.beatsPercentage}%</span></span>
+                                        <span className="text-slate-600 font-medium">{easyStats?.count || 0} <span className="text-slate-400 font-normal">/ Beats {easyStats?.beatsPercentage || 0}%</span></span>
                                     </div>
                                     <div className="w-full bg-slate-100 rounded-full h-2">
-                                        <div className="bg-green-500 h-2 rounded-full" style={{ width: `${Math.min((easyStats?.count || 0) / 3, 100)}%` }}></div>
+                                        <div className="bg-green-500 h-2 rounded-full" style={{ width: `${Math.min(((easyStats?.count || 0) / Math.max(totalSolved, 1)) * 100, 100)}%` }}></div>
                                     </div>
                                 </div>
                                 {/* Medium */}
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <span className="font-medium text-yellow-500">Medium</span>
-                                        <span className="text-slate-600 font-medium">{medStats?.count || 0} <span className="text-slate-400 font-normal">/ Beats {medStats?.beatsPercentage}%</span></span>
+                                        <span className="text-slate-600 font-medium">{medStats?.count || 0} <span className="text-slate-400 font-normal">/ Beats {medStats?.beatsPercentage || 0}%</span></span>
                                     </div>
                                     <div className="w-full bg-slate-100 rounded-full h-2">
-                                        <div className="bg-yellow-400 h-2 rounded-full" style={{ width: `${Math.min((medStats?.count || 0) / 3, 100)}%` }}></div>
+                                        <div className="bg-yellow-400 h-2 rounded-full" style={{ width: `${Math.min(((medStats?.count || 0) / Math.max(totalSolved, 1)) * 100, 100)}%` }}></div>
                                     </div>
                                 </div>
                                 {/* Hard */}
                                 <div>
                                     <div className="flex justify-between text-sm mb-1">
                                         <span className="font-medium text-red-500">Hard</span>
-                                        <span className="text-slate-600 font-medium">{hardStats?.count || 0} <span className="text-slate-400 font-normal">/ Beats {hardStats?.beatsPercentage}%</span></span>
+                                        <span className="text-slate-600 font-medium">{hardStats?.count || 0} <span className="text-slate-400 font-normal">/ Beats {hardStats?.beatsPercentage || 0}%</span></span>
                                     </div>
                                     <div className="w-full bg-slate-100 rounded-full h-2">
-                                        <div className="bg-red-500 h-2 rounded-full" style={{ width: `${Math.min((hardStats?.count || 0), 100)}%` }}></div>
+                                        <div className="bg-red-500 h-2 rounded-full" style={{ width: `${Math.min(((hardStats?.count || 0) / Math.max(totalSolved, 1)) * 100, 100)}%` }}></div>
                                     </div>
                                 </div>
                             </div>
@@ -203,7 +210,7 @@ export default function Dashboard() {
                                             <span className="font-medium text-slate-700">{sub.title}</span>
                                         </div>
                                         <span className="text-sm text-slate-400">
-                                            {parseMongoDate(sub.timestamp)}
+                                            {formatLeetcodeDate(sub.timestamp)}
                                         </span>
                                     </a>
                                 ))}
@@ -227,7 +234,7 @@ export default function Dashboard() {
                                 {dashboardData?.badges?.map((badge, idx) => (
                                     <div key={idx} className="flex flex-col items-center text-center group">
                                         <div className="relative h-16 w-16 transition-transform group-hover:scale-110">
-                                            <img src={badge.icon} alt={badge.title} className="object-contain" />
+                                            <img src={badge.icon.startsWith('http') ? badge.icon : `https://leetcode.com${badge.icon}`} alt={badge.title} className="object-contain" />
                                         </div>
                                         <span className="mt-2 text-xs font-medium text-slate-600 line-clamp-2 leading-tight">
                                             {badge.title}
@@ -252,11 +259,16 @@ export default function Dashboard() {
                                     <div key={idx} className="border-l-2 border-blue-500 pl-4 py-1">
                                         <p className="font-semibold text-slate-800 text-sm">{contest.title}</p>
                                         <div className="flex items-center gap-4 mt-1 text-xs text-slate-500">
-                                            <span>Rank: {contest.ranking}</span>
+                                            <span>Rank: {contest.ranking.toLocaleString()}</span>
                                             <span>Solved: {contest.problemsSolved}/{contest.totalProblems}</span>
                                         </div>
                                     </div>
                                 ))}
+                                {(!dashboardData?.contestHistory || dashboardData.contestHistory.length === 0) && (
+                                    <div className="text-center text-sm text-slate-500 py-2">
+                                        No contest history available.
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -272,8 +284,7 @@ export default function Dashboard() {
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {dashboardData.classrooms.map((classroom) => (
                                 <div key={classroom.id} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                                    <h3 className="text-xl font-bold text-slate-900">{classroom.name}</h3>
-                                    <p className="mt-2 text-sm text-slate-500 line-clamp-2">{classroom.description}</p>
+                                    <h3 className="text-xl font-bold text-slate-900">{classroom.className}</h3>
                                     <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
                                         <span className="text-sm font-medium text-slate-600">
                                             {classroom.assignments?.length || 0} Pending

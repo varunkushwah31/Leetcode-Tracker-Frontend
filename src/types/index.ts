@@ -33,16 +33,15 @@ export interface Badge {
     timestamp: string;
 }
 
-export interface ContestRecord {
+export interface ContestHistory {
     title: string;
-    timestamp: { $numberLong: string } | number;
+    timestamp: number; // Now a clean number!
     rating: number;
     ranking: number;
     problemsSolved: number;
     totalProblems: number;
 }
-
-export interface ProblemStat {
+export interface ProblemStats {
     difficulty: string;
     count: number;
     beatsPercentage: number;
@@ -51,7 +50,7 @@ export interface ProblemStat {
 export interface RecentSubmission {
     title: string;
     titleSlug: string;
-    timestamp: { $numberLong: string } | number;
+    timestamp: number; // Now a clean number!
     questionLink: string;
 }
 
@@ -59,24 +58,20 @@ export interface AssignmentDTO {
     id: string;
     titleSlug: string;
     questionLink: string;
-    // Catch both standard Java numbers AND raw MongoDB $numberLong objects
-    startTimestamp: { $numberLong: string } | number;
-    endTimestamp: { $numberLong: string } | number;
+    startTimestamp: number;
+    endTimestamp: number;
 }
 
 export interface ClassroomSummaryDTO {
     id: string;
-    name: string;
-    description: string;
+    className: string;
+    mentorId: string;
+    studentIds: string[];
     assignments: AssignmentDTO[];
 }
-
 // --- The Master Student Object ---
 export interface StudentSummaryDTO {
-    // Works for both raw MongoDB $oid and standard String IDs
-    _id?: { $oid: string } | string; 
     id?: string; 
-    
     name: string;
     email: string;
     leetcodeUsername: string;
@@ -86,18 +81,17 @@ export interface StudentSummaryDTO {
     rank?: string;
     currentContestRating?: number;
     socialMedia?: SocialMedia;
-    progressHistory?: ProgressRecord[];
+    
     badges?: Badge[];
-    contestHistory?: ContestRecord[];
-    problemStats?: ProblemStat[];
+    contestHistory?: ContestHistory[];
+    problemStats?: ProblemStats[];
     recentSubmissions?: RecentSubmission[];
     classrooms?: ClassroomSummaryDTO[];
     
-    // Fallbacks in case future lightweight DTOs send these directly
+    // Fallbacks for lightweight updates later
     totalSolved?: number; 
     contestRating?: number; 
 }
-
 // --- Request Payloads ---
 export interface LoginRequest {
     email: string;
