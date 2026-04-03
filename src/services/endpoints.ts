@@ -28,7 +28,7 @@ export const StudentService = {
 };
 
 // Add these below your StudentService in src/services/endpoints.ts
-//Epoque day 1
+//Epoque day 1p
 
 export const MentorService = {
     getDashboard: () => api.get('/mentors/me/dashboard'),
