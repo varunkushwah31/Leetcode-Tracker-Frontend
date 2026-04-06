@@ -23,8 +23,9 @@ export const AuthService = {
 
 export const StudentService = {
     getDashboard: () => api.get('/students/me/dashboard'),
-    validateSubmission: (classroomId: string, assignmentId: string, url: string) => 
-        api.post(`/students/me/classrooms/${classroomId}/assignments/${assignmentId}/validate`, { url })
+    
+    // The new Auto-Sync endpoint!
+    syncProfile: (username: string) => api.post(`/students/${username}/sync`),
 };
 
 // Add these below your StudentService in src/services/endpoints.ts
