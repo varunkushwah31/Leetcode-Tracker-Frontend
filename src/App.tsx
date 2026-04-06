@@ -1,7 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import MentorDashboard from './pages/MentorDashboard';
+import Login from './pages/Login';
 import Register from './pages/Register';
 
 const FullPageLoader = () => (
@@ -28,34 +30,35 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-
 function App() {
+  const { user } = useAuth();
+
+  // Safely cast user to any to bypass the missing 'role' type definition for now
+  const userRole = (user as any)?.role;
+
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         
         {/* PUBLIC ROUTES */}
-
-        <Route 
-            path="/register" 
-            element={ <PublicRoute> <Register /> </PublicRoute> } 
-        />
-        <Route 
-            path="/login" 
-            element={ <PublicRoute> <Login /> </PublicRoute> } 
-        />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         
-        {/* PROTECTED ROUTES - 2. Swap the placeholder for the real <Dashboard /> */}
+        {/* PROTECTED ROUTE: Master Dashboard Switcher */}
         <Route 
             path="/dashboard" 
-            element={ <ProtectedRoute> <Dashboard /> </ProtectedRoute> } 
+            element={
+                <ProtectedRoute>
+                    {userRole === 'MENTOR' ? <MentorDashboard /> : <Dashboard />}
+                </ProtectedRoute>
+            } 
         />
 
         {/* DEFAULT FALLBACK */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
         
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 

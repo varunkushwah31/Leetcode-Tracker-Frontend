@@ -62,6 +62,7 @@ export interface AssignmentDTO {
     endTimestamp: number;
 }
 
+
 export interface ClassroomSummaryDTO {
     id: string;
     className: string;
@@ -69,11 +70,17 @@ export interface ClassroomSummaryDTO {
     studentIds: string[];
     assignments: AssignmentDTO[];
 }
+export interface ClassroomDashboardDTO {
+    classroomId: string;
+    className: string;
+    mentorId: string;
+    students: StudentSummaryDTO[];
+}
 // --- The Master Student Object ---
 export interface StudentSummaryDTO {
     id?: string; 
     name: string;
-    email: string;
+    email?: string;
     leetcodeUsername: string;
     role: Role;
     
@@ -88,9 +95,12 @@ export interface StudentSummaryDTO {
     recentSubmissions?: RecentSubmission[];
     classrooms?: ClassroomSummaryDTO[];
     
-    // Fallbacks for lightweight updates later
     totalSolved?: number; 
     contestRating?: number; 
+
+    consistencyStreak?: number;
+    completedAssignments?: number;
+    pendingAssignments?: number;
 }
 // --- Request Payloads ---
 export interface LoginRequest {

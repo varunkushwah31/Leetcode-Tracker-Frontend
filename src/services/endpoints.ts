@@ -31,15 +31,24 @@ export const StudentService = {
 //Epoque day 1p
 
 export const MentorService = {
-    getDashboard: () => api.get('/mentors/me/dashboard'),
+    // Fetches the mentor to get their array of classroomIds
+    getProfile: (mentorId: string) => api.get(`/mentors/${mentorId}`),
 };
 
 export const ClassroomService = {
-    // Add a student via their email address
-    addStudent: (classroomId: string, email: string) => 
-        api.post(`/classrooms/${classroomId}/students`, { email }),
+    // 1. Create a Classroom
+    createClassroom: (mentorId: string, className: string) => 
+        api.post(`/classrooms?mentorId=${mentorId}&className=${encodeURIComponent(className)}`),
     
-    // Assign a question to the entire class
+    // 2. Get Classroom Dashboard (Server-Side Sorting supported!)
+    getDashboard: (classroomId: string, sortBy: string = 'solved') => 
+        api.get(`/classrooms/${classroomId}/dashboard?sortBy=${sortBy}`),
+
+    // 3. Add Student by LeetCode Username
+    addStudent: (classroomId: string, leetcodeUsername: string) => 
+        api.post(`/classrooms/${classroomId}/students/${leetcodeUsername}`),
+    
+    // 4. Assign Question
     assignQuestion: (classroomId: string, titleSlug: string, startTimestamp: number, endTimestamp: number) => 
         api.post(`/classrooms/${classroomId}/assignments`, { 
             titleSlug, 
