@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Badge } from '../components/ui/badge';
 import { LogOut, Plus, UserPlus, ClipboardList, Trophy, Flame, BookOpen, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { ScrollArea } from '../components/ui/scroll-area';
@@ -48,20 +48,28 @@ export function MentorDashboard() {
             setSelectedClassroom(fetchedClassrooms[0]);
         }
     } catch (err) {
+        console.log('====================================');
+        console.log(err);
+        console.log('====================================');
         setError('Failed to load mentor dashboard.');
     } finally {
         setIsLoading(false);
     }
   };
 
-  useEffect(() => { fetchDashboardData(); }, [sortBy, user?.id]);
+  useEffect(() => { 
+      fetchDashboardData(); 
+  }, [sortBy, user?.id]);
 
   const handleCreateClass = async () => {
     if (!user?.id) return;
     try {
         await ClassroomService.createClassroom(user.id, newClassName);
         setCreateClassOpen(false); setNewClassName(''); fetchDashboardData();
-    } catch (err) { alert("Failed to create class."); }
+    } catch (err) {
+        console.log(err);
+        alert("Failed to create class."); 
+    }
   };
 
   const handleAddStudent = async () => {
@@ -79,7 +87,10 @@ export function MentorDashboard() {
     try {
         await ClassroomService.assignQuestion(selectedClassroom.classroomId, assignmentData.titleSlug, startTimestamp, endTimestamp);
         setAssignQuestionOpen(false); setAssignmentData({ titleSlug: '', deadline: '3' }); fetchDashboardData();
-    } catch (err) { alert("Failed to assign question."); }
+    } catch (err) { 
+        console.log(err);
+        alert("Failed to assign question."); 
+    }
   };
 
   if (isLoading && classrooms.length === 0) {
@@ -126,7 +137,7 @@ export function MentorDashboard() {
                       {classroom.enrolledStudents?.length || 0} Students
                     </p>
                   </div>
-                  <ChevronRight className={`w-4 h-4 flex-shrink-0 ml-2 ${selectedClassroom?.classroomId === classroom.classroomId ? 'opacity-100' : 'opacity-0'}`} />
+                  <ChevronRight className={`w-4 h-4 shrink-0 ml-2 ${selectedClassroom?.classroomId === classroom.classroomId ? 'opacity-100' : 'opacity-0'}`} />
                 </div>
               </button>
             ))}

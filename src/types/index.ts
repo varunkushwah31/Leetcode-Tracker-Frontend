@@ -7,6 +7,7 @@ export interface AuthResponse {
     name: string;
     role: Role;
 }
+
 export interface ApiErrorResponse {
     timestamp: string;
     status: number;
@@ -14,8 +15,6 @@ export interface ApiErrorResponse {
     message: string;
     path?: string;
 }
-
-// --- LeetCode Specific Models ---
 
 export interface SocialMedia {
     github?: string;
@@ -36,12 +35,13 @@ export interface Badge {
 
 export interface ContestHistory {
     title: string;
-    timestamp: number; // Now a clean number!
+    timestamp: number;
     rating: number;
     ranking: number;
     problemsSolved: number;
     totalProblems: number;
 }
+
 export interface ProblemStats {
     difficulty: string;
     count: number;
@@ -51,7 +51,7 @@ export interface ProblemStats {
 export interface RecentSubmission {
     title: string;
     titleSlug: string;
-    timestamp: number; // Now a clean number!
+    timestamp: number;
     questionLink: string;
 }
 
@@ -63,49 +63,50 @@ export interface AssignmentDTO {
     endTimestamp: number;
 }
 
-
 export interface ClassroomSummaryDTO {
     id: string;
     className: string;
     mentorId: string;
     studentIds: string[];
-    assignments: AssignmentDTO[]; 
+    assignments: AssignmentDTO[];
 }
+
 export interface ClassroomDashboardDTO {
     classroomId: string;
     className: string;
     mentorName: string;
     enrolledStudents: StudentSummaryDTO[]; 
 }
-// --- The Master Student Object ---
+
 export interface StudentSummaryDTO {
     id?: string; 
     name: string;
     email?: string;
     leetcodeUsername: string;
     role: Role;
-    
     about?: string;
     rank?: string;
     currentContestRating?: number;
     socialMedia?: SocialMedia;
-    
     badges?: Badge[];
     contestHistory?: ContestHistory[];
     problemStats?: ProblemStats[];
     recentSubmissions?: RecentSubmission[];
     classrooms?: ClassroomSummaryDTO[];
-    
     totalSolved?: number; 
     contestRating?: number; 
-
     consistencyStreak?: number;
     completedAssignments?: number;
     pendingAssignments?: number;
     avatarUrl?: string;
     manuallyCompletedAssignments?: string[];
 }
-// --- Request Payloads ---
+
+// Add the Extended DTO that includes the progress history for the heatmap!
+export interface StudentExtendedDTO extends StudentSummaryDTO {
+    progressHistory?: ProgressRecord[];
+}
+
 export interface LoginRequest {
     email: string;
     password: string;
