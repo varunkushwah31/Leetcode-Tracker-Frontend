@@ -23,7 +23,7 @@ export interface SocialMedia {
 }
 
 export interface ProgressRecord {
-    date: { $date: string } | string;
+    date: { $date: string } | string | number[]; 
     questionSolved: number;
 }
 

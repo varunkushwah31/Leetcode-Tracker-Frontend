@@ -18,24 +18,50 @@ const formatLeetcodeDate = (timestamp: number | string): string => {
     return 'Invalid Date';
 };
 
-// FIXED: The missing closing logic for the heatmap generator
+// TIMEZONE-SAFE HEATMAP GENERATOR
 const generateHeatmapDays = (progressHistory: ProgressRecord[]) => {
     const days = [];
     const today = new Date();
     const progressMap: Record<string, number> = {};
     
     progressHistory?.forEach(record => {
-        const dateStr = typeof record.date === 'object' ? record.date.$date : record.date as string;
-        const localDate = new Date(dateStr).toISOString().split('T')[0];
-        progressMap[localDate] = record.questionSolved;
+        let dateKey = "";
+        
+        // 1. Handle Spring Boot Array format [YYYY, MM, DD]
+        if (Array.isArray(record.date)) {
+            const [y, m, d] = record.date;
+            dateKey = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        } 
+        // 2. Handle Mongo $date object
+        else if (typeof record.date === 'object' && record.date !== null && '$date' in record.date) {
+            dateKey = String((record.date as any).$date).substring(0, 10);
+        } 
+        // 3. Handle standard string "YYYY-MM-DD..."
+        else if (typeof record.date === 'string') {
+            dateKey = record.date.substring(0, 10);
+        }
+
+        if (dateKey) {
+            progressMap[dateKey] = record.questionSolved || 0;
+        }
     });
 
-    // The loop that was accidentally deleted
+    // Generate the last 84 days using purely LOCAL timezone strings
     for (let i = 83; i >= 0; i--) {
-        const d = new Date(today);
+        const d = new Date(); // Use a fresh date object
         d.setDate(today.getDate() - i);
-        const dateKey = d.toISOString().split('T')[0];
-        days.push({ date: dateKey, count: progressMap[dateKey] || 0 });
+        
+        // Extract local year, month, and day without triggering UTC shifts
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        
+        const localDateKey = `${year}-${month}-${day}`;
+        
+        days.push({ 
+            date: localDateKey, 
+            count: progressMap[localDateKey] || 0 
+        });
     }
     return days;
 };
@@ -65,6 +91,7 @@ export function StudentDashboard() {
   const [dashboardData, setDashboardData] = useState<StudentExtendedDTO | null>(null); 
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
 
   const fetchDashboard = async () => {
       try {
@@ -114,7 +141,13 @@ export function StudentDashboard() {
   const heatmapDays = generateHeatmapDays(dashboardData?.progressHistory || []);
 
   const pendingAssignments: { classroomId: string, className: string, assignment: AssignmentDTO }[] = [];
+  
   dashboardData?.classrooms?.forEach(cls => {
+      // If a classroom is selected AND this classroom doesn't match the selection, skip it!
+      if (selectedClassroomId && cls.id !== selectedClassroomId) {
+          return;
+      }
+
       cls.assignments?.forEach(assignment => {
           if (!isAssignmentCompleted(assignment)) {
               pendingAssignments.push({ classroomId: cls.id, className: cls.className, assignment });
@@ -177,28 +210,38 @@ export function StudentDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
+            {/* Heatmap */}
             <Card className="shadow-sm border-slate-200">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg"><Target className="w-5 h-5 text-emerald-500" /> Activity Heatmap</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                    <Target className="w-5 h-5 text-emerald-500" /> Activity Heatmap
+                </CardTitle>
                 <CardDescription>Your solving activity over the last 12 weeks</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto pb-4">
-                  <div className="inline-grid grid-rows-7 grid-flow-col gap-0.75">
-                    {heatmapDays.map((day, index) => (
-                      <TooltipProvider key={index}>
-                        <Tooltip>
+                  
+                  {/* Wrap the ENTIRE grid in one Provider for better performance */}
+                  <TooltipProvider>
+                    <div 
+                        className="inline-grid grid-flow-col gap-1" 
+                        // FIXED: Explicitly tell CSS to make 7 rows!
+                        style={{ gridTemplateRows: 'repeat(7, 1fr)' }}
+                    >
+                      {heatmapDays.map((day, index) => (
+                        <Tooltip key={index}>
                           <TooltipTrigger asChild>
-                            <div className={`w-3.5 h-3.5rounded-sm ${getIntensityColor(day.count)} transition-all hover:ring-2 hover:ring-slate-400 cursor-crosshair`} />
+                            <div className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count)} transition-all hover:ring-2 hover:ring-slate-400 cursor-crosshair`} />
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="font-medium text-sm">{day.date}</p>
                             <p className="text-xs text-slate-300">{day.count} {day.count === 1 ? 'problem' : 'problems'}</p>
                           </TooltipContent>
                         </Tooltip>
-                      </TooltipProvider>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  </TooltipProvider>
+
                 </div>
               </CardContent>
             </Card>
@@ -206,13 +249,27 @@ export function StudentDashboard() {
             <Card className="shadow-sm border-slate-200">
               <CardHeader className="bg-blue-50/50 border-b border-slate-100 flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle className="flex items-center gap-2 text-lg"><BookOpen className="w-5 h-5 text-blue-600" /> Pending Assignments</CardTitle>
-                  <CardDescription className="mt-1">Assigned by your mentors</CardDescription>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                      <BookOpen className="w-5 h-5 text-blue-600" /> Pending Assignments
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                      {selectedClassroomId 
+                          ? `Filtered by selected classroom` 
+                          : `Assigned by your mentors`}
+                  </CardDescription>
                 </div>
-                <Button onClick={handleSync} disabled={isSyncing} variant="outline" className="bg-white">
-                  <RefreshCw className={`w-4 h-4 mr-2 text-blue-600 ${isSyncing ? 'animate-spin' : ''}`} />
-                  {isSyncing ? 'Syncing...' : 'Auto-Sync'}
-                </Button>
+                <div className="flex gap-2">
+                  {/* Show a clear filter button if a classroom is selected */}
+                  {selectedClassroomId && (
+                      <Button onClick={() => setSelectedClassroomId(null)} variant="ghost" className="text-slate-500">
+                          Clear Filter
+                      </Button>
+                  )}
+                  <Button onClick={handleSync} disabled={isSyncing} variant="outline" className="bg-white">
+                    <RefreshCw className={`w-4 h-4 mr-2 text-blue-600 ${isSyncing ? 'animate-spin' : ''}`} />
+                    {isSyncing ? 'Syncing...' : 'Auto-Sync'}
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-slate-100">
@@ -254,14 +311,31 @@ export function StudentDashboard() {
               <CardContent>
                 <div className="grid gap-4 sm:grid-cols-2">
                     {dashboardData?.classrooms?.map(cls => (
-                        <div key={cls.id} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-xl hover:border-slate-300 transition-colors">
+                        <div 
+                            key={cls.id} 
+                            onClick={() => setSelectedClassroomId(selectedClassroomId === cls.id ? null : cls.id)}
+                            // <-- UPDATE STYLING FOR SELECTED STATE -->
+                            className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${
+                                selectedClassroomId === cls.id 
+                                    ? 'bg-blue-50 border-blue-500 shadow-md ring-1 ring-blue-500' // Highlighted State
+                                    : 'bg-slate-50 border-slate-200 hover:border-blue-300'       // Default State
+                            }`}
+                        >
                             <div>
-                                <p className="font-bold text-slate-900">{cls.className}</p>
-                                <p className="text-xs font-medium text-slate-500 mt-1">{cls.assignments?.length || 0} Total Assignments</p>
+                                <p className={`font-bold ${selectedClassroomId === cls.id ? 'text-blue-900' : 'text-slate-900'}`}>
+                                    {cls.className}
+                                </p>
+                                <p className={`text-xs font-medium mt-1 ${selectedClassroomId === cls.id ? 'text-blue-700' : 'text-slate-500'}`}>
+                                    {cls.assignments?.length || 0} Total Assignments
+                                </p>
                             </div>
-                            <TrendingUp className="w-5 h-5 text-slate-400" />
+                            <TrendingUp className={`w-5 h-5 ${selectedClassroomId === cls.id ? 'text-blue-500' : 'text-slate-400'}`} />
                         </div>
                     ))}
+                    
+                    {(!dashboardData?.classrooms || dashboardData.classrooms.length === 0) && (
+                        <p className="col-span-2 text-sm text-slate-500 text-center py-4">You are not enrolled in any classrooms.</p>
+                    )}
                 </div>
               </CardContent>
             </Card>
