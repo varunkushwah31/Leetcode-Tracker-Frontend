@@ -29,34 +29,28 @@ export const StudentService = {
     syncProfile: (username: string) => api.post(`/students/${username}/sync`),
 };
 
-// Add these below your StudentService in src/services/endpoints.ts
-//Epoque day 1p
-
 export const MentorService = {
     // Fetches the mentor to get their array of classroomIds
     getProfile: (mentorId: string) => api.get(`/mentors/${mentorId}`),
 };
 
 export const ClassroomService = {
-    // 1. Create a Classroom
-    createClassroom: (mentorId: string, className: string) => 
-        api.post(`/classrooms?mentorId=${mentorId}&className=${encodeURIComponent(className)}`),
+    createClassroom: (mentorId: string, className: string) => api.post('/classrooms', null, { params: { mentorId, className } }),
+    getDashboard: (classroomId: string, sortBy: string = 'solved') => api.get(`/classrooms/${classroomId}/dashboard`, { params: { sortBy } }),
+    addStudent: (classroomId: string, leetcodeUsername: string) => api.post(`/classrooms/${classroomId}/students`, null, { params: { leetcodeUsername } }),
+    assignQuestion: (classroomId: string, titleSlug: string, start: number, end: number) => api.post(`/classrooms/${classroomId}/assignments`, null, { params: { titleSlug, startTimestamp: start, endTimestamp: end } }),
     
-    // 2. Get Classroom Dashboard (Server-Side Sorting supported!)
-    getDashboard: (classroomId: string, sortBy: string = 'solved') => 
-        api.get(`/classrooms/${classroomId}/dashboard?sortBy=${sortBy}`),
-
-    // 3. Add Student by LeetCode Username
-    addStudent: (classroomId: string, leetcodeUsername: string) => 
-        api.post(`/classrooms/${classroomId}/students/${leetcodeUsername}`),
+    // Upload CSV 
+    bulkAddStudents: (classroomId: string, file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return api.post(`/classrooms/${classroomId}/students/bulk`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    },
     
-    // 4. Assign Question
-    assignQuestion: (classroomId: string, titleSlug: string, startTimestamp: number, endTimestamp: number) => 
-        api.post(`/classrooms/${classroomId}/assignments`, { 
-            titleSlug, 
-            startTimestamp, 
-            endTimestamp 
-        }),
+    // Download CSV 
+    exportClassroom: (classroomId: string) => api.get(`/classrooms/${classroomId}/export`, { responseType: 'blob' })
 };
 
 

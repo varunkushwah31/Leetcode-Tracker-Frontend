@@ -3,7 +3,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Badge } from '../components/ui/badge';
-import { LogOut, Plus, UserPlus, ClipboardList, Trophy, Flame, BookOpen, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
+import { LogOut, Plus, UserPlus, ClipboardList, Trophy, Flame, BookOpen, ChevronRight, Loader2, AlertCircle, Download, UploadCloud } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
@@ -41,6 +41,10 @@ export function MentorDashboard() {
   // State for the "Create Path" form
   const [newPath, setNewPath] = useState({ title: '', description: '' });
   const [pathQuestions, setPathQuestions] = useState<PathQuestion[]>([{ titleSlug: '', daysToComplete: 3 }]);
+
+const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadFailures, setUploadFailures] = useState<string[]>([]);
 
   const fetchDashboardData = async () => {
     if (!user?.id) return; 
@@ -145,6 +149,47 @@ export function MentorDashboard() {
       }
   };
 
+  const handleBulkUpload = async () => {
+      if (!selectedClassroom || !uploadFile) return;
+      setIsUploading(true);
+      setUploadFailures([]);
+      try {
+          const response = await ClassroomService.bulkAddStudents(selectedClassroom.classroomId, uploadFile);
+          // Backend returns a list of usernames that failed
+          if (response.data && response.data.length > 0) {
+              setUploadFailures(response.data);
+          } else {
+              setAddStudentOpen(false); // Close modal on complete success
+          }
+          setUploadFile(null);
+          fetchDashboardData();
+      } catch (err) {
+        console.log(err)
+        alert("Failed to upload CSV.");
+      } finally {
+          setIsUploading(false);
+      }
+  };
+
+  const handleExportCSV = async () => {
+      if (!selectedClassroom) return;
+      try {
+          const response = await ClassroomService.exportClassroom(selectedClassroom.classroomId);
+          
+          // Create a hidden link to force the browser to download the blob
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', `${selectedClassroom.className.replace(/\s+/g, '_')}_Leaderboard.csv`);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+      } catch (err) {
+        console.log(err);
+        alert("Failed to export CSV.");
+      }
+  };
+
   if (isLoading && classrooms.length === 0) {
     return <div className="flex min-h-screen items-center justify-center bg-slate-50"><Loader2 className="w-10 h-10 animate-spin text-blue-600" /></div>;
   }
@@ -233,15 +278,40 @@ export function MentorDashboard() {
                 <Dialog open={addStudentOpen} onOpenChange={setAddStudentOpen}>
                   <DialogTrigger asChild><Button variant="outline"><UserPlus className="w-4 h-4 mr-2" />Add Student</Button></DialogTrigger>
                   <DialogContent>
-                    <DialogHeader><DialogTitle>Add Student</DialogTitle></DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <div className="space-y-2">
-                        <Label>LeetCode Username</Label>
-                        <Input placeholder="student_username" value={newStudentUsername} onChange={(e) => setNewStudentUsername(e.target.value)} />
-                        <p className="text-xs text-slate-500">The student must be registered on LeetTracker</p>
+                    <DialogHeader><DialogTitle>Add Students</DialogTitle></DialogHeader>
+                    <div className="space-y-6 py-4">
+                      {/* Single Add */}
+                      <div className="space-y-2 p-4 bg-slate-50 rounded-lg border border-slate-100">
+                        <Label className="text-blue-700 font-bold">1. Add Single Student</Label>
+                        <div className="flex gap-2">
+                            <Input placeholder="LeetCode Username" value={newStudentUsername} onChange={(e) => setNewStudentUsername(e.target.value)} />
+                            <Button onClick={handleAddStudent} disabled={!newStudentUsername}>Add</Button>
+                        </div>
+                      </div>
+
+                      {/* Bulk Upload */}
+                      <div className="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
+                        <Label className="text-emerald-700 font-bold">2. Bulk Import (CSV)</Label>
+                        <p className="text-xs text-slate-500">Upload a .csv file with a single column containing LeetCode usernames.</p>
+                        <div className="flex gap-2">
+                            <Input type="file" accept=".csv" onChange={(e) => setUploadFile(e.target.files ? e.target.files[0] : null)} className="cursor-pointer file:bg-emerald-50 file:text-emerald-700 file:border-0 file:rounded-md file:px-4 file:py-1" />
+                            <Button onClick={handleBulkUpload} disabled={!uploadFile || isUploading} className="bg-emerald-600 hover:bg-emerald-700">
+                                {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
+                                {isUploading ? 'Importing...' : 'Import'}
+                            </Button>
+                        </div>
+                        {uploadFailures.length > 0 && (
+                            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
+                                <span className="font-bold">Failed to add the following users:</span>
+                                <ul className="list-disc pl-5 mt-1">
+                                    {uploadFailures.map((fail, idx) => <li key={idx}>{fail}</li>)}
+                                </ul>
+                                <p className="text-xs mt-2 italic">Ensure they are registered on LeetTracker.</p>
+                            </div>
+                        )}
                       </div>
                     </div>
-                    <DialogFooter><Button variant="outline" onClick={() => setAddStudentOpen(false)}>Cancel</Button><Button onClick={handleAddStudent}>Add Student</Button></DialogFooter>
+                    <DialogFooter><Button variant="outline" onClick={() => { setAddStudentOpen(false); setUploadFailures([]); setUploadFile(null); }}>Close</Button></DialogFooter>
                   </DialogContent>
                 </Dialog>
 
@@ -383,6 +453,10 @@ export function MentorDashboard() {
                     <CardDescription>Track and compare student progress</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
+                    {/* <-- NEW: EXPORT BUTTON --> */}
+                    <Button variant="outline" onClick={handleExportCSV} className="text-slate-600 bg-white hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-colors">
+                        <Download className="w-4 h-4 mr-2" /> Export CSV
+                    </Button>
                     <span className="text-sm text-slate-600 font-medium">Sort by:</span>
                     <Select value={sortBy} onValueChange={setSortBy}>
                       <SelectTrigger className="w-48 bg-white"><SelectValue /></SelectTrigger>
