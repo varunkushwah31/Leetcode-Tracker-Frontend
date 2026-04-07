@@ -1,414 +1,149 @@
 import { useEffect, useState } from 'react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Loader2, Trophy, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { Badge } from '../components/ui/badge';
-import { Progress } from '../components/ui/progress';
-import { ScrollArea } from '../components/ui/scroll-area';
-import { LogOut, ExternalLink, RefreshCw, Trophy, TrendingUp, Calendar, CheckCircle2, Flame, Award, Loader2, BookOpen, Target, Clock } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
+import { Button } from '../components/ui/button';
 import { useAuth } from '../context/AuthContext';
 import { StudentService } from '../services/endpoints';
-import type { StudentExtendedDTO, AssignmentDTO, ProgressRecord } from '../types';
+import type { StudentExtendedDTO, AssignmentDTO } from '../types';
 
-const formatLeetcodeDate = (timestamp: number | string): string => {
-    if (!timestamp) return 'Unknown Date';
-    if (typeof timestamp === 'number') return new Date(timestamp * 1000).toLocaleDateString();
-    if (typeof timestamp === 'string') return new Date(timestamp).toLocaleDateString();
-    return 'Invalid Date';
-};
-
-// TIMEZONE-SAFE HEATMAP GENERATOR
-const generateHeatmapDays = (progressHistory: ProgressRecord[]) => {
-    const days = [];
-    const today = new Date();
-    const progressMap: Record<string, number> = {};
-    
-    progressHistory?.forEach(record => {
-        let dateKey = "";
-        
-        // 1. Handle Spring Boot Array format [YYYY, MM, DD]
-        if (Array.isArray(record.date)) {
-            const [y, m, d] = record.date;
-            dateKey = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        } 
-        // 2. Handle Mongo $date object
-        else if (typeof record.date === 'object' && record.date !== null && '$date' in record.date) {
-            dateKey = String((record.date as any).$date).substring(0, 10);
-        } 
-        // 3. Handle standard string "YYYY-MM-DD..."
-        else if (typeof record.date === 'string') {
-            dateKey = record.date.substring(0, 10);
-        }
-
-        if (dateKey) {
-            progressMap[dateKey] = record.questionSolved || 0;
-        }
-    });
-
-    // Generate the last 84 days using purely LOCAL timezone strings
-    for (let i = 83; i >= 0; i--) {
-        const d = new Date(); // Use a fresh date object
-        d.setDate(today.getDate() - i);
-        
-        // Extract local year, month, and day without triggering UTC shifts
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        
-        const localDateKey = `${year}-${month}-${day}`;
-        
-        days.push({ 
-            date: localDateKey, 
-            count: progressMap[localDateKey] || 0 
-        });
-    }
-    return days;
-};
-
-const getIntensityColor = (count: number) => {
-    if (count === 0) return 'bg-slate-100';
-    if (count <= 2) return 'bg-emerald-200';
-    if (count <= 5) return 'bg-emerald-400';
-    if (count <= 8) return 'bg-emerald-600';
-    return 'bg-emerald-800';
-};
-
-const getDaysUntilDue = (dueTimestamp: number) => {
-    const today = new Date();
-    const due = new Date(dueTimestamp * 1000);
-    const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays < 0) return { text: 'Overdue', color: 'text-rose-600' };
-    if (diffDays === 0) return { text: 'Due today', color: 'text-amber-600' };
-    if (diffDays === 1) return { text: 'Due tomorrow', color: 'text-amber-600' };
-    return { text: `${diffDays} days left`, color: 'text-slate-600' };
-};
+// Import our highly modular components
+import { ProfileStats } from '../components/dashboard/student/ProfileStats';
+import { ActivityHeatmap } from '../components/dashboard/student/ActivityHeatmap';
+import { PendingAssignments } from '../components/dashboard/student/PendingAssignments';
+import { ClassroomList } from '../components/dashboard/student/ClassroomList';
+import { BadgesList } from '../components/dashboard/student/BadgesList';
+import { StudentRightSidebar } from '../components/dashboard/student/StudentRightSidebar'; // Optional: keep Difficulty & Recent here
 
 export function StudentDashboard() {
-  const { logout } = useAuth();
-  const [dashboardData, setDashboardData] = useState<StudentExtendedDTO | null>(null); 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
+    const { logout } = useAuth();
+    const [dashboardData, setDashboardData] = useState<StudentExtendedDTO | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
 
-  const fetchDashboard = async () => {
-      try {
-          const response = await StudentService.getDashboard();
-          setDashboardData(response.data);
-      } catch (err) {
-          console.error('Failed to load dashboard data.');
-          console.log(err);
-      } finally {
-          setIsLoading(false);
-      }
-  };
+    const fetchDashboard = async () => {
+        try {
+            const response = await StudentService.getDashboard();
+            setDashboardData(response.data);
+        } catch (err) { console.error('Failed to load dashboard', err); } 
+        finally { setIsLoading(false); }
+    };
 
-  useEffect(() => { fetchDashboard(); }, []);
+    useEffect(() => { fetchDashboard(); }, []);
 
-  const handleSync = async () => {
-    if (!dashboardData?.leetcodeUsername) return;
-    setIsSyncing(true);
-    try {
-        const response = await StudentService.syncProfile(dashboardData.leetcodeUsername);
-        setDashboardData(response.data);
-    } catch (err) {
-        console.log(err);
-        alert("Failed to sync with LeetCode. Please try again later.");
-    } finally {
-        setIsSyncing(false);
+    const handleSync = async () => {
+        if (!dashboardData?.leetcodeUsername) return;
+        setIsSyncing(true);
+        try {
+            const response = await StudentService.syncProfile(dashboardData.leetcodeUsername);
+            setDashboardData(response.data);
+        } catch (err) {
+            console.log(err);
+            alert("Failed to sync with LeetCode."); 
+        } 
+        finally { setIsSyncing(false); }
+    };
+
+    const isAssignmentCompleted = (assignment: AssignmentDTO) => {
+        if (dashboardData?.manuallyCompletedAssignments?.includes(assignment.id)) return true;
+        return !!dashboardData?.recentSubmissions?.some(sub => 
+            sub.titleSlug === assignment.titleSlug && 
+            sub.timestamp >= assignment.startTimestamp && 
+            sub.timestamp <= assignment.endTimestamp
+        );
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-slate-50">
+                <div className="flex flex-col items-center space-y-4">
+                    <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+                    <p className="font-medium text-slate-500">Decrypting LeetCode stats...</p>
+                </div>
+            </div>
+        );
     }
-  };
 
-  const isAssignmentCompleted = (assignment: AssignmentDTO) => {
-    if (dashboardData?.manuallyCompletedAssignments?.includes(assignment.id)) return true;
-    const autoCompleted = dashboardData?.recentSubmissions?.some(sub => 
-        sub.titleSlug === assignment.titleSlug && sub.timestamp >= assignment.startTimestamp && sub.timestamp <= assignment.endTimestamp
+    // Calculations
+    const easyCount = dashboardData?.problemStats?.find(s => s.difficulty === 'Easy')?.count || 0;
+    const medCount = dashboardData?.problemStats?.find(s => s.difficulty === 'Medium')?.count || 0;
+    const hardCount = dashboardData?.problemStats?.find(s => s.difficulty === 'Hard')?.count || 0;
+    const totalSolved = (easyCount + medCount + hardCount) || 1;
+    const rating = Math.round(dashboardData?.currentContestRating || 0);
+
+    // Filters
+    const pendingAssignments: { classroomId: string, className: string, assignment: AssignmentDTO }[] = [];
+    dashboardData?.classrooms?.forEach(cls => {
+        if (selectedClassroomId && cls.id !== selectedClassroomId) return;
+        cls.assignments?.forEach(assignment => {
+            if (!isAssignmentCompleted(assignment)) {
+                pendingAssignments.push({ classroomId: cls.id!, className: cls.className, assignment });
+            }
+        });
+    });
+
+    return (
+        <div className="min-h-screen bg-slate-50 pb-12">
+            {/* Header */}
+            <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-[#2563eb] p-2 rounded-lg"><Trophy className="w-5 h-5 text-white" /></div>
+                        <span className="text-xl font-bold text-slate-900">LeetTracker</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
+                            <Avatar className="border border-slate-200">
+                                <AvatarImage src={dashboardData?.avatarUrl} />
+                                <AvatarFallback className="bg-blue-50 text-blue-700 font-bold">{dashboardData?.name?.substring(0, 2)}</AvatarFallback>
+                            </Avatar>
+                            <div className="text-right hidden sm:block">
+                                <p className="text-sm font-bold text-slate-900">{dashboardData?.name}</p>
+                                <p className="text-xs font-medium text-slate-500">@{dashboardData?.leetcodeUsername}</p>
+                            </div>
+                        </div>
+                        <Button variant="ghost" size="icon" onClick={logout} className="hover:bg-red-50 hover:text-red-600">
+                            <LogOut className="w-4 h-4" />
+                        </Button>
+                    </div>
+                </div>
+            </header>
+
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                
+                {/* 1. Profile Banner */}
+                <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} />
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-8">
+                        
+                        {/* 2. Heatmap */}
+                        <ActivityHeatmap progressHistory={dashboardData?.progressHistory} />
+                        
+                        {/* 3. Assignments */}
+                        <PendingAssignments 
+                            assignments={pendingAssignments}
+                            isSyncing={isSyncing}
+                            onSync={handleSync}
+                            selectedClassroomId={selectedClassroomId}
+                            onClearFilter={() => setSelectedClassroomId(null)}
+                        />
+
+                        {/* 4. Classrooms */}
+                        <ClassroomList 
+                            classrooms={dashboardData?.classrooms}
+                            selectedClassroomId={selectedClassroomId}
+                            onSelectClassroom={setSelectedClassroomId}
+                        />
+                    </div>
+
+                    <div className="space-y-8">
+                        {/* 5. Right Sidebar Elements */}
+                        <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
+                        <BadgesList badges={dashboardData?.badges} />
+                    </div>
+                </div>
+            </main>
+        </div>
     );
-    return !!autoCompleted;
-  };
-
-  if (isLoading) {
-    return <div className="flex min-h-screen items-center justify-center bg-slate-50"><div className="flex flex-col items-center space-y-4"><Loader2 className="w-10 h-10 animate-spin text-blue-600" /><p className="font-medium text-slate-500">Decrypting LeetCode stats...</p></div></div>;
-  }
-
-  const easyStats = dashboardData?.problemStats?.find(s => s.difficulty === 'Easy') || { count: 0, beatsPercentage: 0 };
-  const medStats = dashboardData?.problemStats?.find(s => s.difficulty === 'Medium') || { count: 0, beatsPercentage: 0 };
-  const hardStats = dashboardData?.problemStats?.find(s => s.difficulty === 'Hard') || { count: 0, beatsPercentage: 0 };
-  const totalSolved = (easyStats.count + medStats.count + hardStats.count) || 1; 
-  const rating = Math.round(dashboardData?.currentContestRating || 0);
-  const heatmapDays = generateHeatmapDays(dashboardData?.progressHistory || []);
-
-  const pendingAssignments: { classroomId: string, className: string, assignment: AssignmentDTO }[] = [];
-  
-  dashboardData?.classrooms?.forEach(cls => {
-      // If a classroom is selected AND this classroom doesn't match the selection, skip it!
-      if (selectedClassroomId && cls.id !== selectedClassroomId) {
-          return;
-      }
-
-      cls.assignments?.forEach(assignment => {
-          if (!isAssignmentCompleted(assignment)) {
-              pendingAssignments.push({ classroomId: cls.id, className: cls.className, assignment });
-          }
-      });
-  });
-
-  return (
-    <div className="min-h-screen bg-slate-50 pb-12">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-[#2563eb] p-2 rounded-lg"><Trophy className="w-5 h-5 text-white" /></div>
-              <span className="text-xl font-bold text-slate-900">LeetTracker</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <Avatar className="border border-slate-200">
-                  <AvatarImage src={dashboardData?.avatarUrl} />
-                  <AvatarFallback className="bg-blue-50 text-blue-700 font-bold">{dashboardData?.name?.substring(0, 2) || 'ST'}</AvatarFallback>
-                </Avatar>
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold text-slate-900">{dashboardData?.name}</p>
-                  <p className="text-xs font-medium text-slate-500">@{dashboardData?.leetcodeUsername}</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="icon" onClick={logout} className="hover:bg-red-50 hover:text-red-600"><LogOut className="w-4 h-4" /></Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="mb-8 shadow-sm border-slate-200">
-          <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <Avatar className="w-20 h-20 border-2 border-slate-100 shadow-sm">
-                <AvatarImage src={dashboardData?.avatarUrl} />
-                <AvatarFallback className="bg-blue-50 text-blue-700 text-xl font-bold">{dashboardData?.name?.substring(0, 2) || 'ST'}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-2xl font-bold text-slate-900">@{dashboardData?.leetcodeUsername}</h2>
-                  <a href={`https://leetcode.com/${dashboardData?.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-[#2563eb] hover:text-[#1d4ed8]"><ExternalLink className="w-4 h-4" /></a>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-6">
-                  <div><p className="text-sm font-medium text-slate-500 mb-1">Global Rank</p><p className="text-2xl font-bold text-slate-900">{dashboardData?.rank ? `#${parseInt(dashboardData.rank).toLocaleString()}` : 'N/A'}</p></div>
-                  <div><p className="text-sm font-medium text-slate-500 mb-1">Total Solved</p><p className="text-2xl font-bold text-slate-900">{totalSolved}</p></div>
-                  <div><p className="text-sm font-medium text-slate-500 mb-1">Contest Rating</p><p className="text-2xl font-bold text-slate-900">{rating}</p></div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1 flex items-center gap-1"><Flame className="w-4 h-4 text-orange-500" /> Streak</p>
-                    <p className="text-2xl font-bold text-orange-600">{dashboardData?.consistencyStreak || 0} days</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            {/* Heatmap */}
-            <Card className="shadow-sm border-slate-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                    <Target className="w-5 h-5 text-emerald-500" /> Activity Heatmap
-                </CardTitle>
-                <CardDescription>Your solving activity over the last 12 weeks</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto pb-4">
-                  
-                  {/* Wrap the ENTIRE grid in one Provider for better performance */}
-                  <TooltipProvider>
-                    <div 
-                        className="inline-grid grid-flow-col gap-1" 
-                        // FIXED: Explicitly tell CSS to make 7 rows!
-                        style={{ gridTemplateRows: 'repeat(7, 1fr)' }}
-                    >
-                      {heatmapDays.map((day, index) => (
-                        <Tooltip key={index}>
-                          <TooltipTrigger asChild>
-                            <div className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count)} transition-all hover:ring-2 hover:ring-slate-400 cursor-crosshair`} />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="font-medium text-sm">{day.date}</p>
-                            <p className="text-xs text-slate-300">{day.count} {day.count === 1 ? 'problem' : 'problems'}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      ))}
-                    </div>
-                  </TooltipProvider>
-
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border-slate-200">
-              <CardHeader className="bg-blue-50/50 border-b border-slate-100 flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                      <BookOpen className="w-5 h-5 text-blue-600" /> Pending Assignments
-                  </CardTitle>
-                  <CardDescription className="mt-1">
-                      {selectedClassroomId 
-                          ? `Filtered by selected classroom` 
-                          : `Assigned by your mentors`}
-                  </CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  {/* Show a clear filter button if a classroom is selected */}
-                  {selectedClassroomId && (
-                      <Button onClick={() => setSelectedClassroomId(null)} variant="ghost" className="text-slate-500">
-                          Clear Filter
-                      </Button>
-                  )}
-                  <Button onClick={handleSync} disabled={isSyncing} variant="outline" className="bg-white">
-                    <RefreshCw className={`w-4 h-4 mr-2 text-blue-600 ${isSyncing ? 'animate-spin' : ''}`} />
-                    {isSyncing ? 'Syncing...' : 'Auto-Sync'}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-slate-100">
-                  {pendingAssignments.map((item, idx) => {
-                    const dueInfo = getDaysUntilDue(item.assignment.endTimestamp);
-                    return (
-                      <div key={idx} className="p-6 hover:bg-slate-50 transition-colors flex justify-between items-center">
-                          <div>
-                              <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200 mb-2 uppercase tracking-wider text-[10px] font-bold">{item.className}</Badge>
-                              <h4 className="text-lg font-bold text-slate-900">{item.assignment.titleSlug}</h4>
-                              <div className="flex items-center gap-1.5 mt-2 text-sm">
-                                  <Calendar className="w-4 h-4 text-slate-400" />
-                                  <span className={`font-medium ${dueInfo.color}`}>{dueInfo.text}</span>
-                              </div>
-                          </div>
-                          <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                              <a href={item.assignment.questionLink} target="_blank" rel="noopener noreferrer">
-                                  Solve <ExternalLink className="w-4 h-4 ml-2" />
-                              </a>
-                          </Button>
-                      </div>
-                    );
-                  })}
-                  {pendingAssignments.length === 0 && (
-                    <div className="p-12 text-center text-slate-500">
-                        <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-                        <h3 className="text-lg font-bold text-slate-900">All Caught Up!</h3>
-                        <p className="mt-1">You have no pending assignments right now.</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border-slate-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg"><BookOpen className="w-5 h-5 text-slate-700" /> My Classrooms</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 sm:grid-cols-2">
-                    {dashboardData?.classrooms?.map(cls => (
-                        <div 
-                            key={cls.id} 
-                            onClick={() => setSelectedClassroomId(selectedClassroomId === cls.id ? null : cls.id)}
-                            // <-- UPDATE STYLING FOR SELECTED STATE -->
-                            className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${
-                                selectedClassroomId === cls.id 
-                                    ? 'bg-blue-50 border-blue-500 shadow-md ring-1 ring-blue-500' // Highlighted State
-                                    : 'bg-slate-50 border-slate-200 hover:border-blue-300'       // Default State
-                            }`}
-                        >
-                            <div>
-                                <p className={`font-bold ${selectedClassroomId === cls.id ? 'text-blue-900' : 'text-slate-900'}`}>
-                                    {cls.className}
-                                </p>
-                                <p className={`text-xs font-medium mt-1 ${selectedClassroomId === cls.id ? 'text-blue-700' : 'text-slate-500'}`}>
-                                    {cls.assignments?.length || 0} Total Assignments
-                                </p>
-                            </div>
-                            <TrendingUp className={`w-5 h-5 ${selectedClassroomId === cls.id ? 'text-blue-500' : 'text-slate-400'}`} />
-                        </div>
-                    ))}
-                    
-                    {(!dashboardData?.classrooms || dashboardData.classrooms.length === 0) && (
-                        <p className="col-span-2 text-sm text-slate-500 text-center py-4">You are not enrolled in any classrooms.</p>
-                    )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-8">
-            <Card className="shadow-sm border-slate-200">
-              <CardHeader><CardTitle className="text-lg">Difficulty Breakdown</CardTitle></CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-bold text-slate-700">Easy</span>
-                    <span className="font-bold text-[#10b981]">{easyStats.count} <span className="text-slate-400 font-medium ml-1">({easyStats.beatsPercentage}% beats)</span></span>
-                  </div>
-                  <Progress value={(easyStats.count / totalSolved) * 100} className="h-2.5 bg-emerald-100 [&>div]:bg-[#10b981]" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-bold text-slate-700">Medium</span>
-                    <span className="font-bold text-[#f59e0b]">{medStats.count} <span className="text-slate-400 font-medium ml-1">({medStats.beatsPercentage}% beats)</span></span>
-                  </div>
-                  <Progress value={(medStats.count / totalSolved) * 100} className="h-2.5 bg-amber-100 [&>div]:bg-[#f59e0b]" />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-bold text-slate-700">Hard</span>
-                    <span className="font-bold text-[#f43f5e]">{hardStats.count} <span className="text-slate-400 font-medium ml-1">({hardStats.beatsPercentage}% beats)</span></span>
-                  </div>
-                  <Progress value={(hardStats.count / totalSolved) * 100} className="h-2.5 bg-rose-100 [&>div]:bg-[#f43f5e]" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border-slate-200">
-              <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><Award className="w-5 h-5 text-[#f59e0b]" /> Earned Badges</CardTitle></CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  {dashboardData?.badges?.slice(0,6).map((badge, index) => (
-                    <div key={index} className="flex flex-col items-center justify-center p-4 bg-linear-to-br from-amber-50 to-orange-50/30 border border-amber-100 rounded-xl text-center group">
-                      <img src={badge.icon.startsWith('http') ? badge.icon : `https://leetcode.com${badge.icon}`} alt={badge.title} className="w-12 h-12 mb-2 transition-transform group-hover:scale-110 object-contain" />
-                      <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider leading-tight line-clamp-2">{badge.title}</span>
-                    </div>
-                  ))}
-                  {(!dashboardData?.badges || dashboardData.badges.length === 0) && (
-                      <p className="col-span-2 text-center text-sm font-medium text-slate-400 py-4">No badges earned yet.</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border-slate-200">
-              <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><Clock className="w-5 h-5 text-blue-500" /> Recent Submissions</CardTitle></CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="h-64">
-                  <div className="divide-y divide-slate-100">
-                    {dashboardData?.recentSubmissions?.slice(0,10).map((sub, idx) => (
-                      <a key={idx} href={sub.questionLink} target="_blank" rel="noreferrer" className="flex flex-col p-4 hover:bg-slate-50 transition-colors">
-                        <div className="flex items-start justify-between gap-4">
-                            <div className="flex gap-3 min-w-0">
-                                <CheckCircle2 className="w-5 h-5 text-[#10b981] shrink-0" />
-                                <p className="text-sm font-bold text-slate-900 truncate">{sub.title}</p>
-                            </div>
-                            <span className="text-xs font-medium text-slate-400 whitespace-nowrap">{formatLeetcodeDate(sub.timestamp)}</span>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
 }
