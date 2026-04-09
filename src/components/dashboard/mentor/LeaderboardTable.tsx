@@ -11,10 +11,10 @@ interface LeaderboardTableProps {
     sortBy: string;
     onSortChange: (value: string) => void;
     onExportCSV: () => void;
+    onStudentClick: (username: string) => void;
 }
 
-export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV }: LeaderboardTableProps) {
-    return (
+export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, onStudentClick }: LeaderboardTableProps) {    return (
         <Card className="mb-6 shadow-sm border-slate-200">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-4">
                 <div className="flex items-center justify-between">
@@ -57,7 +57,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV }
                         </thead>
                         <tbody>
                             {students?.map((student, index) => (
-                                <tr key={student.id} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                                <tr key={student.id} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors cursor-pointer" onClick={() => onStudentClick(student.leetcodeUsername)}>
                                     <td className="py-4 px-6">
                                         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 font-bold text-sm">{index + 1}</div>
                                     </td>

@@ -6,33 +6,36 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { ScrollArea } from '../components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'; // <-- NEW: Import Tabs
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useAuth } from '../context/AuthContext';
 import { MentorService, ClassroomService, PathService } from '../services/endpoints';
-import type { ClassroomDashboardDTO, LearningPath, ClassroomAnalyticsDTO } from '../types'; // <-- NEW: Added Analytics DTO
+import type { ClassroomDashboardDTO, LearningPath, ClassroomAnalyticsDTO } from '../types';
 
 // Extracted Components
 import { MentorActions } from '../components/dashboard/mentor/MentorActions';
 import { LeaderboardTable } from '../components/dashboard/mentor/LeaderboardTable';
-import { ClassroomAnalytics } from '../components/dashboard/mentor/ClassroomAnalytics'; // <-- NEW: Import Analytics Component
+import { ClassroomAnalytics } from '../components/dashboard/mentor/ClassroomAnalytics';
+import { StudentDetailsDialog } from '../components/dashboard/mentor/StudentDetailsDialog';
 
 export function MentorDashboard() {
   const { user, logout } = useAuth();
   
-  // States
+  // Core Data States
   const [classrooms, setClassrooms] = useState<ClassroomDashboardDTO[]>([]);
   const [selectedClassroom, setSelectedClassroom] = useState<ClassroomDashboardDTO | null>(null);
   const [learningPaths, setLearningPaths] = useState<LearningPath[]>([]);
-  const [analyticsData, setAnalyticsData] = useState<ClassroomAnalyticsDTO | null>(null); // <-- NEW: Analytics State
+  const [analyticsData, setAnalyticsData] = useState<ClassroomAnalyticsDTO | null>(null);
   
+  // UI & Loading States
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [sortBy, setSortBy] = useState('solved');
-  const [activeTab, setActiveTab] = useState('leaderboard'); // <-- NEW: Tab State
+  const [activeTab, setActiveTab] = useState('leaderboard');
   
   // Dialog States
   const [createClassOpen, setCreateClassOpen] = useState(false);
   const [newClassName, setNewClassName] = useState('');
+  const [viewingStudentUsername, setViewingStudentUsername] = useState<string | null>(null);
 
   const fetchDashboardData = async () => {
     if (!user?.id) return; 
@@ -53,6 +56,7 @@ export function MentorDashboard() {
             const updated = fetchedClassrooms.find(c => c.classroomId === selectedClassroom.classroomId);
             setSelectedClassroom(updated || fetchedClassrooms[0] || null);
             
+            // Fetch analytics for the updated classroom
             if (updated) {
                 const analyticsRes = await ClassroomService.getAnalytics(updated.classroomId);
                 setAnalyticsData(analyticsRes.data);
@@ -60,6 +64,7 @@ export function MentorDashboard() {
         } else if (fetchedClassrooms.length > 0) {
             setSelectedClassroom(fetchedClassrooms[0]);
             
+            // Fetch analytics for the initially selected classroom
             const analyticsRes = await ClassroomService.getAnalytics(fetchedClassrooms[0].classroomId);
             setAnalyticsData(analyticsRes.data);
         }
@@ -112,7 +117,7 @@ export function MentorDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {/* SIDEBAR */}
+      {/* ================= SIDEBAR ================= */}
       <aside className="w-72 bg-white border-r border-slate-200 flex flex-col z-10 shadow-sm">
         <div className="p-6 border-b border-slate-200">
           <div className="flex items-center gap-3 mb-6">
@@ -161,12 +166,13 @@ export function MentorDashboard() {
         </div>
       </aside>
 
-      {/* MAIN CONTENT */}
+      {/* ================= MAIN CONTENT ================= */}
       <main className="flex-1 overflow-auto">
         {selectedClassroom ? (
           <div className="max-w-7xl mx-auto p-8">
             {error && <div className="mb-6 flex items-center space-x-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700"><AlertCircle className="h-5 w-5 shrink-0" /><p className="font-medium">{error}</p></div>}
 
+            {/* Header & Mentor Actions */}
             <div className="mb-8 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">{selectedClassroom.className}</h1>
@@ -197,7 +203,8 @@ export function MentorDashboard() {
                         students={selectedClassroom.enrolledStudents} 
                         sortBy={sortBy} 
                         onSortChange={setSortBy} 
-                        onExportCSV={handleExportCSV} 
+                        onExportCSV={handleExportCSV}
+                        onStudentClick={(username) => setViewingStudentUsername(username)} 
                     />
                 </TabsContent>
 
@@ -205,6 +212,13 @@ export function MentorDashboard() {
                     <ClassroomAnalytics data={analyticsData} />
                 </TabsContent>
             </Tabs>
+
+            {/* THE MODAL: Deep dive into a specific student's profile */}
+            <StudentDetailsDialog 
+                username={viewingStudentUsername} 
+                open={!!viewingStudentUsername} 
+                onOpenChange={(open) => !open && setViewingStudentUsername(null)} 
+            />
 
           </div>
         ) : (

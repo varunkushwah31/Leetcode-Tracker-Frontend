@@ -27,6 +27,8 @@ export const StudentService = {
     
     // The new Auto-Sync endpoint!
     syncProfile: (username: string) => api.post(`/students/${username}/sync`),
+
+    getExtendedProfile: (username: string) => api.post(`/students/${username}/extended/fetch`),
 };
 
 export const MentorService = {
