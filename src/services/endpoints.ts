@@ -6,7 +6,7 @@ import type {
     StudentRegisterRequest, 
     MentorRegisterRequest, 
     LearningPath
-} from '../types';
+} from '@/types';
 
 export const AuthService = {
     
@@ -51,6 +51,8 @@ export const ClassroomService = {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
     },
+
+    deleteClassroom: (classroomId: string, mentorId: string) => api.delete(`/classrooms/${classroomId}`, { params: { mentorId } }),
     
     // Download CSV 
     exportClassroom: (classroomId: string) => api.get(`/classrooms/${classroomId}/export`, { responseType: 'blob' })

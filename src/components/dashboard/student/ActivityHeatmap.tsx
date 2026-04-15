@@ -1,22 +1,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip';
 import { Target } from 'lucide-react';
-import type { ProgressRecord } from '../../../types';
+import type { ProgressRecord } from '@/types';
 
-// Moved helper functions inside this file so they don't pollute the global scope!
 const getIntensityColor = (count: number) => {
-    if (count === 0) return 'bg-slate-100';
-    if (count <= 2) return 'bg-emerald-200';
-    if (count <= 5) return 'bg-emerald-400';
-    if (count <= 8) return 'bg-emerald-600';
-    return 'bg-emerald-800';
+    if (count === 0) return 'bg-zinc-100 dark:bg-zinc-800';
+    if (count <= 2) return 'bg-emerald-200 dark:bg-emerald-900';
+    if (count <= 5) return 'bg-emerald-400 dark:bg-emerald-700';
+    if (count <= 8) return 'bg-emerald-600 dark:bg-emerald-500';
+    return 'bg-emerald-800 dark:bg-emerald-400';
 };
 
 const generateHeatmapDays = (progressHistory: ProgressRecord[]) => {
     const days = [];
     const today = new Date();
     const progressMap: Record<string, number> = {};
-    
+
     progressHistory?.forEach(record => {
         let dateKey = "";
         if (Array.isArray(record.date)) {
@@ -31,7 +30,7 @@ const generateHeatmapDays = (progressHistory: ProgressRecord[]) => {
     });
 
     for (let i = 83; i >= 0; i--) {
-        const d = new Date(); 
+        const d = new Date();
         d.setDate(today.getDate() - i);
         const localDateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         days.push({ date: localDateKey, count: progressMap[localDateKey] || 0 });
@@ -39,7 +38,6 @@ const generateHeatmapDays = (progressHistory: ProgressRecord[]) => {
     return days;
 };
 
-// Define what data this specific component needs to work
 interface ActivityHeatmapProps {
     progressHistory?: ProgressRecord[];
 }
@@ -48,12 +46,12 @@ export function ActivityHeatmap({ progressHistory = [] }: ActivityHeatmapProps) 
     const heatmapDays = generateHeatmapDays(progressHistory);
 
     return (
-        <Card className="shadow-sm border-slate-200">
+        <Card className="shadow-sm border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
+                <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white">
                     <Target className="w-5 h-5 text-emerald-500" /> Activity Heatmap
                 </CardTitle>
-                <CardDescription>Your solving activity over the last 12 weeks</CardDescription>
+                <CardDescription className="text-zinc-500 dark:text-zinc-400">Your solving activity over the last 12 weeks</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="overflow-x-auto pb-4">
@@ -62,11 +60,11 @@ export function ActivityHeatmap({ progressHistory = [] }: ActivityHeatmapProps) 
                             {heatmapDays.map((day, index) => (
                                 <Tooltip key={index}>
                                     <TooltipTrigger asChild>
-                                        <div className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count)} transition-all hover:ring-2 hover:ring-slate-400 cursor-crosshair`} />
+                                        <div className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count)} transition-all hover:ring-2 hover:ring-zinc-400 dark:hover:ring-zinc-500 cursor-crosshair`} />
                                     </TooltipTrigger>
-                                    <TooltipContent>
+                                    <TooltipContent className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-800 dark:border-zinc-200">
                                         <p className="font-medium text-sm">{day.date}</p>
-                                        <p className="text-xs text-slate-300">{day.count} {day.count === 1 ? 'problem' : 'problems'}</p>
+                                        <p className="text-xs opacity-80">{day.count} {day.count === 1 ? 'problem' : 'problems'}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             ))}

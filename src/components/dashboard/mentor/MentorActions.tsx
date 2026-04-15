@@ -4,7 +4,7 @@ import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { UserPlus, ClipboardList, Map, Plus, Trash2, UploadCloud, Loader2 } from 'lucide-react';
+import { UserPlus, ClipboardList, Map, Plus, Trash2, UploadCloud, Loader2, AlertTriangle } from 'lucide-react';
 import { ClassroomService, PathService } from '@/services/endpoints.ts';
 import type { ClassroomDashboardDTO, LearningPath, PathQuestion } from '@/types';
 import axios from 'axios';
@@ -17,10 +17,12 @@ interface MentorActionsProps {
 }
 
 export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRefresh }: MentorActionsProps) {
+    // Dialog States
     const [addStudentOpen, setAddStudentOpen] = useState(false);
     const [assignQuestionOpen, setAssignQuestionOpen] = useState(false);
     const [assignPathOpen, setAssignPathOpen] = useState(false);
     const [createPathOpen, setCreatePathOpen] = useState(false);
+    const [deleteClassOpen, setDeleteClassOpen] = useState(false); // <-- NEW
 
     // Form States
     const [newStudentUsername, setNewStudentUsername] = useState('');
@@ -32,6 +34,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const [selectedPathId, setSelectedPathId] = useState<string>('');
     const [newPath, setNewPath] = useState({ title: '', description: '' });
     const [pathQuestions, setPathQuestions] = useState<PathQuestion[]>([{ titleSlug: '', daysToComplete: 3 }]);
+    const [isDeleting, setIsDeleting] = useState(false); // <-- NEW
 
     // Handlers
     const handleAddStudent = async () => {
@@ -92,6 +95,21 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const openCreateFromAssign = () => {
         setAssignPathOpen(false);
         setCreatePathOpen(true);
+    };
+
+    // NEW: Delete Classroom Handler
+    const handleDeleteClass = async () => {
+        setIsDeleting(true);
+        try {
+            await ClassroomService.deleteClassroom(selectedClassroom.classroomId, mentorId);
+            setDeleteClassOpen(false);
+            onRefresh(); // This will auto-select a new classroom in your MentorDashboard!
+        } catch (err) {
+            console.error(err);
+            alert(axios.isAxiosError(err) ? err.response?.data?.message : 'Failed to delete classroom');
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     // Helper for input styles to fix modal visibility
@@ -237,6 +255,40 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         </div>
                     </div>
                     <DialogFooter><Button onClick={handleCreatePath} disabled={!newPath.title || !pathQuestions[0].titleSlug} className="bg-blue-600 hover:bg-blue-700 text-white border-transparent disabled:opacity-50">Save Path</Button></DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* 5. DELETE CLASSROOM DIALOG */}
+            <Dialog open={deleteClassOpen} onOpenChange={setDeleteClassOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline" className="border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20">
+                        <Trash2 className="w-4 h-4 mr-2" />Delete Class
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className={dialogContentClasses}>
+                    <DialogHeader>
+                        <DialogTitle className="text-rose-600 dark:text-rose-400 flex items-center">
+                            <AlertTriangle className="w-5 h-5 mr-2" />
+                            Delete Classroom
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <p className="text-zinc-600 dark:text-zinc-400">
+                            Are you sure you want to delete <strong>{selectedClassroom.className}</strong>?
+                        </p>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-500 mt-2">
+                            This action cannot be undone. All tracking for this specific class will be removed from your dashboard. (Students will keep their LeetCode data).
+                        </p>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" className="border-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300" onClick={() => setDeleteClassOpen(false)} disabled={isDeleting}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleDeleteClass} className="bg-rose-600 hover:bg-rose-700 text-white border-transparent" disabled={isDeleting}>
+                            {isDeleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                            Yes, Delete Class
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>

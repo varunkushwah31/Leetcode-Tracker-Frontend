@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import { ScrollArea } from '../../ui/scroll-area';
-import { Clock, CheckCircle2 } from 'lucide-react'; // Removed 'Award' since we removed the badges
+import { Clock, CheckCircle2 } from 'lucide-react';
 import type { StudentExtendedDTO } from '@/types';
 
 export function StudentRightSidebar({ data, totalSolved }: { data: StudentExtendedDTO | null, totalSolved: number }) {
@@ -17,61 +17,59 @@ export function StudentRightSidebar({ data, totalSolved }: { data: StudentExtend
     return (
         <div className="space-y-8 min-w-0">
             {/* Difficulty Breakdown */}
-            <Card className="shadow-sm border-slate-200 dark:border-slate-800 dark:bg-slate-900/50">
+            <Card className="shadow-sm border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                 <CardHeader>
-                    <CardTitle className="text-lg">Difficulty Breakdown</CardTitle>
+                    <CardTitle className="text-lg text-zinc-900 dark:text-white">Difficulty Breakdown</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                            <span className="font-bold text-slate-700 dark:text-slate-200">Easy</span>
-                            <span className="font-bold text-[#10b981]">
-                                {easyStats.count} <span className="text-slate-400 font-medium ml-1">({easyStats.beatsPercentage}% beats)</span>
+                            <span className="font-bold text-zinc-700 dark:text-zinc-300">Easy</span>
+                            <span className="font-bold text-emerald-500">
+                                {easyStats.count} <span className="text-zinc-400 dark:text-zinc-500 font-medium ml-1">({easyStats.beatsPercentage}% beats)</span>
                             </span>
                         </div>
-                        <Progress value={(easyStats.count / totalSolved) * 100} className="h-2.5 bg-emerald-100 dark:bg-emerald-500/20 [&>div]:bg-[#10b981]" />
+                        <Progress value={(easyStats.count / totalSolved) * 100} className="h-2.5 bg-emerald-100 dark:bg-emerald-950 [&>div]:bg-emerald-500" />
                     </div>
                     <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                            <span className="font-bold text-slate-700 dark:text-slate-200">Medium</span>
-                            <span className="font-bold text-[#f59e0b]">
-                                {medStats.count} <span className="text-slate-400 font-medium ml-1">({medStats.beatsPercentage}% beats)</span>
+                            <span className="font-bold text-zinc-700 dark:text-zinc-300">Medium</span>
+                            <span className="font-bold text-amber-500">
+                                {medStats.count} <span className="text-zinc-400 dark:text-zinc-500 font-medium ml-1">({medStats.beatsPercentage}% beats)</span>
                             </span>
                         </div>
-                        <Progress value={(medStats.count / totalSolved) * 100} className="h-2.5 bg-amber-100 dark:bg-amber-500/20 [&>div]:bg-[#f59e0b]" />
+                        <Progress value={(medStats.count / totalSolved) * 100} className="h-2.5 bg-amber-100 dark:bg-amber-950 [&>div]:bg-amber-500" />
                     </div>
                     <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                            <span className="font-bold text-slate-700 dark:text-slate-200">Hard</span>
-                            <span className="font-bold text-[#f43f5e]">
-                                {hardStats.count} <span className="text-slate-400 font-medium ml-1">({hardStats.beatsPercentage}% beats)</span>
+                            <span className="font-bold text-zinc-700 dark:text-zinc-300">Hard</span>
+                            <span className="font-bold text-rose-500">
+                                {hardStats.count} <span className="text-zinc-400 dark:text-zinc-500 font-medium ml-1">({hardStats.beatsPercentage}% beats)</span>
                             </span>
                         </div>
-                        <Progress value={(hardStats.count / totalSolved) * 100} className="h-2.5 bg-rose-100 dark:bg-rose-500/20 [&>div]:bg-[#f43f5e]" />
+                        <Progress value={(hardStats.count / totalSolved) * 100} className="h-2.5 bg-rose-100 dark:bg-rose-950 [&>div]:bg-rose-500" />
                     </div>
                 </CardContent>
             </Card>
 
-            {/* ---> THE DUPLICATE BADGES SECTION WAS DELETED FROM HERE <--- */}
-
             {/* Recent Submissions */}
-            <Card className="shadow-sm border-slate-200 dark:border-slate-800 dark:bg-slate-900/50">
+            <Card className="shadow-sm border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg">
+                    <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white">
                         <Clock className="w-5 h-5 text-blue-500" /> Recent Submissions
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     <ScrollArea className="h-64">
-                        <div className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                        <div className="divide-y divide-zinc-100 dark:divide-zinc-800/50">
                             {data?.recentSubmissions?.slice(0, 10).map((sub, idx) => (
-                                <a key={idx} href={sub.questionLink} target="_blank" rel="noreferrer" className="flex flex-col p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                <a key={idx} href={sub.questionLink} target="_blank" rel="noreferrer" className="flex flex-col p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex gap-3 min-w-0">
-                                            <CheckCircle2 className="w-5 h-5 text-[#10b981] shrink-0" />
-                                            <p className="text-sm font-bold text-slate-900 dark:text-slate-50 truncate">{sub.title}</p>
+                                            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                                            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">{sub.title}</p>
                                         </div>
-                                        <span className="text-xs font-medium text-slate-400 whitespace-nowrap">{formatDate(sub.timestamp)}</span>
+                                        <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500 whitespace-nowrap">{formatDate(sub.timestamp)}</span>
                                     </div>
                                 </a>
                             ))}
