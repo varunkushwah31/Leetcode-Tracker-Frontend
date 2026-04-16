@@ -5,10 +5,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { ShieldAlert, Users, BookOpen, ArrowLeft, Loader2, UserCheck, AlertTriangle, Trash2, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Users, BookOpen, ArrowLeft, Loader2, UserCheck, AlertTriangle, Trash2, RefreshCw, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { AdminService } from '@/services/endpoints';
 import type { SystemOverviewDTO, MentorDTO, ClassroomDashboardDTO } from '@/types';
 import axios from 'axios';
+
 
 export function AdminOverview({ onBack }: { onBack: () => void }) {
     const [data, setData] = useState<SystemOverviewDTO | null>(null);
@@ -19,6 +20,12 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
     const [isSyncing, setIsSyncing] = useState(false);
     const [deletingMentor, setDeletingMentor] = useState<MentorDTO | null>(null);
     const [deletingClassroom, setDeletingClassroom] = useState<ClassroomDashboardDTO | null>(null);
+    const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+    const showToast = (message: string, type: 'success' | 'error') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+    };
 
     const fetchAdminData = async () => {
         try {
@@ -41,10 +48,10 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
         setIsSyncing(true);
         try {
             const res = await AdminService.forceSyncAll();
-            alert(res.data.message); // Will say "Successfully synced X out of Y students"
-            await fetchAdminData(); // Refresh UI to get updated counts
+            showToast(res.data.message, 'success'); // Replaced alert()
+            await fetchAdminData();
         } catch (err) {
-            alert("Failed to force sync.");
+            showToast("Failed to force sync.", 'error'); // Replaced alert()
         } finally {
             setIsSyncing(false);
         }
@@ -55,8 +62,11 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
         try {
             await AdminService.deleteMentor(deletingMentor.id);
             setDeletingMentor(null);
+            showToast(`Successfully deleted mentor ${deletingMentor.name}`, 'success'); // Added Toast
             await fetchAdminData();
-        } catch (err) { alert("Failed to delete mentor."); }
+        } catch (err) {
+            showToast("Failed to delete mentor.", 'error');
+        }
     };
 
     const handleDeleteClassroom = async () => {
@@ -64,8 +74,11 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
         try {
             await AdminService.deleteClassroom(deletingClassroom.classroomId);
             setDeletingClassroom(null);
+            showToast(`Successfully deleted classroom ${deletingClassroom.className}`, 'success'); // Added Toast
             await fetchAdminData();
-        } catch (err) { alert("Failed to delete classroom."); }
+        } catch (err) {
+            showToast("Failed to delete classroom.", 'error');
+        }
     };
 
 
@@ -268,6 +281,24 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* NEW: Floating Toast Notification */}
+            {toast && (
+                <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border animate-in slide-in-from-bottom-5 fade-in duration-300 ${
+                    toast.type === 'success'
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400'
+                        : 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400'
+                }`}>
+                    {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                    <p className="text-sm font-medium">{toast.message}</p>
+                    <button
+                        onClick={() => setToast(null)}
+                        className="ml-2 opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
 
         </div>
     );
