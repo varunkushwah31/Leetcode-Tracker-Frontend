@@ -85,7 +85,7 @@ export function MentorDashboard() {
         try {
             await ClassroomService.createClassroom(user.id, newClassName);
             setCreateClassOpen(false); setNewClassName(''); await fetchDashboardData();
-        } catch (err) { alert("Failed to create class."); }
+        } catch { alert("Failed to create class."); }
     };
 
     const handleExportCSV = async () => {
@@ -96,7 +96,7 @@ export function MentorDashboard() {
             const link = document.createElement('a');
             link.href = url; link.setAttribute('download', `${selectedClassroom.className.replace(/\s+/g, '_')}_Leaderboard.csv`);
             document.body.appendChild(link); link.click(); link.remove();
-        } catch (err) { alert("Failed to export CSV."); }
+        } catch { alert("Failed to export CSV."); }
     };
 
     if (isLoading && classrooms.length === 0) return <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#09090B]"><Loader2 className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-500" /></div>;
