@@ -40,6 +40,7 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
         // Cleanup the event listener when the component unmounts
         return () => window.removeEventListener('keydown', handleEsc);
     }, [onBack]);
+
     // ------------------------------------
 
     useEffect(() => {
