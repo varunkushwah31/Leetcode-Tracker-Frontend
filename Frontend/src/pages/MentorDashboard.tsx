@@ -14,14 +14,9 @@ import { MentorActions } from '../components/dashboard/mentor/MentorActions';
 import { LeaderboardTable } from '../components/dashboard/mentor/LeaderboardTable';
 import { ClassroomAnalytics } from '../components/dashboard/mentor/ClassroomAnalytics';
 import { StudentDetailsView } from '@/components/dashboard/mentor/StudentDetailsView';
-<<<<<<< HEAD
-import { ThemeToggle } from '../components/ui/ThemeToggle';
-import {AdminOverview} from "@/pages/AdminOverview.tsx";
-import {useClassroomWebSocket} from "@/hooks/useClassroomWebSocket.ts";
-=======
+
 import { AdminOverview } from "@/pages/AdminOverview.tsx";
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
->>>>>>> 0067594839bc682cd561ad973856342b6517d808
 
 export function MentorDashboard() {
     const { user, logout } = useAuth();
