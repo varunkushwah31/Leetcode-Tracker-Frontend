@@ -1,0 +1,30 @@
+name: Daily Student Profile Sync
+
+on:
+  schedule:
+    # 9:00 AM IST is 3:30 AM UTC
+    - cron: '30 3 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync-profiles:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install axios
+        working-directory: .github/scripts
+
+      - name: Run Sync Script
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: node .github/scripts/sync_students.js
