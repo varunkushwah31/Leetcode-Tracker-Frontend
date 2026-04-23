@@ -38,6 +38,15 @@ jobs:
   test-backend:
     name: Backend Tests
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
     defaults:
       run:
         working-directory: Backend
@@ -57,6 +66,10 @@ jobs:
         run: chmod +x ./mvnw
 
       - name: Run Unit and Integration Tests
+        env:
+          SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/test_db
+          SPRING_DATA_REDIS_HOST: localhost
+          SPRING_DATA_REDIS_PORT: 6379
         run: ./mvnw clean verify -q
 
   test-failed-jobs-summary:
