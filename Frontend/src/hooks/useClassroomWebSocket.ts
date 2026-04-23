@@ -47,5 +47,6 @@ export function useClassroomWebSocket(
                 clientRef.current.deactivate();
             }
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [classroomId, onUpdateReceived]);
 }

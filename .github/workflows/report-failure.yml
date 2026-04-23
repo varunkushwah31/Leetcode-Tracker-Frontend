@@ -90,3 +90,19 @@ jobs:
 
           Tracking issue: ${{ steps.create-issue.outputs.issue_url }}
           Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ inputs.run_id }}"
+
+      - name: Link Issue to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Extract issue number from the created issue url
+          issue_number=$(basename "${{ steps.create-issue.outputs.issue_url }}")
+          
+          # Fetch the current pull request body
+          current_body=$(gh pr view ${{ inputs.pr_number }} --repo "${{ github.repository }}" --json body -q .body)
+          
+          # Append 'Resolves #ISSUE_NUMBER'
+          if [[ "$current_body" != *"Resolves #$issue_number"* ]]; then
+            new_body=$(printf "%s\n\nResolves #%s" "$current_body" "$issue_number")
+            gh pr edit ${{ inputs.pr_number }} --repo "${{ github.repository }}" --body "$new_body"
+          fi

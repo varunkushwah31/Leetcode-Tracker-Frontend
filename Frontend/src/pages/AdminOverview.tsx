@@ -50,7 +50,7 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
             const res = await AdminService.forceSyncAll();
             showToast(res.data.message, 'success'); // Replaced alert()
             await fetchAdminData();
-        } catch (_err) {
+        } catch {
             showToast("Failed to force sync.", 'error'); // Replaced alert()
         } finally {
             setIsSyncing(false);
@@ -64,7 +64,7 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
             setDeletingMentor(null);
             showToast(`Successfully deleted mentor ${deletingMentor.name}`, 'success'); // Added Toast
             await fetchAdminData();
-        } catch (_err) {
+        } catch {
             showToast("Failed to delete mentor.", 'error');
         }
     };
@@ -76,7 +76,7 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
             setDeletingClassroom(null);
             showToast(`Successfully deleted classroom ${deletingClassroom.className}`, 'success'); // Added Toast
             await fetchAdminData();
-        } catch (_err) {
+        } catch {
             showToast("Failed to delete classroom.", 'error');
         }
     };

@@ -12,7 +12,7 @@ import { PendingAssignments } from '../components/dashboard/student/PendingAssig
 import { ClassroomList } from '../components/dashboard/student/ClassroomList';
 import { BadgesList } from '../components/dashboard/student/BadgesList';
 import { StudentRightSidebar } from '../components/dashboard/student/StudentRightSidebar';
-import { ThemeToggle } from "@/components/ui/ThemeToggle.tsx";
+import { ThemeToggle } from '../components/ui/ThemeToggle';
 import {useClassroomWebSocket} from "@/hooks/useClassroomWebSocket.ts";
 
 export function StudentDashboard() {
@@ -44,7 +44,7 @@ export function StudentDashboard() {
         try {
             const response = await StudentService.syncProfile(dashboardData.leetcodeUsername);
             setDashboardData(response.data);
-        } catch (_err) { alert("Failed to sync with LeetCode."); }
+        } catch { alert("Failed to sync with LeetCode."); }
         finally { setIsSyncing(false); }
     };
 
