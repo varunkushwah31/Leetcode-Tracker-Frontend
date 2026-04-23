@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{children : React.ReactNode}> = ({children})
     },[]);
 
     // Helper function to keep our code DRY!
-    const handleAuthSuccess = (response: any) => {
+    const handleAuthSuccess = (response: { data: { accessToken: string; mentorId: string; name: string; role: string } }) => {
         const { accessToken, mentorId, name: userName, role: userRole } = response.data;
 
         localStorage.setItem('accessToken', accessToken);

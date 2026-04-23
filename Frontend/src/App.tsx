@@ -27,7 +27,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
     const { user } = useAuth();
-    const userRole = (user as any)?.role;
+    const userRole = user?.role;
 
     return (
         <Router>

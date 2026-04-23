@@ -62,6 +62,12 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Ensure ci-failure label exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create "ci-failure" --color "D73A4A" --description "Automated CI failure report" --repo "${{ github.repository }}" 2>/dev/null || true
+
       - name: Create GitHub issue
         id: create-issue
         env:

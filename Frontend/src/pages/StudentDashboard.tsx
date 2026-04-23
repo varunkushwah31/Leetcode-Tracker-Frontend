@@ -44,7 +44,7 @@ export function StudentDashboard() {
         try {
             const response = await StudentService.syncProfile(dashboardData.leetcodeUsername);
             setDashboardData(response.data);
-        } catch (err) { alert("Failed to sync with LeetCode."); }
+        } catch (_err) { alert("Failed to sync with LeetCode."); }
         finally { setIsSyncing(false); }
     };
 
