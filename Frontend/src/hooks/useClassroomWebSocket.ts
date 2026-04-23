@@ -7,14 +7,14 @@ export function useClassroomWebSocket(
     onUpdateReceived: () => void
 ) {
     const clientRef = useRef<Client | null>(null);
-
+    const VITE_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
     useEffect(() => {
         if (!classroomId) return;
 
         // 1. Configure the STOMP Client
         const client = new Client({
             // We use SockJS as the transport mechanism to match Spring Boot's config
-            webSocketFactory: () => new SockJS('http://localhost:8080/ws-endpoint'),
+            webSocketFactory: () => new SockJS(`${VITE_BASE_URL}/ws-endpoint`),
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,

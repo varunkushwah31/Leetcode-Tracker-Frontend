@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Card } from '../components/ui/card';
-import { Terminal, Activity, Target, Globe, AlertCircle, Loader2 } from 'lucide-react';
+import { Terminal, Activity, AlertCircle, Users, LayoutDashboard, Globe, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -38,9 +37,6 @@ export function AuthPage() {
         }
       }
 
-      // Because we used AuthContext to update the state, React Router's
-      // <PublicRoute> in App.tsx will automatically teleport you to the dashboard!
-      // But we include navigate here as a safe fallback.
       navigate('/dashboard');
 
     } catch (err) {
@@ -53,120 +49,214 @@ export function AuthPage() {
   };
 
   return (
-      <div className="min-h-screen flex bg-zinc-50 dark:bg-[#09090B] transition-colors duration-300">
-        {/* Left Branding Panel */}
-        <div className="hidden lg:flex lg:w-1/2 bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 p-12 flex-col justify-between relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-zinc-700 via-transparent to-transparent"></div>
-          <div className="relative z-10">
-            <div className="flex items-center space-x-2 text-white mb-8">
-              <Terminal className="h-8 w-8 text-white" />
-              <span className="text-2xl font-bold tracking-tight">LeetTracker</span>
+    <div className="h-screen overflow-hidden flex text-white font-sans selection:bg-[#5b4fff] selection:text-white">
+      
+      {/* Left Panel - Visuals & Branding */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-[#09090e] border-r border-zinc-900 flex-col justify-center p-10 xl:p-16">
+        
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
+
+        <div className="relative z-10 w-full max-w-lg mx-auto">
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
+              <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />
             </div>
-            <h1 className="text-4xl font-bold text-white mb-6 leading-tight">
-              The modern OS for <br/><span className="text-zinc-400">Coding Bootcamps.</span>
-            </h1>
-            <p className="text-zinc-400 text-lg max-w-md font-light">
-              Seamlessly track, assign, and validate your students' LeetCode progress via an automated, data-rich dashboard.
-            </p>
+            <span className="text-xl font-bold tracking-tight text-white">LeetTracker</span>
           </div>
 
-          <div className="relative z-10 grid grid-cols-2 gap-4">
-            <Card className="bg-zinc-900/40 border-zinc-800/80 backdrop-blur rounded-xl p-4 shadow-none">
-              <Activity className="h-6 w-6 text-zinc-300 mb-2" />
-              <h4 className="text-white font-medium">Live Tracking</h4>
-              <p className="text-zinc-500 text-sm mt-1">Real-time sync with LeetCode API.</p>
-            </Card>
-            <Card className="bg-zinc-900/40 border-zinc-800/80 backdrop-blur rounded-xl p-4 shadow-none">
-              <Target className="h-6 w-6 text-zinc-300 mb-2" />
-              <h4 className="text-white font-medium">Smart Assignments</h4>
-              <p className="text-zinc-500 text-sm mt-1">Automated validation & leaderboards.</p>
-            </Card>
-          </div>
-        </div>
+          <h1 className="text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight mb-4 text-white">
+            The modern OS for <br />
+            <span className="text-[#968fff]">Coding Bootcamps.</span>
+          </h1>
+          <p className="text-zinc-400 text-[16px] leading-relaxed mb-8 max-w-[420px]">
+            Track, assign, and validate your students' LeetCode progress through an automated, data-rich dashboard.
+          </p>
 
-        {/* Right Auth Panel */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative">
-          <div className="w-full max-w-md">
-            <div className="mb-8 text-center">
-              <div className="lg:hidden flex justify-center mb-6">
-                <Terminal className="h-10 w-10 text-zinc-900 dark:text-white" />
-              </div>
-              <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">
-                {isLogin ? 'Welcome Back' : 'Create an Account'}
-              </h2>
-              <p className="text-zinc-500 dark:text-zinc-400">
-                {isLogin ? 'Log in to your account to continue.' : 'Enter your details to get started.'}
-              </p>
+          {/* Feature Cards Grid */}
+          <div className="grid grid-cols-2 gap-3 xl:gap-4">
+            <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors">
+               <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+                  <Activity className="h-4 w-4 text-[#968fff]" />
+               </div>
+               <h3 className="text-white font-semibold text-[14px] mb-1 tracking-tight">Live Tracking</h3>
+               <p className="text-[13px] text-zinc-500 leading-snug pr-2">Real-time sync with LeetCode API</p>
             </div>
-
-            {!isLogin && (
-                <div className="bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg flex mb-6 border border-zinc-200 dark:border-zinc-800">
-                  <button
-                      type="button"
-                      className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${role === 'student' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm dark:border dark:border-zinc-700/50' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
-                      onClick={() => setRole('student')}
-                  >
-                    I am a Student
-                  </button>
-                  <button
-                      type="button"
-                      className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${role === 'mentor' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm dark:border dark:border-zinc-700/50' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
-                      onClick={() => setRole('mentor')}
-                  >
-                    I am a Mentor
-                  </button>
-                </div>
-            )}
-
-            <form onSubmit={handleAuth} className="space-y-4">
-              {error && (
-                  <div className="mb-4 flex items-center space-x-3 rounded-lg border border-red-200 dark:border-rose-900/50 bg-red-50 dark:bg-rose-500/10 p-3 text-sm text-red-700 dark:text-rose-400">
-                    <AlertCircle className="h-4 w-4 shrink-0" />
-                    <p>{error}</p>
-                  </div>
-              )}
-
-              {!isLogin && (
-                  <div className="space-y-1.5">
-                    <Label className="text-zinc-700 dark:text-zinc-300">Full Name</Label>
-                    <Input required placeholder="John Doe" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 focus-visible:ring-blue-500" />
-                  </div>
-              )}
-
-              <div className="space-y-1.5">
-                <Label className="text-zinc-700 dark:text-zinc-300">Email Address</Label>
-                <Input type="email" required placeholder="you@example.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 focus-visible:ring-blue-500" />
-              </div>
-
-              {!isLogin && role === 'student' && (
-                  <div className="animate-in fade-in slide-in-from-top-4 duration-300 space-y-1.5 pt-1">
-                    <Label className="text-zinc-700 dark:text-zinc-300">LeetCode Username</Label>
-                    <Input required placeholder="e.g. neetcode123" value={formData.leetcodeUsername} onChange={(e) => setFormData({...formData, leetcodeUsername: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 focus-visible:ring-blue-500" />
-                    <p className="text-xs text-zinc-500 mt-2 flex items-center">
-                      <Globe className="h-3 w-3 mr-1 inline" /> We use this to auto-sync your progress.
-                    </p>
-                  </div>
-              )}
-
-              <div className="space-y-1.5">
-                <Label className="text-zinc-700 dark:text-zinc-300">Password</Label>
-                <Input type="password" required placeholder="••••••••" minLength={6} value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 focus-visible:ring-blue-500" />
-              </div>
-
-              <Button type="submit" disabled={isLoading} className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white border-transparent">
-                {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                {isLogin ? 'Sign In' : `Register as ${role === 'student' ? 'Student' : 'Mentor'}`}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center text-sm text-zinc-500">
-              {isLogin ? "Don't have an account? " : "Already have an account? "}
-              <button type="button" onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-zinc-900 dark:text-white font-medium hover:underline">
-                {isLogin ? 'Sign up' : 'Sign in'}
-              </button>
+            <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors">
+               <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+                  <AlertCircle className="h-4 w-4 text-[#968fff]" />
+               </div>
+               <h3 className="text-white font-semibold text-[14px] mb-1 tracking-tight">Smart Assignments</h3>
+               <p className="text-[13px] text-zinc-500 leading-snug pr-2">Automated validation & scoring</p>
+            </div>
+            <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors">
+               <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+                  <Users className="h-4 w-4 text-[#968fff]" />
+               </div>
+               <h3 className="text-white font-semibold text-[14px] mb-1 tracking-tight">Leaderboards</h3>
+               <p className="text-[13px] text-zinc-500 leading-snug pr-2">Gamified cohort rankings</p>
+            </div>
+            <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors">
+               <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+                  <LayoutDashboard className="h-4 w-4 text-[#968fff]" />
+               </div>
+               <h3 className="text-white font-semibold text-[14px] mb-1 tracking-tight">Analytics</h3>
+               <p className="text-[13px] text-zinc-500 leading-snug pr-2">Progress heatmaps & reports</p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Right Panel - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#0a0a0a] overflow-hidden">
+        
+        {/* Unique dot grid texture background */}
+        <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-[size:24px_24px] opacity-60 pointer-events-none"></div>
+        
+        {/* Subtle ambient glow behind form */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-[#5b4fff] opacity-[0.06] blur-[100px] rounded-full pointer-events-none"></div>
+
+        <div className="w-full max-w-[440px] relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto">
+          
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
+            <div className="bg-[#5b4fff] p-2.5 rounded-lg">
+              <Terminal className="h-6 w-6 text-white" strokeWidth={2.5} />
+            </div>
+            <span className="text-2xl font-bold tracking-tight text-white">LeetTracker</span>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-[28px] font-bold text-white tracking-tight mb-2">
+              {isLogin ? 'Welcome back' : 'Create an account'}
+            </h2>
+            <p className="text-zinc-400 text-[15px]">
+              {isLogin ? 'Sign in to your account to continue.' : 'Fill in your details to get started.'}
+            </p>
+          </div>
+
+          {!isLogin && (
+            <div className="flex bg-[#1a1a1a] p-1.5 rounded-xl mb-6 border border-zinc-800">
+              <button
+                type="button"
+                className={`flex-1 py-2 text-[14px] font-medium rounded-lg transition-all duration-200 ${
+                  role === 'student'
+                    ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50'
+                    : 'text-zinc-500 hover:text-white'
+                }`}
+                onClick={() => setRole('student')}
+              >
+                Student
+              </button>
+              <button
+                type="button"
+                className={`flex-1 py-2 text-[14px] font-medium rounded-lg transition-all duration-200 ${
+                  role === 'mentor'
+                    ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50'
+                    : 'text-zinc-500 hover:text-white'
+                }`}
+                onClick={() => setRole('mentor')}
+              >
+                Mentor
+              </button>
+            </div>
+          )}
+
+          <form onSubmit={handleAuth} className="space-y-5">
+            {error && (
+              <div className="flex items-center space-x-3 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400 animate-in fade-in zoom-in duration-300">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <p>{error}</p>
+              </div>
+            )}
+
+            {!isLogin && (
+              <div className="space-y-1.5">
+                <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Full Name</Label>
+                <Input 
+                  required 
+                  placeholder="John Doe" 
+                  value={formData.name} 
+                  onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                  className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4" 
+                />
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Email Address</Label>
+              <Input 
+                type="email" 
+                required 
+                placeholder="you@example.com" 
+                value={formData.email} 
+                onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4" 
+              />
+            </div>
+
+            {!isLogin && role === 'student' && (
+              <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">LeetCode Username</Label>
+                <div className="relative">
+                  <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <Input 
+                    required 
+                    placeholder="neetcode123" 
+                    value={formData.leetcodeUsername} 
+                    onChange={(e) => setFormData({...formData, leetcodeUsername: e.target.value})} 
+                    className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-11 h-12 rounded-xl w-full transition-all" 
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Password</Label>
+                {isLogin && (
+                  <a href="#" className="text-xs text-[#968fff] hover:text-[#b4afff] transition-colors font-medium">
+                    Forgot password?
+                  </a>
+                )}
+              </div>
+              <Input 
+                type="password" 
+                required 
+                placeholder="••••••••" 
+                minLength={6} 
+                value={formData.password} 
+                onChange={(e) => setFormData({...formData, password: e.target.value})} 
+                className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full tracking-widest font-mono transition-all px-4" 
+              />
+            </div>
+
+            <Button 
+              type="submit" 
+              disabled={isLoading} 
+              className="w-full h-12 mt-6 bg-transparent border border-zinc-700 text-white text-[15px] font-medium hover:bg-zinc-800 rounded-xl transition-all duration-200 flex items-center justify-center hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-0.5 active:translate-y-0"
+            >
+              {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
+              {isLogin ? 'Sign In' : 'Create Account'}
+            </Button>
+          </form>
+
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <p className="text-zinc-500 text-[14px]">
+              {isLogin ? "Don't have an account?" : "Already have an account?"}
+            </p>
+            <button 
+              type="button" 
+              onClick={() => { setIsLogin(!isLogin); setError(''); }} 
+              className="border border-zinc-700 text-white rounded-lg px-4 py-1.5 text-[14px] font-medium hover:bg-zinc-800 transition-colors"
+            >
+              {isLogin ? 'Sign up' : 'Sign in'}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
   );
 }

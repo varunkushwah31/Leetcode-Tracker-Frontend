@@ -8,6 +8,12 @@
     @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 antialiased transition-colors duration-300;
   }
 }
+@layer base{
+  button:not(:disabled),
+  [role = "button"]:not(:disabled){
+    cursor: pointer;
+  }
+}
 
 @custom-variant dark (&:is(.dark *));
 

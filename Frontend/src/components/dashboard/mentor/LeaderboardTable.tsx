@@ -24,38 +24,38 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
     );
 
     return (
-        <Card className="mb-6 shadow-sm border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-            <CardHeader className="bg-zinc-50/50 dark:bg-[#09090B]/50 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+        <Card className="mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.3)] border-zinc-800/60 bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
+            <CardHeader className="bg-transparent border-b border-zinc-800/60 pb-5">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
-                        <CardTitle className="text-xl text-zinc-900 dark:text-white">Student Leaderboard</CardTitle>
-                        <CardDescription className="dark:text-zinc-400">Track and compare student progress</CardDescription>
+                        <CardTitle className="text-[22px] font-bold text-white tracking-tight">Student Leaderboard</CardTitle>
+                        <CardDescription className="text-zinc-400 text-sm mt-1">Track and compare student progress</CardDescription>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="relative">
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                             <input
                                 type="text"
                                 placeholder="Search students..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-zinc-900 dark:text-white w-full sm:w-60 transition-colors"
+                                className="bg-[#222] border-none rounded-xl py-2.5 pl-10 pr-4 text-[14px] focus:outline-none focus:ring-1 focus:ring-[#5b4fff] text-white placeholder:text-zinc-600 w-full sm:w-64 transition-all"
                             />
                         </div>
-                        <Button variant="outline" onClick={onExportCSV} className="text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                        <Button variant="outline" onClick={onExportCSV} className="text-white bg-transparent border-zinc-700 hover:bg-zinc-800 rounded-xl h-10 px-4 transition-colors">
                             <Download className="w-4 h-4 mr-2 text-zinc-400" /> Export CSV
                         </Button>
                         <div className="flex items-center gap-2">
                             <Select value={sortBy} onValueChange={onSortChange}>
-                                <SelectTrigger className="w-40 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-300">
+                                <SelectTrigger className="w-44 bg-[#222] border-none text-white h-10 rounded-xl focus:ring-1 focus:ring-[#5b4fff]">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                                    <SelectItem value="solved">Total Solved</SelectItem>
-                                    <SelectItem value="consistency">Daily Streak</SelectItem>
-                                    <SelectItem value="pending">Most Pending</SelectItem>
-                                    <SelectItem value="rating">Contest Rating</SelectItem>
-                                    <SelectItem value="name">Alphabetical</SelectItem>
+                                <SelectContent className="bg-[#1a1b2e] border-zinc-800 text-white rounded-xl shadow-xl">
+                                    <SelectItem value="solved" className="focus:bg-[#5b4fff]/20 focus:text-white">Total Solved</SelectItem>
+                                    <SelectItem value="consistency" className="focus:bg-[#5b4fff]/20 focus:text-white">Daily Streak</SelectItem>
+                                    <SelectItem value="pending" className="focus:bg-[#5b4fff]/20 focus:text-white">Most Pending</SelectItem>
+                                    <SelectItem value="rating" className="focus:bg-[#5b4fff]/20 focus:text-white">Contest Rating</SelectItem>
+                                    <SelectItem value="name" className="focus:bg-[#5b4fff]/20 focus:text-white">Alphabetical</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -65,60 +65,60 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
             <CardContent className="p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-zinc-50/80 dark:bg-zinc-900/30">
-                        <tr className="border-b border-zinc-200 dark:border-zinc-800">
-                            <th className="text-left py-3 px-6 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Rank</th>
-                            <th className="text-left py-3 px-6 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Student</th>
-                            <th className="text-center py-3 px-6 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Streak</th>
-                            <th className="text-center py-3 px-6 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Total Solved</th>
-                            <th className="text-center py-3 px-6 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Rating</th>
-                            <th className="text-right py-3 px-6 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Assignments</th>
+                        <thead className="bg-[#1a1b2e]/50 border-b border-zinc-800/60">
+                        <tr>
+                            <th className="text-left py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Rank</th>
+                            <th className="text-left py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Student</th>
+                            <th className="text-center py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Streak</th>
+                            <th className="text-center py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Total Solved</th>
+                            <th className="text-center py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Rating</th>
+                            <th className="text-right py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Assignments</th>
                         </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                        <tbody className="divide-y divide-zinc-800/60">
                         {filteredStudents?.map((student, index) => (
-                            <tr key={student.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername)}>
+                            <tr key={student.id} className="hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername)}>
                                 <td className="py-4 px-6">
                                     <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto
-                                            ${index === 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border dark:border-amber-500/20' :
-                                        index === 1 ? 'bg-zinc-200 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-300 border dark:border-zinc-500/20' :
-                                            index === 2 ? 'bg-orange-100 text-orange-800 dark:bg-orange-500/10 dark:text-orange-400 border dark:border-orange-500/20' :
-                                                'bg-zinc-100 text-zinc-600 dark:bg-zinc-800/50 dark:text-zinc-400 border border-transparent dark:border-zinc-700/50'}`}>
+                                            ${index === 0 ? 'bg-[#5b4fff]/20 text-[#b4afff] border border-[#5b4fff]/30' :
+                                        index === 1 ? 'bg-zinc-800 text-zinc-300 border border-zinc-700' :
+                                            index === 2 ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' :
+                                                'bg-[#222] text-zinc-500 border border-transparent'}`}>
                                         {index + 1}
                                     </div>
                                 </td>
                                 <td className="py-4 px-6">
-                                    <div className="flex items-center gap-3">
-                                        <Avatar className="w-10 h-10 border border-zinc-200 dark:border-zinc-700">
+                                    <div className="flex items-center gap-3.5">
+                                        <Avatar className="w-10 h-10 border border-zinc-800">
                                             <AvatarImage src={student.avatarUrl} />
-                                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-semibold">{student.name.substring(0, 2)}</AvatarFallback>
+                                            <AvatarFallback className="bg-[#1a1b2e] text-[#968fff] font-bold">{student.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <p className="font-semibold text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{student.name}</p>
-                                            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">@{student.leetcodeUsername}</p>
+                                            <p className="font-semibold text-white group-hover:text-[#b4afff] transition-colors">{student.name}</p>
+                                            <p className="text-xs text-zinc-500 font-medium tracking-wide">@{student.leetcodeUsername}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="py-4 px-6 text-center">
                                     <div className="flex items-center justify-center gap-1.5">
-                                        <Flame className={`w-4 h-4 ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500' : 'text-zinc-300 dark:text-zinc-700'}`} />
-                                        <span className={`font-bold ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-600'}`}>{student.consistencyStreak || 0}</span>
+                                        <Flame className={`w-4 h-4 ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500' : 'text-zinc-700'}`} />
+                                        <span className={`font-bold ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-400' : 'text-zinc-600'}`}>{student.consistencyStreak || 0}</span>
                                     </div>
                                 </td>
-                                <td className="py-4 px-6 text-center"><span className="font-bold text-zinc-900 dark:text-zinc-200 text-base">{student.totalSolved || 0}</span></td>
-                                <td className="py-4 px-6 text-center"><span className="font-bold text-zinc-700 dark:text-zinc-300">{Math.round(student.currentContestRating || 0).toLocaleString()}</span></td>
+                                <td className="py-4 px-6 text-center"><span className="font-bold text-zinc-200 text-base">{student.totalSolved || 0}</span></td>
+                                <td className="py-4 px-6 text-center"><span className="font-bold text-zinc-400">{Math.round(student.currentContestRating || 0).toLocaleString()}</span></td>
                                 <td className="py-4 px-6">
                                     <div className="flex flex-col items-end gap-1.5">
-                                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-500/20 px-2 py-0.5 text-[10px] uppercase">{student.completedAssignments || 0} Done</Badge>
+                                        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.completedAssignments || 0} Done</Badge>
                                         {(student.pendingAssignments ?? 0) > 0 && (
-                                            <Badge variant="outline" className="bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200/50 dark:border-rose-500/20 px-2 py-0.5 text-[10px] uppercase">{student.pendingAssignments} Pending</Badge>
+                                            <Badge variant="outline" className="bg-rose-500/10 text-rose-400 border-rose-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.pendingAssignments} Pending</Badge>
                                         )}
                                     </div>
                                 </td>
                             </tr>
                         ))}
                         {(!filteredStudents || filteredStudents.length === 0) && (
-                            <tr><td colSpan={6} className="py-12 text-center text-zinc-500 dark:text-zinc-400">No students found matching your criteria.</td></tr>
+                            <tr><td colSpan={6} className="py-16 text-center text-zinc-500 text-[15px]">No students found matching your criteria.</td></tr>
                         )}
                         </tbody>
                     </table>
