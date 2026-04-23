@@ -52,7 +52,7 @@ services:
   # 4. React Frontend
   frontend:
     build:
-      context: ../LeetcodeTrackerFrontend
+      context: ../
     container_name: leettracker-frontend
     ports:
       - "5173:80"
