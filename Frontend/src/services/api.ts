@@ -13,7 +13,7 @@ api.interceptors.request.use(
     (config) => {
         // Grab the short-lived access token from local storage
         const token = localStorage.getItem('accessToken');
-        
+
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -36,7 +36,7 @@ api.interceptors.response.use(
 
         // If the error is 401 (Unauthorized) AND we haven't already retried this request
         if (error.response?.status === 401 && !originalRequest._retry) {
-            
+
             // Mark this request so we don't get stuck in an infinite retry loop
             originalRequest._retry = true;
 
@@ -46,7 +46,7 @@ api.interceptors.response.use(
                 const refreshResponse = await axios.post(
                     `${API_BASE_URL}/v1/auth/refresh`,
                     {},
-                    { withCredentials: true } 
+                    { withCredentials: true }
                 );
 
                 // Grab the brand new access token from the response
@@ -60,18 +60,18 @@ api.interceptors.response.use(
 
                 // Retry the original request!
                 return api(originalRequest);
-                
+
             } catch (refreshError) {
                 // If the refresh fails (e.g., the 7-day cookie expired or was revoked),
                 // the session is truly dead. We must log the user out.
                 console.error('Session expired. Please log in again.');
-                
+
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('user');
-                
+
                 // Force redirect to the login page
                 window.location.href = '/login';
-                
+
                 return Promise.reject(refreshError);
             }
         }
