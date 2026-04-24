@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { AlertCircle, Info, Loader2 } from 'lucide-react';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 import { AuthService } from '../../services/endpoints';
+
 import axios from 'axios';
 
 export function RegisterForm() {
