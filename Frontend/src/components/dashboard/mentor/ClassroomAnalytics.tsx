@@ -62,8 +62,8 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
                 {/* Difficulty Breakdown */}
                 <Card className={cardClasses}>
                     <CardHeader className="pb-4 border-b border-zinc-800/60">
-                        <CardTitle className="text-lg font-bold text-white tracking-tight">Class Average by Difficulty</CardTitle>
-                        <CardDescription className="text-zinc-400">Average problems solved per student</CardDescription>
+                        <CardTitle className="text-lg font-bold text-white tracking-tight">Performance by Difficulty Level</CardTitle>
+                        <CardDescription className="text-zinc-400">Average problems solved per student across all difficulty levels</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6 pt-6">
                         <div className="space-y-2">
