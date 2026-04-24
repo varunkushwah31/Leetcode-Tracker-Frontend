@@ -85,7 +85,7 @@ export function StudentDashboard() {
     });
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B] pb-12 transition-colors duration-200">
+        <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-[#09090B] transition-colors duration-200">
 
             <header className="bg-white dark:bg-zinc-900/50 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-10 shadow-sm transition-colors duration-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
@@ -95,9 +95,6 @@ export function StudentDashboard() {
                         <span className="text-xl font-bold text-zinc-900 dark:text-white">LeetTracker</span>
                     </div>
                     <div className="flex items-center gap-4">
-                        <a href="/contact" className="hidden sm:flex text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                            Contact Us
-                        </a>
                         <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={handleSync} disabled={isSyncing}>
                             {isSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin text-zinc-500" /> : <Activity className="w-4 h-4 mr-2 text-zinc-500 dark:text-zinc-400" />}
                             <span>Sync Profile</span>
@@ -139,6 +136,13 @@ export function StudentDashboard() {
                     </div>
                 </div>
             </main>
+
+            {/* Footer with Contact Us */}
+            <footer className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-zinc-200 dark:border-zinc-800 mt-auto flex justify-center">
+                <a href="/contact" className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-[#5b4fff] transition-colors">
+                    Need Help? Contact Us
+                </a>
+            </footer>
         </div>
     );
 }
