@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'; // <-- Add useEffect here
+import { useState, useEffect } from 'react';
+import { ScrollArea } from '../../ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
-import { ScrollArea } from '../../ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
+
 import {
     ArrowLeft,
     Flame,

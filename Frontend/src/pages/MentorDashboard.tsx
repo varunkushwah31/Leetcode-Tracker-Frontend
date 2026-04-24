@@ -189,6 +189,11 @@ export function MentorDashboard() {
                         <button onClick={logout} className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300 border border-transparent hover:border-red-500/20">
                             <LogOut className="w-4 h-4 mr-2" /> Sign Out
                         </button>
+                        <div className="pt-2 mt-2 border-t border-zinc-900">
+                            <a href="/contact" className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl transition-colors text-zinc-400 hover:text-white hover:bg-zinc-900 border border-transparent">
+                                Need Help? Contact Us
+                            </a>
+                        </div>
                     </div>
                 </div>
             </aside>

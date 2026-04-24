@@ -255,6 +255,16 @@ export function AuthPage() {
             </button>
           </div>
 
+          <div className="mt-6 flex justify-center">
+            <button 
+              type="button" 
+              onClick={() => navigate('/contact')} 
+              className="text-[13px] text-zinc-500 hover:text-[#968fff] transition-colors font-medium"
+            >
+              Need Help? Contact Us
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

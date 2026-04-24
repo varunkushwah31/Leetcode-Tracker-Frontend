@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { MentorDashboard } from './pages/MentorDashboard';
 import { AuthPage } from './pages/AuthPage';
+import { LandingPage } from './pages/LandingPage';
 
 const FullPageLoader = () => (
     <div className="flex h-screen items-center justify-center bg-slate-50">
@@ -32,7 +33,7 @@ function App() {
     return (
         <Router>
             <Routes>
-
+                <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
                 <Route path="/login" element={<PublicRoute><AuthPage /></PublicRoute>} />
                 <Route path="/register" element={<PublicRoute><AuthPage /></PublicRoute>} />
 

@@ -11,8 +11,8 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
                     <div className="w-16 h-16 bg-[#1a1b2e] rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                         <Activity className="w-8 h-8 text-[#968fff]" />
                     </div>
-                    <p className="text-white text-lg font-bold tracking-tight mb-2">Not enough data to generate analytics.</p>
-                    <p className="text-zinc-400 text-sm">Add students to see class performance insights.</p>
+                    <p className="text-white text-lg font-bold tracking-tight mb-2">No data available to generate analytics.</p>
+                    <p className="text-zinc-400 text-sm">Add students to view class performance insights.</p>
                 </CardContent>
             </Card>
         );
@@ -62,8 +62,8 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
                 {/* Difficulty Breakdown */}
                 <Card className={cardClasses}>
                     <CardHeader className="pb-4 border-b border-zinc-800/60">
-                        <CardTitle className="text-lg font-bold text-white tracking-tight">Class Average by Difficulty</CardTitle>
-                        <CardDescription className="text-zinc-400">Average problems solved per student</CardDescription>
+                        <CardTitle className="text-lg font-bold text-white tracking-tight">Performance by Difficulty Level</CardTitle>
+                        <CardDescription className="text-zinc-400">Average problems solved per student across all difficulty levels</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6 pt-6">
                         <div className="space-y-2">
