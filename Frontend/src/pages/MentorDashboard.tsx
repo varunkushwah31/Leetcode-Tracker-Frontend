@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
-import { LogOut, Plus, Terminal, BookOpen, Loader2, AlertCircle, ShieldAlert, Badge } from 'lucide-react';
+import { LogOut, Plus, Terminal, BookOpen, Loader2, AlertCircle, ShieldAlert, Badge, RefreshCw } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { useAuth } from '../context/AuthContext';
-import { MentorService, ClassroomService, PathService } from '../services/endpoints';
+import { MentorService, ClassroomService, PathService, StudentService } from '../services/endpoints';
 import type { ClassroomDashboardDTO, LearningPath, ClassroomAnalyticsDTO } from '@/types';
 
 import { MentorActions } from '../components/dashboard/mentor/MentorActions';
 import { LeaderboardTable } from '../components/dashboard/mentor/LeaderboardTable';
 import { ClassroomAnalytics } from '../components/dashboard/mentor/ClassroomAnalytics';
 import { StudentDetailsView } from '@/components/dashboard/mentor/StudentDetailsView';
-
 import { AdminOverview } from "@/pages/AdminOverview.tsx";
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 
@@ -36,6 +35,9 @@ export function MentorDashboard() {
     const [newClassName, setNewClassName] = useState('');
     const [viewingStudentUsername, setViewingStudentUsername] = useState<string | null>(null);
     const [showAdminOverview, setShowAdminOverview] = useState(false); // Admin Toggle
+
+    // --- NEW: Sync State ---
+    const [isClassroomSyncing, setIsClassroomSyncing] = useState(false);
 
     // When a ping is received, it calls fetchDashboardData to silently update the UI.
     useClassroomWebSocket(selectedClassroom?.classroomId, () => {
@@ -76,7 +78,6 @@ export function MentorDashboard() {
         } finally { setIsLoading(false); }
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { void fetchDashboardData(); }, [sortBy, user?.id]);
 
     useEffect(() => {
@@ -92,7 +93,7 @@ export function MentorDashboard() {
         try {
             await ClassroomService.createClassroom(user.id, newClassName);
             setCreateClassOpen(false); setNewClassName(''); await fetchDashboardData();
-        } catch { alert("Failed to create class."); }
+        } catch (err) { alert("Failed to create class."); }
     };
 
     const handleExportCSV = async () => {
@@ -103,8 +104,46 @@ export function MentorDashboard() {
             const link = document.createElement('a');
             link.href = url; link.setAttribute('download', `${selectedClassroom.className.replace(/\s+/g, '_')}_Leaderboard.csv`);
             document.body.appendChild(link); link.click(); link.remove();
-        } catch { alert("Failed to export CSV."); }
+        } catch (err) { alert("Failed to export CSV."); }
     };
+
+    // --- NEW: Handle Classroom Sync ---
+    const handleSyncClassroom = async () => {
+        if (!selectedClassroom || !selectedClassroom.enrolledStudents || selectedClassroom.enrolledStudents.length === 0) {
+            alert("No students in this classroom to sync.");
+            return;
+        }
+
+        setIsClassroomSyncing(true);
+        try {
+            const students = selectedClassroom.enrolledStudents;
+            const batchSize = 3; // Process 3 students at a time to stay under the 15/10s limit
+
+            // Send requests in staggered batches so we don't trip Resilience4j!
+            for (let i = 0; i < students.length; i += batchSize) {
+                const batch = students.slice(i, i + batchSize);
+
+                await Promise.allSettled(
+                    batch.map(student => StudentService.syncProfile(student.leetcodeUsername))
+                );
+
+                // Add a small 2-second delay between batches
+                if (i + batchSize < students.length) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+
+            // Fetch the freshly cleared dashboard from the backend
+            await fetchDashboardData();
+
+        } catch (err) {
+            console.error("Failed to sync classroom", err);
+            alert("An error occurred while syncing the classroom.");
+        } finally {
+            setIsClassroomSyncing(false);
+        }
+    };
+
 
     if (isLoading && classrooms.length === 0) return <div className="flex h-screen items-center justify-center bg-[#09090e]"><Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" /></div>;
 
@@ -113,8 +152,8 @@ export function MentorDashboard() {
             {/* Sidebar */}
             <aside className="w-72 relative bg-[#09090e] border-r border-zinc-900 flex flex-col z-20">
                 {/* Subtle grid pattern for sidebar */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
-                
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
+
                 <div className="relative z-10 flex flex-col h-full w-full">
                     <div className="p-6 border-b border-zinc-900">
                         <div className="flex items-center gap-3 mb-6">
@@ -189,11 +228,6 @@ export function MentorDashboard() {
                         <button onClick={logout} className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300 border border-transparent hover:border-red-500/20">
                             <LogOut className="w-4 h-4 mr-2" /> Sign Out
                         </button>
-                        <div className="pt-2 mt-2 border-t border-zinc-900">
-                            <a href="/contact" className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl transition-colors text-zinc-400 hover:text-white hover:bg-zinc-900 border border-transparent">
-                                Need Help? Contact Us
-                            </a>
-                        </div>
                     </div>
                 </div>
             </aside>
@@ -201,10 +235,10 @@ export function MentorDashboard() {
             {/* Main Content */}
             <main className="flex-1 overflow-auto relative bg-[#0a0a0a]">
                 {/* Unique dot grid texture background */}
-                <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-[size:24px_24px] opacity-40 pointer-events-none fixed"></div>
-                
+                <div className="inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-40 pointer-events-none fixed"></div>
+
                 {/* Subtle ambient glow behind content */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#5b4fff] opacity-[0.05] blur-[120px] rounded-full pointer-events-none fixed"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-100 bg-[#5b4fff] opacity-[0.05] blur-[120px] rounded-full pointer-events-none"></div>
 
                 <div className="relative z-10 h-full">
                     {showAdminOverview ? (
@@ -221,7 +255,20 @@ export function MentorDashboard() {
                                     <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">{selectedClassroom.className}</h1>
                                     <p className="text-[15px] text-zinc-400 flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
                                 </div>
-                                <MentorActions mentorId={user!.id!} selectedClassroom={selectedClassroom} learningPaths={learningPaths} onRefresh={fetchDashboardData} />
+                                <div className="flex items-center gap-3">
+                                    {/* --- NEW: Force Sync Button --- */}
+                                    <Button
+                                        onClick={handleSyncClassroom}
+                                        disabled={isClassroomSyncing}
+                                        variant="outline"
+                                        className="bg-transparent border-zinc-700 text-white hover:bg-zinc-800 rounded-xl"
+                                    >
+                                        {isClassroomSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2 text-zinc-400" />}
+                                        {isClassroomSyncing ? 'Syncing Class...' : 'Sync Class Data'}
+                                    </Button>
+
+                                    <MentorActions mentorId={user!.id!} selectedClassroom={selectedClassroom} learningPaths={learningPaths} onRefresh={fetchDashboardData} />
+                                </div>
                             </div>
 
                             <div className="flex bg-[#111111]/85 backdrop-blur-2xl p-1.5 rounded-xl w-max mb-8 border border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
