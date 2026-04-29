@@ -95,7 +95,7 @@ export function StudentDashboard() {
                          <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
                             <Terminal className="w-5 h-5 text-white" strokeWidth={2.5} />
                         </div>
-                        <span className="text-xl font-bold text-zinc-900 dark:text-white">LeetTracker</span>
+                        <span className="text-xl font-bold text-zinc-900 dark:text-white">MentorSync</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={handleSync} disabled={isSyncing}>

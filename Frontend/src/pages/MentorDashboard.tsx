@@ -171,7 +171,7 @@ export function MentorDashboard() {
                             <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
                                 <Terminal className="w-5 h-5 text-white" strokeWidth={2.5} />
                             </div>
-                            <span className="text-xl font-bold tracking-tight text-white">LeetTracker</span>
+                            <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
                         </div>
 
                         <Dialog open={createClassOpen} onOpenChange={setCreateClassOpen}>
