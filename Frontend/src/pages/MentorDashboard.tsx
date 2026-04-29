@@ -56,13 +56,22 @@ export function MentorDashboard() {
             setLearningPaths(pathsRes.data);
 
             const classroomIds = profileRes.data.classroomIds || [];
-            const dashboardResponses = await Promise.all(classroomIds.map((id: string) => ClassroomService.getDashboard(id, sortBy)));
-            const fetchedClassrooms = dashboardResponses.map(res => res.data);
-            setClassrooms(fetchedClassrooms);
 
+            // Fetch all classrooms fresh from the backend (which just cleared its cache!)
+            const dashboardResponses = await Promise.all(
+                classroomIds.map((id: string) => ClassroomService.getDashboard(id, sortBy))
+            );
+
+            const fetchedClassrooms = dashboardResponses.map(res => res.data);
+
+            // Force React to recognize this as a brand-new array to update the sidebar badges
+            setClassrooms([...fetchedClassrooms]);
+
+            // Update the currently viewed classroom with the fresh data
             if (selectedClassroom) {
                 const updated = fetchedClassrooms.find(c => c.classroomId === selectedClassroom.classroomId);
                 setSelectedClassroom(updated || fetchedClassrooms[0] || null);
+
                 if (updated) {
                     const analyticsRes = await ClassroomService.getAnalytics(updated.classroomId);
                     setAnalyticsData(analyticsRes.data);
@@ -73,9 +82,11 @@ export function MentorDashboard() {
                 setAnalyticsData(analyticsRes.data);
             }
         } catch (err) {
-            console.log(err);
+            console.error("Failed to load mentor dashboard.", err);
             setError('Failed to load mentor dashboard.');
-        } finally { setIsLoading(false); }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => { void fetchDashboardData(); }, [sortBy, user?.id]);
