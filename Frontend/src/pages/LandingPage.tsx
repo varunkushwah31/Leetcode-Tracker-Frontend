@@ -22,7 +22,7 @@ export function LandingPage() {
                     <div className="bg-[#5b4fff] p-2.5 rounded-xl flex items-center justify-center shadow-lg">
                         <Terminal className="h-5 w-5 sm:h-6 sm:w-6 text-white" strokeWidth={2.5} />
                     </div>
-                    <span className="text-xl font-bold tracking-tight text-white hidden sm:block">LeetTracker</span>
+                    <span className="text-xl font-bold tracking-tight text-white hidden sm:block">MentorSync</span>
                 </div>
                 <nav className="flex items-center gap-4 sm:gap-6">
                     <Link to="/login" className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]">Sign In</Link>

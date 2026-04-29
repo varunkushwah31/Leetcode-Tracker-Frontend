@@ -28,7 +28,7 @@ export function ContactPage() {
       {/* Left Panel - Visuals & Info */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-[#09090e] border-r border-zinc-900 flex-col justify-center p-10 xl:p-16">
         {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
 
         <div className="relative z-10 w-full max-w-lg mx-auto">
           {/* Logo & Back button */}
@@ -37,7 +37,7 @@ export function ContactPage() {
               <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
                 <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white">LeetTracker</span>
+              <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
             </div>
             <button 
               onClick={() => navigate(-1)}
@@ -52,8 +52,8 @@ export function ContactPage() {
             Let's build something <br />
             <span className="text-[#968fff]">extraordinary.</span>
           </h1>
-          <p className="text-zinc-400 text-[16px] leading-relaxed mb-12 max-w-[420px]">
-            Have questions about LeetTracker, want to request a feature, or need support? We're here to help you elevate your coding bootcamp.
+          <p className="text-zinc-400 text-[16px] leading-relaxed mb-12 max-w-105">
+            Have questions about MentorSync, want to request a feature, or need support? We're here to help you elevate your coding bootcamp.
           </p>
 
           {/* Contact Details Cards */}
@@ -64,7 +64,7 @@ export function ContactPage() {
                </div>
                <div>
                  <h3 className="text-white font-semibold text-[14px] mb-0.5 tracking-tight">Email Us</h3>
-                 <p className="text-[13px] text-zinc-500 leading-snug">hello@leettracker.app</p>
+                 <p className="text-[13px] text-zinc-500 leading-snug">hello@mentorsync.app</p>
                </div>
             </div>
             <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors flex items-center gap-4">
@@ -93,12 +93,12 @@ export function ContactPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#0a0a0a] overflow-hidden">
         
         {/* Unique dot grid texture background */}
-        <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-[size:24px_24px] opacity-60 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-60 pointer-events-none"></div>
         
         {/* Subtle ambient glow behind form */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-[#5b4fff] opacity-[0.06] blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-112.5 h-112.5 bg-[#5b4fff] opacity-[0.06] blur-[100px] rounded-full pointer-events-none"></div>
 
-        <div className="w-full max-w-[480px] relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div className="w-full max-w-120 relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
           
           {/* Mobile Logo & Back */}
           <div className="lg:hidden flex items-center justify-between mb-8">
@@ -106,7 +106,7 @@ export function ContactPage() {
               <div className="bg-[#5b4fff] p-2 rounded-lg">
                 <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white">LeetTracker</span>
+              <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
             </div>
             <button 
               onClick={() => navigate(-1)}
@@ -132,7 +132,7 @@ export function ContactPage() {
                  <Send className="w-8 h-8 ml-1" />
                </div>
                <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-               <p className="text-zinc-400 mb-8 max-w-[280px]">
+               <p className="text-zinc-400 mb-8 max-w-70">
                  Thank you for reaching out. We've received your message and will respond shortly.
                </p>
                <Button 
@@ -186,7 +186,7 @@ export function ContactPage() {
                   placeholder="Tell us more about your inquiry..." 
                   value={formData.message} 
                   onChange={(e) => setFormData({...formData, message: e.target.value})} 
-                  className="flex min-h-[140px] w-full rounded-xl bg-[#222] px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5b4fff] disabled:cursor-not-allowed disabled:opacity-50 border-none transition-all resize-y custom-scrollbar" 
+                  className="flex min-h-35 w-full rounded-xl bg-[#222] px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5b4fff] disabled:cursor-not-allowed disabled:opacity-50 border-none transition-all resize-y custom-scrollbar"
                 />
               </div>
 

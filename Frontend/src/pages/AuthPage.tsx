@@ -55,7 +55,7 @@ export function AuthPage() {
       <div className="hidden lg:flex lg:w-1/2 relative bg-[#09090e] border-r border-zinc-900 flex-col justify-center p-10 xl:p-16">
         
         {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
 
         <div className="relative z-10 w-full max-w-lg mx-auto">
           {/* Logo */}
@@ -63,14 +63,14 @@ export function AuthPage() {
             <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
               <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white">LeetTracker</span>
+            <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
           </div>
 
           <h1 className="text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight mb-4 text-white">
             The modern OS for <br />
             <span className="text-[#968fff]">Coding Bootcamps.</span>
           </h1>
-          <p className="text-zinc-400 text-[16px] leading-relaxed mb-8 max-w-[420px]">
+          <p className="text-zinc-400 text-[16px] leading-relaxed mb-8 max-w-105">
             Track, assign, and validate your students' LeetCode progress through an automated, data-rich dashboard.
           </p>
 
@@ -112,19 +112,19 @@ export function AuthPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#0a0a0a] overflow-hidden">
         
         {/* Unique dot grid texture background */}
-        <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-[size:24px_24px] opacity-60 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-60 pointer-events-none"></div>
         
         {/* Subtle ambient glow behind form */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-[#5b4fff] opacity-[0.06] blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-112.5 h-112.5 bg-[#5b4fff] opacity-[0.06] blur-[100px] rounded-full pointer-events-none"></div>
 
-        <div className="w-full max-w-[440px] relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto">
+        <div className="w-full max-w-110 relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto">
           
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
             <div className="bg-[#5b4fff] p-2.5 rounded-lg">
               <Terminal className="h-6 w-6 text-white" strokeWidth={2.5} />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white">LeetTracker</span>
+            <span className="text-2xl font-bold tracking-tight text-white">MentorSync</span>
           </div>
 
           <div className="mb-8">
