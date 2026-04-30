@@ -5,6 +5,7 @@ import { Terminal, Activity, Users, LayoutDashboard, ChevronRight, CheckCircle, 
 export function LandingPage() {
     const [activeTab, setActiveTab] = useState<'mentor' | 'student'>('student');
 
+
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative">
 

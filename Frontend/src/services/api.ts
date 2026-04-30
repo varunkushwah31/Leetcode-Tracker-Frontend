@@ -24,8 +24,7 @@ api.interceptors.request.use(
     }
 );
 
-
-// 2. RESPONSE INTERCEPTOR (Handles 401 errors and Token Rotation)
+// 2. RESPONSE INTERCEPTOR (Handles Token Rotation & Global Error Formatting)
 api.interceptors.response.use(
     (response) => {
         // If the request succeeds, just return the response
@@ -34,52 +33,66 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // If the error is 401 (Unauthorized) AND we haven't already retried this request
+        // --- PART A: Token Rotation Logic ---
         if (error.response?.status === 401 && !originalRequest._retry) {
-
-            // Mark this request so we don't get stuck in an infinite retry loop
             originalRequest._retry = true;
 
             try {
                 // Silently request a new token from the backend
-                // Notice we use a raw axios call here, not our 'api' instance, to avoid interceptor loops
                 const refreshResponse = await axios.post(
                     `${API_BASE_URL}/v1/auth/refresh`,
                     {},
                     { withCredentials: true }
                 );
 
-                // Grab the brand new access token from the response
                 const newAccessToken = refreshResponse.data.accessToken;
-
-                // Save it to local storage
                 localStorage.setItem('accessToken', newAccessToken);
-
-                // Update the original failed request with the new token
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-                // Retry the original request!
+                // Retry the original request
                 return api(originalRequest);
 
-            } catch (refreshError) {
-                // If the refresh fails (e.g., the 7-day cookie expired or was revoked),
-                // the session is truly dead. We must log the user out.
+            } catch (refreshError: any) {
                 console.error('Session expired. Please log in again.');
-
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('user');
-
-                // Force redirect to the login page
                 window.location.href = '/login';
 
-                return Promise.reject(refreshError);
+                // Format the refresh error if the backend sent a specific message
+                let refreshErrMsg = "Session expired. Please log in again.";
+                if (refreshError.response?.data?.message) {
+                    refreshErrMsg = refreshError.response.data.message;
+                }
+                return Promise.reject(new Error(refreshErrMsg));
             }
         }
 
-        // If it's any other error (400, 404, 500), just pass it down to the component
-        return Promise.reject(error);
+        // --- PART B: Global Error Formatting (For all other errors) ---
+        let specificErrorMessage = "Unable to connect to the server. Please check your internet connection.";
+
+        if (error.response) {
+            // The request reached the backend, and it responded with an error status
+            // Extract our custom Spring Boot ApiErrorResponse payload
+            const backendData = error.response.data;
+
+            if (backendData && backendData.message) {
+                // This grabs the exact message from your GlobalExceptionHandler!
+                specificErrorMessage = backendData.message;
+            } else if (typeof backendData === 'string' && backendData !== '') {
+                // Fallback just in case the backend sends a plain text string instead of JSON
+                specificErrorMessage = backendData;
+            } else {
+                // Fallback for generic server errors
+                specificErrorMessage = `Server Error (${error.response.status}): ${error.response.statusText}`;
+            }
+        } else if (error.request) {
+            // The request was made but no response was received (Backend is down/offline)
+            specificErrorMessage = "The backend server is not responding. Please ensure it is running.";
+        }
+
+        // Reject the promise with a standard Error object containing our highly specific message
+        return Promise.reject(new Error(specificErrorMessage));
     }
 );
-
 
 export default api;
