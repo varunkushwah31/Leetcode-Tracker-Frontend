@@ -1,5 +1,5 @@
-import { createContext, useEffect, useState, useContext } from "react";
-import type { LoginRequest, MentorRegisterRequest, StudentRegisterRequest } from "../types";
+import React, { createContext, useEffect, useState, useContext } from "react";
+import type { LoginRequest, MentorRegisterRequest, StudentRegisterRequest } from "@/types";
 import { AuthService } from "../services/endpoints";
 
 interface User {

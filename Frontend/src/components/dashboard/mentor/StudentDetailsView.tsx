@@ -4,21 +4,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
-
 import {
-    ArrowLeft,
-    Flame,
-    CheckCircle2,
-    ExternalLink,
-    Loader2,
-    BrainCircuit,
-    Clock,
-    Award,
-    Activity
+    ArrowLeft, Flame, CheckCircle2, ExternalLink, Loader2, BrainCircuit, Clock, Award, Activity
 } from 'lucide-react';
 import { StudentService } from '@/services/endpoints';
 import type { StudentExtendedDTO } from '@/types';
 import { ActivityHeatmap } from '../student/ActivityHeatmap';
+import {ErrorBanner} from "@/components/ui/ErrorBanner.tsx"; // <-- 1. Import the Banner
 
 interface StudentDetailsViewProps {
     username: string;
@@ -28,30 +20,25 @@ interface StudentDetailsViewProps {
 export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps) {
     const [data, setData] = useState<StudentExtendedDTO | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null); // <-- 2. Add Error State
 
-    // --- NEW: Add Escape Key Listener ---
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                onBack();
-            }
+            if (event.key === 'Escape') onBack();
         };
         window.addEventListener('keydown', handleEsc);
-
-        // Cleanup the event listener when the component unmounts
         return () => window.removeEventListener('keydown', handleEsc);
     }, [onBack]);
-
-    // -----------------------------------
 
     useEffect(() => {
         const fetchStudentProfile = async () => {
             setLoading(true);
+            setError(null); // Clear errors before fetching
             try {
                 const res = await StudentService.getExtendedProfile(username);
                 setData(res.data);
-            } catch (err) {
-                console.error("Failed to fetch student details", err);
+            } catch (err: any) {
+                setError(err.message); // Set specific error from API
             } finally {
                 setLoading(false);
             }
@@ -82,6 +69,24 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
         );
     }
 
+    // --- 3. Handle the Error State gracefully ---
+    if (error) {
+        return (
+            <div className="fixed inset-0 z-50 bg-[#0a0a0a] flex items-center justify-center p-6 animate-in fade-in duration-300">
+                <div className="max-w-md w-full bg-[#111111] border border-zinc-800 rounded-2xl p-6 shadow-2xl">
+                    <h2 className="text-xl font-bold text-white mb-4 text-center">Profile Sync Failed</h2>
+                    <ErrorBanner message={error} />
+                    <Button
+                        onClick={onBack}
+                        className="w-full mt-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl"
+                    >
+                        Return to Dashboard
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     if (!data) return null;
 
     const cardClasses = "border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
@@ -90,11 +95,9 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
         <div className="fixed inset-0 z-50 bg-[#0a0a0a] flex flex-col overflow-y-auto animate-in fade-in duration-300">
             {/* Unique dot grid texture background */}
             <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-40 pointer-events-none"></div>
-
             {/* Subtle ambient glow behind content */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-100 bg-[#5b4fff] opacity-[0.05] blur-[120px] rounded-full pointer-events-none"></div>
 
-            {/* --- UPDATED HEADER: More prominent Back Button --- */}
             <header className="sticky top-0 z-50 bg-[#111111]/90 backdrop-blur-xl border-b border-zinc-800/60 px-4 md:px-8 py-4 flex items-center justify-between shadow-lg">
                 <div className="flex items-center gap-4 ml-75">
                     <Button

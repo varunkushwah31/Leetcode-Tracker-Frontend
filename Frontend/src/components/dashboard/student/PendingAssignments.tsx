@@ -31,9 +31,9 @@ export function PendingAssignments({ assignments, isSyncing, onSync, selectedCla
  </div>
  <div className="flex gap-2">
  {selectedClassroomId && (
- <Button onClick={onClearFilter} variant="ghost"className="text-zinc-400 hover:text-white">Clear Filter</Button>
+ <Button onClick={onClearFilter} variant="ghost" className="text-zinc-400 hover:text-white">Clear Filter</Button>
  )}
- <Button onClick={onSync} disabled={isSyncing} variant="outline"className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all">
+ <Button onClick={onSync} disabled={isSyncing} variant="outline" className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all">
  <RefreshCw className={`w-4 h-4 mr-2 text-[#968fff] ${isSyncing ? 'animate-spin' : ''}`} />
  {isSyncing ? 'Syncing...' : 'Auto-Sync'}
  </Button>
@@ -46,7 +46,7 @@ export function PendingAssignments({ assignments, isSyncing, onSync, selectedCla
  return (
  <div key={idx} className="p-6 hover:bg-zinc-800/30 transition-colors flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
  <div>
- <Badge variant="outline"className="bg-[#1a1a1a] text-zinc-400 border-zinc-700 mb-2 uppercase tracking-wider text-[10px] font-bold">
+ <Badge variant="outline" className="bg-[#1a1a1a] text-zinc-400 border-zinc-700 mb-2 uppercase tracking-wider text-[10px] font-bold">
  {item.className}
  </Badge>
  <h4 className="text-lg font-bold text-white tracking-tight">{item.assignment.titleSlug}</h4>
@@ -55,8 +55,8 @@ export function PendingAssignments({ assignments, isSyncing, onSync, selectedCla
  <span className={`font-medium ${dueInfo.color}`}>{dueInfo.text}</span>
  </div>
  </div>
- <Button asChild className="bg-transparent border border-zinc-700 hover:bg-zinc-800 text-[14px] text-white border-transparent">
- <a href={item.assignment.questionLink} target="_blank"rel="noopener noreferrer">
+ <Button asChild className="bg-transparent border border-zinc-700 hover:bg-zinc-800 text-[14px] text-white">
+ <a href={item.assignment.questionLink} target="_blank" rel="noopener noreferrer">
  Solve <ExternalLink className="w-4 h-4 ml-2"/>
  </a>
  </Button>

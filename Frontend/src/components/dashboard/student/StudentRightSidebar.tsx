@@ -60,10 +60,10 @@ export function StudentRightSidebar({ data, totalSolved }: { data: StudentExtend
  </CardTitle>
  </CardHeader>
  <CardContent className="p-4 pt-0">
- <ScrollArea className="h-[280px] pr-4">
+ <ScrollArea className="h-70 pr-4">
  <div className="flex flex-col gap-2.5">
  {data?.recentSubmissions?.slice(0, 10).map((sub, idx) => (
- <a key={idx} href={sub.questionLink} target="_blank"rel="noreferrer"className="flex items-center justify-between p-3 bg-[#1a1a1a]/40 hover:bg-[#1a1a1a] border border-zinc-800/50 hover:border-zinc-700 rounded-xl transition-all group">
+ <a key={idx} href={sub.questionLink} target="_blank" rel="noreferrer" className="flex items-center justify-between p-3 bg-[#1a1a1a]/40 hover:bg-[#1a1a1a] border border-zinc-800/50 hover:border-zinc-700 rounded-xl transition-all group">
  <div className="flex items-center gap-3 min-w-0">
  <div className="bg-[#1a1b2e] p-1.5 rounded-lg group-hover:bg-[#5b4fff] transition-colors">
  <CheckCircle2 className="w-4 h-4 text-[#968fff] group-hover:text-white"/>
