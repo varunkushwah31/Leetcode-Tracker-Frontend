@@ -1,19 +1,25 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, Activity, Users, LayoutDashboard, ChevronRight, CheckCircle, Sparkles, Target, Award, Code2Icon,  } from 'lucide-react';
+import { Terminal, Activity, Users, LayoutDashboard, ChevronRight, CheckCircle, Sparkles, Target, Award, Code2Icon } from 'lucide-react';
 
 export function LandingPage() {
     const [activeTab, setActiveTab] = useState<'mentor' | 'student'>('student');
 
+    // 1. Create a custom scroll handler
+    const scrollToFeatures = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        const featuresSection = document.getElementById('features');
+        if (featuresSection) {
+            featuresSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative">
 
             {/* Background Base */}
             <div className="fixed inset-0 z-0 bg-[#050505]">
-                {/* Unique dot grid texture background */}
                 <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-size-[24px_24px] opacity-[0.03] pointer-events-none"></div>
-                {/* Elegant Vercel-like Top Glow */}
                 <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-300 h-150 bg-linear-to-b from-[#5b4fff]/20 via-[#5b4fff]/5 to-transparent blur-[100px] rounded-full pointer-events-none"></div>
             </div>
 
@@ -54,17 +60,22 @@ export function LandingPage() {
                         <Link to="/login" className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_30px_rgba(91,79,255,0.3)] text-white text-[15px] font-medium px-8 py-4 rounded-xl transition-all hover:-translate-y-1 flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]">
                             Start for Free <ChevronRight className="w-4 h-4" />
                         </Link>
-                        <a href="#features" className="w-full sm:w-auto bg-[#0a0a0a] border border-white/8 text-white text-[15px] font-medium px-8 py-4 hover:bg-[#111111] hover:border-white/15 shadow-lg rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]">
+
+                        {/* 2. Apply the custom onClick handler here */}
+                        <a
+                            href="#features"
+                            onClick={scrollToFeatures}
+                            className="w-full sm:w-auto bg-[#0a0a0a] border border-white/8 text-white text-[15px] font-medium px-8 py-4 hover:bg-[#111111] hover:border-white/15 shadow-lg rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]"
+                        >
                             Explore Features
                         </a>
                     </div>
                 </div>
 
-                {/* Divider Line */}
                 <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-800 to-transparent mb-16 sm:mb-24"></div>
 
                 {/* Two-Sided Ecosystem Tabs Section */}
-                <section className="w-full  relative z-10 scroll-mt-32">
+                <section className="w-full relative z-10 scroll-mt-32">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl sm:text-5xl font-bold tracking-tight mb-4 text-balance">Built for Both Sides</h2>
                         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">A unified ecosystem where administrators track with ease and students thrive.</p>
@@ -85,7 +96,6 @@ export function LandingPage() {
                         </button>
                     </div>
 
-                    {/* Tab Content Block */}
                     <div className="max-w-5xl mx-auto bg-[#0a0a0a]/80 backdrop-blur-3xl border border-white/5 rounded-3xl p-6 sm:p-12 min-h-95 shadow-2xl overflow-hidden relative group/tab">
                         <div className="absolute inset-0 bg-linear-to-b from-white/2 to-transparent pointer-events-none"></div>
                         {activeTab === 'mentor' ? (
@@ -170,11 +180,10 @@ export function LandingPage() {
                     </div>
                 </section>
 
-                {/* Divider Line */}
                 <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-800 to-transparent my-24 sm:my-24  "></div>
 
-                {/* Bento Grid Features */}
-                <section id="features" className="w-full  scroll-mt-32 relative z-10">
+                {/* 3. Ensure this ID matches the href! */}
+                <section id="features" className="w-full scroll-mt-32 relative z-10">
                     <div className="text-center mb-12 sm:mb-16">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-800 bg-[#111111]/80 backdrop-blur-md mb-6">
                             <Sparkles className="w-4 h-4 text-[#5b4fff]" />
@@ -185,15 +194,12 @@ export function LandingPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:auto-rows-[340px]">
-
-                        {/* Large Card 1 */}
                         <div className="md:col-span-2 bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-end relative overflow-hidden group hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="absolute top-0 right-0 p-8 sm:p-10">
                                 <div className="bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
                                     <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#968fff]" strokeWidth={2} />
                                 </div>
                             </div>
-                            {/* Abstract Ambient Blob */}
                             <div className="absolute top-[10%] right-[10%] w-50 h-50 bg-[#5b4fff]/20 blur-[90px] rounded-full pointer-events-none"></div>
 
                             <div className="relative z-10 w-full md:max-w-[70%]">
@@ -204,7 +210,6 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Small Card 1 */}
                         <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
                                 <CheckCircle className="h-7 w-7 text-[#968fff]" strokeWidth={2} />
@@ -215,7 +220,6 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Small Card 2 */}
                         <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
                                 <LayoutDashboard className="h-7 w-7 text-[#968fff]" strokeWidth={2} />
@@ -226,11 +230,8 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Large Card 2 */}
                         <div className="md:col-span-2 bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between relative overflow-hidden group hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
-
                             <div className="flex items-end gap-2 sm:gap-3 mb-8 sm:mb-12 relative z-10 w-full h-30 overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-                                {/* Abstract Bar Chart Visual */}
                                 <div className="h-[40%] w-10 sm:w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
                                 <div className="h-[60%] w-10 sm:w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
                                 <div className="h-[30%] w-10 sm:w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
@@ -241,9 +242,6 @@ export function LandingPage() {
                             </div>
 
                             <div className="relative z-10 w-full md:max-w-[75%] h-full flex flex-col justify-end">
-                                <div className="absolute right-[-10%] bottom-[-20%] pointer-events-none opacity-5 transform group-hover:scale-110 transition-transform duration-700">
-                                    {/* <Activity className="h-48 w-48 text-white" /> */}
-                                </div>
                                 <div className="bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
                                     <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" strokeWidth={2} />
                                 </div>
@@ -253,14 +251,11 @@ export function LandingPage() {
                                 </p>
                             </div>
                         </div>
-
                     </div>
                 </section>
             </main>
 
-            {/* Real Footer Section */}
             <footer className="relative w-full overflow-hidden flex flex-col items-center justify-end z-10 pt-20 pb-8 sm:pb-10 border-t border-zinc-900 bg-[#050508]/80 backdrop-blur-sm">
-
                 <div className="w-full max-w-7xl px-4 sm:px-6 flex flex-col md:flex-row justify-between items-start gap-12 mb-24 relative z-20 pointer-events-auto">
                     <div className="max-w-xs">
                         <div className="flex items-center gap-3 mb-6">
@@ -283,7 +278,6 @@ export function LandingPage() {
                     </div>
                 </div>
 
-                {/* Huge Faded Background Text */}
                 <div className="absolute bottom-5 sm:bottom-7.5 left-1/2 -translate-x-1/2 w-[200%] sm:w-[120%] text-center whitespace-nowrap pointer-events-none">
                     <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-white opacity-[0.02] select-none uppercase leading-none">
                         LEETCODE TRACKER

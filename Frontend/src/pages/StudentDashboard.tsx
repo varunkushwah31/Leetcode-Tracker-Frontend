@@ -14,38 +14,57 @@ import { BadgesList } from '../components/dashboard/student/BadgesList';
 import { StudentRightSidebar } from '../components/dashboard/student/StudentRightSidebar';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
+import { ErrorBanner } from '../components/ui/ErrorBanner'; // <-- 1. Import the Banner
 
 export function StudentDashboard() {
     const { logout, user } = useAuth();
     const [dashboardData, setDashboardData] = useState<StudentExtendedDTO | null>(null);
+
+    // UI States
     const [isLoading, setIsLoading] = useState(true);
     const [isSyncing, setIsSyncing] = useState(false);
     const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
 
+    // --- NEW: Specific Error States ---
+    const [pageError, setPageError] = useState<string | null>(null);
+    const [syncError, setSyncError] = useState<string | null>(null);
+
     const fetchDashboard = async () => {
+        setPageError(null);
         try {
             const response = await StudentService.getDashboard();
             setDashboardData(response.data);
-        } catch (err) { console.error('Failed to load dashboard', err); }
-        finally { setIsLoading(false); }
+        } catch (err: any) {
+            // 2. Replaced console.error with specific backend message mapping
+            setPageError(err.message || 'Failed to load dashboard.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // When a ping is received, it calls fetchDashboardData to silently update the UI.
     useClassroomWebSocket(selectedClassroomId, () => {
         console.log("Auto-refreshing Student Dashboard...");
-        fetchDashboard();
+        void fetchDashboard(); // <-- 3. FIXED: Added 'void' to suppress the unhandled promise warning
     });
 
     useEffect(() => { void fetchDashboard(); }, []);
 
     const handleSync = async () => {
         if (!dashboardData?.leetcodeUsername) return;
+
+        setSyncError(null);
         setIsSyncing(true);
+
         try {
             const response = await StudentService.syncProfile(dashboardData.leetcodeUsername);
             setDashboardData(response.data);
-        } catch { alert("Failed to sync with LeetCode."); }
-        finally { setIsSyncing(false); }
+        } catch (err: any) {
+            // 4. Replaced alert() with specific backend message mapping
+            setSyncError(err.message || 'Failed to sync with LeetCode.');
+        } finally {
+            setIsSyncing(false);
+        }
     };
 
     const isAssignmentCompleted = (assignment: AssignmentDTO) => {
@@ -90,9 +109,7 @@ export function StudentDashboard() {
             <header className="bg-white dark:bg-zinc-900/50 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-10 shadow-sm transition-colors duration-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        {/* SWAPPED TROPHY FOR TERMINAL */}
-                        {/* <div className="bg-[#2563eb] p-2 rounded-lg"><Terminal className="w-5 h-5 text-white" /></div> */}
-                         <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
+                        <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
                             <Terminal className="w-5 h-5 text-white" strokeWidth={2.5} />
                         </div>
                         <span className="text-xl font-bold text-zinc-900 dark:text-white">MentorSync</span>
@@ -123,7 +140,12 @@ export function StudentDashboard() {
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+                {/* 5. Render any global errors (like an initial 500 error, or a failed sync) */}
+                <ErrorBanner message={pageError} className="mb-6" />
+                <ErrorBanner message={syncError} className="mb-6" />
+
                 <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

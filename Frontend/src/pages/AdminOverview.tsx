@@ -8,19 +8,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { ShieldAlert, Users, BookOpen, ArrowLeft, Loader2, UserCheck, AlertTriangle, Trash2, RefreshCw, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { AdminService } from '@/services/endpoints';
 import type { SystemOverviewDTO, MentorDTO, ClassroomDashboardDTO } from '@/types';
-import axios from 'axios';
-
+import { ErrorBanner } from '@/components/ui/ErrorBanner'; // <-- 1. Import the Banner
 
 export function AdminOverview({ onBack }: { onBack: () => void }) {
     const [data, setData] = useState<SystemOverviewDTO | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState('');
+
+    // Page-level error for initial load (e.g., 403 Forbidden)
+    const [pageError, setPageError] = useState('');
 
     // Action States
-
     const [isSyncing, setIsSyncing] = useState(false);
     const [deletingMentor, setDeletingMentor] = useState<MentorDTO | null>(null);
     const [deletingClassroom, setDeletingClassroom] = useState<ClassroomDashboardDTO | null>(null);
+
+    // --- NEW: Error states for specific actions ---
+    const [syncError, setSyncError] = useState<string | null>(null);
+    const [deleteMentorError, setDeleteMentorError] = useState<string | null>(null);
+    const [deleteClassError, setDeleteClassError] = useState<string | null>(null);
+
     const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
     const showToast = (message: string, type: 'success' | 'error') => {
@@ -32,11 +38,9 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
         try {
             const response = await AdminService.getOverview();
             setData(response.data);
-        } catch (err) {
-            console.error(err);
-            setError(axios.isAxiosError(err) && err.response?.status === 403
-                ? "Access Denied: You must be a SUPER_ADMIN to view this data."
-                : "Failed to load system overview.");
+        } catch (err: any) {
+            // MAGIC: The interceptor automatically handles the 403 Access Denied message!
+            setPageError(err.message);
         } finally {
             setIsLoading(false);
         }
@@ -46,13 +50,14 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
 
     // SUPERPOWER HANDLERS
     const handleForceSync = async () => {
+        setSyncError(null);
         setIsSyncing(true);
         try {
             const res = await AdminService.forceSyncAll();
-            showToast(res.data.message, 'success'); // Replaced alert()
+            showToast(res.data?.message || "Global sync initiated successfully.", 'success');
             await fetchAdminData();
-        } catch {
-            showToast("Failed to force sync.", 'error'); // Replaced alert()
+        } catch (err: any) {
+            setSyncError(err.message);
         } finally {
             setIsSyncing(false);
         }
@@ -60,34 +65,36 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
 
     const handleDeleteMentor = async () => {
         if (!deletingMentor) return;
+        setDeleteMentorError(null);
         try {
             await AdminService.deleteMentor(deletingMentor.id);
             setDeletingMentor(null);
-            showToast(`Successfully deleted mentor ${deletingMentor.name}`, 'success'); // Added Toast
+            showToast(`Successfully deleted mentor ${deletingMentor.name}`, 'success');
             await fetchAdminData();
-        } catch {
-            showToast("Failed to delete mentor.", 'error');
+        } catch (err: any) {
+            setDeleteMentorError(err.message);
         }
     };
 
     const handleDeleteClassroom = async () => {
         if (!deletingClassroom) return;
+        setDeleteClassError(null);
         try {
             await AdminService.deleteClassroom(deletingClassroom.classroomId);
             setDeletingClassroom(null);
-            showToast(`Successfully deleted classroom ${deletingClassroom.className}`, 'success'); // Added Toast
+            showToast(`Successfully deleted classroom ${deletingClassroom.className}`, 'success');
             await fetchAdminData();
-        } catch {
-            showToast("Failed to delete classroom.", 'error');
+        } catch (err: any) {
+            setDeleteClassError(err.message);
         }
     };
-
 
     if (isLoading) {
         return <div className="flex h-[60vh] items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600 dark:text-blue-500" /></div>;
     }
 
-    if (error || !data) {
+    // Page Error State (Great for 403 Forbidden block)
+    if (pageError || !data) {
         return (
             <div className="p-8">
                 <Button variant="ghost" onClick={onBack} className="mb-6 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
@@ -96,7 +103,7 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
                 <div className="flex flex-col items-center justify-center p-12 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl">
                     <AlertTriangle className="w-12 h-12 text-rose-500 mb-4" />
                     <h2 className="text-xl font-bold text-rose-700 dark:text-rose-400 mb-2">Authorization Error</h2>
-                    <p className="text-rose-600 dark:text-rose-300">{error}</p>
+                    <p className="text-rose-600 dark:text-rose-300">{pageError}</p>
                 </div>
             </div>
         );
@@ -118,18 +125,22 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
                     <p className="text-zinc-500 dark:text-zinc-400 mt-1">Platform-wide overview and statistics.</p>
                 </div>
 
-                <Button
-                    onClick={handleForceSync}
-                    disabled={isSyncing}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md border-transparent transition-all hover:shadow-lg"
-                >
-                    {isSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-                    {isSyncing ? 'Syncing...' : 'Force Global Sync'}
-                </Button>
+                <div className="flex flex-col items-end gap-2">
+                    <Button
+                        onClick={handleForceSync}
+                        disabled={isSyncing}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md border-transparent transition-all hover:shadow-lg w-full sm:w-auto"
+                    >
+                        {isSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                        {isSyncing ? 'Syncing...' : 'Force Global Sync'}
+                    </Button>
+                </div>
             </div>
 
-            {/* Top Level KPIs */}
+            {/* Top Level Sync Error Banner */}
+            <ErrorBanner message={syncError} className="mb-6" />
 
+            {/* Top Level KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <CardContent className="p-6 flex items-center gap-4">
@@ -242,14 +253,17 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
             </div>
 
             {/* DELETE MENTOR DIALOG */}
-            <Dialog open={!!deletingMentor} onOpenChange={() => setDeletingMentor(null)}>
+            <Dialog open={!!deletingMentor} onOpenChange={(open) => { if(!open) { setDeletingMentor(null); setDeleteMentorError(null); } }}>
                 <DialogContent className={dialogClasses}>
                     <DialogHeader>
                         <DialogTitle className="text-rose-600 dark:text-rose-400 flex items-center">
                             <AlertTriangle className="w-5 h-5 mr-2" /> Delete Mentor
                         </DialogTitle>
                     </DialogHeader>
-                    <div className="py-4">
+
+                    <ErrorBanner message={deleteMentorError} />
+
+                    <div className="py-2">
                         <p className="text-zinc-600 dark:text-zinc-400">
                             Are you sure you want to permanently delete <strong>{deletingMentor?.name}</strong>?
                         </p>
@@ -265,14 +279,17 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
             </Dialog>
 
             {/* DELETE CLASSROOM DIALOG */}
-            <Dialog open={!!deletingClassroom} onOpenChange={() => setDeletingClassroom(null)}>
+            <Dialog open={!!deletingClassroom} onOpenChange={(open) => { if(!open) { setDeletingClassroom(null); setDeleteClassError(null); } }}>
                 <DialogContent className={dialogClasses}>
                     <DialogHeader>
                         <DialogTitle className="text-rose-600 dark:text-rose-400 flex items-center">
                             <AlertTriangle className="w-5 h-5 mr-2" /> Force Delete Classroom
                         </DialogTitle>
                     </DialogHeader>
-                    <div className="py-4">
+
+                    <ErrorBanner message={deleteClassError} />
+
+                    <div className="py-2">
                         <p className="text-zinc-600 dark:text-zinc-400">
                             Are you sure you want to permanently delete <strong>{deletingClassroom?.className}</strong>?
                         </p>
@@ -284,7 +301,7 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
                 </DialogContent>
             </Dialog>
 
-            {/* NEW: Floating Toast Notification */}
+            {/* Floating Toast Notification (For Successes) */}
             {toast && (
                 <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border animate-in slide-in-from-bottom-5 fade-in duration-300 ${
                     toast.type === 'success'

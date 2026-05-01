@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
-import { LogOut, Plus, Terminal, BookOpen, Loader2, AlertCircle, ShieldAlert, Badge, RefreshCw } from 'lucide-react';
+import { LogOut, Plus, Terminal, BookOpen, Loader2, ShieldAlert, Badge, RefreshCw } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -16,6 +16,7 @@ import { ClassroomAnalytics } from '../components/dashboard/mentor/ClassroomAnal
 import { StudentDetailsView } from '@/components/dashboard/mentor/StudentDetailsView';
 import { AdminOverview } from "@/pages/AdminOverview.tsx";
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
+import { ErrorBanner } from '../components/ui/ErrorBanner'; // <-- 1. Import the Error Banner
 
 export function MentorDashboard() {
     const { user, logout } = useAuth();
@@ -28,26 +29,29 @@ export function MentorDashboard() {
 
     // UI States
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [error, setError] = useState<string | null>(null); // Changed to accept null
     const [sortBy, setSortBy] = useState('solved');
     const [activeTab, setActiveTab] = useState('leaderboard');
     const [createClassOpen, setCreateClassOpen] = useState(false);
     const [newClassName, setNewClassName] = useState('');
     const [viewingStudentUsername, setViewingStudentUsername] = useState<string | null>(null);
-    const [showAdminOverview, setShowAdminOverview] = useState(false); // Admin Toggle
+    const [showAdminOverview, setShowAdminOverview] = useState(false);
 
-    // --- NEW: Sync State ---
+    // Specific Error State for the Dialog
+    const [createClassError, setCreateClassError] = useState<string | null>(null);
+
     const [isClassroomSyncing, setIsClassroomSyncing] = useState(false);
 
     // When a ping is received, it calls fetchDashboardData to silently update the UI.
     useClassroomWebSocket(selectedClassroom?.classroomId, () => {
         console.log("Auto-refreshing Mentor Dashboard...");
-        fetchDashboardData();
+        void fetchDashboardData(); // <-- 2. FIXED: Added 'void' to suppress the unhandled promise warning
     });
 
     const fetchDashboardData = async () => {
         if (!user?.id) return;
         setIsLoading(true);
+        setError(null);
         try {
             const [profileRes, pathsRes] = await Promise.all([
                 MentorService.getProfile(user.id),
@@ -57,17 +61,13 @@ export function MentorDashboard() {
 
             const classroomIds = profileRes.data.classroomIds || [];
 
-            // Fetch all classrooms fresh from the backend (which just cleared its cache!)
             const dashboardResponses = await Promise.all(
                 classroomIds.map((id: string) => ClassroomService.getDashboard(id, sortBy))
             );
 
             const fetchedClassrooms = dashboardResponses.map(res => res.data);
-
-            // Force React to recognize this as a brand-new array to update the sidebar badges
             setClassrooms([...fetchedClassrooms]);
 
-            // Update the currently viewed classroom with the fresh data
             if (selectedClassroom) {
                 const updated = fetchedClassrooms.find(c => c.classroomId === selectedClassroom.classroomId);
                 setSelectedClassroom(updated || fetchedClassrooms[0] || null);
@@ -81,9 +81,10 @@ export function MentorDashboard() {
                 const analyticsRes = await ClassroomService.getAnalytics(fetchedClassrooms[0].classroomId);
                 setAnalyticsData(analyticsRes.data);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Failed to load mentor dashboard.", err);
-            setError('Failed to load mentor dashboard.');
+            // 3. Replaced generic string with dynamic backend error
+            setError(err.message || 'Failed to load mentor dashboard.');
         } finally {
             setIsLoading(false);
         }
@@ -93,7 +94,8 @@ export function MentorDashboard() {
 
     useEffect(() => {
         if (selectedClassroom?.classroomId) {
-            ClassroomService.getAnalytics(selectedClassroom.classroomId)
+            // FIXED: Added 'void' here as well to satisfy strict promise rules
+            void ClassroomService.getAnalytics(selectedClassroom.classroomId)
                 .then(res => setAnalyticsData(res.data))
                 .catch(err => console.error("Failed to load analytics", err));
         }
@@ -101,36 +103,45 @@ export function MentorDashboard() {
 
     const handleCreateClass = async () => {
         if (!user?.id) return;
+        setCreateClassError(null);
         try {
             await ClassroomService.createClassroom(user.id, newClassName);
-            setCreateClassOpen(false); setNewClassName(''); await fetchDashboardData();
-        } catch (err) { alert("Failed to create class."); }
+            setCreateClassOpen(false);
+            setNewClassName('');
+            await fetchDashboardData();
+        } catch (err: any) {
+            // 4. Replaced alert()
+            setCreateClassError(err.message);
+        }
     };
 
     const handleExportCSV = async () => {
         if (!selectedClassroom) return;
+        setError(null);
         try {
             const response = await ClassroomService.exportClassroom(selectedClassroom.classroomId);
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url; link.setAttribute('download', `${selectedClassroom.className.replace(/\s+/g, '_')}_Leaderboard.csv`);
             document.body.appendChild(link); link.click(); link.remove();
-        } catch (err) { alert("Failed to export CSV."); }
+        } catch (err: any) {
+            // 5. Replaced alert()
+            setError(err.message);
+        }
     };
 
-    // --- NEW: Handle Classroom Sync ---
     const handleSyncClassroom = async () => {
         if (!selectedClassroom || !selectedClassroom.enrolledStudents || selectedClassroom.enrolledStudents.length === 0) {
-            alert("No students in this classroom to sync.");
+            setError("No students in this classroom to sync."); // Replaced alert()
             return;
         }
 
+        setError(null);
         setIsClassroomSyncing(true);
         try {
             const students = selectedClassroom.enrolledStudents;
-            const batchSize = 3; // Process 3 students at a time to stay under the 15/10s limit
+            const batchSize = 3;
 
-            // Send requests in staggered batches so we don't trip Resilience4j!
             for (let i = 0; i < students.length; i += batchSize) {
                 const batch = students.slice(i, i + batchSize);
 
@@ -138,18 +149,17 @@ export function MentorDashboard() {
                     batch.map(student => StudentService.syncProfile(student.leetcodeUsername))
                 );
 
-                // Add a small 2-second delay between batches
                 if (i + batchSize < students.length) {
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 }
             }
 
-            // Fetch the freshly cleared dashboard from the backend
             await fetchDashboardData();
 
-        } catch (err) {
+        } catch (err: any) {
             console.error("Failed to sync classroom", err);
-            alert("An error occurred while syncing the classroom.");
+            // 6. Replaced alert()
+            setError(err.message);
         } finally {
             setIsClassroomSyncing(false);
         }
@@ -162,7 +172,6 @@ export function MentorDashboard() {
         <div className="h-screen bg-[#09090e] text-white flex overflow-hidden selection:bg-[#5b4fff] selection:text-white">
             {/* Sidebar */}
             <aside className="w-72 relative bg-[#09090e] border-r border-zinc-900 flex flex-col z-20">
-                {/* Subtle grid pattern for sidebar */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
 
                 <div className="relative z-10 flex flex-col h-full w-full">
@@ -174,7 +183,7 @@ export function MentorDashboard() {
                             <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
                         </div>
 
-                        <Dialog open={createClassOpen} onOpenChange={setCreateClassOpen}>
+                        <Dialog open={createClassOpen} onOpenChange={(open) => { setCreateClassOpen(open); if(!open) setCreateClassError(null); }}>
                             <DialogTrigger asChild>
                                 <Button className="w-full bg-transparent border border-zinc-800 text-white hover:bg-[#5b4fff] hover:border-transparent rounded-xl transition-all duration-200">
                                     <Plus className="w-4 h-4 mr-2" />Create New Class
@@ -182,10 +191,14 @@ export function MentorDashboard() {
                             </DialogTrigger>
                             <DialogContent className="bg-[#111111] border-zinc-800 text-white sm:rounded-2xl">
                                 <DialogHeader><DialogTitle className="text-white text-xl font-bold">Create New Classroom</DialogTitle></DialogHeader>
-                                <div className="space-y-4 py-4">
-                                    <div className="space-y-1.5"><Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Classroom Name</Label><Input className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4" placeholder="e.g., Data Structures 101" value={newClassName} onChange={(e) => setNewClassName(e.target.value)} /></div>
+
+                                {/* Error Banner for Class Creation */}
+                                <ErrorBanner message={createClassError} />
+
+                                <div className="space-y-4 py-2">
+                                    <div className="space-y-1.5"><Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Classroom Name</Label><Input className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4" placeholder="e.g., Data Structures 101" value={newClassName} onChange={(e) => { setNewClassName(e.target.value); if(createClassError) setCreateClassError(null); }} /></div>
                                 </div>
-                                <DialogFooter><Button variant="outline" className="bg-transparent border border-zinc-700 text-white hover:bg-zinc-800 hover:text-white rounded-xl" onClick={() => setCreateClassOpen(false)}>Cancel</Button><Button className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl" onClick={handleCreateClass}>Create Classroom</Button></DialogFooter>
+                                <DialogFooter><Button variant="outline" className="bg-transparent border border-zinc-700 text-white hover:bg-zinc-800 hover:text-white rounded-xl" onClick={() => setCreateClassOpen(false)}>Cancel</Button><Button className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl" onClick={handleCreateClass} disabled={!newClassName}>Create Classroom</Button></DialogFooter>
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -198,6 +211,7 @@ export function MentorDashboard() {
                                         onClick={() => {
                                             setSelectedClassroom(c);
                                             setShowAdminOverview(false);
+                                            setError(null); // Clear global errors on navigation
                                         }}
                                         className={`w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 flex justify-between items-center ${
                                             selectedClassroom?.classroomId === c.classroomId && !showAdminOverview
@@ -229,6 +243,7 @@ export function MentorDashboard() {
                                 onClick={() => {
                                     setShowAdminOverview(true);
                                     setSelectedClassroom(null);
+                                    setError(null);
                                 }}
                                 className={`w-full flex items-center px-3 py-2.5 text-sm rounded-xl transition-all ${showAdminOverview ? 'bg-[#5b4fff]/10 text-[#968fff] border border-[#5b4fff]/20 font-medium' : 'text-zinc-400 hover:bg-zinc-900 hover:text-white border border-transparent'}`}
                             >
@@ -245,10 +260,7 @@ export function MentorDashboard() {
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto relative bg-[#0a0a0a]">
-                {/* Unique dot grid texture background */}
                 <div className="inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-40 pointer-events-none fixed"></div>
-
-                {/* Subtle ambient glow behind content */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-100 bg-[#5b4fff] opacity-[0.05] blur-[120px] rounded-full pointer-events-none"></div>
 
                 <div className="relative z-10 h-full">
@@ -259,7 +271,9 @@ export function MentorDashboard() {
                         }} />
                     ) : selectedClassroom ? (
                         <div className="max-w-7xl mx-auto p-6 lg:p-10 min-h-full">
-                            {error && <div className="mb-6 flex items-center space-x-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-red-400 backdrop-blur-md"><AlertCircle className="h-5 w-5 shrink-0" /><p className="font-medium text-sm">{error}</p></div>}
+
+                            {/* Main Dashboard Error Banner */}
+                            <ErrorBanner message={error} />
 
                             <div className="mb-8 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
                                 <div>
@@ -267,7 +281,6 @@ export function MentorDashboard() {
                                     <p className="text-[15px] text-zinc-400 flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    {/* --- NEW: Force Sync Button --- */}
                                     <Button
                                         onClick={handleSyncClassroom}
                                         disabled={isClassroomSyncing}
