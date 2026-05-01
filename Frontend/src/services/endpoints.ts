@@ -47,6 +47,10 @@ export const ClassroomService = {
             endTimestamp: end
         }),
     getAnalytics: (classroomId: string) => api.get(`/classrooms/${classroomId}/analytics`),
+
+    deleteAssignment: (classroomId: string, assignmentId: string, mentorId: string) =>
+        api.delete(`/classrooms/${classroomId}/assignments/${assignmentId}`, { params: { mentorId } }),
+
     
     // Upload CSV 
     bulkAddStudents: (classroomId: string, file: File) => {
@@ -77,3 +81,4 @@ export const AdminService = {
     deleteClassroom: (id: string) => api.delete(`/admin/classrooms/${id}`),
     forceSyncAll: () => api.post('/admin/sync-all')
 };
+

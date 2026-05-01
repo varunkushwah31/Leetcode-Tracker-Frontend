@@ -14,9 +14,10 @@ import { MentorActions } from '../components/dashboard/mentor/MentorActions';
 import { LeaderboardTable } from '../components/dashboard/mentor/LeaderboardTable';
 import { ClassroomAnalytics } from '../components/dashboard/mentor/ClassroomAnalytics';
 import { StudentDetailsView } from '@/components/dashboard/mentor/StudentDetailsView';
+import { ManageAssignments } from '../components/dashboard/mentor/ManageAssignments'; // <-- 1. Import the new component
 import { AdminOverview } from "@/pages/AdminOverview.tsx";
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
-import { ErrorBanner } from '../components/ui/ErrorBanner'; // <-- 1. Import the Error Banner
+import { ErrorBanner } from '../components/ui/ErrorBanner';
 
 export function MentorDashboard() {
     const { user, logout } = useAuth();
@@ -29,7 +30,7 @@ export function MentorDashboard() {
 
     // UI States
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null); // Changed to accept null
+    const [error, setError] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState('solved');
     const [activeTab, setActiveTab] = useState('leaderboard');
     const [createClassOpen, setCreateClassOpen] = useState(false);
@@ -42,10 +43,9 @@ export function MentorDashboard() {
 
     const [isClassroomSyncing, setIsClassroomSyncing] = useState(false);
 
-    // When a ping is received, it calls fetchDashboardData to silently update the UI.
     useClassroomWebSocket(selectedClassroom?.classroomId, () => {
         console.log("Auto-refreshing Mentor Dashboard...");
-        void fetchDashboardData(); // <-- 2. FIXED: Added 'void' to suppress the unhandled promise warning
+        void fetchDashboardData();
     });
 
     const fetchDashboardData = async () => {
@@ -83,7 +83,6 @@ export function MentorDashboard() {
             }
         } catch (err: any) {
             console.error("Failed to load mentor dashboard.", err);
-            // 3. Replaced generic string with dynamic backend error
             setError(err.message || 'Failed to load mentor dashboard.');
         } finally {
             setIsLoading(false);
@@ -94,7 +93,6 @@ export function MentorDashboard() {
 
     useEffect(() => {
         if (selectedClassroom?.classroomId) {
-            // FIXED: Added 'void' here as well to satisfy strict promise rules
             void ClassroomService.getAnalytics(selectedClassroom.classroomId)
                 .then(res => setAnalyticsData(res.data))
                 .catch(err => console.error("Failed to load analytics", err));
@@ -110,7 +108,6 @@ export function MentorDashboard() {
             setNewClassName('');
             await fetchDashboardData();
         } catch (err: any) {
-            // 4. Replaced alert()
             setCreateClassError(err.message);
         }
     };
@@ -125,14 +122,13 @@ export function MentorDashboard() {
             link.href = url; link.setAttribute('download', `${selectedClassroom.className.replace(/\s+/g, '_')}_Leaderboard.csv`);
             document.body.appendChild(link); link.click(); link.remove();
         } catch (err: any) {
-            // 5. Replaced alert()
             setError(err.message);
         }
     };
 
     const handleSyncClassroom = async () => {
         if (!selectedClassroom || !selectedClassroom.enrolledStudents || selectedClassroom.enrolledStudents.length === 0) {
-            setError("No students in this classroom to sync."); // Replaced alert()
+            setError("No students in this classroom to sync.");
             return;
         }
 
@@ -158,7 +154,6 @@ export function MentorDashboard() {
 
         } catch (err: any) {
             console.error("Failed to sync classroom", err);
-            // 6. Replaced alert()
             setError(err.message);
         } finally {
             setIsClassroomSyncing(false);
@@ -308,12 +303,27 @@ export function MentorDashboard() {
                                 >
                                     Weakness & Analytics
                                 </button>
+                                {/* 2. NEW: Manage Assignments Tab Button */}
+                                <button
+                                    className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'assignments' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
+                                    onClick={() => setActiveTab('assignments')}
+                                >
+                                    Manage Assignments
+                                </button>
                             </div>
 
+                            {/* 3. NEW: Conditional render for the 3 tabs */}
                             {activeTab === 'leaderboard' ? (
                                 <LeaderboardTable students={selectedClassroom.enrolledStudents} sortBy={sortBy} onSortChange={setSortBy} onExportCSV={handleExportCSV} onStudentClick={(username) => setViewingStudentUsername(username)} />
-                            ) : (
+                            ) : activeTab === 'analytics' ? (
                                 <ClassroomAnalytics data={analyticsData} />
+                            ) : (
+                                <ManageAssignments
+                                    classroomId={selectedClassroom.classroomId}
+                                    mentorId={user!.id!}
+                                    assignments={(selectedClassroom as any).assignments || []}
+                                    onRefresh={fetchDashboardData}
+                                />
                             )}
 
                             {viewingStudentUsername && (

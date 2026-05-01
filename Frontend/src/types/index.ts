@@ -160,3 +160,11 @@ export interface SystemOverviewDTO {
     allMentors: MentorDTO[];
     allClassrooms: ClassroomDashboardDTO[];
 }
+
+export interface ClassroomDashboardDTO {
+    classroomId: string;
+    className: string;
+    mentorName: string;
+    enrolledStudents: StudentSummaryDTO[];
+    assignments?: AssignmentDTO[];
+}
