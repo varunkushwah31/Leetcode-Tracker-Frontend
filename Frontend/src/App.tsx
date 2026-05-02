@@ -5,6 +5,7 @@ import { StudentDashboard } from './pages/StudentDashboard';
 import { MentorDashboard } from './pages/MentorDashboard';
 import { AuthPage } from './pages/AuthPage';
 import { LandingPage } from './pages/LandingPage';
+import { ContactPage } from './pages/ContactPage'; // <-- 1. Import the Contact Page!
 
 const FullPageLoader = () => (
     <div className="flex h-screen items-center justify-center bg-slate-50">
@@ -33,15 +34,19 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+                {/* 2. Removed <PublicRoute> so logged-in users can still see the Landing Page */}
+                <Route path="/" element={<LandingPage />} />
+
                 <Route path="/login" element={<PublicRoute><AuthPage /></PublicRoute>} />
                 <Route path="/register" element={<PublicRoute><AuthPage /></PublicRoute>} />
+
+                {/* 3. Added the missing Contact route! */}
+                <Route path="/contact" element={<ContactPage />} />
 
                 <Route
                     path="/dashboard"
                     element={
                         <ProtectedRoute>
-                            {/* FIXED: Check for both MENTOR and SUPER_ADMIN */}
                             {userRole === 'MENTOR' || userRole === 'SUPER_ADMIN'
                                 ? <MentorDashboard />
                                 : <StudentDashboard />
