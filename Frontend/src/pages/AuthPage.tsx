@@ -43,13 +43,21 @@ export function AuthPage() {
             name: formData.name, email: formData.email, password: formData.password
           });
         }
-        // Registration successful (backend returned 200 OK with message)
-        // Swap the UI to the OTP screen!
+        // Registration successful
         setRegisteredEmail(formData.email);
         setIsAwaitingOtp(true);
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred");
+      // MAGIC UPDATE: Catch the unverified error and switch to the OTP screen!
+      const errorMessage = err.message || "An error occurred";
+
+      if (errorMessage.includes("verify your email")) {
+        setRegisteredEmail(formData.email);
+        setIsAwaitingOtp(true);
+        setError("Please enter the 6-digit code sent to your email to continue.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
