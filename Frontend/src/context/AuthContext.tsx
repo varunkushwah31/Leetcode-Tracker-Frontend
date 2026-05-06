@@ -15,6 +15,7 @@ interface AuthContextType {
     login: (credentials: LoginRequest) => Promise<void>;
     registerMentor: (data: MentorRegisterRequest) => Promise<void>;
     registerStudent: (data: StudentRegisterRequest) => Promise<void>;
+    verifyOtp: (email: string, otp: string) => Promise<void>; // <-- 1. Added verifyOtp type
     logout: () => Promise<void>;
 }
 
@@ -39,7 +40,7 @@ export const AuthProvider: React.FC<{children : React.ReactNode}> = ({children})
         setIsLoading(false);
     },[]);
 
-    // Helper function to keep our code DRY!
+    // Helper function to handle successful token retrievals
     const handleAuthSuccess = (response: { data: { accessToken: string; mentorId: string; name: string; role: string } }) => {
         const { accessToken, mentorId, name: userName, role: userRole } = response.data;
 
@@ -59,12 +60,20 @@ export const AuthProvider: React.FC<{children : React.ReactNode}> = ({children})
     };
 
     const registerMentor = async (data: MentorRegisterRequest) => {
-        const response = await AuthService.registerMentor(data);
-        handleAuthSuccess(response);
+        // 2. We NO LONGER call handleAuthSuccess here, because the backend
+        // just returns a {message: "..."} and no token!
+        await AuthService.registerMentor(data);
     };
 
     const registerStudent = async (data: StudentRegisterRequest) => {
-        const response = await AuthService.registerStudent(data);
+        // 2. Same here. Just send the request and wait for the OTP.
+        await AuthService.registerStudent(data);
+    };
+
+    // 3. NEW: The verification function that actually logs them in
+    const verifyOtp = async (email: string, otp: string) => {
+        // Assuming you add verifyEmail to your AuthService endpoints!
+        const response = await AuthService.verifyEmail(email, otp);
         handleAuthSuccess(response);
     };
 
@@ -89,6 +98,7 @@ export const AuthProvider: React.FC<{children : React.ReactNode}> = ({children})
                 login,
                 registerMentor,
                 registerStudent,
+                verifyOtp, // <-- Make sure to expose it here
                 logout,
             }}
         >
@@ -97,7 +107,6 @@ export const AuthProvider: React.FC<{children : React.ReactNode}> = ({children})
     );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {

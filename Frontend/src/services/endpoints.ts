@@ -9,17 +9,21 @@ import type {
 } from '@/types';
 
 export const AuthService = {
-    
-    login: (credentials: LoginRequest) => 
+
+    login: (credentials: LoginRequest) =>
         api.post<AuthResponse>('/v1/auth/login', credentials),
-    
-    registerStudent: (data: StudentRegisterRequest) => 
+
+    registerStudent: (data: StudentRegisterRequest) =>
         api.post<AuthResponse>('/v1/auth/register/student', data),
-    
-    registerMentor: (data: MentorRegisterRequest) => 
+
+    registerMentor: (data: MentorRegisterRequest) =>
         api.post<AuthResponse>('/v1/auth/register', data),
-    
+
     logout: () => api.post('/v1/auth/logout'),
+
+    // FIXED: Changed axiosInstance to api, and updated the path to match the others!
+    verifyEmail: (email: string, otp: string) =>
+        api.post<AuthResponse>('/v1/auth/verify-email', { email, otp })
 };
 
 export const StudentService = {
@@ -81,4 +85,5 @@ export const AdminService = {
     deleteClassroom: (id: string) => api.delete(`/admin/classrooms/${id}`),
     forceSyncAll: () => api.post('/admin/sync-all')
 };
+
 
