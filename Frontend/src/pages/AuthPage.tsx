@@ -25,8 +25,7 @@ export function AuthPage() {
   const [isAwaitingOtp, setIsAwaitingOtp] = useState(false);
   const [otp, setOtp] = useState('');
   const [registeredEmail, setRegisteredEmail] = useState('');
-
-
+  
   // --- 1. Handle Initial Login or Registration ---
   const handleAuth = async (e: React.SubmitEvent) => {
     e.preventDefault();
