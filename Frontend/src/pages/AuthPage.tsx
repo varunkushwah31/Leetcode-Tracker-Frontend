@@ -331,7 +331,6 @@ export function AuthPage() {
                 Need Help? Contact Us
               </button>
             </div>
-
           </div>
         </div>
       </div>
