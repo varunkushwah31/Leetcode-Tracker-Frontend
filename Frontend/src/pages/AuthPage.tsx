@@ -306,7 +306,6 @@ export function AuthPage() {
                       {isLogin ? 'Sign In' : 'Create Account'}
                     </Button>
                   </form>
-
                   <div className="mt-8 flex items-center justify-center gap-3">
                     <p className="text-zinc-500 text-[14px]">
                       {isLogin ? "Don't have an account?" : "Already have an account?"}
