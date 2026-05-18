@@ -296,7 +296,6 @@ export function AuthPage() {
                           className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full tracking-widest font-mono transition-all px-4"
                       />
                     </div>
-
                     <Button
                         type="submit"
                         disabled={isLoading}
