@@ -234,7 +234,6 @@ export function AuthPage() {
                         </button>
                       </div>
                   )}
-
                   <form onSubmit={handleAuth} className="space-y-5">
                     {!isLogin && (
                         <div className="space-y-1.5">
