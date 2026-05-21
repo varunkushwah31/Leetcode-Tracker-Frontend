@@ -167,9 +167,7 @@ export function AuthPage() {
                         : 'Fill in your details to get started.'}
               </p>
             </div>
-
             <ErrorBanner message={error} />
-
             {/* 3. Conditional Rendering: Show OTP Form OR Standard Form */}
             {isAwaitingOtp ? (
                 <form onSubmit={handleVerifyOtp} className="space-y-5 mt-4">
