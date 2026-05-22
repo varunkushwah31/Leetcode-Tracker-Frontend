@@ -106,7 +106,6 @@ export function AuthPage() {
             <p className="text-zinc-400 text-[16px] leading-relaxed mb-8 max-w-105">
               Track, assign, and validate your students' LeetCode progress through an automated, data-rich dashboard.
             </p>
-
             <div className="grid grid-cols-2 gap-3 xl:gap-4">
               {/* Features Cards */}
               <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors">
@@ -140,7 +139,6 @@ export function AuthPage() {
             </div>
           </div>
         </div>
-
         {/* Right Panel - Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#0a0a0a] overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-60 pointer-events-none"></div>
