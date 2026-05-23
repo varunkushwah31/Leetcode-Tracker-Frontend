@@ -86,11 +86,9 @@ export function AuthPage() {
 
   return (
       <div className="h-screen overflow-hidden flex text-white font-sans selection:bg-[#5b4fff] selection:text-white">
-
         {/* Left Panel - Visuals & Branding */}
         <div className="hidden lg:flex lg:w-1/2 relative bg-[#09090e] border-r border-zinc-900 flex-col justify-center p-10 xl:p-16">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
-
           <div className="relative z-10 w-full max-w-lg mx-auto">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
