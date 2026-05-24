@@ -96,7 +96,6 @@ export function AuthPage() {
               </div>
               <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
             </div>
-
             <h1 className="text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight mb-4 text-white">
               The modern OS for <br />
               <span className="text-[#968fff]">Coding Bootcamps.</span>
