@@ -142,7 +142,6 @@ export function AuthPage() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-112.5 h-112.5 bg-[#5b4fff] opacity-[0.06] blur-[100px] rounded-full pointer-events-none"></div>
 
           <div className="w-full max-w-110 relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto">
-
             <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
               <div className="bg-[#5b4fff] p-2.5 rounded-lg">
                 <Terminal className="h-6 w-6 text-white" strokeWidth={2.5} />
