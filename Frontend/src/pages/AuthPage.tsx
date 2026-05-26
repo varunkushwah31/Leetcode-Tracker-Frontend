@@ -148,7 +148,6 @@ export function AuthPage() {
               </div>
               <span className="text-2xl font-bold tracking-tight text-white">MentorSync</span>
             </div>
-
             <div className="mb-8">
               <h2 className="text-[28px] font-bold text-white tracking-tight mb-2">
                 {isAwaitingOtp ? 'Check your email' : isLogin ? 'Welcome back' : 'Create an account'}
