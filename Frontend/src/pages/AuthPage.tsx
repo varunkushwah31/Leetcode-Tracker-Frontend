@@ -80,6 +80,7 @@ export function AuthPage() {
     }
   };
 
+
   const clearError = () => {
     if (error) setError(null);
   };
