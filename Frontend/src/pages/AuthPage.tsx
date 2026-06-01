@@ -79,7 +79,6 @@ export function AuthPage() {
       setIsLoading(false);
     }
   };
-
   const clearError = () => {
     if (error) setError(null);
   };
