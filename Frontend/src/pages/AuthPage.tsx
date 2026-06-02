@@ -64,6 +64,8 @@ export function AuthPage() {
     }
   };
 
+
+
   // --- 2. Handle OTP Submission ---
   const handleVerifyOtp = async (e: React.SubmitEvent) => {
     e.preventDefault();
