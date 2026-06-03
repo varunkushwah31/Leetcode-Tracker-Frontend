@@ -22,6 +22,7 @@ export function AuthPage() {
     name: '', email: '', password: '', leetcodeUsername: '',
   });
 
+
   const [isAwaitingOtp, setIsAwaitingOtp] = useState(false);
   const [otp, setOtp] = useState('');
   const [registeredEmail, setRegisteredEmail] = useState('');
