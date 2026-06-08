@@ -15,7 +15,6 @@ interface AuthContextType {
     login: (credentials: LoginRequest) => Promise<void>;
     registerMentor: (data: MentorRegisterRequest) => Promise<void>;
     registerStudent: (data: StudentRegisterRequest) => Promise<void>;
-    verifyOtp: (email: string, otp: string) => Promise<void>; // <-- 1. Added verifyOtp type
     logout: () => Promise<void>;
 }
 
@@ -60,21 +59,13 @@ export const AuthProvider: React.FC<{children : React.ReactNode}> = ({children})
     };
 
     const registerMentor = async (data: MentorRegisterRequest) => {
-        // 2. We NO LONGER call handleAuthSuccess here, because the backend
-        // just returns a {message: "..."} and no token!
-        await AuthService.registerMentor(data);
+        const response = await AuthService.registerMentor(data);
+        handleAuthSuccess(response); // <-- Added back for instant login
     };
 
     const registerStudent = async (data: StudentRegisterRequest) => {
-        // 2. Same here. Just send the request and wait for the OTP.
-        await AuthService.registerStudent(data);
-    };
-
-    // 3. NEW: The verification function that actually logs them in
-    const verifyOtp = async (email: string, otp: string) => {
-        // Assuming you add verifyEmail to your AuthService endpoints!
-        const response = await AuthService.verifyEmail(email, otp);
-        handleAuthSuccess(response);
+        const response = await AuthService.registerStudent(data);
+        handleAuthSuccess(response); // <-- Added back for instant login
     };
 
     const logout = async () => {
@@ -98,7 +89,6 @@ export const AuthProvider: React.FC<{children : React.ReactNode}> = ({children})
                 login,
                 registerMentor,
                 registerStudent,
-                verifyOtp, // <-- Make sure to expose it here
                 logout,
             }}
         >
