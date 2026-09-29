@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Terminal, Activity, Users, LayoutDashboard, ChevronRight, CheckCircle, Sparkles, Target, Award, Code2Icon } from 'lucide-react';
 
@@ -6,8 +6,7 @@ export function LandingPage() {
     const [activeTab, setActiveTab] = useState<'mentor' | 'student'>('student');
 
     // 1. Create a custom scroll handler
-    const scrollToFeatures = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        e.preventDefault();
+    const scrollToFeatures = () => {
         const featuresSection = document.getElementById('features');
         if (featuresSection) {
             featuresSection.scrollIntoView({ behavior: 'smooth' });
@@ -62,13 +61,13 @@ export function LandingPage() {
                         </Link>
 
                         {/* 2. Apply the custom onClick handler here */}
-                        <a
-                            href="#features"
+                        <button
+                            type="button"
                             onClick={scrollToFeatures}
-                            className="w-full sm:w-auto bg-[#0a0a0a] border border-white/8 text-white text-[15px] font-medium px-8 py-4 hover:bg-[#111111] hover:border-white/15 shadow-lg rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]"
+                            className="w-full sm:w-auto bg-[#0a0a0a] border border-white/8 text-white text-[15px] font-medium px-8 py-4 hover:bg-[#111111] hover:border-white/15 shadow-lg rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505] cursor-pointer"
                         >
                             Explore Features
-                        </a>
+                        </button>
                     </div>
                 </div>
 
@@ -193,7 +192,7 @@ export function LandingPage() {
                         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">A modern toolkit designed to help you run, track, and scale your coding cohorts efficiently.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:auto-rows-[340px]">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:auto-rows-[minmax(300px,auto)]">
                         <div className="md:col-span-2 bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-end relative overflow-hidden group hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="absolute top-0 right-0 p-8 sm:p-10">
                                 <div className="bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
@@ -230,18 +229,18 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="md:col-span-2 bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between relative overflow-hidden group hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
-                            <div className="flex items-end gap-2 sm:gap-3 mb-8 sm:mb-12 relative z-10 w-full h-30 overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="h-[40%] w-10 sm:w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
-                                <div className="h-[60%] w-10 sm:w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
-                                <div className="h-[30%] w-10 sm:w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
-                                <div className="h-[80%] w-10 sm:w-14 bg-[#5b4fff]/40 rounded-t-lg backdrop-blur-md"></div>
-                                <div className="h-full w-10 sm:w-14 bg-[#5b4fff] rounded-t-lg shadow-[0_0_30px_rgba(91,79,255,0.6)] relative">
-                                    <div className="absolute -top-3.75 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white] animate-pulse"></div>
+                        <div className="md:col-span-2 bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-end gap-6 relative overflow-hidden group hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
+                            <div className="flex items-end gap-2 sm:gap-3 relative z-10 w-full h-28 sm:h-32 shrink-0 overflow-visible pt-5 opacity-60 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
+                                <div className="h-[40%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
+                                <div className="h-[60%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
+                                <div className="h-[30%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
+                                <div className="h-[80%] min-h-8 flex-1 max-w-14 bg-[#5b4fff]/40 rounded-t-lg backdrop-blur-md"></div>
+                                <div className="h-full flex-1 max-w-14 bg-[#5b4fff] rounded-t-lg shadow-[0_0_30px_rgba(91,79,255,0.6)] relative">
+                                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white] animate-pulse"></div>
                                 </div>
                             </div>
 
-                            <div className="relative z-10 w-full md:max-w-[75%] h-full flex flex-col justify-end">
+                            <div className="relative z-10 w-full md:max-w-[75%] flex flex-col justify-end">
                                 <div className="bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
                                     <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" strokeWidth={2} />
                                 </div>

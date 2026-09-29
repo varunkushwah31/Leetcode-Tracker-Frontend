@@ -16,7 +16,7 @@ interface MentorActionsProps {
     onRefresh: () => void;
 }
 
-export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRefresh }: MentorActionsProps) {
+export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRefresh }: Readonly<MentorActionsProps>) {
     // Dialog States
     const [addStudentOpen, setAddStudentOpen] = useState(false);
     const [assignQuestionOpen, setAssignQuestionOpen] = useState(false);
@@ -33,7 +33,9 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const [assignmentData, setAssignmentData] = useState({ titleSlug: '', deadline: '3' });
     const [selectedPathId, setSelectedPathId] = useState<string>('');
     const [newPath, setNewPath] = useState({ title: '', description: '' });
-    const [pathQuestions, setPathQuestions] = useState<PathQuestion[]>([{ titleSlug: '', daysToComplete: 3 }]);
+    const [pathQuestions, setPathQuestions] = useState<Array<PathQuestion & { tempId: string }>>([
+        { tempId: 'question-initial-1', titleSlug: '', daysToComplete: 3 }
+    ]);
     const [isDeleting, setIsDeleting] = useState(false);
 
     // --- NEW: Error States for all actions ---
@@ -46,6 +48,9 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
     const [isAdding, setIsAdding] = useState(false);
 
+    const getErrMsg = (err: unknown, fallback: string) =>
+        err instanceof Error && err.message ? err.message : fallback;
+
     // Handlers
     const handleAddStudent = async () => {
         setAddStudentError(null);
@@ -57,8 +62,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             setNewStudentUsername('');
             setAddStudentOpen(false);
             onRefresh();
-        } catch (err: any) {
-            setAddStudentError(err.message); // Magic mapping
+        } catch (err: unknown) {
+            setAddStudentError(getErrMsg(err, 'Failed to add student.'));
         } finally {
             setIsAdding(false);
         }
@@ -76,8 +81,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             if (response.data?.length > 0) setUploadFailures(response.data);
             else { setAddStudentOpen(false); setUploadFile(null); }
             onRefresh();
-        } catch (err: any) {
-            setBulkUploadError(err.message);
+        } catch (err: unknown) {
+            setBulkUploadError(getErrMsg(err, 'Failed to upload students.'));
         } finally {
             setIsUploading(false);
         }
@@ -86,28 +91,29 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const handleAssignQuestion = async () => {
         setAssignQuestionError(null);
         const start = Math.floor(Date.now() / 1000);
-        const end = start + (parseInt(assignmentData.deadline) * 86400);
+        const end = start + (Number.parseInt(assignmentData.deadline) * 86400);
 
         try {
             await ClassroomService.assignQuestion(selectedClassroom.classroomId, assignmentData.titleSlug, start, end);
             setAssignQuestionOpen(false);
             setAssignmentData({ titleSlug: '', deadline: '3' });
             onRefresh();
-        } catch (err: any) {
-            setAssignQuestionError(err.message);
+        } catch (err: unknown) {
+            setAssignQuestionError(getErrMsg(err, 'Failed to assign question.'));
         }
     };
 
     const handleCreatePath = async () => {
         setCreatePathError(null);
         try {
-            await PathService.createPath({ mentorId, title: newPath.title, description: newPath.description, questions: pathQuestions });
+            const sanitizedQuestions = pathQuestions.map(({ titleSlug, daysToComplete }) => ({ titleSlug, daysToComplete }));
+            await PathService.createPath({ mentorId, title: newPath.title, description: newPath.description, questions: sanitizedQuestions });
             setCreatePathOpen(false);
             setNewPath({ title: '', description: '' });
-            setPathQuestions([{ titleSlug: '', daysToComplete: 3 }]);
+            setPathQuestions([{ tempId: `question-reset-${Date.now()}`, titleSlug: '', daysToComplete: 3 }]);
             onRefresh();
-        } catch (err: any) {
-            setCreatePathError(err.message);
+        } catch (err: unknown) {
+            setCreatePathError(getErrMsg(err, 'Failed to create learning path.'));
         }
     };
 
@@ -118,8 +124,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             setAssignPathOpen(false);
             setSelectedPathId('');
             onRefresh();
-        } catch (err: any) {
-            setAssignPathError(err.message);
+        } catch (err: unknown) {
+            setAssignPathError(getErrMsg(err, 'Failed to assign learning path.'));
         }
     };
 
@@ -135,8 +141,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             await ClassroomService.deleteClassroom(selectedClassroom.classroomId, mentorId);
             setDeleteClassOpen(false);
             onRefresh();
-        } catch (err: any) {
-            setDeleteClassError(err.message);
+        } catch (err: unknown) {
+            setDeleteClassError(getErrMsg(err, 'Failed to delete classroom.'));
         } finally {
             setIsDeleting(false);
         }
@@ -198,7 +204,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             {uploadFailures.length > 0 && (
                                 <div className="mt-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-sm text-rose-400">
                                     <span className="font-bold">Failed to add:</span>
-                                    <ul className="list-disc pl-5 mt-1">{uploadFailures.map((f, i) => <li key={i}>{f}</li>)}</ul>
+                                    <ul className="list-disc pl-5 mt-1">{uploadFailures.map((f) => <li key={`fail-${f}`}>{f}</li>)}</ul>
                                 </div>
                             )}
                         </div>
@@ -299,14 +305,53 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         <div className="mt-6">
                             <div className="flex items-center justify-between mb-2">
                                 <Label className="text-zinc-300">Questions</Label>
-                                <Button type="button" variant="outline" size="sm" className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 rounded-lg h-8" onClick={() => setPathQuestions([...pathQuestions, { titleSlug: '', daysToComplete: 3 }])}><Plus className="w-3 h-3 mr-1" /> Add</Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 rounded-lg h-8"
+                                    onClick={() => setPathQuestions(prev => [...prev, { tempId: `question-new-${Date.now()}-${prev.length}`, titleSlug: '', daysToComplete: 3 }])}
+                                >
+                                    <Plus className="w-3 h-3 mr-1" /> Add
+                                </Button>
                             </div>
                             <div className="space-y-3">
                                 {pathQuestions.map((q, idx) => (
-                                    <div key={idx} className="flex items-center gap-3 bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-800/60">
-                                        <div className="flex-1"><Label className="text-xs text-zinc-400">Slug</Label><Input className={`mt-1 ${inputClasses}`} value={q.titleSlug} onChange={e => { const newQs = [...pathQuestions]; newQs[idx].titleSlug = e.target.value; setPathQuestions(newQs); }} /></div>
-                                        <div className="w-32"><Label className="text-xs text-zinc-400">Days</Label><Input type="number" className={`mt-1 ${inputClasses}`} value={q.daysToComplete} onChange={e => { const newQs = [...pathQuestions]; newQs[idx].daysToComplete = parseInt(e.target.value) || 1; setPathQuestions(newQs); }} /></div>
-                                        <Button variant="ghost" size="icon" className="mt-6 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300" onClick={() => setPathQuestions(pathQuestions.filter((_, i) => i !== idx))} disabled={pathQuestions.length === 1}><Trash2 className="w-4 h-4" /></Button>
+                                    <div key={q.tempId} className="flex items-center gap-3 bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-800/60">
+                                        <div className="flex-1">
+                                            <Label className="text-xs text-zinc-400">Slug</Label>
+                                            <Input
+                                                className={`mt-1 ${inputClasses}`}
+                                                value={q.titleSlug}
+                                                onChange={e => {
+                                                    const newQs = [...pathQuestions];
+                                                    newQs[idx].titleSlug = e.target.value;
+                                                    setPathQuestions(newQs);
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="w-32">
+                                            <Label className="text-xs text-zinc-400">Days</Label>
+                                            <Input
+                                                type="number"
+                                                className={`mt-1 ${inputClasses}`}
+                                                value={q.daysToComplete}
+                                                onChange={e => {
+                                                    const newQs = [...pathQuestions];
+                                                    newQs[idx].daysToComplete = Number.parseInt(e.target.value) || 1;
+                                                    setPathQuestions(newQs);
+                                                }}
+                                            />
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="mt-6 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+                                            onClick={() => setPathQuestions(prev => prev.filter(item => item.tempId !== q.tempId))}
+                                            disabled={pathQuestions.length === 1}
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
                                     </div>
                                 ))}
                             </div>

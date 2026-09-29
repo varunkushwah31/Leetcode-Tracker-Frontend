@@ -17,7 +17,7 @@ interface StudentDetailsViewProps {
     onBack: () => void;
 }
 
-export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps) {
+export function StudentDetailsView({ username, onBack }: Readonly<StudentDetailsViewProps>) {
     const [data, setData] = useState<StudentExtendedDTO | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null); // <-- 2. Add Error State
@@ -37,8 +37,8 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
             try {
                 const res = await StudentService.getExtendedProfile(username);
                 setData(res.data);
-            } catch (err: any) {
-                setError(err.message); // Set specific error from API
+            } catch (err: unknown) {
+                setError(err instanceof Error ? err.message : 'Failed to fetch student profile');
             } finally {
                 setLoading(false);
             }
@@ -49,7 +49,9 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
     const easyCount = data?.problemStats?.find(s => s.difficulty === 'Easy')?.count || 0;
     const medCount = data?.problemStats?.find(s => s.difficulty === 'Medium')?.count || 0;
     const hardCount = data?.problemStats?.find(s => s.difficulty === 'Hard')?.count || 0;
-    const totalSolved = (easyCount + medCount + hardCount) || 1;
+    const actualSolved = data?.totalSolved ?? (easyCount + medCount + hardCount);
+    const totalSolved = actualSolved;
+    const progressTotal = Math.max(actualSolved, 1);
 
     const rating = Math.round(data?.currentContestRating || 0);
 
@@ -136,7 +138,7 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
                         <div className="flex flex-wrap justify-center sm:justify-start gap-6 sm:gap-8 bg-[#1a1b2e]/40 p-5 rounded-xl border border-zinc-800/60 shadow-inner">
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rank</p>
-                                <p className="text-2xl font-bold text-white">{data.rank ? `#${parseInt(data.rank).toLocaleString()}` : 'N/A'}</p>
+                                <p className="text-2xl font-bold text-white">{data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : 'N/A'}</p>
                             </div>
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Solved</p>
@@ -171,8 +173,8 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
                             <CardContent className="pt-6">
                                 <div className="flex flex-wrap gap-3">
                                     {data.skills && data.skills.length > 0 ? (
-                                        data.skills.sort((a, b) => b.problemsSolved - a.problemsSolved).slice(0, 15).map((skill, i) => (
-                                            <div key={i} className="flex items-center bg-[#1a1b2e]/30 rounded-xl px-3 py-2 border border-zinc-800/60 shadow-sm">
+                                        data.skills.toSorted((a, b) => b.problemsSolved - a.problemsSolved).slice(0, 15).map((skill) => (
+                                            <div key={skill.tagName} className="flex items-center bg-[#1a1b2e]/30 rounded-xl px-3 py-2 border border-zinc-800/60 shadow-sm">
                                                 <span className="text-sm font-medium text-zinc-300 mr-3">{skill.tagName}</span>
                                                 <span className="text-[11px] font-bold bg-[#5b4fff]/20 text-[#b4afff] px-2 py-0.5 rounded-md">{skill.problemsSolved}</span>
                                             </div>
@@ -192,15 +194,15 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
                             <CardContent className="space-y-5 pt-6">
                                 <div>
                                     <div className="flex justify-between text-sm mb-2"><span className="text-emerald-400 font-bold tracking-wide">Easy</span><span className="font-bold text-white">{easyCount}</span></div>
-                                    <Progress value={(easyCount / totalSolved) * 100} className="h-2.5 bg-[#1a1b2e] border border-zinc-800/60 [&>div]:bg-emerald-500 shadow-inner" />
+                                    <Progress value={(easyCount / progressTotal) * 100} className="h-2.5 bg-[#1a1b2e] border border-zinc-800/60 [&>div]:bg-emerald-500 shadow-inner" />
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-2"><span className="text-amber-400 font-bold tracking-wide">Medium</span><span className="font-bold text-white">{medCount}</span></div>
-                                    <Progress value={(medCount / totalSolved) * 100} className="h-2.5 bg-[#1a1b2e] border border-zinc-800/60 [&>div]:bg-amber-500 shadow-inner" />
+                                    <Progress value={(medCount / progressTotal) * 100} className="h-2.5 bg-[#1a1b2e] border border-zinc-800/60 [&>div]:bg-amber-500 shadow-inner" />
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-2"><span className="text-rose-400 font-bold tracking-wide">Hard</span><span className="font-bold text-white">{hardCount}</span></div>
-                                    <Progress value={(hardCount / totalSolved) * 100} className="h-2.5 bg-[#1a1b2e] border border-zinc-800/60 [&>div]:bg-rose-500 shadow-inner" />
+                                    <Progress value={(hardCount / progressTotal) * 100} className="h-2.5 bg-[#1a1b2e] border border-zinc-800/60 [&>div]:bg-rose-500 shadow-inner" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -210,8 +212,8 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
                             <CardContent className="flex-1 p-0 px-6 pb-6 pt-6">
                                 <ScrollArea className="h-64 pr-4 custom-scrollbar">
                                     <div className="space-y-4">
-                                        {data.recentSubmissions?.slice(0, 15).map((sub, i) => (
-                                            <div key={i} className="flex items-start space-x-3 pb-4 border-b border-zinc-800/60 last:border-0 last:pb-0">
+                                        {data.recentSubmissions?.slice(0, 15).map((sub) => (
+                                            <div key={`${sub.titleSlug || sub.title}-${sub.timestamp}`} className="flex items-start space-x-3 pb-4 border-b border-zinc-800/60 last:border-0 last:pb-0">
                                                 <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
                                                 <div>
                                                     <p className="text-[14px] font-medium leading-tight text-white mb-1">{sub.title}</p>
@@ -229,8 +231,8 @@ export function StudentDetailsView({ username, onBack }: StudentDetailsViewProps
                                 <CardHeader className="border-b border-zinc-800/60 pb-4"><CardTitle className="text-lg font-bold text-white tracking-tight flex items-center"><Award className="w-5 h-5 mr-2 text-amber-500" /> Earned Badges</CardTitle></CardHeader>
                                 <CardContent className="pt-6">
                                     <div className="grid grid-cols-3 gap-3">
-                                        {data.badges.slice(0, 6).map((badge, i) => (
-                                            <div key={i} className="aspect-square bg-[#1a1b2e]/40 rounded-xl flex items-center justify-center border border-zinc-800/60 p-2 shadow-sm" title={badge.title}>
+                                        {data.badges.slice(0, 6).map((badge) => (
+                                            <div key={`${badge.title}-${badge.icon}`} className="aspect-square bg-[#1a1b2e]/40 rounded-xl flex items-center justify-center border border-zinc-800/60 p-2 shadow-sm" title={badge.title}>
                                                 <img src={badge.icon.startsWith('http') ? badge.icon : `https://leetcode.com${badge.icon}`} alt="badge" className="w-10 h-10 object-contain" />
                                             </div>
                                         ))}

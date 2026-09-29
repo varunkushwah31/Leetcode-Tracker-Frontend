@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { LogOut, Plus, Terminal, BookOpen, Loader2, ShieldAlert, Badge, RefreshCw } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { ScrollArea } from '../components/ui/scroll-area';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { MentorService, ClassroomService, PathService, StudentService } from '../services/endpoints';
 import type { ClassroomDashboardDTO, LearningPath, ClassroomAnalyticsDTO } from '@/types';
 
@@ -18,6 +18,88 @@ import { ManageAssignments } from '../components/dashboard/mentor/ManageAssignme
 import { AdminOverview } from "@/pages/AdminOverview.tsx";
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 import { ErrorBanner } from '../components/ui/ErrorBanner';
+
+async function syncStudentsInBatches(students: { leetcodeUsername: string }[], batchSize = 3): Promise<void> {
+    for (let i = 0; i < students.length; i += batchSize) {
+        const batch = students.slice(i, i + batchSize);
+        await Promise.allSettled(
+            batch.map(student => StudentService.syncProfile(student.leetcodeUsername))
+        );
+        if (i + batchSize < students.length) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+}
+
+interface ClassroomTabContentProps {
+    readonly activeTab: string;
+    readonly selectedClassroom: ClassroomDashboardDTO;
+    readonly sortBy: string;
+    readonly onSortChange: (value: string) => void;
+    readonly onExportCSV: () => void;
+    readonly onStudentClick: (username: string) => void;
+    readonly analyticsData: ClassroomAnalyticsDTO | null;
+    readonly mentorId: string;
+    readonly onRefresh: () => void;
+}
+
+function ClassroomTabContent({
+    activeTab,
+    selectedClassroom,
+    sortBy,
+    onSortChange,
+    onExportCSV,
+    onStudentClick,
+    analyticsData,
+    mentorId,
+    onRefresh,
+}: Readonly<ClassroomTabContentProps>) {
+    if (activeTab === 'leaderboard') {
+        return (
+            <LeaderboardTable
+                students={selectedClassroom.enrolledStudents}
+                sortBy={sortBy}
+                onSortChange={onSortChange}
+                onExportCSV={onExportCSV}
+                onStudentClick={onStudentClick}
+                classroomId={selectedClassroom.classroomId}
+            />
+        );
+    }
+    if (activeTab === 'analytics') {
+        return <ClassroomAnalytics data={analyticsData} />;
+    }
+    return (
+        <ManageAssignments
+            classroomId={selectedClassroom.classroomId}
+            mentorId={mentorId}
+            assignments={selectedClassroom.assignments || []}
+            onRefresh={onRefresh}
+        />
+    );
+}
+
+function EmptyClassroomState({ onCreateClass }: Readonly<{ onCreateClass: () => void }>) {
+    return (
+        <div className="h-full flex items-center justify-center p-8">
+            <div className="text-center max-w-md relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)]">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1a1b2e] rounded-2xl mb-6 shadow-lg">
+                    <BookOpen className="w-8 h-8 text-[#968fff]" />
+                </div>
+                <h2 className="text-[28px] font-bold text-white tracking-tight mb-3">No Classroom Selected</h2>
+                <p className="text-zinc-400 text-[15px] mb-8">
+                    Select a classroom from the sidebar, or create a new one to start tracking progress.
+                </p>
+                <Button
+                    onClick={onCreateClass}
+                    className="w-full h-12 bg-transparent border border-zinc-700 text-white text-[15px] font-medium hover:bg-zinc-800 rounded-xl transition-all duration-200 flex items-center justify-center hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-0.5 active:translate-y-0"
+                >
+                    <Plus className="w-5 h-5 mr-2" />Create Your First Classroom
+                </Button>
+            </div>
+        </div>
+    );
+}
 
 export function MentorDashboard() {
     const { user, logout } = useAuth();
@@ -43,12 +125,10 @@ export function MentorDashboard() {
 
     const [isClassroomSyncing, setIsClassroomSyncing] = useState(false);
 
-    useClassroomWebSocket(selectedClassroom?.classroomId, () => {
-        console.log("Auto-refreshing Mentor Dashboard...");
-        void fetchDashboardData();
-    });
+    const getErrorMessage = (err: unknown, fallback: string) =>
+        err instanceof Error && err.message ? err.message : fallback;
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         if (!user?.id) return;
         setIsLoading(true);
         setError(null);
@@ -68,34 +148,31 @@ export function MentorDashboard() {
             const fetchedClassrooms = dashboardResponses.map(res => res.data);
             setClassrooms([...fetchedClassrooms]);
 
-            if (selectedClassroom) {
-                const updated = fetchedClassrooms.find(c => c.classroomId === selectedClassroom.classroomId);
-                setSelectedClassroom(updated || fetchedClassrooms[0] || null);
-
-                if (updated) {
-                    const analyticsRes = await ClassroomService.getAnalytics(updated.classroomId);
-                    setAnalyticsData(analyticsRes.data);
+            setSelectedClassroom(prev => {
+                if (prev) {
+                    const updated = fetchedClassrooms.find(c => c.classroomId === prev.classroomId);
+                    return updated || fetchedClassrooms[0] || null;
                 }
-            } else if (fetchedClassrooms.length > 0) {
-                setSelectedClassroom(fetchedClassrooms[0]);
-                const analyticsRes = await ClassroomService.getAnalytics(fetchedClassrooms[0].classroomId);
-                setAnalyticsData(analyticsRes.data);
-            }
-        } catch (err: any) {
-            console.error("Failed to load mentor dashboard.", err);
-            setError(err.message || 'Failed to load mentor dashboard.');
+                return fetchedClassrooms[0] || null;
+            });
+        } catch (err: unknown) {
+            setError(getErrorMessage(err, 'Failed to load mentor dashboard.'));
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [sortBy, user?.id]);
 
-    useEffect(() => { void fetchDashboardData(); }, [sortBy, user?.id]);
+    useClassroomWebSocket(selectedClassroom?.classroomId, () => {
+        void fetchDashboardData();
+    });
+
+    useEffect(() => { void fetchDashboardData(); }, [fetchDashboardData]);
 
     useEffect(() => {
         if (selectedClassroom?.classroomId) {
             void ClassroomService.getAnalytics(selectedClassroom.classroomId)
                 .then(res => setAnalyticsData(res.data))
-                .catch(err => console.error("Failed to load analytics", err));
+                .catch(() => { /* analytics load is best-effort */ });
         }
     }, [selectedClassroom?.classroomId]);
 
@@ -107,8 +184,8 @@ export function MentorDashboard() {
             setCreateClassOpen(false);
             setNewClassName('');
             await fetchDashboardData();
-        } catch (err: any) {
-            setCreateClassError(err.message);
+        } catch (err: unknown) {
+            setCreateClassError(getErrorMessage(err, 'Failed to create classroom.'));
         }
     };
 
@@ -121,13 +198,14 @@ export function MentorDashboard() {
             const link = document.createElement('a');
             link.href = url; link.setAttribute('download', `${selectedClassroom.className.replace(/\s+/g, '_')}_Leaderboard.csv`);
             document.body.appendChild(link); link.click(); link.remove();
-        } catch (err: any) {
-            setError(err.message);
+            window.URL.revokeObjectURL(url);
+        } catch (err: unknown) {
+            setError(getErrorMessage(err, 'Failed to export classroom.'));
         }
     };
 
     const handleSyncClassroom = async () => {
-        if (!selectedClassroom || !selectedClassroom.enrolledStudents || selectedClassroom.enrolledStudents.length === 0) {
+        if (!selectedClassroom?.enrolledStudents || selectedClassroom.enrolledStudents.length === 0) {
             setError("No students in this classroom to sync.");
             return;
         }
@@ -135,26 +213,10 @@ export function MentorDashboard() {
         setError(null);
         setIsClassroomSyncing(true);
         try {
-            const students = selectedClassroom.enrolledStudents;
-            const batchSize = 3;
-
-            for (let i = 0; i < students.length; i += batchSize) {
-                const batch = students.slice(i, i + batchSize);
-
-                await Promise.allSettled(
-                    batch.map(student => StudentService.syncProfile(student.leetcodeUsername))
-                );
-
-                if (i + batchSize < students.length) {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-            }
-
+            await syncStudentsInBatches(selectedClassroom.enrolledStudents);
             await fetchDashboardData();
-
-        } catch (err: any) {
-            console.error("Failed to sync classroom", err);
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(getErrorMessage(err, 'Failed to sync classroom.'));
         } finally {
             setIsClassroomSyncing(false);
         }
@@ -185,7 +247,12 @@ export function MentorDashboard() {
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="bg-[#111111] border-zinc-800 text-white sm:rounded-2xl">
-                                <DialogHeader><DialogTitle className="text-white text-xl font-bold">Create New Classroom</DialogTitle></DialogHeader>
+                                <DialogHeader>
+                                    <DialogTitle className="text-white text-xl font-bold">Create New Classroom</DialogTitle>
+                                    <DialogDescription className="text-zinc-400 text-sm">
+                                        Enter the name of the new classroom to start managing students and assignments.
+                                    </DialogDescription>
+                                </DialogHeader>
 
                                 {/* Error Banner for Class Creation */}
                                 <ErrorBanner message={createClassError} />
@@ -246,7 +313,7 @@ export function MentorDashboard() {
                             </button>
                         )}
 
-                        <button onClick={logout} className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300 border border-transparent hover:border-red-500/20">
+                        <button onClick={logout} aria-label="Sign out" className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300 border border-transparent hover:border-red-500/20">
                             <LogOut className="w-4 h-4 mr-2" /> Sign Out
                         </button>
                     </div>
@@ -259,87 +326,85 @@ export function MentorDashboard() {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-100 bg-[#5b4fff] opacity-[0.05] blur-[120px] rounded-full pointer-events-none"></div>
 
                 <div className="relative z-10 h-full">
-                    {showAdminOverview ? (
-                        <AdminOverview onBack={() => {
-                            setShowAdminOverview(false);
-                            if (classrooms.length > 0) setSelectedClassroom(classrooms[0]);
-                        }} />
-                    ) : selectedClassroom ? (
-                        <div className="max-w-7xl mx-auto p-6 lg:p-10 min-h-full">
+                    {(() => {
+                        if (showAdminOverview) {
+                            return (
+                                <AdminOverview onBack={() => {
+                                    setShowAdminOverview(false);
+                                    if (classrooms.length > 0) setSelectedClassroom(classrooms[0]);
+                                }} />
+                            );
+                        }
 
-                            {/* Main Dashboard Error Banner */}
-                            <ErrorBanner message={error} />
+                        if (!selectedClassroom) {
+                            return <EmptyClassroomState onCreateClass={() => setCreateClassOpen(true)} />;
+                        }
 
-                            <div className="mb-8 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
-                                <div>
-                                    <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">{selectedClassroom.className}</h1>
-                                    <p className="text-[15px] text-zinc-400 flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
+                        return (
+                            <div className="max-w-7xl mx-auto p-6 lg:p-10 min-h-full">
+                                {/* Main Dashboard Error Banner */}
+                                <ErrorBanner message={error} />
+
+                                <div className="mb-8 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+                                    <div>
+                                        <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">{selectedClassroom.className}</h1>
+                                        <p className="text-[15px] text-zinc-400 flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <Button
+                                            onClick={handleSyncClassroom}
+                                            disabled={isClassroomSyncing}
+                                            variant="outline"
+                                            aria-label="Sync classroom data"
+                                            className="bg-transparent border-zinc-700 text-white hover:bg-zinc-800 rounded-xl"
+                                        >
+                                            {isClassroomSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2 text-zinc-400" />}
+                                            {isClassroomSyncing ? 'Syncing Class...' : 'Sync Class Data'}
+                                        </Button>
+
+                                        <MentorActions mentorId={user!.id!} selectedClassroom={selectedClassroom} learningPaths={learningPaths} onRefresh={fetchDashboardData} />
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <Button
-                                        onClick={handleSyncClassroom}
-                                        disabled={isClassroomSyncing}
-                                        variant="outline"
-                                        className="bg-transparent border-zinc-700 text-white hover:bg-zinc-800 rounded-xl"
+
+                                <div className="flex bg-[#111111]/85 backdrop-blur-2xl p-1.5 rounded-xl w-max mb-8 border border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
+                                    <button
+                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'leaderboard' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
+                                        onClick={() => setActiveTab('leaderboard')}
                                     >
-                                        {isClassroomSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2 text-zinc-400" />}
-                                        {isClassroomSyncing ? 'Syncing Class...' : 'Sync Class Data'}
-                                    </Button>
-
-                                    <MentorActions mentorId={user!.id!} selectedClassroom={selectedClassroom} learningPaths={learningPaths} onRefresh={fetchDashboardData} />
+                                        Class Leaderboard
+                                    </button>
+                                    <button
+                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'analytics' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
+                                        onClick={() => setActiveTab('analytics')}
+                                    >
+                                        Weakness & Analytics
+                                    </button>
+                                    <button
+                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'assignments' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
+                                        onClick={() => setActiveTab('assignments')}
+                                    >
+                                        Manage Assignments
+                                    </button>
                                 </div>
-                            </div>
 
-                            <div className="flex bg-[#111111]/85 backdrop-blur-2xl p-1.5 rounded-xl w-max mb-8 border border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
-                                <button
-                                    className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'leaderboard' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
-                                    onClick={() => setActiveTab('leaderboard')}
-                                >
-                                    Class Leaderboard
-                                </button>
-                                <button
-                                    className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'analytics' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
-                                    onClick={() => setActiveTab('analytics')}
-                                >
-                                    Weakness & Analytics
-                                </button>
-                                {/* 2. NEW: Manage Assignments Tab Button */}
-                                <button
-                                    className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'assignments' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
-                                    onClick={() => setActiveTab('assignments')}
-                                >
-                                    Manage Assignments
-                                </button>
-                            </div>
-
-                            {/* 3. NEW: Conditional render for the 3 tabs */}
-                            {activeTab === 'leaderboard' ? (
-                                <LeaderboardTable students={selectedClassroom.enrolledStudents} sortBy={sortBy} onSortChange={setSortBy} onExportCSV={handleExportCSV} onStudentClick={(username) => setViewingStudentUsername(username)} />
-                            ) : activeTab === 'analytics' ? (
-                                <ClassroomAnalytics data={analyticsData} />
-                            ) : (
-                                <ManageAssignments
-                                    classroomId={selectedClassroom.classroomId}
+                                <ClassroomTabContent
+                                    activeTab={activeTab}
+                                    selectedClassroom={selectedClassroom}
+                                    sortBy={sortBy}
+                                    onSortChange={setSortBy}
+                                    onExportCSV={handleExportCSV}
+                                    onStudentClick={(username) => setViewingStudentUsername(username)}
+                                    analyticsData={analyticsData}
                                     mentorId={user!.id!}
-                                    assignments={(selectedClassroom as any).assignments || []}
                                     onRefresh={fetchDashboardData}
                                 />
-                            )}
 
-                            {viewingStudentUsername && (
-                                <StudentDetailsView username={viewingStudentUsername} onBack={() => setViewingStudentUsername(null)} />
-                            )}
-                        </div>
-                    ) : (
-                        <div className="h-full flex items-center justify-center p-8">
-                            <div className="text-center max-w-md relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)]">
-                                <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1a1b2e] rounded-2xl mb-6 shadow-lg"><BookOpen className="w-8 h-8 text-[#968fff]" /></div>
-                                <h2 className="text-[28px] font-bold text-white tracking-tight mb-3">No Classroom Selected</h2>
-                                <p className="text-zinc-400 text-[15px] mb-8">Select a classroom from the sidebar, or create a new one to start tracking progress.</p>
-                                <Button onClick={() => setCreateClassOpen(true)} className="w-full h-12 bg-transparent border border-zinc-700 text-white text-[15px] font-medium hover:bg-zinc-800 rounded-xl transition-all duration-200 flex items-center justify-center hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-0.5 active:translate-y-0"><Plus className="w-5 h-5 mr-2" />Create Your First Classroom</Button>
+                                {viewingStudentUsername && (
+                                    <StudentDetailsView username={viewingStudentUsername} onBack={() => setViewingStudentUsername(null)} />
+                                )}
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
                 </div>
             </main>
         </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -10,7 +10,11 @@ import { AdminService } from '@/services/endpoints';
 import type { SystemOverviewDTO, MentorDTO, ClassroomDashboardDTO } from '@/types';
 import { ErrorBanner } from '@/components/ui/ErrorBanner'; // <-- 1. Import the Banner
 
-export function AdminOverview({ onBack }: { onBack: () => void }) {
+interface AdminOverviewProps {
+    readonly onBack: () => void;
+}
+
+export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
     const [data, setData] = useState<SystemOverviewDTO | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -34,19 +38,22 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
         setTimeout(() => setToast(null), 4000);
     };
 
-    const fetchAdminData = async () => {
+    const getErrMsg = (err: unknown, fallback: string) =>
+        err instanceof Error && err.message ? err.message : fallback;
+
+    const fetchAdminData = useCallback(async () => {
         try {
             const response = await AdminService.getOverview();
             setData(response.data);
-        } catch (err: any) {
+        } catch (err: unknown) {
             // MAGIC: The interceptor automatically handles the 403 Access Denied message!
-            setPageError(err.message);
+            setPageError(getErrMsg(err, 'Failed to load admin overview.'));
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
-    useEffect(() => { void fetchAdminData(); }, []);
+    useEffect(() => { void fetchAdminData(); }, [fetchAdminData]);
 
     // SUPERPOWER HANDLERS
     const handleForceSync = async () => {
@@ -56,8 +63,8 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
             const res = await AdminService.forceSyncAll();
             showToast(res.data?.message || "Global sync initiated successfully.", 'success');
             await fetchAdminData();
-        } catch (err: any) {
-            setSyncError(err.message);
+        } catch (err: unknown) {
+            setSyncError(getErrMsg(err, 'Failed to force sync.'));
         } finally {
             setIsSyncing(false);
         }
@@ -71,8 +78,8 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
             setDeletingMentor(null);
             showToast(`Successfully deleted mentor ${deletingMentor.name}`, 'success');
             await fetchAdminData();
-        } catch (err: any) {
-            setDeleteMentorError(err.message);
+        } catch (err: unknown) {
+            setDeleteMentorError(getErrMsg(err, 'Failed to delete mentor.'));
         }
     };
 
@@ -84,8 +91,8 @@ export function AdminOverview({ onBack }: { onBack: () => void }) {
             setDeletingClassroom(null);
             showToast(`Successfully deleted classroom ${deletingClassroom.className}`, 'success');
             await fetchAdminData();
-        } catch (err: any) {
-            setDeleteClassError(err.message);
+        } catch (err: unknown) {
+            setDeleteClassError(getErrMsg(err, 'Failed to delete classroom.'));
         }
     };
 

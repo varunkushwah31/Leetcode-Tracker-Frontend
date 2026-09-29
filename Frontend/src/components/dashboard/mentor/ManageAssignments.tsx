@@ -8,13 +8,13 @@ import { ErrorBanner } from '../../ui/ErrorBanner';
 import type { AssignmentDTO } from '@/types';
 
 interface ManageAssignmentsProps {
-    classroomId: string;
-    mentorId: string;
-    assignments?: AssignmentDTO[];
-    onRefresh: () => void;
+    readonly classroomId: string;
+    readonly mentorId: string;
+    readonly assignments?: AssignmentDTO[];
+    readonly onRefresh: () => void;
 }
 
-export function ManageAssignments({ classroomId, mentorId, assignments = [], onRefresh }: ManageAssignmentsProps) {
+export function ManageAssignments({ classroomId, mentorId, assignments = [], onRefresh }: Readonly<ManageAssignmentsProps>) {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -24,8 +24,8 @@ export function ManageAssignments({ classroomId, mentorId, assignments = [], onR
         try {
             await ClassroomService.deleteAssignment(classroomId, assignmentId, mentorId);
             onRefresh(); // Refresh dashboard to show updated list
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to delete assignment');
         } finally {
             setIsDeleting(null);
         }

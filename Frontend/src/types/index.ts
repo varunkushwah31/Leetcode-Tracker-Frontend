@@ -3,7 +3,9 @@ export type Role = 'SUPER_ADMIN' | 'MENTOR' | 'STUDENT';
 export interface AuthResponse {
     accessToken: string;
     refreshToken?: string;
-    mentorId: string;
+    userId: string;
+    /** @deprecated Use userId instead. Kept for backward compatibility with older backends. */
+    mentorId?: string;
     name: string;
     role: Role;
 }
@@ -61,13 +63,6 @@ export interface ClassroomSummaryDTO {
     mentorId: string;
     studentIds: string[];
     assignments: AssignmentDTO[];
-}
-
-export interface ClassroomDashboardDTO {
-    classroomId: string;
-    className: string;
-    mentorName: string;
-    enrolledStudents: StudentSummaryDTO[];
 }
 
 export interface StudentSummaryDTO {

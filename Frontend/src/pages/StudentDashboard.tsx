@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Loader2, Terminal, LogOut, Activity } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { StudentService } from '../services/endpoints';
 import type { StudentExtendedDTO, AssignmentDTO } from '@/types';
 
@@ -29,26 +29,28 @@ export function StudentDashboard() {
     const [pageError, setPageError] = useState<string | null>(null);
     const [syncError, setSyncError] = useState<string | null>(null);
 
-    const fetchDashboard = async () => {
+    const getErrorMessage = (err: unknown, fallback: string) =>
+        err instanceof Error && err.message ? err.message : fallback;
+
+    const fetchDashboard = useCallback(async () => {
         setPageError(null);
         try {
             const response = await StudentService.getDashboard();
             setDashboardData(response.data);
-        } catch (err: any) {
-            // 2. Replaced console.error with specific backend message mapping
-            setPageError(err.message || 'Failed to load dashboard.');
+        } catch (err: unknown) {
+            setPageError(getErrorMessage(err, 'Failed to load dashboard.'));
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     // When a ping is received, it calls fetchDashboardData to silently update the UI.
     useClassroomWebSocket(selectedClassroomId, () => {
         console.log("Auto-refreshing Student Dashboard...");
-        void fetchDashboard(); // <-- 3. FIXED: Added 'void' to suppress the unhandled promise warning
+        void fetchDashboard();
     });
 
-    useEffect(() => { void fetchDashboard(); }, []);
+    useEffect(() => { void fetchDashboard(); }, [fetchDashboard]);
 
     const handleSync = async () => {
         if (!dashboardData?.leetcodeUsername) return;
@@ -59,9 +61,8 @@ export function StudentDashboard() {
         try {
             const response = await StudentService.syncProfile(dashboardData.leetcodeUsername);
             setDashboardData(response.data);
-        } catch (err: any) {
-            // 4. Replaced alert() with specific backend message mapping
-            setSyncError(err.message || 'Failed to sync with LeetCode.');
+        } catch (err: unknown) {
+            setSyncError(getErrorMessage(err, 'Failed to sync with LeetCode.'));
         } finally {
             setIsSyncing(false);
         }
@@ -90,7 +91,7 @@ export function StudentDashboard() {
     const easyCount = dashboardData?.problemStats?.find(s => s.difficulty === 'Easy')?.count || 0;
     const medCount = dashboardData?.problemStats?.find(s => s.difficulty === 'Medium')?.count || 0;
     const hardCount = dashboardData?.problemStats?.find(s => s.difficulty === 'Hard')?.count || 0;
-    const totalSolved = (easyCount + medCount + hardCount) || 1;
+    const totalSolved = dashboardData?.totalSolved ?? (easyCount + medCount + hardCount);
     const rating = Math.round(dashboardData?.currentContestRating || 0);
 
     const pendingAssignments: { classroomId: string, className: string, assignment: AssignmentDTO }[] = [];
@@ -151,7 +152,14 @@ export function StudentDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                         <ActivityHeatmap progressHistory={dashboardData?.progressHistory} />
-                        <PendingAssignments assignments={pendingAssignments} isSyncing={isSyncing} onSync={handleSync} selectedClassroomId={selectedClassroomId} onClearFilter={() => setSelectedClassroomId(null)} />
+                        <PendingAssignments
+                            assignments={pendingAssignments}
+                            isSyncing={isSyncing}
+                            onSync={handleSync}
+                            selectedClassroomId={selectedClassroomId}
+                            onClearFilter={() => setSelectedClassroomId(null)}
+                            onValidationSuccess={fetchDashboard}
+                        />
                         <ClassroomList classrooms={dashboardData?.classrooms} selectedClassroomId={selectedClassroomId} onSelectClassroom={setSelectedClassroomId} />
                     </div>
 

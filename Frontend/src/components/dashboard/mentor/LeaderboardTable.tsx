@@ -3,8 +3,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
-import { Flame, Download, Search } from 'lucide-react';
+import { Flame, Download, Search, Bell } from 'lucide-react';
 import type { StudentSummaryDTO } from '@/types';
+import { ClassroomService } from '@/services/endpoints';
 import { useState } from 'react';
 
 interface LeaderboardTableProps {
@@ -13,10 +14,50 @@ interface LeaderboardTableProps {
     onSortChange: (value: string) => void;
     onExportCSV: () => void;
     onStudentClick: (username: string) => void;
+    classroomId?: string;
 }
 
-export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, onStudentClick }: LeaderboardTableProps) {
+function getRankBadgeClass(index: number): string {
+    if (index === 0) {
+        return 'bg-[#5b4fff]/20 text-[#b4afff] border border-[#5b4fff]/30';
+    }
+    if (index === 1) {
+        return 'bg-zinc-800 text-zinc-300 border border-zinc-700';
+    }
+    if (index === 2) {
+        return 'bg-orange-500/10 text-orange-400 border border-orange-500/20';
+    }
+    return 'bg-[#222] text-zinc-500 border border-transparent';
+}
+
+function getNudgeButtonLabel(isCurrentlyNudging: boolean, isNudged: boolean): string {
+    if (isCurrentlyNudging) {
+        return '...';
+    }
+    if (isNudged) {
+        return 'Nudged';
+    }
+    return 'Nudge';
+}
+
+export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, onStudentClick, classroomId }: Readonly<LeaderboardTableProps>) {
     const [searchQuery, setSearchQuery] = useState("");
+    const [nudgingStudentId, setNudgingStudentId] = useState<string | null>(null);
+    const [nudgedStudents, setNudgedStudents] = useState<Record<string, boolean>>({});
+
+    const handleNudge = async (e: React.MouseEvent, studentId: string) => {
+        e.stopPropagation();
+        if (!classroomId || nudgingStudentId || nudgedStudents[studentId]) return;
+        setNudgingStudentId(studentId);
+        try {
+            await ClassroomService.nudgeStudent(classroomId, studentId, 'Pending Assignment');
+            setNudgedStudents(prev => ({ ...prev, [studentId]: true }));
+        } catch {
+            // failed gracefully
+        } finally {
+            setNudgingStudentId(null);
+        }
+    };
 
     const filteredStudents = students?.filter(s =>
         s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -79,11 +120,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                         {filteredStudents?.map((student, index) => (
                             <tr key={student.id} className="hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername)}>
                                 <td className="py-4 px-6">
-                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto
-                                            ${index === 0 ? 'bg-[#5b4fff]/20 text-[#b4afff] border border-[#5b4fff]/30' :
-                                        index === 1 ? 'bg-zinc-800 text-zinc-300 border border-zinc-700' :
-                                            index === 2 ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' :
-                                                'bg-[#222] text-zinc-500 border border-transparent'}`}>
+                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto ${getRankBadgeClass(index)}`}>
                                         {index + 1}
                                     </div>
                                 </td>
@@ -111,7 +148,25 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                     <div className="flex flex-col items-end gap-1.5">
                                         <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.completedAssignments || 0} Done</Badge>
                                         {(student.pendingAssignments ?? 0) > 0 && (
-                                            <Badge variant="outline" className="bg-rose-500/10 text-rose-400 border-rose-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.pendingAssignments} Pending</Badge>
+                                            <div className="flex items-center gap-1.5">
+                                                <Badge variant="outline" className="bg-rose-500/10 text-rose-400 border-rose-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.pendingAssignments} Pending</Badge>
+                                                {classroomId && student.id && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => handleNudge(e, student.id!)}
+                                                        disabled={nudgingStudentId === student.id || Boolean(nudgedStudents[student.id])}
+                                                        title="Send reminder email to student"
+                                                        className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border transition-all ${
+                                                            nudgedStudents[student.id]
+                                                                ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10 cursor-default'
+                                                                : 'border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white bg-zinc-800'
+                                                        }`}
+                                                    >
+                                                        <Bell className="w-2.5 h-2.5" />
+                                                        {getNudgeButtonLabel(nudgingStudentId === student.id, Boolean(nudgedStudents[student.id]))}
+                                                    </button>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
                                 </td>

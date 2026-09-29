@@ -33,6 +33,9 @@ export const StudentService = {
     syncProfile: (username: string) => api.post(`/students/${username}/sync`),
 
     getExtendedProfile: (username: string) => api.post(`/students/${username}/extended/fetch`),
+
+    validateSubmission: (classroomId: string, assignmentId: string, url: string) =>
+        api.post(`/students/me/classrooms/${classroomId}/assignments/${assignmentId}/validate`, { url }),
 };
 
 export const MentorService = {
@@ -41,6 +44,9 @@ export const MentorService = {
 };
 
 export const ClassroomService = {
+    // NOTE: mentorId is currently passed from the client, but it must move
+    // server-side (derive the mentor from the authenticated principal/JWT) so
+    // clients cannot spoof another mentor's identity.
     createClassroom: (mentorId: string, className: string) => api.post('/classrooms', null, { params: { mentorId, className } }),
     getDashboard: (classroomId: string, sortBy: string = 'solved') => api.get(`/classrooms/${classroomId}/dashboard`, { params: { sortBy } }),
     addStudent: (classroomId: string, leetcodeUsername: string) => api.post(`/classrooms/${classroomId}/students`, null, { params: { leetcodeUsername } }),
@@ -55,14 +61,17 @@ export const ClassroomService = {
     deleteAssignment: (classroomId: string, assignmentId: string, mentorId: string) =>
         api.delete(`/classrooms/${classroomId}/assignments/${assignmentId}`, { params: { mentorId } }),
 
+    validateStudentSubmission: (classroomId: string, username: string, assignmentId: string, url: string) =>
+        api.post(`/classrooms/${classroomId}/students/${username}/assignments/${assignmentId}/validate`, { url }),
+
+    nudgeStudent: (classroomId: string, studentId: string, assignmentName: string) =>
+        api.post(`/classrooms/${classroomId}/students/${studentId}/nudge`, null, { params: { assignmentName } }),
     
-    // Upload CSV 
+    // Upload CSV (let axios set the multipart boundary automatically)
     bulkAddStudents: (classroomId: string, file: File) => {
         const formData = new FormData();
         formData.append('file', file);
-        return api.post(`/classrooms/${classroomId}/students/bulk`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        return api.post(`/classrooms/${classroomId}/students/bulk`, formData);
     },
 
     deleteClassroom: (classroomId: string, mentorId: string) => api.delete(`/classrooms/${classroomId}`, { params: { mentorId } }),

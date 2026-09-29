@@ -25,8 +25,8 @@ export function ContactPage() {
 
             setIsSuccess(true);
             setFormData({ name: '', email: '', subject: '', message: '' });
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to send message');
         } finally {
             setIsSubmitting(false);
         }

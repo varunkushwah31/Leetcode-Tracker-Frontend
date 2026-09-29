@@ -64,7 +64,12 @@ This platform automates the tracking of coding assignments by integrating direct
 
 ## 🚀 Local Setup & Installation
 
-> This repository contains both frontend and backend
+> Repository: [https://github.com/varunkushwah31/Leetcode-Tracker-Frontend](https://github.com/varunkushwah31/Leetcode-Tracker-Frontend)
+
+```bash
+git clone https://github.com/varunkushwah31/Leetcode-Tracker-Frontend.git
+cd Leetcode-Tracker-Frontend
+```
 
 ---
 
