@@ -20,9 +20,23 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // The endpoint our React app will connect to
+        // Native STOMP WebSocket endpoint (primary for modern browsers, eliminates SockJS unload violation)
         registry.addEndpoint("/ws-endpoint")
-                .setAllowedOrigins("http://localhost:5173")
-                .withSockJS(); // Fallback for browsers that don't support raw WebSockets
+                .setAllowedOriginPatterns(
+                        "http://localhost:*",
+                        "http://127.0.0.1:*",
+                        "https://*.onrender.com",
+                        "*"
+                );
+
+        // SockJS fallback endpoint
+        registry.addEndpoint("/ws-endpoint")
+                .setAllowedOriginPatterns(
+                        "http://localhost:*",
+                        "http://127.0.0.1:*",
+                        "https://*.onrender.com",
+                        "*"
+                )
+                .withSockJS();
     }
 }

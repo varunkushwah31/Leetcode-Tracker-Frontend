@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 @RestController
 @RequestMapping("/api/classrooms")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost", "http://localhost:80", "http://127.0.0.1:5173", "http://127.0.0.1", "http://127.0.0.1:80"}, allowedHeaders = "*", allowCredentials = "true")
 public class ClassroomController {
 
     private final ClassroomService classroomService;
@@ -146,5 +146,15 @@ public class ClassroomController {
 
         classroomService.deleteClassroom(classroomId, mentorId);
         return ResponseEntity.ok("Classroom deleted successfully.");
+    }
+
+    @DeleteMapping("/{classroomId}/assignments/{assignmentId}")
+    public ResponseEntity<String> deleteAssignment(
+            @PathVariable String classroomId,
+            @PathVariable String assignmentId,
+            @RequestParam String mentorId) {
+
+        classroomService.deleteAssignment(classroomId, assignmentId, mentorId);
+        return ResponseEntity.ok("Assignment deleted successfully.");
     }
 }

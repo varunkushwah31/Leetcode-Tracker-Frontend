@@ -5,6 +5,7 @@ import com.tracker.leetcode.tracker.DTO.AuthenticationResponse;
 import com.tracker.leetcode.tracker.DTO.RegisterRequest;
 import com.tracker.leetcode.tracker.DTO.StudentRegisterRequest;
 import com.tracker.leetcode.tracker.Exception.DuplicateMentorException;
+import com.tracker.leetcode.tracker.Exception.DuplicateStudentException;
 import com.tracker.leetcode.tracker.Exception.UserAuthenticationException;
 import com.tracker.leetcode.tracker.Models.*;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
@@ -34,7 +35,7 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest request){
         log.info("Registering new Mentor with email: {}", request.email());
-        if (mentorRepository.findByEmail(request.email()).isPresent()){
+        if (mentorRepository.findByEmail(request.email()).isPresent() || studentRepository.findByEmail(request.email()).isPresent()){
             throw new DuplicateMentorException("Email already in use.");
         }
         Mentor mentor = new Mentor();
@@ -51,8 +52,11 @@ public class AuthenticationService {
 
     public AuthenticationResponse registerStudent(StudentRegisterRequest request){
         log.info("Registering new student: {}", request.email());
-        if (studentRepository.findByEmail(request.email()).isPresent()){
-            throw new DuplicateMentorException("Student email already in use.");
+        if (studentRepository.findByEmail(request.email()).isPresent() || mentorRepository.findByEmail(request.email()).isPresent()){
+            throw new DuplicateStudentException("Student email already in use.");
+        }
+        if (studentRepository.findByLeetcodeUsername(request.leetcodeUsername()).isPresent()){
+            throw new DuplicateStudentException("LeetCode username '" + request.leetcodeUsername() + "' already in use.");
         }
         Student student = new Student();
         student.setName(request.name());
@@ -65,12 +69,14 @@ public class AuthenticationService {
 
         Student savedStudent = studentRepository.save(student);
 
-        try {
-            log.info("Auto-syncing LeetCode data for new student: {}", savedStudent.getLeetcodeUsername());
-            studentService.syncAllProfileData(savedStudent.getLeetcodeUsername());
-        } catch (Exception e) {
-            log.warn("Failed to auto-sync LeetCode data for {}. Error: {}", savedStudent.getLeetcodeUsername(), e.getMessage());
-        }
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            try {
+                log.info("Auto-syncing LeetCode data in background for new student: {}", savedStudent.getLeetcodeUsername());
+                studentService.syncAllProfileData(savedStudent.getLeetcodeUsername());
+            } catch (Exception e) {
+                log.warn("Failed to auto-sync LeetCode data for {}. Error: {}", savedStudent.getLeetcodeUsername(), e.getMessage());
+            }
+        });
 
         return generateAuthResponseForStudent(savedStudent);
     }
@@ -122,9 +128,10 @@ public class AuthenticationService {
                         return AuthenticationResponse.builder()
                                 .accessToken(jwtToken)
                                 .refreshToken(requestRefreshToken)
+                                .userId(student.getId())
                                 .mentorId(student.getId())
                                 .name(student.getName())
-                                .role(student.getRole()) // <-- ADDED ROLE HERE
+                                .role(student.getRole())
                                 .build();
                     }
 
@@ -136,9 +143,10 @@ public class AuthenticationService {
                         return AuthenticationResponse.builder()
                                 .accessToken(jwtToken)
                                 .refreshToken(requestRefreshToken)
+                                .userId(mentor.getId())
                                 .mentorId(mentor.getId())
                                 .name(mentor.getName())
-                                .role(mentor.getRole()) // <-- ADDED ROLE HERE
+                                .role(mentor.getRole())
                                 .build();
                     }
 
@@ -158,9 +166,10 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken.getToken())
+                .userId(student.getId())
                 .mentorId(student.getId())
                 .name(student.getName())
-                .role(student.getRole()) // <-- ADDED ROLE HERE
+                .role(student.getRole())
                 .build();
     }
 
@@ -173,9 +182,10 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken.getToken())
+                .userId(mentor.getId())
                 .mentorId(mentor.getId())
                 .name(mentor.getName())
-                .role(mentor.getRole()) // <-- ADDED ROLE HERE
+                .role(mentor.getRole())
                 .build();
     }
 }

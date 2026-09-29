@@ -4,7 +4,6 @@ import com.tracker.leetcode.tracker.DTO.AuthenticationRequest;
 import com.tracker.leetcode.tracker.DTO.AuthenticationResponse;
 import com.tracker.leetcode.tracker.DTO.RegisterRequest;
 import com.tracker.leetcode.tracker.DTO.StudentRegisterRequest;
-import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import com.tracker.leetcode.tracker.Service.AuthenticationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,11 +14,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost", "http://localhost:80", "http://127.0.0.1:5173", "http://127.0.0.1", "http://127.0.0.1:80"}, allowedHeaders = "*", allowCredentials = "true")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-    private final MentorRepository mentorRepository;
 
     // Helper to build the secure cookie
     private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
@@ -40,6 +38,7 @@ public class AuthenticationController {
         // Return everything EXCEPT the refresh token in the JSON body (it's in the cookie now!)
         return ResponseEntity.ok(AuthenticationResponse.builder()
                 .accessToken(authResponse.accessToken())
+                .userId(authResponse.userId() != null ? authResponse.userId() : authResponse.mentorId())
                 .mentorId(authResponse.mentorId())
                 .name(authResponse.name())
                 .role(authResponse.role()) // <-- FIXED: Added Role
@@ -55,6 +54,7 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(AuthenticationResponse.builder()
                 .accessToken(authResponse.accessToken())
+                .userId(authResponse.userId() != null ? authResponse.userId() : authResponse.mentorId())
                 .mentorId(authResponse.mentorId())
                 .name(authResponse.name())
                 .role(authResponse.role()) // <-- FIXED: Added Role
@@ -80,6 +80,7 @@ public class AuthenticationController {
         // Return the NEW access token
         return ResponseEntity.ok(AuthenticationResponse.builder()
                 .accessToken(authResponse.accessToken())
+                .userId(authResponse.userId() != null ? authResponse.userId() : authResponse.mentorId())
                 .mentorId(authResponse.mentorId())
                 .name(authResponse.name())
                 .role(authResponse.role())
@@ -109,21 +110,10 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(AuthenticationResponse.builder()
                 .accessToken(authResponse.accessToken())
+                .userId(authResponse.userId() != null ? authResponse.userId() : authResponse.mentorId())
                 .mentorId(authResponse.mentorId())
                 .name(authResponse.name())
                 .role(authResponse.role()) // <-- FIXED: Added Role
                 .build());
-    }
-
-
-    @GetMapping("/make-admin")
-    public org.springframework.http.ResponseEntity<?> makeAdmin(@RequestParam String email) {
-        com.tracker.leetcode.tracker.Models.Mentor mentor = mentorRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Mentor not found"));
-
-        mentor.setRole(com.tracker.leetcode.tracker.Models.Role.SUPER_ADMIN);
-        mentorRepository.save(mentor);
-
-        return org.springframework.http.ResponseEntity.ok("Successfully promoted " + email + " to SUPER_ADMIN!");
     }
 }

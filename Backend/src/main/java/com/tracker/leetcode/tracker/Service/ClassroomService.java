@@ -131,6 +131,7 @@ public class ClassroomService {
                 .className(classroom.getClassName())
                 .mentorName(mentor.getName())
                 .enrolledStudents(studentSummaries)
+                .assignments(classroom.getAssignments() != null ? classroom.getAssignments() : new ArrayList<>())
                 .build();
     }
 
@@ -155,7 +156,15 @@ public class ClassroomService {
         initializeAssignmentsIfNull(classroom);
 
         classroom.getAssignments().add(assignment);
-        return classroomRepository.save(classroom);
+        Classroom savedClassroom = classroomRepository.save(classroom);
+
+        // Broadcast assignment update to all connected students and mentors
+        messagingTemplate.convertAndSend(
+                "/topic/classrooms/" + classroomId,
+                (Object) Map.of("action", "UPDATE", "message", "New assignment added!")
+        );
+
+        return savedClassroom;
     }
 
     // Helper method to extract submission ID from URL
@@ -351,7 +360,17 @@ public class ClassroomService {
 
         if (totalStudents == 0) {
             return ClassroomAnalyticsDTO.builder()
-                    .classroomId(classroomId).className(classroom.getClassName()).totalStudents(0)
+                    .classroomId(classroomId)
+                    .className(classroom.getClassName())
+                    .totalStudents(0)
+                    .averageTotalSolved(0)
+                    .averageEasy(0)
+                    .averageMedium(0)
+                    .averageHard(0)
+                    .activeStudentsThisWeek(0)
+                    .classEngagementScore(0.0)
+                    .topStrengths(new ArrayList<>())
+                    .criticalWeaknesses(new ArrayList<>())
                     .build();
         }
 
@@ -441,5 +460,35 @@ public class ClassroomService {
         // 4. Delete the actual classroom document
         classroomRepository.delete(classroom);
         log.info("Successfully deleted classroom ID: {}", classroomId);
+    }
+
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
+    public void deleteAssignment(String classroomId, String assignmentId, String mentorId) {
+        log.info("Deleting assignment {} from classroom {} by mentor {}", assignmentId, classroomId, mentorId);
+
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+
+        if (!classroom.getMentorId().equals(mentorId)) {
+            log.warn("Security Alert: Mentor {} attempted to delete assignment {} in classroom {} which they do not own.", mentorId, assignmentId, classroomId);
+            throw new AccessDeniedException("You do not have permission to delete assignments in this classroom.");
+        }
+
+        if (classroom.getAssignments() != null) {
+            boolean removed = classroom.getAssignments().removeIf(a -> a.getId().equals(assignmentId));
+            if (!removed) {
+                throw new AssignmentNotFoundException("Assignment not found with ID: " + assignmentId);
+            }
+            classroomRepository.save(classroom);
+        } else {
+            throw new AssignmentNotFoundException("Assignment not found with ID: " + assignmentId);
+        }
+
+        // Broadcast the update via WebSocket
+        messagingTemplate.convertAndSend(
+                "/topic/classrooms/" + classroomId,
+                (Object) Map.of("action", "UPDATE", "message", "Assignment deleted!")
+        );
+        log.info("Successfully deleted assignment {} from classroom {}", assignmentId, classroomId);
     }
 }

@@ -42,6 +42,10 @@ public class SecurityConfig {
                         // 2. Explicitly allow all preflight OPTIONS requests without a token!
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                        // TODO: /api/v1/auth/** is permitAll by design (login/register/refresh).
+                        // The former insecure GET /api/v1/auth/make-admin privilege-escalation
+                        // endpoint has been deleted; do not re-add admin promotion under permitAll.
+                        // Any future admin-bootstrap endpoint must require SUPER_ADMIN.
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN")
 
@@ -50,6 +54,7 @@ public class SecurityConfig {
 
                         // Mentor & Student Routes
                         .requestMatchers("/api/classrooms/**").hasAnyRole("MENTOR", "SUPER_ADMIN")
+                        .requestMatchers("/api/paths/**").hasAnyRole("MENTOR", "SUPER_ADMIN")
                         .requestMatchers("/api/students/me/**").hasRole("STUDENT")
 
                         .anyRequest().authenticated()
@@ -69,17 +74,37 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Exactly match Vite frontend
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        // Allow localhost and 127.0.0.1 on all ports
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://localhost",
+                "http://127.0.0.1:*",
+                "http://127.0.0.1",
+                "https://*.onrender.com"
+        ));
 
-        // Allow all standard HTTP methods, including OPTIONS
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        // Match Vite frontend and standard local ports
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://localhost",
+                "http://localhost:80",
+                "http://127.0.0.1:5173",
+                "http://127.0.0.1",
+                "http://127.0.0.1:80"
+        ));
 
-        // Allow the browser to send the Authorization header
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+        // Allow all standard HTTP methods, including OPTIONS and HEAD
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
+
+        // Allow all request headers (Content-Type, Authorization, Accept, X-Requested-With, etc.)
+        configuration.setAllowedHeaders(List.of("*"));
+
+        // Expose headers needed by frontend
+        configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
 
         // Crucial for secure cookies/tokens
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         // Apply these rules to every single endpoint in your app

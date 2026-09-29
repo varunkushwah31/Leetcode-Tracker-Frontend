@@ -22,9 +22,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 1. Check if ANY Super Admin exists in the database
-        boolean adminExists = mentorRepository.findAll().stream()
-                .anyMatch(mentor -> mentor.getRole() == Role.SUPER_ADMIN);
+        // 1. Check if the bootstrap admin already exists (indexed exists query, no full scan)
+        boolean adminExists = mentorRepository.existsByEmail("admin@mentorsync.com");
 
         // 2. If no admin exists, create the master key account
         if (!adminExists) {
@@ -32,7 +31,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             Mentor defaultAdmin = Mentor.builder()
                     .name("Master Admin")
-                    .email("admin@leettracker.com")
+                    .email("admin@mentorsync.com")
                     .password(passwordEncoder.encode("Admin123!"))
                     .role(Role.SUPER_ADMIN)
                     .enabled(true) // <-- Explicitly enable it
@@ -42,8 +41,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             //
             mentorRepository.save(defaultAdmin);
-            log.info("Default SUPER_ADMIN created successfully!");
-            log.info("Email: admin@leettracker.com | Password: Admin123!");
+            log.info("Default SUPER_ADMIN created successfully for email: admin@mentorsync.com");
         } else {
             log.info("SUPER_ADMIN account already exists. Skipping bootstrap process.");
         }

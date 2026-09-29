@@ -10,11 +10,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import com.tracker.leetcode.tracker.Repository.MentorRepository;
+import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final MentorRepository mentorRepository;
+    private final StudentRepository studentRepository;
 
     @Override
     protected void doFilterInternal(
@@ -43,13 +49,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
 
         // 3. Extract the email from the token
-        userEmail = jwtService.extractUsername(jwt);
+        try {
+            userEmail = jwtService.extractUsername(jwt);
+        } catch (Exception ex) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // 4. If we have an email and the user is NOT already authenticated in this session...
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
 
-            // Fetch the user from the database
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            // Fetch the user from the database matching the role claimed in the JWT
+            UserDetails userDetails = null;
+            final List<String> roles = jwtService.extractRoles(jwt);
+
+            if (roles != null && (roles.contains("ROLE_MENTOR") || roles.contains("ROLE_SUPER_ADMIN"))) {
+                userDetails = mentorRepository.findByEmail(userEmail).orElse(null);
+            } else if (roles != null && roles.contains("ROLE_STUDENT")) {
+                userDetails = studentRepository.findByEmail(userEmail).orElse(null);
+            }
+
+            if (userDetails == null) {
+                try {
+                    userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                } catch (UsernameNotFoundException ex) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials.");
+                    return;
+                }
+            }
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

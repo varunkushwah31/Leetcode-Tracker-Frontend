@@ -30,8 +30,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-    // This is where we will redirect the user to your React app after successful login
-    private final String FRONTEND_REDIRECT_URI = "http://localhost:3000/oauth2/redirect";
+    @org.springframework.beans.factory.annotation.Value("${application.security.oauth2.redirect-uri:http://localhost:5173/oauth2/redirect}")
+    private String frontendRedirectUri;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException{
@@ -74,8 +74,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         cookie.setMaxAge(7*24*60*60);
         response.addCookie(cookie);
 
-        String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_REDIRECT_URI)
+        String targetUrl = UriComponentsBuilder.fromUriString(frontendRedirectUri)
                 .queryParam("token", accessToken)
+                .queryParam("userId", mentor.getId())
+                .queryParam("name", mentor.getName())
+                .queryParam("role", mentor.getRole().name())
                 .build().toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);

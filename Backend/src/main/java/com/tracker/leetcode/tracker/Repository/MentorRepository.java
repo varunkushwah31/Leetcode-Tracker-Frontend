@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface MentorRepository extends MongoRepository<Mentor,String > {
     Optional<Mentor> findByEmail(String email);
+    boolean existsByEmail(String email);
 }

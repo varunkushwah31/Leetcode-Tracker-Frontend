@@ -4,11 +4,13 @@ import com.tracker.leetcode.tracker.DTO.MentorDTO;
 import com.tracker.leetcode.tracker.Exception.DuplicateMentorException;
 import com.tracker.leetcode.tracker.Exception.MentorNotFoundException;
 import com.tracker.leetcode.tracker.Models.Mentor;
+import com.tracker.leetcode.tracker.Models.Role;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class MentorService {
 
     private final MentorRepository mentorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Helper method to map Model to DTO
     private MentorDTO mapToDTO(Mentor mentor) {
@@ -40,6 +43,13 @@ public class MentorService {
         Optional<Mentor> existingMentor = mentorRepository.findByEmail(mentor.getEmail());
         if (existingMentor.isPresent()) {
             throw new DuplicateMentorException("A mentor with the email '" + mentor.getEmail() + "' already exists.");
+        }
+
+        if (mentor.getRole() == null) {
+            mentor.setRole(Role.MENTOR);
+        }
+        if (mentor.getPassword() != null) {
+            mentor.setPassword(passwordEncoder.encode(mentor.getPassword()));
         }
 
         Mentor savedMentor = mentorRepository.save(mentor);
