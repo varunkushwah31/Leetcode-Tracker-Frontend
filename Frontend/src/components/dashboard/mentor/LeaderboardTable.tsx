@@ -156,13 +156,13 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                         onClick={(e) => handleNudge(e, student.id!)}
                                                         disabled={nudgingStudentId === student.id || Boolean(nudgedStudents[student.id])}
                                                         title="Send reminder email to student"
-                                                        className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border transition-all ${
+                                                        className={`group/nudge inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border transition-all ${
                                                             nudgedStudents[student.id]
                                                                 ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10 cursor-default'
                                                                 : 'border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white bg-zinc-800'
                                                         }`}
                                                     >
-                                                        <BellIcon className="w-2.5 h-2.5" />
+                                                        <BellIcon className="w-2.5 h-2.5 group-hover/nudge:animate-bell-ring" />
                                                         {getNudgeButtonLabel(nudgingStudentId === student.id, Boolean(nudgedStudents[student.id]))}
                                                     </button>
                                                 )}

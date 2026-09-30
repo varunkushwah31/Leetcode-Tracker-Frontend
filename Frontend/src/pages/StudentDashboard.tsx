@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { SpinnerIcon as Loader2, TerminalIcon, SignOutIcon as LogOut, PulseIcon as Activity } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
@@ -14,7 +15,8 @@ import { BadgesList } from '../components/dashboard/student/BadgesList';
 import { StudentRightSidebar } from '../components/dashboard/student/StudentRightSidebar';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
-import { ErrorBanner } from '../components/ui/ErrorBanner'; // <-- 1. Import the Banner
+import { ErrorBanner } from '../components/ui/ErrorBanner';
+import { AmbientGlow } from '../components/ui/AmbientGlow';
 
 export function StudentDashboard() {
     const { logout, user } = useAuth();
@@ -105,21 +107,33 @@ export function StudentDashboard() {
     });
 
     return (
-        <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-[#09090B] transition-colors duration-200">
+        <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-[#09090B] transition-colors duration-200 relative">
+            <div className="hidden dark:block">
+                <AmbientGlow />
+            </div>
 
-            <header className="bg-white dark:bg-zinc-900/50 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-10 shadow-sm transition-colors duration-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <header className="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-20 shadow-sm transition-colors duration-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
-                            <TerminalIcon className="w-5 h-5 text-white" weight="bold" />
-                        </div>
-                        <span className="text-xl font-bold text-zinc-900 dark:text-white">MentorSync</span>
+                        <Link to="/" className="flex items-center gap-3 group">
+                            <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                                <TerminalIcon className="w-5 h-5 text-white" weight="bold" />
+                            </div>
+                            <span className="text-xl font-bold text-zinc-900 dark:text-white group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">MentorSync</span>
+                        </Link>
+                        <span className="hidden sm:inline-flex text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
+                            Student
+                        </span>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800" onClick={handleSync} disabled={isSyncing}>
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl" onClick={handleSync} disabled={isSyncing}>
                             {isSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin text-zinc-500" /> : <Activity className="w-4 h-4 mr-2 text-zinc-500 dark:text-zinc-400" />}
                             <span>Sync Profile</span>
                         </Button>
+
+                        <Link to="/contact" className="hidden md:inline-flex items-center text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-[#5b4fff] transition-colors">
+                            Help
+                        </Link>
 
                         <ThemeToggle />
 

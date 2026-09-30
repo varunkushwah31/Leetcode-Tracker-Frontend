@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { TerminalIcon, PulseIcon as Activity, WarningCircleIcon as AlertCircle, UsersIcon, SquaresFourIcon as LayoutDashboard, GlobeIcon, SpinnerIcon as Loader2 } from '@phosphor-icons/react';
+import { TerminalIcon, PulseIcon as Activity, WarningCircleIcon as AlertCircle, UsersIcon, SquaresFourIcon as LayoutDashboard, GlobeIcon, SpinnerIcon as Loader2, ArrowLeftIcon } from '@phosphor-icons/react';
 import { useAuth } from '../hooks/useAuth';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
+import { AmbientGlow } from '../components/ui/AmbientGlow';
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -51,16 +52,27 @@ export function AuthPage() {
   };
 
   return (
-      <div className="h-screen overflow-hidden flex text-white font-sans selection:bg-[#5b4fff] selection:text-white">
+      <div className="min-h-screen lg:h-screen lg:overflow-hidden overflow-y-auto flex text-white font-sans selection:bg-[#5b4fff] selection:text-white relative">
+        {/* Single Back to Home Navigation Button */}
+        <Link
+          to="/"
+          className="fixed top-5 left-5 sm:top-6 sm:left-6 z-30 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 text-xs font-semibold transition-all hover:-translate-x-0.5 shadow-lg backdrop-blur-md"
+        >
+          <ArrowLeftIcon className="w-3.5 h-3.5" />
+          <span>Back to Home</span>
+        </Link>
+
         {/* Left Panel - Visuals & Branding */}
         <div className="hidden lg:flex lg:w-1/2 relative bg-[#09090e] border-r border-zinc-900 flex-col justify-center p-10 xl:p-16">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
           <div className="relative z-10 w-full max-w-lg mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
-                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
+            <div className="flex items-center gap-3 mb-8">
+              <Link to="/" className="flex items-center gap-3 group w-max">
+                <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                  <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
+                </div>
+                <span className="text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">MentorSync</span>
+              </Link>
             </div>
             <h1 className="text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight mb-4 text-white">
               The modern OS for <br />
@@ -102,16 +114,19 @@ export function AuthPage() {
           </div>
         </div>
         {/* Right Panel - Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#0a0a0a] overflow-hidden">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#0a0a0a] overflow-hidden min-h-screen lg:min-h-0">
           <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-60 pointer-events-none"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-112.5 h-112.5 bg-[#5b4fff] opacity-[0.06] blur-[100px] rounded-full pointer-events-none"></div>
+          <AmbientGlow variant="center" />
 
-          <div className="w-full max-w-110 relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto">
-            <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-              <div className="bg-[#5b4fff] p-2.5 rounded-lg">
-                <TerminalIcon className="h-6 w-6 text-white" weight="bold" />
+          <div className="w-full max-w-110 relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto mt-16 sm:mt-auto">
+            {/* Mobile Header with Logo */}
+            <div className="flex items-center mb-6 pb-4 border-b border-zinc-800/60 lg:hidden">
+              <div className="flex items-center gap-2.5">
+                <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
+                  <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
+                </div>
+                <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
               </div>
-              <span className="text-2xl font-bold tracking-tight text-white">MentorSync</span>
             </div>
             <div className="mb-8">
               <h2 className="text-[28px] font-bold text-white tracking-tight mb-2">
@@ -283,14 +298,13 @@ export function AuthPage() {
               </button>
             </div>
 
-            <div className="mt-6 flex justify-center">
-              <button
-                  type="button"
-                  onClick={() => navigate('/contact')}
-                  className="text-[13px] text-zinc-500 hover:text-[#968fff] transition-colors font-medium"
+            <div className="mt-6 pt-5 border-t border-zinc-800/60 flex items-center justify-center text-[13px]">
+              <Link
+                to="/contact"
+                className="text-zinc-500 hover:text-[#968fff] transition-colors font-medium flex items-center gap-1.5"
               >
-                Need Help? Contact Us
-              </button>
+                <span>Need help? Contact support</span>
+              </Link>
             </div>
           </div>
         </div>

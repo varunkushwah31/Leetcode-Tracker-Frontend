@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import { PulseIcon as Activity, TargetIcon, WarningIcon as AlertTriangleIcon, TrendUpIcon as TrendingUp, UsersIcon } from '@phosphor-icons/react';
-// import { Activity, Target, AlertTriangle, TrendingUp, Users } from 'lucide-react';
 import type { ClassroomAnalyticsDTO } from '@/types';
 
 export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | null }) {

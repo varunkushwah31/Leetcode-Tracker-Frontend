@@ -10,7 +10,8 @@ import {
 import { StudentService } from '@/services/endpoints';
 import type { StudentExtendedDTO } from '@/types';
 import { ActivityHeatmap } from '../student/ActivityHeatmap';
-import {ErrorBanner} from "@/components/ui/ErrorBanner.tsx"; // <-- 1. Import the Banner
+import { ErrorBanner } from "@/components/ui/ErrorBanner.tsx";
+import { AmbientGlow } from '@/components/ui/AmbientGlow';
 
 interface StudentDetailsViewProps {
     username: string;
@@ -98,14 +99,14 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
             {/* Unique dot grid texture background */}
             <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-40 pointer-events-none"></div>
             {/* Subtle ambient glow behind content */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-100 bg-[#5b4fff] opacity-[0.05] blur-[120px] rounded-full pointer-events-none"></div>
+            <AmbientGlow />
 
-            <header className="sticky top-0 z-50 bg-[#111111]/90 backdrop-blur-xl border-b border-zinc-800/60 px-4 md:px-8 py-4 flex items-center justify-between shadow-lg">
-                <div className="flex items-center gap-4 ml-75">
+            <header className="sticky top-0 z-50 bg-[#111111]/90 backdrop-blur-xl border-b border-zinc-800/60 px-4 md:px-8 py-3.5 shadow-lg">
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <Button
                         variant="outline"
                         onClick={onBack}
-                        className="bg-[#1a1b2e] border-zinc-700 text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all rounded-xl shadow-sm"
+                        className="bg-[#1a1b2e] border-zinc-700 text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all rounded-xl shadow-sm hover:-translate-x-0.5"
                     >
                         <ArrowLeftIcon className="h-4 w-4 mr-2" /> Back to Classroom
                     </Button>

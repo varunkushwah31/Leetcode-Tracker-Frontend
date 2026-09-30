@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { TerminalIcon, PaperPlaneTiltIcon as Send, ArrowLeftIcon, EnvelopeIcon as Mail, MapPinIcon, PhoneIcon } from '@phosphor-icons/react';
-import { ErrorBanner } from '../components/ui/ErrorBanner'; // <-- 1. Ready for future backend errors
+import { ErrorBanner } from '../components/ui/ErrorBanner';
+import { AmbientGlow } from '../components/ui/AmbientGlow';
 
 export function ContactPage() {
-    const navigate = useNavigate();
     const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -45,19 +45,19 @@ export function ContactPage() {
 
                 <div className="relative z-10 w-full max-w-lg mx-auto">
                     <div className="flex items-center justify-between mb-12">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
+                        <Link to="/" className="flex items-center gap-3 group">
+                            <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
                                 <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
                             </div>
-                            <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
-                        </div>
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium"
+                            <span className="text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">MentorSync</span>
+                        </Link>
+                        <Link
+                            to="/"
+                            className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium hover:-translate-x-0.5"
                         >
                             <ArrowLeftIcon className="h-4 w-4" />
-                            Go Back
-                        </button>
+                            Back to Home
+                        </Link>
                     </div>
 
                     <h1 className="text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight mb-4 text-white">
@@ -75,7 +75,7 @@ export function ContactPage() {
                             </div>
                             <div>
                                 <h3 className="text-white font-semibold text-[14px] mb-0.5 tracking-tight">Email Us</h3>
-                                <p className="text-[13px] text-zinc-500 leading-snug">hello@mentorsync.app</p>
+                                <p className="text-[13px] text-zinc-500 leading-snug">hello@mentorsync.in</p>
                             </div>
                         </div>
                         <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors flex items-center gap-4">
@@ -84,7 +84,7 @@ export function ContactPage() {
                             </div>
                             <div>
                                 <h3 className="text-white font-semibold text-[14px] mb-0.5 tracking-tight">Call Us</h3>
-                                <p className="text-[13px] text-zinc-500 leading-snug">+1 (555) 123-4567</p>
+                                <p className="text-[13px] text-zinc-500 leading-snug">+91 98765 43210</p>
                             </div>
                         </div>
                         <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors flex items-center gap-4">
@@ -93,7 +93,7 @@ export function ContactPage() {
                             </div>
                             <div>
                                 <h3 className="text-white font-semibold text-[14px] mb-0.5 tracking-tight">Headquarters</h3>
-                                <p className="text-[13px] text-zinc-500 leading-snug">San Francisco, CA</p>
+                                <p className="text-[13px] text-zinc-500 leading-snug">Bengaluru, Karnataka, India</p>
                             </div>
                         </div>
                     </div>
@@ -103,24 +103,24 @@ export function ContactPage() {
             {/* Right Panel - Form */}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#0a0a0a] overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-60 pointer-events-none"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-112.5 h-112.5 bg-[#5b4fff] opacity-[0.06] blur-[100px] rounded-full pointer-events-none"></div>
+                <AmbientGlow variant="center" />
 
                 <div className="w-full max-w-120 relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
 
                     <div className="lg:hidden flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-[#5b4fff] p-2 rounded-lg">
+                        <Link to="/" className="flex items-center gap-3 group">
+                            <div className="bg-[#5b4fff] p-2 rounded-lg shadow-lg group-hover:scale-105 transition-transform">
                                 <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
                             </div>
-                            <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
-                        </div>
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium"
+                            <span className="text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">MentorSync</span>
+                        </Link>
+                        <Link
+                            to="/"
+                            className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:-translate-x-0.5"
                         >
-                            <ArrowLeftIcon className="h-4 w-4" />
-                            Back
-                        </button>
+                            <ArrowLeftIcon className="h-3.5 w-3.5" />
+                            Home
+                        </Link>
                     </div>
 
                     <div className="mb-8">
@@ -203,12 +203,12 @@ export function ContactPage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full h-12 mt-6 bg-transparent border border-zinc-700 text-white text-[15px] font-medium hover:bg-zinc-800 rounded-xl transition-all duration-200 flex items-center justify-center hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-0.5 active:translate-y-0"
+                                className="w-full h-12 mt-6 bg-transparent border border-zinc-700 text-white text-[15px] font-medium hover:bg-zinc-800 rounded-xl transition-all duration-200 flex items-center justify-center hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-0.5 active:translate-y-0 group"
                             >
                                 {isSubmitting ? (
                                     <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-400 border-t-white mr-2"></div>
                                 ) : (
-                                    <Send className="w-4 h-4 mr-2" />
+                                    <Send className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                 )}
                                 {isSubmitting ? 'Sending...' : 'Send Message'}
                             </Button>

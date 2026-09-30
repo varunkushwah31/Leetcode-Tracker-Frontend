@@ -68,7 +68,7 @@ export function ActivityHeatmap({ progressHistory = [], consistencyStreak = 0 }:
  {heatmapDays.map((day, index) => (
  <Tooltip key={index}>
  <TooltipTrigger asChild>
- <div className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count)} transition-all hover:ring-2 hover:ring-zinc-400 :ring-zinc-500 cursor-crosshair`} />
+ <div className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count)} transition-all hover:ring-2 hover:ring-zinc-400 cursor-crosshair transition-transform duration-150 hover:scale-125 relative hover:z-10`} />
  </TooltipTrigger>
  <TooltipContent className="bg-zinc-900 text-white border-zinc-800">
  <p className="font-medium text-sm">{day.date}</p>

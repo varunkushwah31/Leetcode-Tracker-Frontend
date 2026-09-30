@@ -159,12 +159,46 @@ body {
   75% { transform: rotate(2deg) scale(1.05); }
 }
 
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(1.04); }
+}
+
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes bell-ring {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(14deg); }
+  40% { transform: rotate(-14deg); }
+  60% { transform: rotate(8deg); }
+  80% { transform: rotate(-4deg); }
+}
+
 .animate-flame {
   animation: flame-wiggle 1.8s ease-in-out infinite;
   transform-origin: bottom center;
 }
 
+.animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
+}
+
+.animate-float-subtle {
+  animation: float-subtle 4s ease-in-out infinite;
+}
+
+.animate-bell-ring {
+  animation: bell-ring 0.6s ease-in-out;
+}
+
 button:not(:disabled):active,
 [role="button"]:not(:disabled):active {
   transform: scale(0.98);
+}
+
+[role="progressbar"] > div {
+  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1), width 600ms cubic-bezier(0.16, 1, 0.3, 1);
 }

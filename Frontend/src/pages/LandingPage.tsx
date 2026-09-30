@@ -12,6 +12,7 @@ import {
     MedalIcon as Award,
     CodeIcon as Code2Icon
 } from '@phosphor-icons/react';
+import { AmbientGlow } from '../components/ui/AmbientGlow';
 
 export function LandingPage() {
     const [activeTab, setActiveTab] = useState<'mentor' | 'student'>('student');
@@ -30,20 +31,34 @@ export function LandingPage() {
             {/* Background Base */}
             <div className="fixed inset-0 z-0 bg-[#050505]">
                 <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-size-[24px_24px] opacity-[0.03] pointer-events-none"></div>
-                <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-300 h-150 bg-linear-to-b from-[#5b4fff]/20 via-[#5b4fff]/5 to-transparent blur-[100px] rounded-full pointer-events-none"></div>
+                <AmbientGlow />
             </div>
 
             {/* Floating Header */}
-            <header className="fixed top-6 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/5 shadow-2xl px-4 sm:px-6 py-3 flex items-center justify-between transition-all">
-                <div className="flex items-center gap-3">
-                    <div className="bg-[#5b4fff] p-2.5 rounded-xl flex items-center justify-center shadow-lg">
+            <header className="fixed top-6 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-[#0a0a0a]/70 backdrop-blur-2xl border border-white/5 shadow-2xl px-4 sm:px-6 py-3 flex items-center justify-between transition-all">
+                <Link to="/" className="flex items-center gap-3 group">
+                    <div className="bg-[#5b4fff] p-2.5 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
                         <TerminalIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" weight="bold" />
                     </div>
-                    <span className="text-xl font-bold tracking-tight text-white hidden sm:block">MentorSync</span>
-                </div>
+                    <span className="text-xl font-bold tracking-tight text-white hidden sm:block group-hover:text-zinc-200 transition-colors">MentorSync</span>
+                </Link>
                 <nav className="flex items-center gap-4 sm:gap-6">
-                    <Link to="/login" className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]">Sign In</Link>
-                    <Link to="/login" className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-5 sm:px-6 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]">Get Started</Link>
+                    <button
+                        type="button"
+                        onClick={scrollToFeatures}
+                        className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors hidden md:block cursor-pointer"
+                    >
+                        Features
+                    </button>
+                    <Link to="/contact" className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors hidden md:block">
+                        Contact
+                    </Link>
+                    <Link to="/login" className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]">
+                        Sign In
+                    </Link>
+                    <Link to="/login" className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-5 sm:px-6 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] hover:-translate-y-0.5 active:translate-y-0">
+                        Get Started
+                    </Link>
                 </nav>
             </header>
 
@@ -52,7 +67,7 @@ export function LandingPage() {
 
                 {/* Hero Section */}
                 <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-28 sm:mb-40">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-zinc-800 bg-[#111111]/80 backdrop-blur-md mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-zinc-800 bg-[#111111]/80 backdrop-blur-md mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 animate-float-subtle">
                         <span className="flex h-2 w-2 rounded-full bg-[#5b4fff] animate-pulse"></span>
                         <span className="text-[11px] sm:text-xs font-semibold tracking-wider text-zinc-300 uppercase">The Ultimate Classroom Tool</span>
                     </div>
@@ -161,7 +176,7 @@ export function LandingPage() {
                                     </div>
                                     <div className="grid grid-cols-7 gap-1.5 relative z-10 w-full rounded-lg overflow-hidden">
                                         {Array.from({length: 28}).map((_, i) => (
-                                            <div key={i} className={`w-full aspect-square rounded-[3px] shadow-sm ${i % 5 === 0 || i % 7 === 0 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-zinc-800/80'}`}></div>
+                                            <div key={i} className={`w-full aspect-square rounded-[3px] shadow-sm transition-transform duration-200 hover:scale-125 cursor-pointer ${i % 5 === 0 || i % 7 === 0 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-zinc-800/80 hover:bg-zinc-700'}`}></div>
                                         ))}
                                     </div>
                                 </div>
@@ -220,21 +235,68 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
-                            <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                <CheckCircleIcon className="h-7 w-7 text-[#968fff]" weight="bold" />
+                        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-7 sm:p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
+                            <div className="flex items-center justify-between">
+                                <div className="bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
+                                    <CheckCircleIcon className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" weight="bold" />
+                                </div>
+                                <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    Auto-Verified
+                                </span>
                             </div>
-                            <div className="mt-8">
+
+                            {/* Realistic Submission Preview UI */}
+                            <div className="my-5 p-3.5 rounded-2xl bg-[#121215] border border-zinc-800/80 space-y-2.5 shadow-inner group-hover:border-zinc-700/60 transition-colors">
+                                <div className="flex items-center justify-between gap-2 text-[11px] font-mono">
+                                    <span className="text-zinc-400 truncate max-w-35 sm:max-w-40">leetcode.com/two-sum/...</span>
+                                    <span className="text-emerald-400 font-semibold shrink-0 bg-emerald-500/15 px-2 py-0.5 rounded-md">
+                                        Accepted
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-2 border-t border-zinc-800/60 font-mono">
+                                    <span className="text-zinc-500">Runtime: <span className="text-zinc-200 font-semibold">0 ms</span></span>
+                                    <span className="text-zinc-500">Beats: <span className="text-emerald-400 font-semibold">100.0%</span></span>
+                                </div>
+                            </div>
+
+                            <div>
                                 <h3 className="text-xl sm:text-2xl font-bold mb-2 tracking-tight">Smart Validation</h3>
                                 <p className="text-[14px] sm:text-[15px] text-zinc-400 leading-relaxed">Automated submission checking directly from URLs.</p>
                             </div>
                         </div>
 
-                        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
-                            <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                <LayoutDashboard className="h-7 w-7 text-[#968fff]" weight="bold" />
+                        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-7 sm:p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
+                            <div className="flex items-center justify-between">
+                                <div className="bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
+                                    <LayoutDashboard className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" weight="bold" />
+                                </div>
+                                <span className="text-[11px] font-semibold text-zinc-400 bg-zinc-800/60 border border-zinc-700/40 px-2.5 py-1 rounded-full">
+                                    Week 3 Cohort
+                                </span>
                             </div>
-                            <div className="mt-8">
+
+                            {/* Problem List Preview */}
+                            <div className="my-5 space-y-2">
+                                <div className="p-2.5 rounded-xl bg-[#121215] border border-zinc-800/80 flex items-center justify-between group-hover:border-zinc-700/60 transition-colors">
+                                    <span className="text-xs font-semibold text-zinc-200 truncate">1. Two Sum</span>
+                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                        Easy
+                                    </span>
+                                </div>
+                                <div className="p-2.5 rounded-xl bg-[#121215] border border-zinc-800/80 flex items-center justify-between group-hover:border-zinc-700/60 transition-colors">
+                                    <span className="text-xs font-semibold text-zinc-200 truncate">146. LRU Cache</span>
+                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                        Medium
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between px-1 text-[11px] text-zinc-500 pt-0.5">
+                                    <span>Assigned to 80 students</span>
+                                    <span className="text-[#968fff] font-medium">92% Done</span>
+                                </div>
+                            </div>
+
+                            <div>
                                 <h3 className="text-xl sm:text-2xl font-bold mb-2 tracking-tight">Clear Assignments</h3>
                                 <p className="text-[14px] sm:text-[15px] text-zinc-400 leading-relaxed">Manage cohort problem-sets effortlessly.</p>
                             </div>
@@ -242,11 +304,11 @@ export function LandingPage() {
 
                         <div className="md:col-span-2 bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-end gap-6 relative overflow-hidden group hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="flex items-end gap-2 sm:gap-3 relative z-10 w-full h-28 sm:h-32 shrink-0 overflow-visible pt-5 opacity-60 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
-                                <div className="h-[40%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
-                                <div className="h-[60%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
-                                <div className="h-[30%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg"></div>
-                                <div className="h-[80%] min-h-8 flex-1 max-w-14 bg-[#5b4fff]/40 rounded-t-lg backdrop-blur-md"></div>
-                                <div className="h-full flex-1 max-w-14 bg-[#5b4fff] rounded-t-lg shadow-[0_0_30px_rgba(91,79,255,0.6)] relative">
+                                <div className="h-[40%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[60%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-75 group-hover:scale-y-110 origin-bottom"></div>
+                                <div className="h-[30%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-100 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[80%] min-h-8 flex-1 max-w-14 bg-[#5b4fff]/40 rounded-t-lg backdrop-blur-md transition-transform duration-300 delay-150 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-full flex-1 max-w-14 bg-[#5b4fff] rounded-t-lg shadow-[0_0_30px_rgba(91,79,255,0.6)] relative transition-transform duration-300 delay-200 group-hover:scale-y-105 origin-bottom">
                                     <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white] animate-pulse"></div>
                                 </div>
                             </div>
@@ -295,7 +357,7 @@ export function LandingPage() {
                 </div>
 
                 <div className="relative z-20 text-zinc-600 text-xs sm:text-sm font-medium tracking-wide mt-auto pointer-events-auto flex flex-col sm:flex-row items-center justify-between w-full max-w-7xl px-4 sm:px-6">
-                    <span>© {new Date().getFullYear()} MentorSync. Built for educators.</span>
+                    <span>© {new Date().getFullYear()} MentorSync. Built for educators • Made with ❤️ in India.</span>
                     <span className="mt-2 sm:mt-0 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> All systems operational</span>
                 </div>
             </footer>

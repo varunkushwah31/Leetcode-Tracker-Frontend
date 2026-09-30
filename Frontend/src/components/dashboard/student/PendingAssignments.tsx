@@ -98,9 +98,9 @@ export function PendingAssignments({
                         onClick={onSync}
                         disabled={isSyncing}
                         variant="outline"
-                        className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all"
+                        className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all group"
                     >
-                        <RefreshCw className={`w-4 h-4 mr-2 text-[#968fff] ${isSyncing ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={`w-4 h-4 mr-2 text-[#968fff] transition-transform duration-500 ${isSyncing ? 'animate-spin' : 'group-hover:rotate-180'}`} />
                         {isSyncing ? 'Syncing...' : 'Auto-Sync'}
                     </Button>
                 </div>
@@ -139,10 +139,10 @@ export function PendingAssignments({
                                         <Button
                                             asChild
                                             variant="outline"
-                                            className="bg-transparent border border-zinc-700 hover:bg-zinc-800 text-[14px] text-white"
+                                            className="bg-transparent border border-zinc-700 hover:bg-zinc-800 text-[14px] text-white group"
                                         >
                                             <a href={item.assignment.questionLink} target="_blank" rel="noopener noreferrer">
-                                                Solve <ExternalLink className="w-4 h-4 ml-2" />
+                                                Solve <ExternalLink className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                             </a>
                                         </Button>
                                         <Button
