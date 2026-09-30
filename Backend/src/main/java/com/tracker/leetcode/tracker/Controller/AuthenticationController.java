@@ -5,28 +5,39 @@ import com.tracker.leetcode.tracker.DTO.AuthenticationResponse;
 import com.tracker.leetcode.tracker.DTO.RegisterRequest;
 import com.tracker.leetcode.tracker.DTO.StudentRegisterRequest;
 import com.tracker.leetcode.tracker.Service.AuthenticationService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost", "http://localhost:80", "http://127.0.0.1:5173", "http://127.0.0.1", "http://127.0.0.1:80"}, allowedHeaders = "*", allowCredentials = "true")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
+    @Value("${application.security.cookie.secure:false}")
+    private boolean cookieSecure;
+
+    @Value("${application.security.cookie.same-site:Lax}")
+    private String cookieSameSite;
+
     // Helper to build the secure cookie
     private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        Cookie cookie = new Cookie("refresh_token", refreshToken);
-        cookie.setHttpOnly(true); // Prevents JS access (XSS protection)
-        cookie.setSecure(false);  // Set to TRUE in production when using HTTPS!
-        cookie.setPath("/api/v1/auth/refresh"); // Cookie is ONLY sent to the refresh endpoint
-        cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days in seconds
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path("/api/v1/auth/refresh")
+                .maxAge(Duration.ofDays(7))
+                .sameSite(cookieSameSite)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @PostMapping("/register")
@@ -90,13 +101,15 @@ public class AuthenticationController {
     // NEW: Logout Endpoint
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        // To log out, we simply overwrite the cookie with an immediate expiration date
-        Cookie cookie = new Cookie("refresh_token", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // Set to true for HTTPS
-        cookie.setPath("/api/v1/auth/refresh");
-        cookie.setMaxAge(0); // Deletes the cookie
-        response.addCookie(cookie);
+        // Clear refresh_token cookie
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path("/api/v1/auth/refresh")
+                .maxAge(0)
+                .sameSite(cookieSameSite)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         return ResponseEntity.noContent().build();
     }

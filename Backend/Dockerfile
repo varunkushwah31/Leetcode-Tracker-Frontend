@@ -19,8 +19,12 @@ WORKDIR /app
 # Copy the built jar from Stage 1
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose your backend port
+# Render assigns PORT dynamically; default to 8080 for local/docker-compose
+ENV PORT=8080
 EXPOSE 8080
 
-# Run the app (Using sh -c to ensure environment variable expansion)
-ENTRYPOINT ["sh", "-c", "exec java -Dspring.mongodb.uri=\"$MONGO_URI\" -jar app.jar"]
+# Tune JVM memory for Render's 512MB RAM free tier to prevent OOM (exit code 137)
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
+
+# Run the app: Spring Boot automatically picks up environment variables
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

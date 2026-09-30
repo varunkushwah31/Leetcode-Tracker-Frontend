@@ -13,7 +13,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost", "http://localhost:80", "http://127.0.0.1:5173", "http://127.0.0.1", "http://127.0.0.1:80"}, allowedHeaders = "*", allowCredentials = "true")
 public class AdminController {
 
     private final AdminService adminService;

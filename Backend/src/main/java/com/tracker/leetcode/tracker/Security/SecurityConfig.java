@@ -1,6 +1,7 @@
 package com.tracker.leetcode.tracker.Security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -25,6 +28,9 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    @Value("${application.cors.allowed-origins:http://localhost:5173,http://localhost:3000,http://localhost:80}")
+    private List<String> configuredAllowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,10 +48,10 @@ public class SecurityConfig {
                         // 2. Explicitly allow all preflight OPTIONS requests without a token!
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // TODO: /api/v1/auth/** is permitAll by design (login/register/refresh).
-                        // The former insecure GET /api/v1/auth/make-admin privilege-escalation
-                        // endpoint has been deleted; do not re-add admin promotion under permitAll.
-                        // Any future admin-bootstrap endpoint must require SUPER_ADMIN.
+                        // Health check endpoint for Render monitoring
+                        .requestMatchers("/health").permitAll()
+
+                        // Auth endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN")
 
@@ -74,24 +80,27 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Allow localhost and 127.0.0.1 on all ports
-        configuration.setAllowedOriginPatterns(List.of(
+        // Allow localhost and common deployment platforms
+        List<String> allowedPatterns = new ArrayList<>(List.of(
                 "http://localhost:*",
                 "http://localhost",
                 "http://127.0.0.1:*",
                 "http://127.0.0.1",
-                "https://*.onrender.com"
+                "https://*.onrender.com",
+                "https://*.vercel.app",
+                "https://*.netlify.app"
         ));
 
-        // Match Vite frontend and standard local ports
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "http://localhost",
-                "http://localhost:80",
-                "http://127.0.0.1:5173",
-                "http://127.0.0.1",
-                "http://127.0.0.1:80"
-        ));
+        // Add any user-configured allowed origins
+        if (configuredAllowedOrigins != null) {
+            for (String origin : configuredAllowedOrigins) {
+                if (origin != null && !origin.isBlank() && !allowedPatterns.contains(origin.trim())) {
+                    allowedPatterns.add(origin.trim());
+                }
+            }
+        }
+
+        configuration.setAllowedOriginPatterns(allowedPatterns);
 
         // Allow all standard HTTP methods, including OPTIONS and HEAD
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
