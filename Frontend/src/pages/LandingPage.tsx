@@ -235,68 +235,77 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-7 sm:p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
-                            <div className="flex items-center justify-between">
-                                <div className="bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                    <CheckCircleIcon className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" weight="bold" />
-                                </div>
-                                <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                    Auto-Verified
-                                </span>
+                        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
+                            {/* Ambient Purple Glow */}
+                            <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/15 blur-[70px] rounded-full pointer-events-none"></div>
+
+                            {/* Top Icon */}
+                            <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20 relative z-10">
+                                <CheckCircleIcon className="h-7 w-7 text-[#968fff]" weight="bold" />
                             </div>
 
-                            {/* Realistic Submission Preview UI */}
-                            <div className="my-5 p-3.5 rounded-2xl bg-[#121215] border border-zinc-800/80 space-y-2.5 shadow-inner group-hover:border-zinc-700/60 transition-colors">
-                                <div className="flex items-center justify-between gap-2 text-[11px] font-mono">
-                                    <span className="text-zinc-400 truncate max-w-35 sm:max-w-40">leetcode.com/two-sum/...</span>
-                                    <span className="text-emerald-400 font-semibold shrink-0 bg-emerald-500/15 px-2 py-0.5 rounded-md">
-                                        Accepted
+                            {/* Sleek Abstract Verification Graphic */}
+                            <div className="my-6 space-y-2.5 relative z-10 w-full">
+                                <div className="flex items-center justify-between bg-[#141414] p-3 rounded-xl border border-zinc-800/50 transition-all duration-300 group-hover:border-zinc-700/60">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="w-2 h-2 rounded-full bg-[#5b4fff] animate-pulse"></div>
+                                        <span className="text-xs text-zinc-300 font-medium truncate">Solution Submission</span>
+                                    </div>
+                                    <span className="text-xs bg-[#5b4fff]/20 text-[#968fff] px-2.5 py-0.5 rounded-md font-semibold">
+                                        Auto-Synced
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-2 border-t border-zinc-800/60 font-mono">
-                                    <span className="text-zinc-500">Runtime: <span className="text-zinc-200 font-semibold">0 ms</span></span>
-                                    <span className="text-zinc-500">Beats: <span className="text-emerald-400 font-semibold">100.0%</span></span>
+                                <div className="flex items-center justify-between bg-[#141414] p-3 rounded-xl border border-[#5b4fff]/30 shadow-[0_0_20px_rgba(91,79,255,0.15)] transition-all duration-300 group-hover:border-[#5b4fff]/50">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <CheckCircleIcon className="w-4 h-4 text-[#968fff]" weight="fill" />
+                                        <span className="text-xs text-white font-medium truncate">LeetCode Status</span>
+                                    </div>
+                                    <span className="text-xs bg-[#5b4fff] text-white px-2.5 py-0.5 rounded-md font-semibold shadow-[0_0_12px_rgba(91,79,255,0.5)]">
+                                        Verified (100%)
+                                    </span>
                                 </div>
                             </div>
 
-                            <div>
+                            {/* Bottom Title & Description */}
+                            <div className="relative z-10">
                                 <h3 className="text-xl sm:text-2xl font-bold mb-2 tracking-tight">Smart Validation</h3>
                                 <p className="text-[14px] sm:text-[15px] text-zinc-400 leading-relaxed">Automated submission checking directly from URLs.</p>
                             </div>
                         </div>
 
-                        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-7 sm:p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
-                            <div className="flex items-center justify-between">
-                                <div className="bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                    <LayoutDashboard className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" weight="bold" />
-                                </div>
-                                <span className="text-[11px] font-semibold text-zinc-400 bg-zinc-800/60 border border-zinc-700/40 px-2.5 py-1 rounded-full">
-                                    Week 3 Cohort
-                                </span>
+                        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
+                            {/* Ambient Purple Glow */}
+                            <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/15 blur-[70px] rounded-full pointer-events-none"></div>
+
+                            {/* Top Icon */}
+                            <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20 relative z-10">
+                                <LayoutDashboard className="h-7 w-7 text-[#968fff]" weight="bold" />
                             </div>
 
-                            {/* Problem List Preview */}
-                            <div className="my-5 space-y-2">
-                                <div className="p-2.5 rounded-xl bg-[#121215] border border-zinc-800/80 flex items-center justify-between group-hover:border-zinc-700/60 transition-colors">
-                                    <span className="text-xs font-semibold text-zinc-200 truncate">1. Two Sum</span>
-                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                        Easy
+                            {/* Sleek Problem Set Graphic */}
+                            <div className="my-6 space-y-2.5 relative z-10 w-full">
+                                <div className="flex items-center justify-between bg-[#141414] p-3 rounded-xl border border-[#5b4fff]/30 shadow-[0_0_20px_rgba(91,79,255,0.15)] transition-all duration-300 group-hover:border-[#5b4fff]/50">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="w-2 h-2 rounded-full bg-[#5b4fff] shadow-[0_0_8px_#5b4fff]"></div>
+                                        <span className="text-xs text-white font-medium truncate">Arrays & Two Pointers</span>
+                                    </div>
+                                    <span className="text-xs bg-[#5b4fff]/20 text-[#968fff] px-2.5 py-0.5 rounded-md font-semibold">
+                                        Active Cohort
                                     </span>
                                 </div>
-                                <div className="p-2.5 rounded-xl bg-[#121215] border border-zinc-800/80 flex items-center justify-between group-hover:border-zinc-700/60 transition-colors">
-                                    <span className="text-xs font-semibold text-zinc-200 truncate">146. LRU Cache</span>
-                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                        Medium
+                                <div className="flex items-center justify-between bg-[#141414] p-3 rounded-xl border border-zinc-800/50 opacity-60 transition-all duration-300 group-hover:opacity-90">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="w-2 h-2 rounded-full bg-zinc-700"></div>
+                                        <span className="text-xs text-zinc-300 font-medium truncate">Dynamic Programming</span>
+                                    </div>
+                                    <span className="text-xs bg-zinc-800 text-zinc-400 px-2.5 py-0.5 rounded-md font-semibold">
+                                        Next Week
                                     </span>
-                                </div>
-                                <div className="flex items-center justify-between px-1 text-[11px] text-zinc-500 pt-0.5">
-                                    <span>Assigned to 80 students</span>
-                                    <span className="text-[#968fff] font-medium">92% Done</span>
                                 </div>
                             </div>
 
-                            <div>
+                            {/* Bottom Title & Description */}
+                            <div className="relative z-10">
                                 <h3 className="text-xl sm:text-2xl font-bold mb-2 tracking-tight">Clear Assignments</h3>
                                 <p className="text-[14px] sm:text-[15px] text-zinc-400 leading-relaxed">Manage cohort problem-sets effortlessly.</p>
                             </div>
