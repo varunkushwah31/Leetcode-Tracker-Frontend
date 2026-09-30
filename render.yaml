@@ -4,8 +4,8 @@ services:
     runtime: docker
     plan: free
     region: ohio
-    rootDir: Backend
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./Backend/Dockerfile
+    dockerContext: ./Backend
     healthCheckPath: /health
     envVars:
       - key: MONGO_URI
