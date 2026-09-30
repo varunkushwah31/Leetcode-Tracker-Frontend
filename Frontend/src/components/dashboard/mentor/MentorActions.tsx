@@ -4,7 +4,7 @@ import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { UserPlus, ClipboardList, Map, Plus, Trash2, UploadCloud, Loader2, AlertTriangle} from 'lucide-react';
+import { UserPlusIcon, ClipboardTextIcon as ClipboardList, MapTrifoldIcon as Map, PlusIcon, TrashIcon as Trash2, CloudArrowUpIcon as UploadCloud, SpinnerIcon as Loader2, WarningIcon as AlertTriangle } from '@phosphor-icons/react';
 import { ClassroomService, PathService } from '@/services/endpoints.ts';
 import type { ClassroomDashboardDTO, LearningPath, PathQuestion } from '@/types';
 import {ErrorBanner} from "@/components/ui/ErrorBanner.tsx";// <-- 1. Import the Banner
@@ -157,7 +157,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             <Dialog open={addStudentOpen} onOpenChange={(open) => { setAddStudentOpen(open); if(!open) { setAddStudentError(null); setBulkUploadError(null); } }}>
                 <DialogTrigger asChild>
                     <Button variant="outline" className="border-zinc-700 bg-transparent text-white hover:bg-zinc-800 rounded-xl transition-colors">
-                        <UserPlus className="w-4 h-4 mr-2" />Add Student
+                        <UserPlusIcon className="w-4 h-4 mr-2" />Add Student
                     </Button>
                 </DialogTrigger>
                 <DialogContent className={dialogContentClasses}>
@@ -258,7 +258,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             <div className="text-center p-6 bg-[#1a1b2e]/30 rounded-xl border border-dashed border-zinc-700">
                                 <p className="text-sm text-zinc-400 mb-4">You haven't built any roadmaps yet.</p>
                                 <Button onClick={openCreateFromAssign} className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl">
-                                    <Plus className="w-4 h-4 mr-2" /> Create Your First Path
+                                    <PlusIcon className="w-4 h-4 mr-2" /> Create Your First Path
                                 </Button>
                             </div>
                         ) : (
@@ -277,7 +277,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                     <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#111111] px-2 text-zinc-500 font-medium tracking-widest">Or</span></div>
                                 </div>
                                 <Button variant="outline" className="w-full border-[#5b4fff]/30 text-[#968fff] hover:bg-[#5b4fff]/10 bg-transparent rounded-xl h-12" onClick={openCreateFromAssign}>
-                                    <Plus className="w-4 h-4 mr-2" /> Create New Learning Path
+                                    <PlusIcon className="w-4 h-4 mr-2" /> Create New Learning Path
                                 </Button>
                             </div>
                         )}
@@ -312,7 +312,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                     className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 rounded-lg h-8"
                                     onClick={() => setPathQuestions(prev => [...prev, { tempId: `question-new-${Date.now()}-${prev.length}`, titleSlug: '', daysToComplete: 3 }])}
                                 >
-                                    <Plus className="w-3 h-3 mr-1" /> Add
+                                    <PlusIcon className="w-3 h-3 mr-1" /> Add
                                 </Button>
                             </div>
                             <div className="space-y-3">

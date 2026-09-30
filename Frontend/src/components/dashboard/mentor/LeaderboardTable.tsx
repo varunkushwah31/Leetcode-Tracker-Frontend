@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
-import { Flame, Download, Search, Bell } from 'lucide-react';
+import { FlameIcon, DownloadSimpleIcon as Download, MagnifyingGlassIcon as Search, BellIcon } from '@phosphor-icons/react';
 import type { StudentSummaryDTO } from '@/types';
 import { ClassroomService } from '@/services/endpoints';
 import { useState } from 'react';
@@ -138,7 +138,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 </td>
                                 <td className="py-4 px-6 text-center">
                                     <div className="flex items-center justify-center gap-1.5">
-                                        <Flame className={`w-4 h-4 ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500' : 'text-zinc-700'}`} />
+                                        <FlameIcon className={`w-4 h-4 ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500 animate-flame' : 'text-zinc-700'}`} />
                                         <span className={`font-bold ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-400' : 'text-zinc-600'}`}>{student.consistencyStreak || 0}</span>
                                     </div>
                                 </td>
@@ -162,7 +162,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                                 : 'border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white bg-zinc-800'
                                                         }`}
                                                     >
-                                                        <Bell className="w-2.5 h-2.5" />
+                                                        <BellIcon className="w-2.5 h-2.5" />
                                                         {getNudgeButtonLabel(nudgingStudentId === student.id, Boolean(nudgedStudents[student.id]))}
                                                     </button>
                                                 )}

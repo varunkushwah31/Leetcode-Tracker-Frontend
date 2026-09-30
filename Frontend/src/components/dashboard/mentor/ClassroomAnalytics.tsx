@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card';
 import { Progress } from '../../ui/progress';
-import { Activity, Target, AlertTriangle, TrendingUp, Users } from 'lucide-react';
+import { PulseIcon as Activity, TargetIcon, WarningIcon as AlertTriangleIcon, TrendUpIcon as TrendingUp, UsersIcon } from '@phosphor-icons/react';
+// import { Activity, Target, AlertTriangle, TrendingUp, Users } from 'lucide-react';
 import type { ClassroomAnalyticsDTO } from '@/types';
 
 export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | null }) {
@@ -26,7 +27,7 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className={cardClasses}>
                     <CardContent className="p-6 flex items-center gap-5">
-                        <div className="p-3.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl shadow-inner"><Users className="w-6 h-6" /></div>
+                        <div className="p-3.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl shadow-inner"><UsersIcon className="w-6 h-6" /></div>
                         <div>
                             <p className="text-[13px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Class Engagement</p>
                             <h3 className="text-3xl font-extrabold text-white tracking-tight">{Math.round(data.classEngagementScore)}%</h3>
@@ -36,7 +37,7 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
                 </Card>
                 <Card className={cardClasses}>
                     <CardContent className="p-6 flex items-center gap-5">
-                        <div className="p-3.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl shadow-inner"><Target className="w-6 h-6" /></div>
+                        <div className="p-3.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl shadow-inner"><TargetIcon className="w-6 h-6" /></div>
                         <div>
                             <p className="text-[13px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Avg. Problems</p>
                             <h3 className="text-3xl font-extrabold text-white tracking-tight">{data.averageTotalSolved}</h3>
@@ -46,7 +47,7 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
                 </Card>
                 <Card className={cardClasses}>
                     <CardContent className="p-6 flex items-center gap-5">
-                        <div className="p-3.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl shadow-inner"><AlertTriangle className="w-6 h-6" /></div>
+                        <div className="p-3.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl shadow-inner"><AlertTriangleIcon className="w-6 h-6" /></div>
                         <div className="min-w-0 flex-1">
                             <p className="text-[13px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Critical Weakness</p>
                             <h3 className="text-xl font-extrabold text-white truncate w-full">

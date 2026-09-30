@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Award } from 'lucide-react';
+import { MedalIcon as Award } from '@phosphor-icons/react';
 import type { Badge } from '@/types';
 
 export function BadgesList({ badges }: { badges?: Badge[] }) {

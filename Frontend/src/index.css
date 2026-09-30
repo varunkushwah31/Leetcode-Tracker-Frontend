@@ -150,3 +150,21 @@ body {
     @apply font-sans;
   }
 }
+
+/* Subtle micro-interactions preserving previous aesthetics */
+@keyframes flame-wiggle {
+  0%, 100% { transform: rotate(-3deg) scale(1); }
+  25% { transform: rotate(3deg) scale(1.08); }
+  50% { transform: rotate(-2deg) scale(0.97); }
+  75% { transform: rotate(2deg) scale(1.05); }
+}
+
+.animate-flame {
+  animation: flame-wiggle 1.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+button:not(:disabled):active,
+[role="button"]:not(:disabled):active {
+  transform: scale(0.98);
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Loader2, Terminal, LogOut, Activity } from 'lucide-react';
+import { SpinnerIcon as Loader2, TerminalIcon, SignOutIcon as LogOut, PulseIcon as Activity } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../hooks/useAuth';
@@ -111,7 +111,7 @@ export function StudentDashboard() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
-                            <Terminal className="w-5 h-5 text-white" strokeWidth={2.5} />
+                            <TerminalIcon className="w-5 h-5 text-white" weight="bold" />
                         </div>
                         <span className="text-xl font-bold text-zinc-900 dark:text-white">MentorSync</span>
                     </div>

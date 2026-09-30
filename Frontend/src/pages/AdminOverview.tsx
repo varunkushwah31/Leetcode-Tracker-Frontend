@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { ShieldAlert, Users, BookOpen, ArrowLeft, Loader2, UserCheck, AlertTriangle, Trash2, RefreshCw, CheckCircle2, X, AlertCircle } from 'lucide-react';
+import { ShieldWarningIcon as ShieldAlert, UsersIcon, BookOpenIcon, ArrowLeftIcon, SpinnerIcon as Loader2, UserCheckIcon, WarningIcon as AlertTriangle, TrashIcon as Trash2, ArrowsClockwiseIcon as RefreshCw, CheckCircleIcon as CheckCircle2, XIcon, WarningCircleIcon as AlertCircle } from '@phosphor-icons/react';
 import { AdminService } from '@/services/endpoints';
 import type { SystemOverviewDTO, MentorDTO, ClassroomDashboardDTO } from '@/types';
 import { ErrorBanner } from '@/components/ui/ErrorBanner'; // <-- 1. Import the Banner
@@ -105,7 +105,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
         return (
             <div className="p-8">
                 <Button variant="ghost" onClick={onBack} className="mb-6 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                    <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
+                    <ArrowLeftIcon className="h-4 w-4 mr-2" /> Back to Dashboard
                 </Button>
                 <div className="flex flex-col items-center justify-center p-12 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl">
                     <AlertTriangle className="w-12 h-12 text-rose-500 mb-4" />
@@ -124,7 +124,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
             <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <Button variant="ghost" onClick={onBack} className="mb-2 -ml-4 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                        <ArrowLeft className="h-4 w-4 mr-2" /> Return to Mentor View
+                        <ArrowLeftIcon className="h-4 w-4 mr-2" /> Return to Mentor View
                     </Button>
                     <h1 className="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
                         <ShieldAlert className="w-8 h-8 text-indigo-500" /> System Administration
@@ -151,7 +151,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <CardContent className="p-6 flex items-center gap-4">
-                        <div className="p-4 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl"><Users className="w-6 h-6" /></div>
+                        <div className="p-4 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl"><UsersIcon className="w-6 h-6" /></div>
                         <div>
                             <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Students</p>
                             <h3 className="text-3xl font-bold text-zinc-900 dark:text-white">{data.totalStudents}</h3>
@@ -160,7 +160,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                 </Card>
                 <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <CardContent className="p-6 flex items-center gap-4">
-                        <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl"><UserCheck className="w-6 h-6" /></div>
+                        <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl"><UserCheckIcon className="w-6 h-6" /></div>
                         <div>
                             <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Mentors</p>
                             <h3 className="text-3xl font-bold text-zinc-900 dark:text-white">{data.totalMentors}</h3>
@@ -169,7 +169,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                 </Card>
                 <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <CardContent className="p-6 flex items-center gap-4">
-                        <div className="p-4 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl"><BookOpen className="w-6 h-6" /></div>
+                        <div className="p-4 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl"><BookOpenIcon className="w-6 h-6" /></div>
                         <div>
                             <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Active Classrooms</p>
                             <h3 className="text-3xl font-bold text-zinc-900 dark:text-white">{data.totalClassrooms}</h3>
@@ -183,7 +183,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                 <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-lg text-zinc-900 dark:text-white flex items-center gap-2">
-                            <UserCheck className="w-5 h-5 text-zinc-400" /> Platform Mentors
+                            <UserCheckIcon className="w-5 h-5 text-zinc-400" /> Platform Mentors
                         </CardTitle>
                         <CardDescription className="dark:text-zinc-400">All registered instructors</CardDescription>
                     </CardHeader>
@@ -225,7 +225,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                 <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-lg text-zinc-900 dark:text-white flex items-center gap-2">
-                            <BookOpen className="w-5 h-5 text-zinc-400" /> Global Classrooms
+                            <BookOpenIcon className="w-5 h-5 text-zinc-400" /> Global Classrooms
                         </CardTitle>
                         <CardDescription className="dark:text-zinc-400">All active classes across the platform</CardDescription>
                     </CardHeader>
@@ -321,7 +321,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                         onClick={() => setToast(null)}
                         className="ml-2 opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
                     >
-                        <X className="w-4 h-4" />
+                        <XIcon className="w-4 h-4" />
                     </button>
                 </div>
             )}

@@ -1,6 +1,6 @@
 import { Card, CardContent } from '../../ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
-import { ExternalLink, Flame, Trophy } from 'lucide-react';
+import { ArrowSquareOutIcon as ExternalLink, FlameIcon, TrophyIcon } from '@phosphor-icons/react';
 import type { StudentExtendedDTO } from '@/types';
 
 interface ProfileStatsProps {
@@ -35,7 +35,7 @@ export function ProfileStats({ data, totalSolved, rating }: ProfileStatsProps) {
  </AvatarFallback>
  </Avatar>
  <div className="absolute -bottom-2 -right-2 bg-zinc-900 border border-zinc-700 p-1.5 rounded-full z-20 shadow-lg">
- <Flame className="w-5 h-5 text-orange-500 animate-pulse" />
+ <FlameIcon className="w-5 h-5 text-orange-500 animate-flame" />
  </div>
  </div>
 
@@ -55,7 +55,7 @@ export function ProfileStats({ data, totalSolved, rating }: ProfileStatsProps) {
  </div>
  
  <div className="inline-flex items-center gap-2 bg-[#1a1b2e]/60 border border-[#5b4fff]/20 px-4 py-2 rounded-full">
- <Flame className="w-4 h-4 text-orange-500" />
+ <FlameIcon className="w-4 h-4 text-orange-500 animate-flame" />
  <span className="text-sm font-bold text-white"><span className="text-orange-400 mr-1.5">{data.consistencyStreak || 0}</span>Day Streak</span>
  </div>
  </div>
@@ -65,8 +65,8 @@ export function ProfileStats({ data, totalSolved, rating }: ProfileStatsProps) {
  <div className="absolute inset-0 bg-linear-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
  <p className="text-sm font-medium text-zinc-400 mb-2">Global Rank</p>
  <p className="text-3xl font-black text-white tracking-tight flex items-center">
- <Trophy className="w-6 h-6 text-amber-500 mr-2 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
- {data.rank ? `#${parseInt(data.rank).toLocaleString()}` : 'N/A'}
+ <TrophyIcon className="w-6 h-6 text-amber-500 mr-2 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+ {data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : 'N/A'}
  </p>
  </div>
  

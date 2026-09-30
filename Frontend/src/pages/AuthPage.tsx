@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Terminal, Activity, AlertCircle, Users, LayoutDashboard, Globe, Loader2 } from 'lucide-react';
+import { TerminalIcon, PulseIcon as Activity, WarningCircleIcon as AlertCircle, UsersIcon, SquaresFourIcon as LayoutDashboard, GlobeIcon, SpinnerIcon as Loader2 } from '@phosphor-icons/react';
 import { useAuth } from '../hooks/useAuth';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 
@@ -58,7 +58,7 @@ export function AuthPage() {
           <div className="relative z-10 w-full max-w-lg mx-auto">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
-                <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />
+                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
               </div>
               <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
             </div>
@@ -86,7 +86,7 @@ export function AuthPage() {
               </div>
               <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors">
                 <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
-                  <Users className="h-4 w-4 text-[#968fff]" />
+                  <UsersIcon className="h-4 w-4 text-[#968fff]" />
                 </div>
                 <h3 className="text-white font-semibold text-[14px] mb-1 tracking-tight">Leaderboards</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Gamified cohort rankings</p>
@@ -109,7 +109,7 @@ export function AuthPage() {
           <div className="w-full max-w-110 relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto">
             <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
               <div className="bg-[#5b4fff] p-2.5 rounded-lg">
-                <Terminal className="h-6 w-6 text-white" strokeWidth={2.5} />
+                <TerminalIcon className="h-6 w-6 text-white" weight="bold" />
               </div>
               <span className="text-2xl font-bold tracking-tight text-white">MentorSync</span>
             </div>
@@ -182,7 +182,7 @@ export function AuthPage() {
                   <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
                     <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">LeetCode Username</Label>
                     <div className="relative">
-                      <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                      <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                       <Input
                           required
                           autoComplete="username"

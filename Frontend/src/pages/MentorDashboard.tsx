@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
-import { LogOut, Plus, Terminal, BookOpen, Loader2, ShieldAlert, Badge, RefreshCw } from 'lucide-react';
+import { SignOutIcon as LogOut, PlusIcon, TerminalIcon, BookOpenIcon, SpinnerIcon as Loader2, ShieldWarningIcon as ShieldAlert, ArrowsClockwiseIcon as RefreshCw } from '@phosphor-icons/react';
+import { Badge } from '../components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -84,7 +85,7 @@ function EmptyClassroomState({ onCreateClass }: Readonly<{ onCreateClass: () => 
         <div className="h-full flex items-center justify-center p-8">
             <div className="text-center max-w-md relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)]">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1a1b2e] rounded-2xl mb-6 shadow-lg">
-                    <BookOpen className="w-8 h-8 text-[#968fff]" />
+                    <BookOpenIcon className="w-8 h-8 text-[#968fff]" />
                 </div>
                 <h2 className="text-[28px] font-bold text-white tracking-tight mb-3">No Classroom Selected</h2>
                 <p className="text-zinc-400 text-[15px] mb-8">
@@ -94,7 +95,7 @@ function EmptyClassroomState({ onCreateClass }: Readonly<{ onCreateClass: () => 
                     onClick={onCreateClass}
                     className="w-full h-12 bg-transparent border border-zinc-700 text-white text-[15px] font-medium hover:bg-zinc-800 rounded-xl transition-all duration-200 flex items-center justify-center hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-0.5 active:translate-y-0"
                 >
-                    <Plus className="w-5 h-5 mr-2" />Create Your First Classroom
+                    <PlusIcon className="w-5 h-5 mr-2" />Create Your First Classroom
                 </Button>
             </div>
         </div>
@@ -235,7 +236,7 @@ export function MentorDashboard() {
                     <div className="p-6 border-b border-zinc-900">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
-                                <Terminal className="w-5 h-5 text-white" strokeWidth={2.5} />
+                                <TerminalIcon className="w-5 h-5 text-white" weight="bold" />
                             </div>
                             <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
                         </div>
@@ -243,7 +244,7 @@ export function MentorDashboard() {
                         <Dialog open={createClassOpen} onOpenChange={(open) => { setCreateClassOpen(open); if(!open) setCreateClassError(null); }}>
                             <DialogTrigger asChild>
                                 <Button className="w-full bg-transparent border border-zinc-800 text-white hover:bg-[#5b4fff] hover:border-transparent rounded-xl transition-all duration-200">
-                                    <Plus className="w-4 h-4 mr-2" />Create New Class
+                                    <PlusIcon className="w-4 h-4 mr-2" />Create New Class
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="bg-[#111111] border-zinc-800 text-white sm:rounded-2xl">
@@ -348,7 +349,7 @@ export function MentorDashboard() {
                                 <div className="mb-8 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
                                     <div>
                                         <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">{selectedClassroom.className}</h1>
-                                        <p className="text-[15px] text-zinc-400 flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
+                                        <p className="text-[15px] text-zinc-400 flex items-center gap-1.5"><BookOpenIcon className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Button

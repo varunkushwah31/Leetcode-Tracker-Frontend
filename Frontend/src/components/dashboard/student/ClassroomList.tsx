@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { BookOpen, TrendingUp } from 'lucide-react';
+import { BookOpenIcon, TrendUpIcon as TrendingUp } from '@phosphor-icons/react';
 import type { ClassroomSummaryDTO } from '@/types';
 
 interface ClassroomListProps {
@@ -13,7 +13,7 @@ export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassro
  <Card className="relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden">
  <CardHeader>
  <CardTitle className="flex items-center gap-2 text-lg text-white tracking-tight">
- <BookOpen className="w-5 h-5 text-[#5b4fff]"/> My Classrooms
+ <BookOpenIcon className="w-5 h-5 text-[#5b4fff]"/> My Classrooms
  </CardTitle>
  </CardHeader>
  <CardContent>

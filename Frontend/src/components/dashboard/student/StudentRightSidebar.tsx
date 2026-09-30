@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import { ScrollArea } from '../../ui/scroll-area';
-import { Clock, CheckCircle2 } from 'lucide-react';
+import { ClockIcon, CheckCircleIcon as CheckCircle2 } from '@phosphor-icons/react';
 import type { StudentExtendedDTO } from '@/types';
 
 export function StudentRightSidebar({ data, totalSolved }: Readonly<{
@@ -61,7 +61,7 @@ export function StudentRightSidebar({ data, totalSolved }: Readonly<{
  <Card className="relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden">
  <CardHeader>
  <CardTitle className="flex items-center gap-2 text-lg text-white tracking-tight">
- <Clock className="w-5 h-5 text-[#5b4fff]"/> Recent Submissions
+ <ClockIcon className="w-5 h-5 text-[#5b4fff]"/> Recent Submissions
  </CardTitle>
  </CardHeader>
  <CardContent className="p-4 pt-0">

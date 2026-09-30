@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, Activity, Users, LayoutDashboard, ChevronRight, CheckCircle, Sparkles, Target, Award, Code2Icon } from 'lucide-react';
+import { 
+    TerminalIcon,
+    PulseIcon as Activity,
+    UsersIcon,
+    SquaresFourIcon as LayoutDashboard,
+    CaretRightIcon as ChevronRight,
+    CheckCircleIcon,
+    SparkleIcon as Sparkles,
+    TargetIcon,
+    MedalIcon as Award,
+    CodeIcon as Code2Icon
+} from '@phosphor-icons/react';
 
 export function LandingPage() {
     const [activeTab, setActiveTab] = useState<'mentor' | 'student'>('student');
@@ -26,7 +37,7 @@ export function LandingPage() {
             <header className="fixed top-6 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/5 shadow-2xl px-4 sm:px-6 py-3 flex items-center justify-between transition-all">
                 <div className="flex items-center gap-3">
                     <div className="bg-[#5b4fff] p-2.5 rounded-xl flex items-center justify-center shadow-lg">
-                        <Terminal className="h-5 w-5 sm:h-6 sm:w-6 text-white" strokeWidth={2.5} />
+                        <TerminalIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" weight="bold" />
                     </div>
                     <span className="text-xl font-bold tracking-tight text-white hidden sm:block">MentorSync</span>
                 </div>
@@ -101,20 +112,20 @@ export function LandingPage() {
                             <div className="grid md:grid-cols-2 gap-10 items-center animate-in fade-in slide-in-from-right-4 duration-500">
                                 <div>
                                     <div className="bg-[#1a1b2e] w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl mb-6 border border-[#5b4fff]/20">
-                                        <Users className="h-6 w-6 text-[#968fff]" strokeWidth={2} />
+                                        <UsersIcon className="h-6 w-6 text-[#968fff]" weight="bold" />
                                     </div>
                                     <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight">Manage Entire Cohorts</h3>
                                     <ul className="space-y-4">
                                         <li className="flex items-start gap-3">
-                                            <CheckCircle className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
                                             <span className="text-zinc-300 leading-relaxed text-[15px]">Create boundless classrooms and organize your students effectively.</span>
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <CheckCircle className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
                                             <span className="text-zinc-300 leading-relaxed text-[15px]">Assign lists of target LeetCode problems natively to the entire class.</span>
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <CheckCircle className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
                                             <span className="text-zinc-300 leading-relaxed text-[15px]">Instantly flag plagiarized or invalid URL submissions with automated 1-click validation.</span>
                                         </li>
                                     </ul>
@@ -156,20 +167,20 @@ export function LandingPage() {
                                 </div>
                                 <div className="order-1 md:order-2">
                                     <div className="bg-[#1a1b2e] w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl mb-6 border border-[#5b4fff]/20">
-                                        <Target className="h-6 w-6 text-[#968fff]" strokeWidth={2} />
+                                        <TargetIcon className="h-6 w-6 text-[#968fff]" weight="bold" />
                                     </div>
                                     <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight">Compete, Learn, Grow</h3>
                                     <ul className="space-y-4">
                                         <li className="flex items-start gap-3">
-                                            <CheckCircle className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
                                             <span className="text-zinc-300 leading-relaxed text-[15px]">See your progress mapped against your classmates on live cohort leaderboards.</span>
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <CheckCircle className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
                                             <span className="text-zinc-300 leading-relaxed text-[15px]">Get a beautiful and dynamic heatmap analyzing your 365-day technical consistency.</span>
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <CheckCircle className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
                                             <span className="text-zinc-300 leading-relaxed text-[15px]">Submit answers actively and unlock profile achievements along your journey.</span>
                                         </li>
                                     </ul>
@@ -196,7 +207,7 @@ export function LandingPage() {
                         <div className="md:col-span-2 bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-end relative overflow-hidden group hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="absolute top-0 right-0 p-8 sm:p-10">
                                 <div className="bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                    <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#968fff]" strokeWidth={2} />
+                                    <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#968fff]" weight="bold" />
                                 </div>
                             </div>
                             <div className="absolute top-[10%] right-[10%] w-50 h-50 bg-[#5b4fff]/20 blur-[90px] rounded-full pointer-events-none"></div>
@@ -211,7 +222,7 @@ export function LandingPage() {
 
                         <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                <CheckCircle className="h-7 w-7 text-[#968fff]" strokeWidth={2} />
+                                <CheckCircleIcon className="h-7 w-7 text-[#968fff]" weight="bold" />
                             </div>
                             <div className="mt-8">
                                 <h3 className="text-xl sm:text-2xl font-bold mb-2 tracking-tight">Smart Validation</h3>
@@ -221,7 +232,7 @@ export function LandingPage() {
 
                         <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-between group relative overflow-hidden hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                <LayoutDashboard className="h-7 w-7 text-[#968fff]" strokeWidth={2} />
+                                <LayoutDashboard className="h-7 w-7 text-[#968fff]" weight="bold" />
                             </div>
                             <div className="mt-8">
                                 <h3 className="text-xl sm:text-2xl font-bold mb-2 tracking-tight">Clear Assignments</h3>
@@ -242,7 +253,7 @@ export function LandingPage() {
 
                             <div className="relative z-10 w-full md:max-w-[75%] flex flex-col justify-end">
                                 <div className="bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                    <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" strokeWidth={2} />
+                                    <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" weight="bold" />
                                 </div>
                                 <h3 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight">Deep Analytics</h3>
                                 <p className="text-zinc-400 text-[15px] sm:text-base leading-relaxed relative z-10">
@@ -259,7 +270,7 @@ export function LandingPage() {
                     <div className="max-w-xs">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="bg-[#5b4fff] p-2 rounded-lg flex items-center justify-center">
-                                <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />
+                                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
                             </div>
                             <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
                         </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { SpinnerIcon as Loader2, WarningCircleIcon as AlertCircle } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import type { Role } from '@/types';
 

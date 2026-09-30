@@ -1,4 +1,4 @@
-import { AlertCircle } from 'lucide-react';
+import { WarningCircleIcon as AlertCircle } from '@phosphor-icons/react';
 
 interface ErrorBannerProps {
     message: string | null;

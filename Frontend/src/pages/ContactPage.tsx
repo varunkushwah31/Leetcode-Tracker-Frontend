@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Terminal, Send, ArrowLeft, Mail, MapPin, Phone } from 'lucide-react';
+import { TerminalIcon, PaperPlaneTiltIcon as Send, ArrowLeftIcon, EnvelopeIcon as Mail, MapPinIcon, PhoneIcon } from '@phosphor-icons/react';
 import { ErrorBanner } from '../components/ui/ErrorBanner'; // <-- 1. Ready for future backend errors
 
 export function ContactPage() {
@@ -47,7 +47,7 @@ export function ContactPage() {
                     <div className="flex items-center justify-between mb-12">
                         <div className="flex items-center gap-3">
                             <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
-                                <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />
+                                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
                             </div>
                             <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
                         </div>
@@ -55,7 +55,7 @@ export function ContactPage() {
                             onClick={() => navigate(-1)}
                             className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium"
                         >
-                            <ArrowLeft className="h-4 w-4" />
+                            <ArrowLeftIcon className="h-4 w-4" />
                             Go Back
                         </button>
                     </div>
@@ -80,7 +80,7 @@ export function ContactPage() {
                         </div>
                         <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors flex items-center gap-4">
                             <div className="bg-[#1a1b2e] w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
-                                <Phone className="h-5 w-5 text-[#968fff]" />
+                                <PhoneIcon className="h-5 w-5 text-[#968fff]" />
                             </div>
                             <div>
                                 <h3 className="text-white font-semibold text-[14px] mb-0.5 tracking-tight">Call Us</h3>
@@ -89,7 +89,7 @@ export function ContactPage() {
                         </div>
                         <div className="bg-transparent border border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-900/30 transition-colors flex items-center gap-4">
                             <div className="bg-[#1a1b2e] w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
-                                <MapPin className="h-5 w-5 text-[#968fff]" />
+                                <MapPinIcon className="h-5 w-5 text-[#968fff]" />
                             </div>
                             <div>
                                 <h3 className="text-white font-semibold text-[14px] mb-0.5 tracking-tight">Headquarters</h3>
@@ -110,7 +110,7 @@ export function ContactPage() {
                     <div className="lg:hidden flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
                             <div className="bg-[#5b4fff] p-2 rounded-lg">
-                                <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />
+                                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
                             </div>
                             <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
                         </div>
@@ -118,7 +118,7 @@ export function ContactPage() {
                             onClick={() => navigate(-1)}
                             className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium"
                         >
-                            <ArrowLeft className="h-4 w-4" />
+                            <ArrowLeftIcon className="h-4 w-4" />
                             Back
                         </button>
                     </div>

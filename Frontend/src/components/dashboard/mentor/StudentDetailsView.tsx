@@ -5,8 +5,8 @@ import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import {
-    ArrowLeft, Flame, CheckCircle2, ExternalLink, Loader2, BrainCircuit, Clock, Award, Activity
-} from 'lucide-react';
+    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, PulseIcon as Activity
+} from '@phosphor-icons/react';
 import { StudentService } from '@/services/endpoints';
 import type { StudentExtendedDTO } from '@/types';
 import { ActivityHeatmap } from '../student/ActivityHeatmap';
@@ -107,7 +107,7 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
                         onClick={onBack}
                         className="bg-[#1a1b2e] border-zinc-700 text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all rounded-xl shadow-sm"
                     >
-                        <ArrowLeft className="h-4 w-4 mr-2" /> Back to Classroom
+                        <ArrowLeftIcon className="h-4 w-4 mr-2" /> Back to Classroom
                     </Button>
                     <span className="hidden sm:inline text-sm text-zinc-500 font-medium">
                         Press <kbd className="bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-300 font-mono text-xs mx-1">Esc</kbd> to close
@@ -151,7 +151,7 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Streak</p>
                                 <p className="text-2xl font-bold text-amber-500 flex justify-center items-center">
-                                    {data.consistencyStreak || 0} <Flame className="w-5 h-5 ml-1" />
+                                    {data.consistencyStreak || 0} <FlameIcon className="w-5 h-5 ml-1 animate-flame" />
                                 </p>
                             </div>
                         </div>
@@ -208,7 +208,7 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
                         </Card>
 
                         <Card className={`flex flex-col ${cardClasses}`}>
-                            <CardHeader className="border-b border-zinc-800/60 pb-4"><CardTitle className="text-lg font-bold text-white tracking-tight flex items-center"><Clock className="w-5 h-5 mr-2 text-[#5b4fff]" /> Recent Activity</CardTitle></CardHeader>
+                            <CardHeader className="border-b border-zinc-800/60 pb-4"><CardTitle className="text-lg font-bold text-white tracking-tight flex items-center"><ClockIcon className="w-5 h-5 mr-2 text-[#5b4fff]" /> Recent Activity</CardTitle></CardHeader>
                             <CardContent className="flex-1 p-0 px-6 pb-6 pt-6">
                                 <ScrollArea className="h-64 pr-4 custom-scrollbar">
                                     <div className="space-y-4">

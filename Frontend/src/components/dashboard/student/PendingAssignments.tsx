@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 import { Input } from '../../ui/input';
-import { BookOpen, RefreshCw, Calendar, ExternalLink, CheckCircle2, Check, Loader2, AlertCircle, Link2 } from 'lucide-react';
+import { BookOpenIcon, ArrowsClockwiseIcon as RefreshCw, CalendarBlankIcon as Calendar, ArrowSquareOutIcon as ExternalLink, CheckCircleIcon as CheckCircle2, CheckIcon, SpinnerIcon as Loader2, WarningCircleIcon as AlertCircle, LinkSimpleIcon as Link2 } from '@phosphor-icons/react';
 import { StudentService } from '@/services/endpoints';
 import type { AssignmentDTO } from '@/types';
 
@@ -82,7 +82,7 @@ export function PendingAssignments({
             <CardHeader className="bg-transparent border-b border-zinc-800/60 flex flex-row items-center justify-between">
                 <div>
                     <CardTitle className="flex items-center gap-2 text-lg text-white tracking-tight">
-                        <BookOpen className="w-5 h-5 text-[#968fff]" /> Pending Assignments
+                        <BookOpenIcon className="w-5 h-5 text-[#968fff]" /> Pending Assignments
                     </CardTitle>
                     <CardDescription className="mt-1 text-zinc-400">
                         {selectedClassroomId ? 'Filtered by selected classroom' : 'Assigned by your mentors'}
@@ -108,7 +108,7 @@ export function PendingAssignments({
             <CardContent className="p-0">
                 {successMessage && (
                     <div className="m-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center gap-2 text-emerald-400 text-sm">
-                        <Check className="w-4 h-4 shrink-0" />
+                        <CheckIcon className="w-4 h-4 shrink-0" />
                         <span>{successMessage}</span>
                     </div>
                 )}
@@ -185,7 +185,7 @@ export function PendingAssignments({
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Check className="w-4 h-4 mr-2" /> Verify
+                                                        <CheckIcon className="w-4 h-4 mr-2" /> Verify
                                                     </>
                                                 )}
                                             </Button>

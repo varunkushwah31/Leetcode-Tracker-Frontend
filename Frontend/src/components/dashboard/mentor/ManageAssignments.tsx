@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
-import { Trash2, ExternalLink, Calendar, Loader2, CheckCircle2 } from 'lucide-react';
+import { TrashIcon as Trash2, ArrowSquareOutIcon as ExternalLink, CalendarBlankIcon as Calendar, SpinnerIcon as Loader2, CheckCircleIcon as CheckCircle2 } from '@phosphor-icons/react';
 import { ClassroomService } from '@/services/endpoints';
 import { ErrorBanner } from '../../ui/ErrorBanner';
 import type { AssignmentDTO } from '@/types';
