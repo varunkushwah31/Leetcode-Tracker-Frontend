@@ -10,6 +10,9 @@ import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import com.tracker.leetcode.tracker.Service.ClassroomService;
 import com.tracker.leetcode.tracker.Service.EmailService;
+import com.tracker.leetcode.tracker.Exception.ClassroomNotFoundException;
+import com.tracker.leetcode.tracker.Exception.StudentNotFoundException;
+import com.tracker.leetcode.tracker.Exception.ValidationFailedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -97,15 +100,17 @@ public class ClassroomController {
             @RequestParam String assignmentName) {
 
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new StudentNotFoundException("Student not found with ID: " + studentId));
 
-        if (student.getEmail() != null) {
-            emailService.sendNudgeEmail(student.getEmail(), student.getName(), assignmentName, classroom.getClassName());
-            return ResponseEntity.ok().build();
+        if (student.getEmail() == null || student.getEmail().isBlank()) {
+            throw new ValidationFailedException("Student '" + student.getName() + "' does not have a valid email address.");
         }
-        return ResponseEntity.badRequest().body("Student does not have a valid email address.");
+
+        emailService.sendNudgeEmail(student.getEmail(), student.getName(), assignmentName, classroom.getClassName());
+        log.info("Sent nudge email to student [{}] for assignment [{}]", student.getEmail(), assignmentName);
+        return ResponseEntity.ok().build();
     }
 
     // 1. Endpoint for Bulk Import (Receives a file)

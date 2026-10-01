@@ -9,6 +9,8 @@ import com.tracker.leetcode.tracker.Models.Student;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
+import com.tracker.leetcode.tracker.Exception.ClassroomNotFoundException;
+import com.tracker.leetcode.tracker.Exception.MentorNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -60,7 +62,7 @@ public class AdminService {
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics", "mentors-all", "mentor"}, allEntries = true)
     public void deleteMentor(String mentorId) {
         Mentor mentor = mentorRepository.findById(mentorId)
-                .orElseThrow(() -> new RuntimeException("Mentor not found with ID: " + mentorId));
+                .orElseThrow(() -> new MentorNotFoundException("Mentor not found with ID: " + mentorId));
 
         // Cascade Delete: Wipe out all classrooms owned by this mentor
         if (mentor.getClassroomIds() != null && !mentor.getClassroomIds().isEmpty()) {
@@ -74,7 +76,7 @@ public class AdminService {
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics", "mentors-all", "mentor"}, allEntries = true)
     public void deleteClassroom(String classroomId) {
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
 
         // Remove the classroom reference from the Mentor's profile
         mentorRepository.findById(classroom.getMentorId()).ifPresent(mentor -> {

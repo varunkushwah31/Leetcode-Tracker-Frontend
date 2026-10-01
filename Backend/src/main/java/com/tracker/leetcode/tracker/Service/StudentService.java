@@ -118,8 +118,9 @@ public class StudentService {
     public CompletableFuture<Void> syncProfileAsync(String username) {
         try {
             syncAllProfileData(username);
+            log.info("Async sync completed successfully for student [{}]", username);
         } catch (Exception e) {
-            log.error("Async sync failed for {}", username);
+            log.error("Async sync failed for student [{}]: {}", username, e.getMessage(), e);
         }
         return CompletableFuture.completedFuture(null);
     }

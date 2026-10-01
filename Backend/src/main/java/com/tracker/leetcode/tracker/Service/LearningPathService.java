@@ -1,5 +1,6 @@
 package com.tracker.leetcode.tracker.Service;
 
+import com.tracker.leetcode.tracker.Exception.LearningPathNotFoundException;
 import com.tracker.leetcode.tracker.Models.LearningPath;
 import com.tracker.leetcode.tracker.Repository.LearningPathRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class LearningPathService {
     @CacheEvict(value = "classroom-dashboard", allEntries = true)
     public void assignPathToClassroom(String pathId, String classroomId) {
         LearningPath path = pathRepository.findById(pathId)
-                .orElseThrow(() -> new RuntimeException("Learning Path not found with ID: " + pathId));
+                .orElseThrow(() -> new LearningPathNotFoundException("Learning Path not found with ID: " + pathId));
 
         log.info("Assigning path '{}' to classroom '{}'", path.getTitle(), classroomId);
 

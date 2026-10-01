@@ -28,12 +28,20 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final com.tracker.leetcode.tracker.Service.RateLimitingService rateLimitingService;
+    private final tools.jackson.databind.ObjectMapper objectMapper;
 
     @Value("${application.cors.allowed-origins:http://localhost:5173,http://localhost:3000,http://localhost:80}")
     private List<String> configuredAllowedOrigins;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public RateLimitingFilter rateLimitingFilter() {
+        return new RateLimitingFilter(rateLimitingService, objectMapper);
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, RateLimitingFilter rateLimitingFilter) throws Exception {
         http
                 // 1. Tell Spring Security to use our Master CORS config
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -42,6 +50,7 @@ public class SecurityConfig {
 
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
 
                 .authorizeHttpRequests(auth -> auth
@@ -70,7 +79,8 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(rateLimitingFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }

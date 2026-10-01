@@ -10,8 +10,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -22,29 +22,32 @@ import java.time.LocalDateTime;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(@NonNull HttpServletRequest request, HttpServletResponse response, @NonNull AuthenticationException authException)
-            throws IOException, ServletException {
+    public void handle(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull AccessDeniedException accessDeniedException
+    ) throws IOException, ServletException {
 
         String traceId = MDC.get(RequestLoggingFilter.MDC_TRACE_ID_KEY);
-        log.warn("Unauthorized access on [{} {}] (traceId: {}): {}",
-                request.getMethod(), request.getRequestURI(), traceId, authException.getMessage());
+        log.warn("Access denied on [{} {}] (traceId: {}): {}",
+                request.getMethod(), request.getRequestURI(), traceId, accessDeniedException.getMessage());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .time(LocalDateTime.now())
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .error("Unauthorized")
-                .message("Missing, invalid, or expired authentication token.")
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Forbidden")
+                .message("You do not have permission to access this resource.")
                 .path(request.getRequestURI())
                 .traceId(traceId)
                 .build();
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
         OutputStream responseStream = response.getOutputStream();
         objectMapper.writeValue(responseStream, errorResponse);

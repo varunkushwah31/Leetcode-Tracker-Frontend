@@ -4,8 +4,10 @@ import com.tracker.leetcode.tracker.DTO.AuthenticationRequest;
 import com.tracker.leetcode.tracker.DTO.AuthenticationResponse;
 import com.tracker.leetcode.tracker.DTO.RegisterRequest;
 import com.tracker.leetcode.tracker.DTO.StudentRegisterRequest;
+import com.tracker.leetcode.tracker.Exception.RefreshTokenException;
 import com.tracker.leetcode.tracker.Service.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -41,7 +43,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request,HttpServletResponse response){
+    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterRequest request, HttpServletResponse response){
 
         AuthenticationResponse authResponse = authenticationService.register(request);
         setRefreshTokenCookie(response, authResponse.refreshToken());
@@ -52,34 +54,34 @@ public class AuthenticationController {
                 .userId(authResponse.userId() != null ? authResponse.userId() : authResponse.mentorId())
                 .mentorId(authResponse.mentorId())
                 .name(authResponse.name())
-                .role(authResponse.role()) // <-- FIXED: Added Role
+                .role(authResponse.role())
                 .build());
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request,
+            @Valid @RequestBody AuthenticationRequest request,
             HttpServletResponse response) {
         AuthenticationResponse authResponse = authenticationService.authenticate(request);
-        setRefreshTokenCookie(response,authResponse.refreshToken());
+        setRefreshTokenCookie(response, authResponse.refreshToken());
 
         return ResponseEntity.ok(AuthenticationResponse.builder()
                 .accessToken(authResponse.accessToken())
                 .userId(authResponse.userId() != null ? authResponse.userId() : authResponse.mentorId())
                 .mentorId(authResponse.mentorId())
                 .name(authResponse.name())
-                .role(authResponse.role()) // <-- FIXED: Added Role
+                .role(authResponse.role())
                 .build());
     }
 
-    // NEW: The Refresh Endpoint
+    // The Refresh Endpoint
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse> refresh(
             @CookieValue(name = "refresh_token", required = false) String refreshToken,
             HttpServletResponse response) {
 
-        if (refreshToken == null) {
-            return ResponseEntity.status(401).build(); // No cookie, no refresh!
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new RefreshTokenException("Refresh token cookie is missing.");
         }
 
         // Rotate the tokens
@@ -98,7 +100,7 @@ public class AuthenticationController {
                 .build());
     }
 
-    // NEW: Logout Endpoint
+    // Logout Endpoint
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
         // Clear refresh_token cookie
@@ -116,7 +118,7 @@ public class AuthenticationController {
 
     @PostMapping("/register/student")
     public ResponseEntity<AuthenticationResponse> registerStudent(
-            @RequestBody StudentRegisterRequest request,
+            @Valid @RequestBody StudentRegisterRequest request,
             HttpServletResponse response){
         AuthenticationResponse authResponse = authenticationService.registerStudent(request);
         setRefreshTokenCookie(response, authResponse.refreshToken());
@@ -126,7 +128,7 @@ public class AuthenticationController {
                 .userId(authResponse.userId() != null ? authResponse.userId() : authResponse.mentorId())
                 .mentorId(authResponse.mentorId())
                 .name(authResponse.name())
-                .role(authResponse.role()) // <-- FIXED: Added Role
+                .role(authResponse.role())
                 .build());
     }
 }

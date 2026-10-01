@@ -93,22 +93,25 @@ public class AuthenticationService {
                     )
             );
         } catch (Exception e) {
-            log.error("Authentication failed for user: {}", request.email());
+            log.warn("Authentication failed for user: {}", request.email());
             throw new UserAuthenticationException("Invalid email or password");
         }
 
         // 2. Are they a Student?
         var studentOpt = studentRepository.findByEmail(request.email());
         if (studentOpt.isPresent()) {
+            log.info("Student authenticated successfully: {}", request.email());
             return generateAuthResponseForStudent(studentOpt.get());
         }
 
         // 3. Are they a Mentor?
         var mentorOpt = mentorRepository.findByEmail(request.email());
         if (mentorOpt.isPresent()) {
+            log.info("Mentor authenticated successfully: {}", request.email());
             return generateAuthResponseForMentor(mentorOpt.get());
         }
 
+        log.warn("User '{}' authenticated with credentials but not found in student or mentor repositories", request.email());
         throw new UserAuthenticationException("User not found after successful authentication");
     }
 
@@ -125,6 +128,7 @@ public class AuthenticationService {
                     if (studentOpt.isPresent()) {
                         Student student = studentOpt.get();
                         String jwtToken = jwtService.generateToken(student);
+                        log.info("Refreshed access token for student: {}", student.getEmail());
                         return AuthenticationResponse.builder()
                                 .accessToken(jwtToken)
                                 .refreshToken(requestRefreshToken)
@@ -140,6 +144,7 @@ public class AuthenticationService {
                     if (mentorOpt.isPresent()) {
                         Mentor mentor = mentorOpt.get();
                         String jwtToken = jwtService.generateToken(mentor);
+                        log.info("Refreshed access token for mentor: {}", mentor.getEmail());
                         return AuthenticationResponse.builder()
                                 .accessToken(jwtToken)
                                 .refreshToken(requestRefreshToken)
@@ -150,9 +155,10 @@ public class AuthenticationService {
                                 .build();
                     }
 
-                    throw new UserAuthenticationException("User not found during refresh");
+                    log.warn("Refresh token user ID '{}' not found in database", userId);
+                    throw new com.tracker.leetcode.tracker.Exception.RefreshTokenException("User associated with refresh token no longer exists.");
                 })
-                .orElseThrow(() -> new UserAuthenticationException("Refresh token is not in database!"));
+                .orElseThrow(() -> new com.tracker.leetcode.tracker.Exception.RefreshTokenException("Invalid or expired refresh token."));
     }
 
     // 4. DRY HELPER METHODS

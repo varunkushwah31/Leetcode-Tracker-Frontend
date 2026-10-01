@@ -224,7 +224,7 @@ public class ClassroomService {
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not Found."));
 
         if (!classroom.getStudentIds().contains(student.getId())) {
-            throw new RuntimeException("Security Exception: You are not enrolled in this classroom.");
+            throw new AccessDeniedException("You are not enrolled in this classroom.");
         }
 
         Assignment assignment = classroom.getAssignments().stream()
@@ -289,7 +289,8 @@ public class ClassroomService {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse CSV file.");
+            log.error("Failed to parse uploaded CSV file for classroom [{}]: {}", classroomId, e.getMessage());
+            throw new ValidationFailedException("Failed to parse CSV file: " + e.getMessage());
         }
 
         return failedUsernames;
