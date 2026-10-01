@@ -245,24 +245,18 @@ export function LandingPage() {
                             </div>
 
                             {/* Sleek Abstract Verification Graphic */}
-                            <div className="my-6 space-y-2.5 relative z-10 w-full">
-                                <div className="flex items-center justify-between bg-[#141414] p-3 rounded-xl border border-zinc-800/50 transition-all duration-300 group-hover:border-zinc-700/60">
-                                    <div className="flex items-center gap-2.5 min-w-0">
-                                        <div className="w-2 h-2 rounded-full bg-[#5b4fff] animate-pulse"></div>
-                                        <span className="text-xs text-zinc-300 font-medium truncate">Solution Submission</span>
-                                    </div>
-                                    <span className="text-xs bg-[#5b4fff]/20 text-[#968fff] px-2.5 py-0.5 rounded-md font-semibold">
-                                        Auto-Synced
-                                    </span>
+                            <div className="my-6 space-y-3 relative z-10 w-full">
+                                <div className="flex justify-between items-center bg-[#141414] p-3.5 rounded-xl border border-zinc-800/50">
+                                    <span className="text-sm font-medium">Solution Submission</span>
+                                    <span className="text-xs bg-[#5b4fff]/20 text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Auto-Synced</span>
                                 </div>
-                                <div className="flex items-center justify-between bg-[#141414] p-3 rounded-xl border border-[#5b4fff]/30 shadow-[0_0_20px_rgba(91,79,255,0.15)] transition-all duration-300 group-hover:border-[#5b4fff]/50">
-                                    <div className="flex items-center gap-2.5 min-w-0">
-                                        <CheckCircleIcon className="w-4 h-4 text-[#968fff]" weight="fill" />
-                                        <span className="text-xs text-white font-medium truncate">LeetCode Status</span>
-                                    </div>
-                                    <span className="text-xs bg-[#5b4fff] text-white px-2.5 py-0.5 rounded-md font-semibold shadow-[0_0_12px_rgba(91,79,255,0.5)]">
-                                        Verified (100%)
-                                    </span>
+                                <div className="flex justify-between items-center bg-[#141414] p-3.5 rounded-xl border border-zinc-800/50">
+                                    <span className="text-sm font-medium">LeetCode Status</span>
+                                    <span className="text-xs bg-[#5b4fff]/20 text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Verified (100%)</span>
+                                </div>
+                                <div className="flex justify-between items-center bg-[#141414] p-3.5 rounded-xl border border-zinc-800/50 opacity-40">
+                                    <span className="text-sm font-medium">Plagiarism Check</span>
+                                    <span className="text-xs bg-zinc-800 text-zinc-300 px-2.5 py-1 rounded-md font-semibold">Draft</span>
                                 </div>
                             </div>
 
@@ -283,24 +277,18 @@ export function LandingPage() {
                             </div>
 
                             {/* Sleek Problem Set Graphic */}
-                            <div className="my-6 space-y-2.5 relative z-10 w-full">
-                                <div className="flex items-center justify-between bg-[#141414] p-3 rounded-xl border border-[#5b4fff]/30 shadow-[0_0_20px_rgba(91,79,255,0.15)] transition-all duration-300 group-hover:border-[#5b4fff]/50">
-                                    <div className="flex items-center gap-2.5 min-w-0">
-                                        <div className="w-2 h-2 rounded-full bg-[#5b4fff] shadow-[0_0_8px_#5b4fff]"></div>
-                                        <span className="text-xs text-white font-medium truncate">Arrays & Two Pointers</span>
-                                    </div>
-                                    <span className="text-xs bg-[#5b4fff]/20 text-[#968fff] px-2.5 py-0.5 rounded-md font-semibold">
-                                        Active Cohort
-                                    </span>
+                            <div className="my-6 space-y-3 relative z-10 w-full">
+                                <div className="flex justify-between items-center bg-[#141414] p-3.5 rounded-xl border border-zinc-800/50">
+                                    <span className="text-sm font-medium">Arrays & Two Pointers</span>
+                                    <span className="text-xs bg-[#5b4fff]/20 text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Active Cohort</span>
                                 </div>
-                                <div className="flex items-center justify-between bg-[#141414] p-3 rounded-xl border border-zinc-800/50 opacity-60 transition-all duration-300 group-hover:opacity-90">
-                                    <div className="flex items-center gap-2.5 min-w-0">
-                                        <div className="w-2 h-2 rounded-full bg-zinc-700"></div>
-                                        <span className="text-xs text-zinc-300 font-medium truncate">Dynamic Programming</span>
-                                    </div>
-                                    <span className="text-xs bg-zinc-800 text-zinc-400 px-2.5 py-0.5 rounded-md font-semibold">
-                                        Next Week
-                                    </span>
+                                <div className="flex justify-between items-center bg-[#141414] p-3.5 rounded-xl border border-zinc-800/50">
+                                    <span className="text-sm font-medium">Dynamic Programming</span>
+                                    <span className="text-xs bg-[#5b4fff]/20 text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Next Week</span>
+                                </div>
+                                <div className="flex justify-between items-center bg-[#141414] p-3.5 rounded-xl border border-zinc-800/50 opacity-40">
+                                    <span className="text-sm font-medium">Graphs & Trees</span>
+                                    <span className="text-xs bg-zinc-800 text-zinc-300 px-2.5 py-1 rounded-md font-semibold">Draft</span>
                                 </div>
                             </div>
 
