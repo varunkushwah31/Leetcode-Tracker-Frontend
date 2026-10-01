@@ -1,0 +1,25 @@
+name: Keep Render Instance Alive
+
+on:
+  schedule:
+    # Runs every 14 minutes to prevent Render free instance from sleeping (spins down after 15m inactivity)
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+
+jobs:
+  keep-alive:
+    name: Ping Render Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Keep-Alive Ping
+        env:
+          SERVICE_URL: ${{ secrets.BACKEND_HEALTH_URL || 'https://leettracker-backend-nq7r.onrender.com/health' }}
+        run: |
+          echo "Sending keep-alive ping to: $SERVICE_URL"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 "$SERVICE_URL" || true)
+          echo "Received HTTP status code: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "Success: Render service is active and responding."
+          else
+            echo "Notice: Service responded with HTTP $HTTP_STATUS (ping sent to wake up instance)."
+          fi
