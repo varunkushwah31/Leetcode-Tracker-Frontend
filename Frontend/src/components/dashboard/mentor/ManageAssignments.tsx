@@ -48,13 +48,25 @@ export function ManageAssignments({ classroomId, mentorId, assignments = [], onR
                         <div key={assignment.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-[#1a1a1a]/40 border border-zinc-800/50 hover:bg-[#1a1a1a]/80 hover:border-zinc-700 rounded-xl transition-all gap-4">
                             <div>
                                 <div className="flex items-center gap-3 mb-1">
-                                    <h4 className="text-lg font-bold text-white tracking-tight">{assignment.titleSlug}</h4>
+                                    <h4 className="text-lg font-bold text-white tracking-tight">
+                                        {assignment.title ? `${assignment.title} (${assignment.titleSlug})` : assignment.titleSlug}
+                                    </h4>
+                                    <Badge
+                                        variant="outline"
+                                        className={
+                                            assignment.platform === 'CODEFORCES'
+                                                ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[10px] uppercase font-bold'
+                                                : 'bg-[#ffa116]/10 text-[#ffa116] border-[#ffa116]/20 text-[10px] uppercase font-bold'
+                                        }
+                                    >
+                                        {assignment.platform || 'LEETCODE'}
+                                    </Badge>
                                     <Badge variant="outline" className="bg-[#5b4fff]/10 text-[#968fff] border-[#5b4fff]/20 text-[10px] uppercase">Active</Badge>
                                 </div>
                                 <div className="flex items-center gap-4 text-xs text-zinc-400 font-medium">
                                     <span className="flex items-center"><Calendar className="w-3.5 h-3.5 mr-1.5" /> Due: {formatDate(assignment.endTimestamp)}</span>
                                     <a href={assignment.questionLink} target="_blank" rel="noopener noreferrer" className="flex items-center text-[#5b4fff] hover:text-[#b4afff] transition-colors">
-                                        View on LeetCode <ExternalLink className="w-3 h-3 ml-1" />
+                                        View on {assignment.platform === 'CODEFORCES' ? 'Codeforces' : 'LeetCode'} <ExternalLink className="w-3 h-3 ml-1" />
                                     </a>
                                 </div>
                             </div>

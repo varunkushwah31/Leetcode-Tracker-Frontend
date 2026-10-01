@@ -63,6 +63,9 @@ public class AuthenticationService {
         student.setEmail(request.email());
         student.setPassword(passwordEncoder.encode(request.password()));
         student.setLeetcodeUsername(request.leetcodeUsername());
+        if (request.codeforcesHandle() != null && !request.codeforcesHandle().isBlank()) {
+            student.setCodeforcesHandle(request.codeforcesHandle().trim());
+        }
         student.setRole(Role.STUDENT);
         student.setAuthProvider(AuthProvider.LOCAL);
         student.setEnabled(true);

@@ -130,24 +130,37 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
                             </Avatar>
                             <div>
                                 <h1 className="text-3xl font-extrabold mb-1 text-white tracking-tight">{data.name}</h1>
-                                <a href={`https://leetcode.com/${data.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-[#b4afff] transition-colors flex items-center mb-3 font-medium">
-                                    @{data.leetcodeUsername} <ExternalLink className="h-3 w-3 ml-2" />
-                                </a>
+                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                    <a href={`https://leetcode.com/${data.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-[#1a1b2e]/60 px-2.5 py-1 rounded-lg border border-zinc-800">
+                                        LC: @{data.leetcodeUsername} <ExternalLink className="h-3 w-3 ml-1.5" />
+                                    </a>
+                                    {data.codeforcesHandle && (
+                                        <a href={`https://codeforces.com/profile/${data.codeforcesHandle}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center text-xs font-medium bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
+                                            CF: @{data.codeforcesHandle} <ExternalLink className="h-3 w-3 ml-1.5" />
+                                        </a>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
                         <div className="flex flex-wrap justify-center sm:justify-start gap-6 sm:gap-8 bg-[#1a1b2e]/40 p-5 rounded-xl border border-zinc-800/60 shadow-inner">
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rank</p>
-                                <p className="text-2xl font-bold text-white">{data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : 'N/A'}</p>
+                                <p className="text-2xl font-bold text-white">{data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : (data.codeforcesRank || 'N/A')}</p>
                             </div>
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Solved</p>
                                 <p className="text-2xl font-bold text-emerald-400">{totalSolved}</p>
+                                {Boolean(data.codeforcesSolvedCount && data.codeforcesSolvedCount > 0) && (
+                                    <p className="text-[10px] text-zinc-400 mt-0.5">LC: {data.leetcodeSolvedCount ?? (easyCount + medCount + hardCount)} | CF: {data.codeforcesSolvedCount}</p>
+                                )}
                             </div>
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rating</p>
                                 <p className="text-2xl font-bold text-[#b4afff]">{rating}</p>
+                                {Boolean(data.codeforcesRating && data.codeforcesRating > 0) && (
+                                    <p className="text-[10px] text-blue-400 mt-0.5">CF: {data.codeforcesRating}</p>
+                                )}
                             </div>
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Streak</p>
@@ -214,10 +227,21 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
                                 <ScrollArea className="h-64 pr-4 custom-scrollbar">
                                     <div className="space-y-4">
                                         {data.recentSubmissions?.slice(0, 15).map((sub) => (
-                                            <div key={`${sub.titleSlug || sub.title}-${sub.timestamp}`} className="flex items-start space-x-3 pb-4 border-b border-zinc-800/60 last:border-0 last:pb-0">
+                                            <div key={`${sub.platform || 'LC'}-${sub.titleSlug || sub.title}-${sub.timestamp}`} className="flex items-start space-x-3 pb-4 border-b border-zinc-800/60 last:border-0 last:pb-0">
                                                 <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                                                <div>
-                                                    <p className="text-[14px] font-medium leading-tight text-white mb-1">{sub.title}</p>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <p className="text-[14px] font-medium leading-tight text-white truncate">{sub.title}</p>
+                                                        {sub.platform && (
+                                                            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded shrink-0 ${
+                                                                sub.platform === 'CODEFORCES'
+                                                                    ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                                                    : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                                            }`}>
+                                                                {sub.platform === 'CODEFORCES' ? 'CF' : 'LC'}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <p className="text-xs text-zinc-500">{formatDate(sub.timestamp)}</p>
                                                 </div>
                                             </div>

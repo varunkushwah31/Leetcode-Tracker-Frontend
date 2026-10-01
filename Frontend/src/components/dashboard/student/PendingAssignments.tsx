@@ -1,32 +1,35 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 import { Input } from '../../ui/input';
-import { BookOpenIcon, ArrowsClockwiseIcon as RefreshCw, CalendarBlankIcon as Calendar, ArrowSquareOutIcon as ExternalLink, CheckCircleIcon as CheckCircle2, CheckIcon, SpinnerIcon as Loader2, WarningCircleIcon as AlertCircle, LinkSimpleIcon as Link2 } from '@phosphor-icons/react';
+import {
+    CalendarBlankIcon as Calendar,
+    ArrowSquareOutIcon as ExternalLink,
+    CheckCircleIcon as CheckIcon,
+    SpinnerIcon as Loader2,
+    WarningCircleIcon as AlertCircle,
+    ArrowsClockwiseIcon as RefreshCw,
+    LinkSimpleIcon as Link2,
+    BookOpenIcon,
+    LightningIcon,
+} from '@phosphor-icons/react';
 import { StudentService } from '@/services/endpoints';
 import type { AssignmentDTO } from '@/types';
 
-const getDaysUntilDue = (dueTimestamp: number) => {
-    const diffDays = Math.ceil((new Date(dueTimestamp * 1000).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return { text: 'Overdue', color: 'text-rose-500' };
-    if (diffDays === 0) return { text: 'Due today', color: 'text-amber-500' };
-    return { text: `${diffDays} days left`, color: 'text-zinc-400' };
-};
-
 interface PendingAssignmentsProps {
     assignments: { classroomId: string; className: string; assignment: AssignmentDTO }[];
-    isSyncing: boolean;
     onSync: () => void;
-    selectedClassroomId: string | null;
-    onClearFilter: () => void;
+    isSyncing: boolean;
+    selectedClassroomId?: string | null;
+    onClearFilter?: () => void;
     onValidationSuccess?: () => void;
 }
 
 export function PendingAssignments({
     assignments,
-    isSyncing,
     onSync,
+    isSyncing,
     selectedClassroomId,
     onClearFilter,
     onValidationSuccess,
@@ -34,6 +37,7 @@ export function PendingAssignments({
     const [activeAssignmentId, setActiveAssignmentId] = useState<string | null>(null);
     const [submissionUrl, setSubmissionUrl] = useState('');
     const [isValidating, setIsValidating] = useState(false);
+    const [isAutoValidating, setIsAutoValidating] = useState<string | null>(null);
     const [validationError, setValidationError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -50,9 +54,34 @@ export function PendingAssignments({
         }
     };
 
+    const handleAutoValidate = async (classroomId: string, assignmentId: string) => {
+        setIsAutoValidating(assignmentId);
+        setValidationError(null);
+        setSuccessMessage(null);
+
+        try {
+            await StudentService.autoValidateSubmission(classroomId, assignmentId);
+            setSuccessMessage('Assignment verified and completed automatically!');
+            setActiveAssignmentId(null);
+            if (onValidationSuccess) {
+                onValidationSuccess();
+            } else {
+                onSync();
+            }
+        } catch (err: unknown) {
+            setValidationError(
+                err instanceof Error
+                    ? err.message
+                    : 'Auto-validation could not find an accepted submission. If you recently solved it, click Sync or paste your submission URL.'
+            );
+        } finally {
+            setIsAutoValidating(null);
+        }
+    };
+
     const handleValidateSubmission = async (classroomId: string, assignmentId: string) => {
         if (!submissionUrl.trim()) {
-            setValidationError('Please enter your LeetCode submission URL.');
+            setValidationError('Please enter your submission URL or click Auto-Verify.');
             return;
         }
 
@@ -77,6 +106,18 @@ export function PendingAssignments({
         }
     };
 
+    const getDaysUntilDue = (timestamp: number) => {
+        if (!timestamp) return { text: 'No deadline', color: 'text-zinc-500' };
+        const now = Math.floor(Date.now() / 1000);
+        const diff = timestamp - now;
+        const days = Math.ceil(diff / 86400);
+
+        if (days < 0) return { text: 'Overdue', color: 'text-rose-400 font-bold' };
+        if (days === 0) return { text: 'Due today', color: 'text-amber-400 font-bold' };
+        if (days === 1) return { text: 'Due tomorrow', color: 'text-amber-400' };
+        return { text: `${days} days left`, color: 'text-zinc-400' };
+    };
+
     return (
         <Card className="relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden">
             <CardHeader className="bg-transparent border-b border-zinc-800/60 flex flex-row items-center justify-between">
@@ -85,7 +126,7 @@ export function PendingAssignments({
                         <BookOpenIcon className="w-5 h-5 text-[#968fff]" /> Pending Assignments
                     </CardTitle>
                     <CardDescription className="mt-1 text-zinc-400">
-                        {selectedClassroomId ? 'Filtered by selected classroom' : 'Assigned by your mentors'}
+                        {selectedClassroomId ? 'Filtered by selected classroom' : 'Assigned by your mentors on LeetCode & Codeforces'}
                     </CardDescription>
                 </div>
                 <div className="flex gap-2">
@@ -98,10 +139,17 @@ export function PendingAssignments({
                         onClick={onSync}
                         disabled={isSyncing}
                         variant="outline"
-                        className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all group"
+                        className="bg-transparent border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800"
                     >
-                        <RefreshCw className={`w-4 h-4 mr-2 text-[#968fff] transition-transform duration-500 ${isSyncing ? 'animate-spin' : 'group-hover:rotate-180'}`} />
-                        {isSyncing ? 'Syncing...' : 'Auto-Sync'}
+                        {isSyncing ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Syncing...
+                            </>
+                        ) : (
+                            <>
+                                <RefreshCw className="w-4 h-4 mr-2" /> Sync Stats
+                            </>
+                        )}
                     </Button>
                 </div>
             </CardHeader>
@@ -116,26 +164,40 @@ export function PendingAssignments({
                     {assignments.map((item) => {
                         const dueInfo = getDaysUntilDue(item.assignment.endTimestamp);
                         const isExpanded = activeAssignmentId === item.assignment.id;
+                        const isCf = item.assignment.platform === 'CODEFORCES';
+                        const isAutoValidatingThis = isAutoValidating === item.assignment.id;
 
                         return (
                             <div key={`${item.classroomId}-${item.assignment.id}`} className="p-6 hover:bg-zinc-800/30 transition-colors">
                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                                     <div>
-                                        <Badge
-                                            variant="outline"
-                                            className="bg-[#1a1a1a] text-zinc-400 border-zinc-700 mb-2 uppercase tracking-wider text-[10px] font-bold"
-                                        >
-                                            {item.className}
-                                        </Badge>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Badge
+                                                variant="outline"
+                                                className="bg-[#1a1a1a] text-zinc-400 border-zinc-700 uppercase tracking-wider text-[10px] font-bold"
+                                            >
+                                                {item.className}
+                                            </Badge>
+                                            <Badge
+                                                variant="outline"
+                                                className={
+                                                    isCf
+                                                        ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[10px] uppercase font-bold'
+                                                        : 'bg-[#ffa116]/10 text-[#ffa116] border-[#ffa116]/20 text-[10px] uppercase font-bold'
+                                                }
+                                            >
+                                                {item.assignment.platform || 'LEETCODE'}
+                                            </Badge>
+                                        </div>
                                         <h4 className="text-lg font-bold text-white tracking-tight">
-                                            {item.assignment.titleSlug}
+                                            {item.assignment.title ? `${item.assignment.title} (${item.assignment.titleSlug})` : item.assignment.titleSlug}
                                         </h4>
                                         <div className="flex items-center gap-1.5 mt-2 text-sm">
                                             <Calendar className="w-4 h-4 text-zinc-400" />
                                             <span className={`font-medium ${dueInfo.color}`}>{dueInfo.text}</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex flex-wrap items-center gap-2">
                                         <Button
                                             asChild
                                             variant="outline"
@@ -145,16 +207,32 @@ export function PendingAssignments({
                                                 Solve <ExternalLink className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                             </a>
                                         </Button>
+
+                                        {/* Auto-Verify Button */}
+                                        <Button
+                                            onClick={() => handleAutoValidate(item.classroomId, item.assignment.id)}
+                                            disabled={isAutoValidatingThis || isValidating}
+                                            className="bg-emerald-600/90 hover:bg-emerald-600 text-white text-[14px] font-medium"
+                                        >
+                                            {isAutoValidatingThis ? (
+                                                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                                            ) : (
+                                                <LightningIcon className="w-4 h-4 mr-1.5" weight="fill" />
+                                            )}
+                                            Auto-Verify
+                                        </Button>
+
                                         <Button
                                             onClick={() => handleOpenSubmit(item.assignment.id)}
-                                            className={`text-[14px] font-medium transition-colors ${
+                                            variant="outline"
+                                            className={`text-[14px] font-medium transition-colors border-zinc-700 ${
                                                 isExpanded
-                                                    ? 'bg-zinc-700 text-white hover:bg-zinc-600'
-                                                    : 'bg-[#5b4fff] text-white hover:bg-[#4a3ecc]'
+                                                    ? 'bg-zinc-800 text-white'
+                                                    : 'bg-transparent text-zinc-300 hover:text-white hover:bg-zinc-800'
                                             }`}
                                         >
                                             <Link2 className="w-4 h-4 mr-1.5" />
-                                            {isExpanded ? 'Cancel' : 'Submit'}
+                                            {isExpanded ? 'Cancel' : 'Submit Link'}
                                         </Button>
                                     </div>
                                 </div>
@@ -162,11 +240,17 @@ export function PendingAssignments({
                                 {isExpanded && (
                                     <div className="mt-4 pt-4 border-t border-zinc-800/60 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                                         <p className="text-xs text-zinc-400">
-                                            Paste your accepted LeetCode submission URL to verify:
+                                            {isCf
+                                                ? 'Paste your Codeforces submission URL (e.g. https://codeforces.com/contest/.../submission/...) or submission ID:'
+                                                : 'Paste your accepted LeetCode submission URL to verify:'}
                                         </p>
                                         <div className="flex flex-col sm:flex-row gap-2">
                                             <Input
-                                                placeholder="https://leetcode.com/problems/.../submissions/..."
+                                                placeholder={
+                                                    isCf
+                                                        ? 'https://codeforces.com/contest/4/submission/12345678'
+                                                        : 'https://leetcode.com/problems/.../submissions/...'
+                                                }
                                                 value={submissionUrl}
                                                 onChange={(e) => {
                                                     setSubmissionUrl(e.target.value);
@@ -177,7 +261,7 @@ export function PendingAssignments({
                                             <Button
                                                 onClick={() => handleValidateSubmission(item.classroomId, item.assignment.id)}
                                                 disabled={isValidating}
-                                                className="bg-emerald-600 hover:bg-emerald-500 text-white shrink-0 font-medium"
+                                                className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white shrink-0 font-medium"
                                             >
                                                 {isValidating ? (
                                                     <>
@@ -185,7 +269,7 @@ export function PendingAssignments({
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <CheckIcon className="w-4 h-4 mr-2" /> Verify
+                                                        <CheckIcon className="w-4 h-4 mr-2" /> Verify Link
                                                     </>
                                                 )}
                                             </Button>
@@ -201,11 +285,12 @@ export function PendingAssignments({
                             </div>
                         );
                     })}
+
                     {assignments.length === 0 && (
-                        <div className="p-12 text-center text-zinc-400">
-                            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-                            <h3 className="text-lg font-bold text-white tracking-tight">All Caught Up!</h3>
-                            <p className="text-sm mt-1">You have no pending assignments.</p>
+                        <div className="p-12 text-center text-zinc-500">
+                            <CheckIcon className="w-12 h-12 mx-auto text-emerald-500/40 mb-3" />
+                            <h5 className="text-white font-semibold">All Caught Up!</h5>
+                            <p className="text-sm mt-1">You have no pending assignments on LeetCode or Codeforces.</p>
                         </div>
                     )}
                 </div>

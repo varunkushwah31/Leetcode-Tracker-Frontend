@@ -37,6 +37,7 @@ public class ClassroomService {
     private final StudentRepository studentRepository;
     private final StudentMapper studentMapper;
     private final LeetCodeApiClient leetCodeApiClient;
+    private final CodeforcesApiClient codeforcesApiClient;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Lazy
@@ -138,23 +139,23 @@ public class ClassroomService {
     // 4. Assign a LeetCode problem to the classroom
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
     public Classroom assignQuestionToClassroom(String classroomId, Assignment assignment) {
-        log.info("Assigning question '{}' to classroom ID: {}", assignment.getTitleSlug(), classroomId);
+        log.info("Assigning question '{}' on platform {} to classroom ID: {}",
+                assignment.getTitleSlug(), assignment.getPlatform(), classroomId);
 
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
 
-        // --- Ensure ID and questionLink are explicitly set before saving ---
         if (assignment.getId() == null) {
             assignment.setId(UUID.randomUUID().toString());
         }
 
-        if (assignment.getQuestionLink() == null && assignment.getTitleSlug() != null) {
-            assignment.setQuestionLink("https://leetcode.com/problems/" + assignment.getTitleSlug() + "/");
+        if (assignment.getPlatform() == null) {
+            assignment.setPlatform(Platform.LEETCODE);
         }
 
-        // Defensive programming: initialize assignments array if null
-        initializeAssignmentsIfNull(classroom);
+        assignment.ensureQuestionLink();
 
+        initializeAssignmentsIfNull(classroom);
         classroom.getAssignments().add(assignment);
         Classroom savedClassroom = classroomRepository.save(classroom);
 
@@ -204,9 +205,7 @@ public class ClassroomService {
             return student;
         }
 
-        String submissionId = extractSubmissionIdFromUrl(submissionUrl);
-
-        boolean isValid = leetCodeApiClient.verifySubmission(submissionId, leetcodeUsername, assignment.getTitleSlug());
+        boolean isValid = verifyAssignmentSubmission(student, assignment, submissionUrl);
 
         if (!isValid) {
             throw new ValidationFailedException("Validation Failed! Ensure the submission is 'Accepted', belongs to you, and is the correct problem.");
@@ -214,7 +213,14 @@ public class ClassroomService {
 
         // Success! Permanently save it to the student's profile
         student.getManuallyCompletedAssignments().add(assignmentId);
-        return studentRepository.save(student);
+        Student savedStudent = studentRepository.save(student);
+
+        messagingTemplate.convertAndSend(
+                "/topic/classrooms/" + classroomId,
+                (Object) Map.of("action", "UPDATE", "message", "Leaderboard changed!")
+        );
+
+        return savedStudent;
     }
 
     public Student validateSubmissionAsStudent(Student student, String classroomId, String assignmentId, String submissionUrl) {
@@ -238,31 +244,48 @@ public class ClassroomService {
             return student;
         }
 
-        String submissionId = extractSubmissionIdFromUrl(submissionUrl);
-
-        // Verify with LeetCode API (using the student's exact username)
-        boolean isValid = leetCodeApiClient.verifySubmission(submissionId, student.getLeetcodeUsername(), assignment.getTitleSlug());
+        boolean isValid = verifyAssignmentSubmission(student, assignment, submissionUrl);
 
         if (!isValid) {
             throw new ValidationFailedException("Validation Failed! Ensure the submission is 'Accepted', belongs to you, and is the correct problem.");
         }
 
-
-
         // Success! Save it to the student's profile
         student.getManuallyCompletedAssignments().add(assignmentId);
         Student savedStudent = studentRepository.save(student);
 
-        // Broadcast the "Ping" to anyone listening to this classroom
+        // Broadcast the update to anyone listening to this classroom
         log.info("Broadcasting leaderboard update for classroom: {}", classroomId);
         messagingTemplate.convertAndSend(
                 "/topic/classrooms/" + classroomId,
-                (Object) Map.of("action", "UPDATE", "message", "Leaderboard changed!") // <-- Added (Object) cast
+                (Object) Map.of("action", "UPDATE", "message", "Leaderboard changed!")
         );
 
-
         return savedStudent;
+    }
 
+    public Student autoValidateAssignment(Student student, String classroomId, String assignmentId) {
+        return validateSubmissionAsStudent(student, classroomId, assignmentId, null);
+    }
+
+    private boolean verifyAssignmentSubmission(Student student, Assignment assignment, String submissionUrl) {
+        if (assignment.getPlatform() == Platform.CODEFORCES) {
+            if (student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank()) {
+                throw new ValidationFailedException("You must link a Codeforces handle to your profile to validate Codeforces assignments.");
+            }
+            return codeforcesApiClient.verifySubmission(student.getCodeforcesHandle(), assignment.getTitleSlug(), submissionUrl);
+        } else {
+            // LeetCode verification
+            if (submissionUrl != null && !submissionUrl.isBlank()) {
+                String submissionId = extractSubmissionIdFromUrl(submissionUrl);
+                return leetCodeApiClient.verifySubmission(submissionId, student.getLeetcodeUsername(), assignment.getTitleSlug());
+            } else {
+                // Auto-validate from student's recent submissions
+                return student.getRecentSubmissions() != null && student.getRecentSubmissions().stream()
+                        .anyMatch(sub -> (sub.getPlatform() == null || sub.getPlatform() == Platform.LEETCODE)
+                                && sub.getTitleSlug().equalsIgnoreCase(assignment.getTitleSlug()));
+            }
+        }
     }
 
 
@@ -304,17 +327,20 @@ public class ClassroomService {
 
         StringBuilder csv = new StringBuilder();
         // Add the standard CSV Header row
-        csv.append("Rank,Name,LeetCode Username,Daily Streak,Total Solved,Contest Rating,Done Assignments,Pending Assignments\n");
+        csv.append("Rank,Name,LeetCode Username,Codeforces Handle,Daily Streak,Total Solved,LC Solved,CF Solved,LC Rating,CF Rating,Done Assignments,Pending Assignments\n");
 
         int rank = 1;
         for (StudentSummaryDTO s : dashboard.getEnrolledStudents()) {
-            // FIXED: Removed the != null checks since int and double can never be null in Java
             csv.append(rank++).append(",")
-                    .append("\"").append(s.getName()).append("\",")
-                    .append(s.getLeetcodeUsername()).append(",")
+                    .append("\"").append(s.getName() != null ? s.getName().replace("\"", "\"\"") : "").append("\",")
+                    .append(s.getLeetcodeUsername() != null ? s.getLeetcodeUsername() : "").append(",")
+                    .append(s.getCodeforcesHandle() != null ? s.getCodeforcesHandle() : "").append(",")
                     .append(s.getConsistencyStreak()).append(",")
                     .append(s.getTotalSolved()).append(",")
+                    .append(s.getLeetcodeSolvedCount()).append(",")
+                    .append(s.getCodeforcesSolvedCount()).append(",")
                     .append(Math.round(s.getCurrentContestRating())).append(",")
+                    .append(s.getCodeforcesRating() != null ? s.getCodeforcesRating() : 0).append(",")
                     .append(s.getCompletedAssignments()).append(",")
                     .append(s.getPendingAssignments()).append("\n");
         }
@@ -323,27 +349,28 @@ public class ClassroomService {
 
 
     public void assignQuestion(String classroomId, String titleSlug, long startTimestamp, long endTimestamp) {
-        log.info("Assigning question {} to classroom ID: {} with deadline from {} to {}",
-                titleSlug, classroomId, startTimestamp, endTimestamp);
+        assignQuestion(classroomId, Platform.LEETCODE, null, titleSlug, startTimestamp, endTimestamp);
+    }
 
+    public void assignQuestion(String classroomId, Platform platform, String title, String titleSlug, long startTimestamp, long endTimestamp) {
+        log.info("Assigning question {} ({}) to classroom ID: {} with deadline from {} to {}",
+                titleSlug, platform, classroomId, startTimestamp, endTimestamp);
 
-        // 1. Find the classroom
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
 
-        // 2. Build the Assignment object
         Assignment assignment = new Assignment();
-        assignment.setId(UUID.randomUUID().toString()); // Generate a unique ID for this specific homework
+        assignment.setId(UUID.randomUUID().toString());
+        assignment.setPlatform(platform != null ? platform : Platform.LEETCODE);
+        assignment.setTitle(title);
         assignment.setTitleSlug(titleSlug);
-        assignment.setQuestionLink("https://leetcode.com/problems/" + titleSlug + "/");
         assignment.setStartTimestamp(startTimestamp);
         assignment.setEndTimestamp(endTimestamp);
+        assignment.ensureQuestionLink();
 
-        // 3. Add it to the classroom's assignment list (initialize if null)
         initializeAssignmentsIfNull(classroom);
         classroom.getAssignments().add(assignment);
 
-        // 4. Save the updated classroom back to MongoDB
         classroomRepository.save(classroom);
         log.info("Successfully assigned {} to classroom {}", titleSlug, classroom.getClassName());
     }

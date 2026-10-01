@@ -42,15 +42,29 @@ export interface ProblemStats {
     beatsPercentage: number;
 }
 
+export type Platform = 'LEETCODE' | 'CODEFORCES';
+
+export interface CodeforcesContestHistory {
+    contestId: number;
+    contestName: string;
+    rank: number;
+    oldRating: number;
+    newRating: number;
+    ratingUpdateTimeSeconds: number;
+}
+
 export interface RecentSubmission {
     title: string;
     titleSlug: string;
     timestamp: number;
     questionLink: string;
+    platform?: Platform;
 }
 
 export interface AssignmentDTO {
     id: string;
+    platform?: Platform;
+    title?: string;
     titleSlug: string;
     questionLink: string;
     startTimestamp: number;
@@ -70,13 +84,20 @@ export interface StudentSummaryDTO {
     name: string;
     email?: string;
     leetcodeUsername: string;
+    codeforcesHandle?: string;
     role: Role;
     about?: string;
     rank?: string;
     currentContestRating?: number;
+    codeforcesRating?: number;
+    codeforcesMaxRating?: number;
+    codeforcesRank?: string;
+    leetcodeSolvedCount?: number;
+    codeforcesSolvedCount?: number;
     socialMedia?: SocialMedia;
     badges?: Badge[];
     contestHistory?: ContestHistory[];
+    codeforcesContestHistory?: CodeforcesContestHistory[];
     problemStats?: ProblemStats[];
     recentSubmissions?: RecentSubmission[];
     classrooms?: ClassroomSummaryDTO[];
@@ -92,6 +113,8 @@ export interface StudentSummaryDTO {
 export interface StudentExtendedDTO extends StudentSummaryDTO {
     skills?: SkillStat[];
     progressHistory?: ProgressRecord[];
+    codeforcesMaxRank?: string;
+    codeforcesAvatarUrl?: string;
 }
 
 export interface LoginRequest {
@@ -107,6 +130,7 @@ export interface MentorRegisterRequest {
 
 export interface StudentRegisterRequest extends MentorRegisterRequest {
     leetcodeUsername: string;
+    codeforcesHandle?: string;
 }
 
 export interface PathQuestion {

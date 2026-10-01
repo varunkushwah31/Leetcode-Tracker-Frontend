@@ -1,7 +1,7 @@
 package com.tracker.leetcode.tracker.Controller;
 
 import com.tracker.leetcode.tracker.DTO.*;
-import com.tracker.leetcode.tracker.Exception.DuplicateStudentException;
+import com.tracker.leetcode.tracker.Exception.*;
 import com.tracker.leetcode.tracker.Mapper.StudentMapper;
 import com.tracker.leetcode.tracker.Models.Classroom;
 import com.tracker.leetcode.tracker.Models.Student;
@@ -142,6 +142,42 @@ public class StudentController {
                 .orElseThrow(() -> new RuntimeException("Classroom not found"));
 
         // 3. Return the updated summary so the React frontend can instantly turn the "Pending" tag to "Completed"
+        return ResponseEntity.ok(mapper.toSummaryDTO(updatedStudent, classroom.getAssignments()));
+    }
+
+    @PutMapping("/me/handles")
+    public ResponseEntity<StudentExtendedDTO> updateMyHandles(
+            @AuthenticationPrincipal Student currentStudent,
+            @RequestBody UpdateHandlesRequest request) {
+        log.info("Updating handles for student {}: LC={}, CF={}",
+                currentStudent.getEmail(), request.leetcodeUsername(), request.codeforcesHandle());
+
+        Student updatedStudent = studentService.updateStudentHandles(
+                currentStudent.getId(),
+                request.leetcodeUsername(),
+                request.codeforcesHandle()
+        );
+
+        StudentExtendedDTO dto = mapper.toExtendedDTO(updatedStudent);
+        List<Classroom> myClassrooms = classroomRepository.findByStudentIdsContaining(updatedStudent.getId());
+        dto.setClassrooms(myClassrooms);
+        dto.setManuallyCompletedAssignments(updatedStudent.getManuallyCompletedAssignments());
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/me/classrooms/{classroomId}/assignments/{assignmentId}/auto-validate")
+    public ResponseEntity<StudentSummaryDTO> autoValidateMySubmission(
+            @AuthenticationPrincipal Student currentStudent,
+            @PathVariable String classroomId,
+            @PathVariable String assignmentId) {
+        log.info("Student {} is auto-validating assignment {}", currentStudent.getLeetcodeUsername(), assignmentId);
+
+        Student updatedStudent = classroomService.autoValidateAssignment(currentStudent, classroomId, assignmentId);
+
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+
         return ResponseEntity.ok(mapper.toSummaryDTO(updatedStudent, classroom.getAssignments()));
     }
 }

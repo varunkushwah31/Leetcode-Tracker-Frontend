@@ -17,5 +17,7 @@ public record StudentRegisterRequest(
         String password,
 
         @NotBlank(message = "LeetCode username is required")
-        String leetcodeUsername
+        String leetcodeUsername,
+
+        String codeforcesHandle
 ) {}

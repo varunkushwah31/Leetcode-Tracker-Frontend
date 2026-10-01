@@ -36,6 +36,12 @@ export const StudentService = {
 
     validateSubmission: (classroomId: string, assignmentId: string, url: string) =>
         api.post(`/students/me/classrooms/${classroomId}/assignments/${assignmentId}/validate`, { url }),
+
+    autoValidateSubmission: (classroomId: string, assignmentId: string) =>
+        api.post(`/students/me/classrooms/${classroomId}/assignments/${assignmentId}/auto-validate`),
+
+    updateHandles: (leetcodeUsername: string, codeforcesHandle?: string) =>
+        api.put('/students/me/handles', { leetcodeUsername, codeforcesHandle }),
 };
 
 export const MentorService = {
@@ -50,12 +56,24 @@ export const ClassroomService = {
     createClassroom: (mentorId: string, className: string) => api.post('/classrooms', null, { params: { mentorId, className } }),
     getDashboard: (classroomId: string, sortBy: string = 'solved') => api.get(`/classrooms/${classroomId}/dashboard`, { params: { sortBy } }),
     addStudent: (classroomId: string, leetcodeUsername: string) => api.post(`/classrooms/${classroomId}/students`, null, { params: { leetcodeUsername } }),
-    assignQuestion: (classroomId: string, titleSlug: string, start: number, end: number) =>
-        api.post(`/classrooms/${classroomId}/assignments`, {
-            titleSlug: titleSlug,
+    assignQuestion: (classroomId: string, titleSlugOrData: string | { platform?: 'LEETCODE' | 'CODEFORCES'; title?: string; titleSlug: string; questionLink?: string; start: number; end: number }, start?: number, end?: number) => {
+        if (typeof titleSlugOrData === 'object') {
+            return api.post(`/classrooms/${classroomId}/assignments`, {
+                platform: titleSlugOrData.platform || 'LEETCODE',
+                title: titleSlugOrData.title,
+                titleSlug: titleSlugOrData.titleSlug,
+                questionLink: titleSlugOrData.questionLink,
+                startTimestamp: titleSlugOrData.start,
+                endTimestamp: titleSlugOrData.end,
+            });
+        }
+        return api.post(`/classrooms/${classroomId}/assignments`, {
+            platform: 'LEETCODE',
+            titleSlug: titleSlugOrData,
             startTimestamp: start,
-            endTimestamp: end
-        }),
+            endTimestamp: end,
+        });
+    },
     getAnalytics: (classroomId: string) => api.get(`/classrooms/${classroomId}/analytics`),
 
     deleteAssignment: (classroomId: string, assignmentId: string, mentorId: string) =>

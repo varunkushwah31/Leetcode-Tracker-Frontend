@@ -19,7 +19,7 @@ export function AuthPage() {
   const { login, registerMentor, registerStudent } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', leetcodeUsername: '',
+    name: '', email: '', password: '', leetcodeUsername: '', codeforcesHandle: '',
   });
 
   const handleAuth = async (e: React.SubmitEvent) => {
@@ -194,20 +194,36 @@ export function AuthPage() {
               </div>
 
               {!isLogin && role === 'student' && (
-                  <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">LeetCode Username</Label>
-                    <div className="relative">
-                      <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                      <Input
-                          required
-                          autoComplete="username"
-                          placeholder="neetcode123"
-                          value={formData.leetcodeUsername}
-                          onChange={(e) => { setFormData({...formData, leetcodeUsername: e.target.value}); clearError(); }}
-                          className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-11 h-12 rounded-xl w-full transition-all"
-                      />
+                  <>
+                    <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">LeetCode Username</Label>
+                      <div className="relative">
+                        <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                        <Input
+                            required
+                            autoComplete="username"
+                            placeholder="neetcode123"
+                            value={formData.leetcodeUsername}
+                            onChange={(e) => { setFormData({...formData, leetcodeUsername: e.target.value}); clearError(); }}
+                            className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-11 h-12 rounded-xl w-full transition-all"
+                        />
+                      </div>
                     </div>
-                  </div>
+
+                    <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Codeforces Handle <span className="text-zinc-500 font-normal lowercase">(optional)</span></Label>
+                      <div className="relative">
+                        <TerminalIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                        <Input
+                            autoComplete="username"
+                            placeholder="tourist"
+                            value={formData.codeforcesHandle}
+                            onChange={(e) => { setFormData({...formData, codeforcesHandle: e.target.value}); clearError(); }}
+                            className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-11 h-12 rounded-xl w-full transition-all"
+                        />
+                      </div>
+                    </div>
+                  </>
               )}
 
               <div className="space-y-1.5">

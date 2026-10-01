@@ -72,11 +72,15 @@ export function StudentDashboard() {
 
     const isAssignmentCompleted = (assignment: AssignmentDTO) => {
         if (dashboardData?.manuallyCompletedAssignments?.includes(assignment.id)) return true;
-        return !!dashboardData?.recentSubmissions?.some(sub =>
-            sub.titleSlug === assignment.titleSlug &&
-            sub.timestamp >= assignment.startTimestamp &&
-            sub.timestamp <= assignment.endTimestamp
-        );
+        const normTarget = assignment.titleSlug ? assignment.titleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : '';
+        return !!dashboardData?.recentSubmissions?.some(sub => {
+            const platformMatches = !assignment.platform || !sub.platform || assignment.platform === sub.platform;
+            const normSub = sub.titleSlug ? sub.titleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : '';
+            return platformMatches &&
+                normSub === normTarget &&
+                sub.timestamp >= assignment.startTimestamp &&
+                sub.timestamp <= assignment.endTimestamp;
+        });
     };
 
     if (isLoading) {
@@ -161,7 +165,7 @@ export function StudentDashboard() {
                 <ErrorBanner message={pageError} className="mb-6" />
                 <ErrorBanner message={syncError} className="mb-6" />
 
-                <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} />
+                <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} onProfileUpdated={fetchDashboard} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
