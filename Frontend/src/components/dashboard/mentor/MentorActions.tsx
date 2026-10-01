@@ -172,10 +172,11 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
         try {
             const sanitizedQuestions = pathQuestions.map(({ platform, title, titleSlug, daysToComplete }) => {
                 const p = platform || 'LEETCODE';
+                const parsed = parseProblemInput(titleSlug, p);
                 return {
-                    platform: p,
+                    platform: parsed.detectedPlatform || p,
                     title: title?.trim() || undefined,
-                    titleSlug: parseProblemInput(titleSlug, p),
+                    titleSlug: parsed.slug,
                     daysToComplete: daysToComplete || 3
                 };
             });
