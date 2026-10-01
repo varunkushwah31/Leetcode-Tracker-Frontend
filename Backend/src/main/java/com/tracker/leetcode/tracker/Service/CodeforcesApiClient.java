@@ -292,44 +292,114 @@ public class CodeforcesApiClient {
         // Normalize expected problem identifier (e.g. "4A" or "4/A" or "4")
         String normalizedTarget = normalizeProblemIdentifier(problemIdentifier);
 
-        // If a direct submission URL is provided, parse it
+        // If a direct submission URL is provided, extract submissionId and contestId
+        String targetSubmissionId = null;
+        Integer targetContestId = null;
+
         if (submissionUrl != null && !submissionUrl.isBlank()) {
-            Pattern cfUrlPattern = Pattern.compile("contest/(\\d+)/submission/(\\d+)");
-            Matcher matcher = cfUrlPattern.matcher(submissionUrl);
+            Pattern cfUrlPattern = Pattern.compile("(?i)(?:contest|gym|problemset/submission)/(\\d+)/(?:submission/)?(\\d+)");
+            Matcher matcher = cfUrlPattern.matcher(submissionUrl.trim());
             if (matcher.find()) {
-                log.info("Validating Codeforces submission URL {} for handle {}", submissionUrl, handle);
+                targetContestId = Integer.parseInt(matcher.group(1));
+                targetSubmissionId = matcher.group(2);
+                log.info("Validating Codeforces submission URL {} -> Contest: {}, Submission: {} for handle: {}",
+                        submissionUrl, targetContestId, targetSubmissionId, handle);
+            } else {
+                throw new com.tracker.leetcode.tracker.Exception.ValidationFailedException(
+                        "Invalid Codeforces submission URL format. Expected: https://codeforces.com/contest/{contestId}/submission/{submissionId}");
             }
         }
 
-        // Query the user's latest 100 submissions on Codeforces
+        // Query the user's latest 200 submissions on Codeforces
         try {
-            JsonNode result = executeGetRequest("/user.status?handle=" + handle.trim() + "&from=1&count=100", handle);
+            JsonNode result = executeGetRequest("/user.status?handle=" + handle.trim() + "&from=1&count=200", handle);
             if (result != null && result.isArray()) {
-                for (JsonNode subNode : result) {
-                    String verdict = subNode.path("verdict").asString("");
-                    if (!"OK".equalsIgnoreCase(verdict)) {
-                        continue;
-                    }
+                boolean submissionIdFound = false;
 
+                for (JsonNode subNode : result) {
+                    long id = subNode.path("id").asLong(0);
+                    String verdict = subNode.path("verdict").asString("");
                     JsonNode problem = subNode.path("problem");
                     int contestId = problem.path("contestId").asInt(0);
                     String index = problem.path("index").asString("");
                     String currentSlug = contestId + index.toUpperCase();
 
-                    if (currentSlug.equalsIgnoreCase(normalizedTarget) ||
-                            (index.equalsIgnoreCase(normalizedTarget) && contestId > 0)) {
-                        log.info("Codeforces Validation Successful -> Found accepted submission for {} on problem {}",
-                                handle, currentSlug);
-                        return true;
+                    // If manual submission validation (URL provided):
+                    if (targetSubmissionId != null) {
+                        if (String.valueOf(id).equals(targetSubmissionId)) {
+                            submissionIdFound = true;
+
+                            if (!"OK".equalsIgnoreCase(verdict)) {
+                                throw new com.tracker.leetcode.tracker.Exception.ValidationFailedException(
+                                        "Submission #" + targetSubmissionId + " was not accepted! Verdict on Codeforces was: " + verdict);
+                            }
+
+                            if (!currentSlug.equalsIgnoreCase(normalizedTarget) &&
+                                    !(index.equalsIgnoreCase(normalizedTarget) && contestId > 0)) {
+                                throw new com.tracker.leetcode.tracker.Exception.ValidationFailedException(
+                                        "Submission #" + targetSubmissionId + " is for problem " + currentSlug +
+                                                ", but this assignment is for problem " + problemIdentifier + ".");
+                            }
+
+                            log.info("Codeforces Manual Validation Successful -> Submission: {} for {} on problem {}",
+                                    targetSubmissionId, handle, currentSlug);
+                            return true;
+                        }
+                    } else {
+                        // Auto-validation (no submission URL provided - match any recent accepted submission)
+                        if ("OK".equalsIgnoreCase(verdict)) {
+                            if (currentSlug.equalsIgnoreCase(normalizedTarget) ||
+                                    (index.equalsIgnoreCase(normalizedTarget) && contestId > 0)) {
+                                log.info("Codeforces Auto-Validation Successful -> Found accepted submission for {} on problem {}",
+                                        handle, currentSlug);
+                                return true;
+                            }
+                        }
                     }
                 }
+
+                if (targetSubmissionId != null && !submissionIdFound) {
+                    throw new com.tracker.leetcode.tracker.Exception.ValidationFailedException(
+                            "Submission #" + targetSubmissionId + " was not found among recent submissions for Codeforces handle @" +
+                                    handle + ". Please verify this submission belongs to your account.");
+                }
             }
+        } catch (com.tracker.leetcode.tracker.Exception.ValidationFailedException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error verifying Codeforces submission for {}: {}", handle, e.getMessage());
         }
 
         log.warn("Codeforces submission not verified for handle {} and problem {}", handle, problemIdentifier);
         return false;
+    }
+
+    // 5. Fetch Problem Details (Problem Name, Rating)
+    public record CodeforcesProblemInfo(String problemNumber, String title, int contestId, String index, int rating) {}
+
+    public CodeforcesProblemInfo fetchProblemDetails(int contestId, String index) {
+        if (contestId <= 0 || index == null || index.isBlank()) return null;
+        String cleanIndex = index.trim().toUpperCase();
+        try {
+            JsonNode result = executeGetRequest("/contest.standings?contestId=" + contestId + "&from=1&count=1", "contest:" + contestId);
+            if (result != null) {
+                JsonNode problems = result.path("problems");
+                if (problems != null && problems.isArray()) {
+                    for (JsonNode pNode : problems) {
+                        String pIndex = pNode.path("index").asString("");
+                        if (cleanIndex.equalsIgnoreCase(pIndex)) {
+                            String name = pNode.path("name").asString("");
+                            int rating = pNode.path("rating").asInt(0);
+                            String problemNumber = contestId + cleanIndex;
+                            return new CodeforcesProblemInfo(problemNumber, name, contestId, cleanIndex, rating);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not fetch Codeforces problem details for {}{}: {}", contestId, cleanIndex, e.getMessage());
+        }
+        return null;
     }
 
     public static String normalizeProblemIdentifier(String input) {

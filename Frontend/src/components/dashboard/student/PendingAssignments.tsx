@@ -80,8 +80,14 @@ export function PendingAssignments({
     };
 
     const handleValidateSubmission = async (classroomId: string, assignmentId: string) => {
-        if (!submissionUrl.trim()) {
-            setValidationError('Please enter your submission URL or click Auto-Verify.');
+        const cleanUrl = submissionUrl.trim();
+        if (!cleanUrl) {
+            setValidationError('Please paste your full submission URL or click Auto-Verify.');
+            return;
+        }
+
+        if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+            setValidationError('Please paste the complete submission URL starting with https:// instead of just a submission ID.');
             return;
         }
 
@@ -90,7 +96,7 @@ export function PendingAssignments({
         setSuccessMessage(null);
 
         try {
-            await StudentService.validateSubmission(classroomId, assignmentId, submissionUrl.trim());
+            await StudentService.validateSubmission(classroomId, assignmentId, cleanUrl);
             setSuccessMessage('Submission validated successfully!');
             setActiveAssignmentId(null);
             setSubmissionUrl('');
@@ -190,7 +196,9 @@ export function PendingAssignments({
                                             </Badge>
                                         </div>
                                         <h4 className="text-lg font-bold text-white tracking-tight">
-                                            {item.assignment.title ? `${item.assignment.title} (${item.assignment.titleSlug})` : item.assignment.titleSlug}
+                                            {item.assignment.problemNumber
+                                                ? `Problem #${item.assignment.problemNumber}: ${item.assignment.title || item.assignment.titleSlug}`
+                                                : (item.assignment.title ? `${item.assignment.title} (${item.assignment.titleSlug})` : item.assignment.titleSlug)}
                                         </h4>
                                         <div className="flex items-center gap-1.5 mt-2 text-sm">
                                             <Calendar className="w-4 h-4 text-zinc-400" />
@@ -215,7 +223,7 @@ export function PendingAssignments({
                                             className="bg-emerald-600/90 hover:bg-emerald-600 text-white text-[14px] font-medium"
                                         >
                                             {isAutoValidatingThis ? (
-                                                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                                                 <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
                                             ) : (
                                                 <LightningIcon className="w-4 h-4 mr-1.5" weight="fill" />
                                             )}
@@ -241,15 +249,15 @@ export function PendingAssignments({
                                     <div className="mt-4 pt-4 border-t border-zinc-800/60 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                                         <p className="text-xs text-zinc-400">
                                             {isCf
-                                                ? 'Paste your Codeforces submission URL (e.g. https://codeforces.com/contest/.../submission/...) or submission ID:'
-                                                : 'Paste your accepted LeetCode submission URL to verify:'}
+                                                ? 'Paste your full Codeforces submission URL (e.g. https://codeforces.com/contest/4/submission/12345678):'
+                                                : 'Paste your full accepted LeetCode submission URL (e.g. https://leetcode.com/problems/two-sum/submissions/123456789/):'}
                                         </p>
                                         <div className="flex flex-col sm:flex-row gap-2">
                                             <Input
                                                 placeholder={
                                                     isCf
                                                         ? 'https://codeforces.com/contest/4/submission/12345678'
-                                                        : 'https://leetcode.com/problems/.../submissions/...'
+                                                        : 'https://leetcode.com/problems/two-sum/submissions/123456789/'
                                                 }
                                                 value={submissionUrl}
                                                 onChange={(e) => {

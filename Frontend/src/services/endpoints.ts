@@ -80,6 +80,11 @@ export const ClassroomService = {
     deleteAssignment: (classroomId: string, assignmentId: string, mentorId: string) =>
         api.delete(`/classrooms/${classroomId}/assignments/${assignmentId}`, { params: { mentorId } }),
 
+    updateAssignmentDeadline: (classroomId: string, assignmentId: string, mentorId: string, newEndTimestamp: number) =>
+        api.put(`/classrooms/${classroomId}/assignments/${assignmentId}/deadline`, null, {
+            params: { mentorId, newEndTimestamp }
+        }),
+
     validateStudentSubmission: (classroomId: string, username: string, assignmentId: string, url: string) =>
         api.post(`/classrooms/${classroomId}/students/${username}/assignments/${assignmentId}/validate`, { url }),
 

@@ -139,7 +139,7 @@ public class ClassroomService {
                 .build();
     }
 
-    // 4. Assign a LeetCode problem to the classroom
+    // 4. Assign a question to the classroom
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
     public Classroom assignQuestionToClassroom(String classroomId, Assignment assignment) {
         log.info("Assigning question '{}' on platform {} to classroom ID: {}",
@@ -152,11 +152,8 @@ public class ClassroomService {
             assignment.setId(UUID.randomUUID().toString());
         }
 
-        if (assignment.getPlatform() == null) {
-            assignment.setPlatform(Platform.LEETCODE);
-        }
-
-        assignment.ensureQuestionLink();
+        // Extract problem info, problem number, and canonical links from whole URLs or slugs
+        enrichAssignmentDetails(assignment);
 
         initializeAssignmentsIfNull(classroom);
         classroom.getAssignments().add(assignment);
@@ -171,12 +168,96 @@ public class ClassroomService {
         return savedClassroom;
     }
 
-    // Helper method to extract submission ID from URL
+    public void enrichAssignmentDetails(Assignment assignment) {
+        if (assignment == null) return;
+
+        // 1. Ensure canonical question link and platform detection
+        assignment.ensureQuestionLink();
+
+        // 2. Extract and enrich problem info & problem number for both platforms
+        if (assignment.getPlatform() == Platform.CODEFORCES) {
+            // Parse contest ID and problem index from titleSlug or questionLink
+            Pattern cfPattern = Pattern.compile("^(\\d+)([A-Za-z0-9]+)$");
+            Matcher matcher = cfPattern.matcher(assignment.getTitleSlug() != null ? assignment.getTitleSlug().trim().toUpperCase() : "");
+            if (matcher.find()) {
+                int contestId = Integer.parseInt(matcher.group(1));
+                String index = matcher.group(2);
+                if (assignment.getProblemNumber() == null || assignment.getProblemNumber().isBlank()) {
+                    assignment.setProblemNumber(contestId + index);
+                }
+
+                // If title is missing or default, fetch real problem title from Codeforces
+                if (assignment.getTitle() == null || assignment.getTitle().isBlank() ||
+                        assignment.getTitle().equalsIgnoreCase(assignment.getTitleSlug())) {
+                    try {
+                        CodeforcesApiClient.CodeforcesProblemInfo cfInfo = codeforcesApiClient.fetchProblemDetails(contestId, index);
+                        if (cfInfo != null && cfInfo.title() != null && !cfInfo.title().isBlank()) {
+                            assignment.setTitle(cfInfo.title());
+                        } else {
+                            assignment.setTitle("Problem " + contestId + index);
+                        }
+                    } catch (Exception e) {
+                        assignment.setTitle("Problem " + contestId + index);
+                    }
+                }
+            }
+        } else {
+            // LeetCode: fetch problem number (questionFrontendId) and official title
+            String slug = assignment.getTitleSlug();
+            if (slug != null && !slug.isBlank()) {
+                try {
+                    LeetCodeApiClient.LeetCodeQuestionInfo lcInfo = leetCodeApiClient.fetchQuestionDetails(slug);
+                    if (lcInfo != null) {
+                        if (assignment.getProblemNumber() == null || assignment.getProblemNumber().isBlank()) {
+                            assignment.setProblemNumber(lcInfo.problemNumber());
+                        }
+                        if (assignment.getTitle() == null || assignment.getTitle().isBlank() ||
+                                assignment.getTitle().equalsIgnoreCase(slug)) {
+                            assignment.setTitle(lcInfo.title());
+                        }
+                    }
+                } catch (Exception e) {
+                    log.warn("Could not enrich LeetCode question details: {}", e.getMessage());
+                }
+
+                if (assignment.getTitle() == null || assignment.getTitle().isBlank()) {
+                    assignment.setTitle(humanizeSlug(slug));
+                }
+            }
+        }
+    }
+
+    private String humanizeSlug(String slug) {
+        if (slug == null) return "";
+        String[] parts = slug.replace("-", " ").replace("_", " ").split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String part : parts) {
+            if (!part.isEmpty()) {
+                sb.append(Character.toUpperCase(part.charAt(0)))
+                  .append(part.substring(1).toLowerCase())
+                  .append(" ");
+            }
+        }
+        return sb.toString().trim();
+    }
+
+    // Helper method to extract submission ID from full LeetCode submission URL
     private String extractSubmissionIdFromUrl(String submissionUrl) {
-        Pattern pattern = Pattern.compile("submissions/(?:detail/)?(\\d+)");
-        Matcher matcher = pattern.matcher(submissionUrl);
+        if (submissionUrl == null || submissionUrl.isBlank()) {
+            throw new ValidationFailedException("Please provide a valid submission URL.");
+        }
+
+        String trimmed = submissionUrl.trim();
+
+        // Reject Codeforces URL when validating LeetCode
+        if (trimmed.toLowerCase().contains("codeforces.com")) {
+            throw new ValidationFailedException("You provided a Codeforces URL, but this assignment is on LeetCode.");
+        }
+
+        Pattern pattern = Pattern.compile("(?i)submissions/(?:detail/)?(\\d+)");
+        Matcher matcher = pattern.matcher(trimmed);
         if (!matcher.find()) {
-            throw new ValidationFailedException("Invalid LeetCode URL. It must contain the submission ID.");
+            throw new ValidationFailedException("Invalid LeetCode submission URL. Please paste the full URL of your accepted submission (e.g. https://leetcode.com/problems/two-sum/submissions/123456789/).");
         }
         return matcher.group(1);
     }
@@ -188,8 +269,8 @@ public class ClassroomService {
         }
     }
 
-    public Student validateManualSubmission(String classroomId, String leetcodeUsername, String assignmentId, String submissionUrl) {
-        log.info("Validating manual submission for {} on assignment {}", leetcodeUsername, assignmentId);
+    public Student validateManualSubmission(String classroomId, String studentIdentifier, String assignmentId, String submissionUrl) {
+        log.info("Validating manual submission for {} on assignment {}", studentIdentifier, assignmentId);
 
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
@@ -199,19 +280,21 @@ public class ClassroomService {
                 .findFirst()
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found in this classroom."));
 
-        Student student = studentRepository.findByLeetcodeUsername(leetcodeUsername)
+        Student student = studentRepository.findByLeetcodeUsername(studentIdentifier)
+                .or(() -> studentRepository.findByCodeforcesHandle(studentIdentifier))
+                .or(() -> studentRepository.findById(studentIdentifier))
                 .orElseThrow(() -> new StudentNotFoundException("Student not found."));
 
         // If they already validated it, skip the network call and return
         if (student.getManuallyCompletedAssignments().contains(assignmentId)) {
-            log.info("Assignment {} already validated for {}", assignmentId, leetcodeUsername);
+            log.info("Assignment {} already validated for {}", assignmentId, studentIdentifier);
             return student;
         }
 
         boolean isValid = verifyAssignmentSubmission(student, assignment, submissionUrl);
 
         if (!isValid) {
-            throw new ValidationFailedException("Validation Failed! Ensure the submission is 'Accepted', belongs to you, and is the correct problem.");
+            throw new ValidationFailedException("Validation Failed! Ensure the submission is 'Accepted', belongs to you, and is for the correct problem.");
         }
 
         // Success! Permanently save it to the student's profile
@@ -227,7 +310,7 @@ public class ClassroomService {
     }
 
     public Student validateSubmissionAsStudent(Student student, String classroomId, String assignmentId, String submissionUrl) {
-        log.info("Student {} is self-validating assignment {}", student.getLeetcodeUsername(), assignmentId);
+        log.info("Student {} is self-validating assignment {}", student.getName(), assignmentId);
 
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not Found."));
@@ -243,7 +326,7 @@ public class ClassroomService {
 
         // If they already validated it, skip the network call
         if (student.getManuallyCompletedAssignments().contains(assignmentId)) {
-            log.info("Assignment {} already validated for {}", assignmentId, student.getLeetcodeUsername());
+            log.info("Assignment {} already validated for {}", assignmentId, student.getName());
             return student;
         }
 
@@ -276,21 +359,157 @@ public class ClassroomService {
             if (student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank()) {
                 throw new ValidationFailedException("You must link a Codeforces handle to your profile to validate Codeforces assignments.");
             }
+            if (submissionUrl != null && !submissionUrl.isBlank()) {
+                if (submissionUrl.toLowerCase().contains("leetcode.com")) {
+                    throw new ValidationFailedException("You provided a LeetCode URL, but this assignment is on Codeforces.");
+                }
+            }
             return codeforcesApiClient.verifySubmission(student.getCodeforcesHandle(), assignment.getTitleSlug(), submissionUrl);
         } else {
             // LeetCode verification
             if (student.getLeetcodeUsername() == null || student.getLeetcodeUsername().isBlank()) {
                 throw new ValidationFailedException("You must link a LeetCode username to your profile to validate LeetCode assignments.");
             }
+
             if (submissionUrl != null && !submissionUrl.isBlank()) {
+                // Check if problem slug in the URL mismatches assignment
+                Pattern slugPattern = Pattern.compile("(?i)problems/([a-zA-Z0-9_-]+)/submissions");
+                Matcher slugMatcher = slugPattern.matcher(submissionUrl);
+                if (slugMatcher.find()) {
+                    String urlSlug = slugMatcher.group(1);
+                    if (!StudentService.isProblemSlugMatch(urlSlug, assignment.getTitleSlug())) {
+                        throw new ValidationFailedException("This submission URL is for problem '" + urlSlug +
+                                "', but this assignment is for problem '" + assignment.getTitleSlug() + "'.");
+                    }
+                }
+
                 String submissionId = extractSubmissionIdFromUrl(submissionUrl);
-                return leetCodeApiClient.verifySubmission(submissionId, student.getLeetcodeUsername(), assignment.getTitleSlug());
+                boolean verified = leetCodeApiClient.verifySubmission(submissionId, student.getLeetcodeUsername(), assignment.getTitleSlug());
+                if (!verified) {
+                    throw new ValidationFailedException("Could not verify submission #" + submissionId +
+                            " on LeetCode for @" + student.getLeetcodeUsername() + ". Ensure the submission is 'Accepted' and was submitted by your account.");
+                }
+                return true;
             } else {
-                // Auto-validate from student's recent submissions
-                return student.getRecentSubmissions() != null && student.getRecentSubmissions().stream()
+                // Auto-validate LeetCode assignment:
+                // 1. First check existing recent submissions in database
+                boolean matched = student.getRecentSubmissions() != null && student.getRecentSubmissions().stream()
                         .anyMatch(sub -> (sub.getPlatform() == null || sub.getPlatform() == Platform.LEETCODE)
                                 && StudentService.isProblemSlugMatch(sub.getTitleSlug(), assignment.getTitleSlug()));
+
+                if (matched) {
+                    return true;
+                }
+
+                // 2. If not found in DB, fetch fresh recent submissions directly from LeetCode
+                try {
+                    List<RecentSubmission> fresh = leetCodeApiClient.fetchRecentSubmissions(student.getLeetcodeUsername(), 20);
+                    if (fresh != null && !fresh.isEmpty()) {
+                        List<RecentSubmission> existing = student.getRecentSubmissions() != null
+                                ? new ArrayList<>(student.getRecentSubmissions())
+                                : new ArrayList<>();
+
+                        for (RecentSubmission r : fresh) {
+                            if (existing.stream().noneMatch(e -> e.getTitleSlug() != null && e.getTitleSlug().equalsIgnoreCase(r.getTitleSlug()) && e.getTimestamp() == r.getTimestamp())) {
+                                existing.add(0, r);
+                            }
+                        }
+                        student.setRecentSubmissions(existing);
+
+                        return fresh.stream().anyMatch(sub -> StudentService.isProblemSlugMatch(sub.getTitleSlug(), assignment.getTitleSlug()));
+                    }
+                } catch (Exception e) {
+                    log.warn("Could not query fresh LeetCode submissions during auto-validation: {}", e.getMessage());
+                }
+
+                return false;
             }
+        }
+    }
+
+    /**
+     * Automatically validates all pending assignments across all classrooms for a student.
+     * Called whenever a student visits their dashboard, so they never need to do manual validation.
+     */
+    public void autoValidatePendingAssignmentsForStudent(Student student) {
+        try {
+            List<Classroom> classrooms = classroomRepository.findByStudentIdsContaining(student.getId());
+            if (classrooms == null || classrooms.isEmpty()) return;
+
+            if (student.getManuallyCompletedAssignments() == null) {
+                student.setManuallyCompletedAssignments(new ArrayList<>());
+            }
+
+            // Collect all uncompleted assignments across all enrolled classrooms
+            List<Assignment> pending = new ArrayList<>();
+            for (Classroom c : classrooms) {
+                if (c.getAssignments() == null) continue;
+                for (Assignment a : c.getAssignments()) {
+                    if (!student.getManuallyCompletedAssignments().contains(a.getId())) {
+                        pending.add(a);
+                    }
+                }
+            }
+
+            if (pending.isEmpty()) return;
+
+            // Fetch fresh LeetCode submissions if there are pending LeetCode assignments
+            boolean hasLCPending = pending.stream().anyMatch(a -> a.getPlatform() == Platform.LEETCODE || a.getPlatform() == null);
+            if (hasLCPending && student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
+                try {
+                    List<RecentSubmission> fresh = leetCodeApiClient.fetchRecentSubmissions(student.getLeetcodeUsername(), 20);
+                    if (fresh != null && !fresh.isEmpty()) {
+                        List<RecentSubmission> existing = student.getRecentSubmissions() != null
+                                ? new ArrayList<>(student.getRecentSubmissions())
+                                : new ArrayList<>();
+                        for (RecentSubmission r : fresh) {
+                            if (existing.stream().noneMatch(e -> e.getTitleSlug() != null && e.getTitleSlug().equalsIgnoreCase(r.getTitleSlug()) && e.getTimestamp() == r.getTimestamp())) {
+                                existing.add(0, r);
+                            }
+                        }
+                        student.setRecentSubmissions(existing);
+                    }
+                } catch (Exception e) {
+                    log.debug("Auto-validation: LC fetch skipped: {}", e.getMessage());
+                }
+            }
+
+            boolean updated = false;
+
+            for (Assignment assignment : pending) {
+                boolean isCompleted = false;
+
+                if (assignment.getPlatform() == Platform.CODEFORCES) {
+                    if (student.getCodeforcesHandle() != null && !student.getCodeforcesHandle().isBlank()) {
+                        isCompleted = codeforcesApiClient.verifySubmission(student.getCodeforcesHandle(), assignment.getTitleSlug(), null);
+                    }
+                } else {
+                    if (student.getRecentSubmissions() != null) {
+                        isCompleted = student.getRecentSubmissions().stream()
+                                .anyMatch(sub -> (sub.getPlatform() == null || sub.getPlatform() == Platform.LEETCODE)
+                                        && StudentService.isProblemSlugMatch(sub.getTitleSlug(), assignment.getTitleSlug()));
+                    }
+                }
+
+                if (isCompleted) {
+                    student.getManuallyCompletedAssignments().add(assignment.getId());
+                    updated = true;
+                    log.info("Auto-validated assignment [{}] ({}) for student [{}]",
+                            assignment.getTitleSlug(), assignment.getPlatform(), student.getName());
+                }
+            }
+
+            if (updated) {
+                studentRepository.save(student);
+                if (messagingTemplate != null) {
+                    for (Classroom classroom : classrooms) {
+                        messagingTemplate.convertAndSend("/topic/classrooms/" + classroom.getId(),
+                                (Object) Map.of("action", "UPDATE", "message", "Assignment auto-validated!"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Error during auto-validation of pending assignments for student {}: {}", student.getId(), e.getMessage());
         }
     }
 
@@ -376,7 +595,7 @@ public class ClassroomService {
         assignment.setTitleSlug(titleSlug);
         assignment.setStartTimestamp(startTimestamp);
         assignment.setEndTimestamp(endTimestamp);
-        assignment.ensureQuestionLink();
+        enrichAssignmentDetails(assignment);
 
         initializeAssignmentsIfNull(classroom);
         classroom.getAssignments().add(assignment);
@@ -531,5 +750,45 @@ public class ClassroomService {
                 (Object) Map.of("action", "UPDATE", "message", "Assignment deleted!")
         );
         log.info("Successfully deleted assignment {} from classroom {}", assignmentId, classroomId);
+    }
+
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
+    public Classroom updateAssignmentDeadline(String classroomId, String assignmentId, String mentorId, long newEndTimestamp) {
+        log.info("Updating deadline for assignment {} in classroom {} to {} by mentor {}",
+                assignmentId, classroomId, newEndTimestamp, mentorId);
+
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+
+        if (!classroom.getMentorId().equals(mentorId)) {
+            log.warn("Security Alert: Mentor {} attempted to update assignment {} in classroom {} which they do not own.",
+                    mentorId, assignmentId, classroomId);
+            throw new AccessDeniedException("You do not have permission to modify assignments in this classroom.");
+        }
+
+        if (newEndTimestamp <= 0) {
+            throw new ValidationFailedException("Invalid deadline timestamp. Deadline must be a positive timestamp.");
+        }
+
+        if (classroom.getAssignments() == null || classroom.getAssignments().isEmpty()) {
+            throw new AssignmentNotFoundException("No assignments found in this classroom.");
+        }
+
+        Assignment targetAssignment = classroom.getAssignments().stream()
+                .filter(a -> a.getId().equals(assignmentId))
+                .findFirst()
+                .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found with ID: " + assignmentId));
+
+        targetAssignment.setEndTimestamp(newEndTimestamp);
+        Classroom saved = classroomRepository.save(classroom);
+
+        // Broadcast the update via WebSocket
+        messagingTemplate.convertAndSend(
+                "/topic/classrooms/" + classroomId,
+                (Object) Map.of("action", "UPDATE", "message", "Assignment deadline updated!")
+        );
+
+        log.info("Successfully updated deadline for assignment {} to {}", assignmentId, newEndTimestamp);
+        return saved;
     }
 }

@@ -30,18 +30,23 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const [isUploading, setIsUploading] = useState(false);
     const [uploadFailures, setUploadFailures] = useState<string[]>([]);
 
+    const getDefaultDeadline = (daysAhead: number = 3) => {
+        const d = new Date(Date.now() + daysAhead * 86400 * 1000);
+        d.setHours(23, 59, 0, 0);
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
     const [assignmentData, setAssignmentData] = useState<{
         platform: 'LEETCODE' | 'CODEFORCES';
         title: string;
         titleSlug: string;
-        deadlineType: string;
-        customDays: string;
+        deadline: string;
     }>({
         platform: 'LEETCODE',
         title: '',
         titleSlug: '',
-        deadlineType: '3',
-        customDays: '5',
+        deadline: getDefaultDeadline(3),
     });
     const [selectedPathId, setSelectedPathId] = useState<string>('');
     const [newPath, setNewPath] = useState({ title: '', description: '' });
@@ -100,39 +105,52 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
         }
     };
 
-    const parseProblemInput = (input: string, platform: 'LEETCODE' | 'CODEFORCES'): string => {
+    const parseProblemInput = (input: string, platform: 'LEETCODE' | 'CODEFORCES'): { slug: string; detectedPlatform: 'LEETCODE' | 'CODEFORCES'; problemNumber?: string } => {
         const trimmed = input.trim();
-        if (platform === 'CODEFORCES') {
-            const cfMatch = trimmed.match(/(?:problemset\/problem|contest)\/(\d+)\/(?:problem\/)?([A-Za-z0-9]+)/i);
-            if (cfMatch) return `${cfMatch[1]}${cfMatch[2].toUpperCase()}`;
-            return trimmed.replace('/', '').toUpperCase();
-        } else {
-            const lcMatch = trimmed.match(/problems\/([a-z0-9-]+)/i);
-            if (lcMatch) return lcMatch[1].toLowerCase();
-            return trimmed.toLowerCase();
+        const cfMatch = trimmed.match(/(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([A-Za-z0-9]+)/i);
+        if (cfMatch) {
+            const pNum = `${cfMatch[1]}${cfMatch[2].toUpperCase()}`;
+            return { slug: pNum, detectedPlatform: 'CODEFORCES', problemNumber: pNum };
         }
+
+        const lcMatch = trimmed.match(/problems\/([a-zA-Z0-9_-]+)/i);
+        if (lcMatch) {
+            return { slug: lcMatch[1].toLowerCase(), detectedPlatform: 'LEETCODE' };
+        }
+
+        if (platform === 'CODEFORCES') {
+            const cleanCF = trimmed.replace('/', '').toUpperCase();
+            return { slug: cleanCF, detectedPlatform: 'CODEFORCES', problemNumber: cleanCF };
+        }
+
+        return { slug: trimmed.toLowerCase(), detectedPlatform: 'LEETCODE' };
     };
 
     const handleAssignQuestion = async () => {
         setAssignQuestionError(null);
         if (!assignmentData.titleSlug.trim()) {
-            setAssignQuestionError('Please enter a problem slug or link.');
+            setAssignQuestionError('Please enter a problem URL or problem slug/ID.');
             return;
         }
 
-        const parsedSlug = parseProblemInput(assignmentData.titleSlug, assignmentData.platform);
-        const days = assignmentData.deadlineType === 'custom'
-            ? Math.max(1, Number.parseInt(assignmentData.customDays) || 1)
-            : Number.parseInt(assignmentData.deadlineType) || 3;
+        const parsed = parseProblemInput(assignmentData.titleSlug, assignmentData.platform);
+        const effectivePlatform = parsed.detectedPlatform || assignmentData.platform;
 
         const start = Math.floor(Date.now() / 1000);
-        const end = start + (days * 86400);
+        const deadlineDate = new Date(assignmentData.deadline);
+        const end = Math.floor(deadlineDate.getTime() / 1000);
+
+        if (isNaN(end) || end <= start) {
+            setAssignQuestionError('Please select a valid future deadline date and time.');
+            return;
+        }
 
         try {
             await ClassroomService.assignQuestion(selectedClassroom.classroomId, {
-                platform: assignmentData.platform,
+                platform: effectivePlatform,
                 title: assignmentData.title.trim() || undefined,
-                titleSlug: parsedSlug,
+                titleSlug: parsed.slug,
+                questionLink: assignmentData.titleSlug.trim().startsWith('http') ? assignmentData.titleSlug.trim() : undefined,
                 start,
                 end,
             });
@@ -141,8 +159,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                 platform: 'LEETCODE',
                 title: '',
                 titleSlug: '',
-                deadlineType: '3',
-                customDays: '5',
+                deadline: getDefaultDeadline(3),
             });
             onRefresh();
         } catch (err: unknown) {
@@ -309,33 +326,64 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             </div>
                         </div>
 
-                        {/* Problem Slug / ID / URL */}
+                        {/* Problem URL or Slug/ID */}
                         <div className="space-y-1.5">
-                            <Label className="text-zinc-300 text-xs uppercase font-semibold">
-                                {assignmentData.platform === 'CODEFORCES' ? 'Problem ID or URL' : 'Problem Slug or URL'}
-                            </Label>
+                            <div className="flex items-center justify-between">
+                                <Label className="text-zinc-300 text-xs uppercase font-semibold">
+                                    Problem URL
+                                </Label>
+                                <span className="text-[11px] text-zinc-500">Paste whole URL or ID</span>
+                            </div>
                             <Input
                                 placeholder={
                                     assignmentData.platform === 'CODEFORCES'
-                                        ? '4A or https://codeforces.com/problemset/problem/4/A'
-                                        : 'two-sum or https://leetcode.com/problems/two-sum/'
+                                        ? 'https://codeforces.com/problemset/problem/4/A or 4A'
+                                        : 'https://leetcode.com/problems/two-sum/ or two-sum'
                                 }
                                 value={assignmentData.titleSlug}
                                 onChange={(e) => {
-                                    setAssignmentData({ ...assignmentData, titleSlug: e.target.value });
+                                    const val = e.target.value;
+                                    let newPlatform = assignmentData.platform;
+
+                                    // Auto-detect platform from URL
+                                    if (val.toLowerCase().includes('codeforces.com')) {
+                                        newPlatform = 'CODEFORCES';
+                                    } else if (val.toLowerCase().includes('leetcode.com') || val.toLowerCase().includes('leetcode.cn')) {
+                                        newPlatform = 'LEETCODE';
+                                    }
+
+                                    setAssignmentData({
+                                        ...assignmentData,
+                                        titleSlug: val,
+                                        platform: newPlatform,
+                                    });
                                     if (assignQuestionError) setAssignQuestionError(null);
                                 }}
                                 className={inputClasses}
                             />
+                            {/* Extracted preview badge */}
+                            {assignmentData.titleSlug.trim().length > 0 && (() => {
+                                const parsed = parseProblemInput(assignmentData.titleSlug, assignmentData.platform);
+                                return (
+                                    <div className="flex items-center gap-2 pt-1 text-xs text-zinc-400">
+                                        <span className="font-semibold text-zinc-500">Extracted:</span>
+                                        <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-md font-mono text-[11px]">
+                                            {parsed.detectedPlatform === 'CODEFORCES'
+                                                ? `CF Problem #${parsed.problemNumber || parsed.slug}`
+                                                : `LeetCode: ${parsed.slug}`}
+                                        </span>
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Problem Title (Optional) */}
                         <div className="space-y-1.5">
                             <Label className="text-zinc-300 text-xs uppercase font-semibold">
-                                Problem Title <span className="text-zinc-500 font-normal lowercase">(optional)</span>
+                                Problem Title <span className="text-zinc-500 font-normal lowercase">(optional - auto-fetched from platform)</span>
                             </Label>
                             <Input
-                                placeholder={assignmentData.platform === 'CODEFORCES' ? 'Watermelon' : 'Two Sum'}
+                                placeholder={assignmentData.platform === 'CODEFORCES' ? 'Watermelon (or leave empty to auto-fetch)' : 'Two Sum (or leave empty to auto-fetch)'}
                                 value={assignmentData.title}
                                 onChange={(e) => setAssignmentData({ ...assignmentData, title: e.target.value })}
                                 className={inputClasses}
@@ -343,37 +391,40 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         </div>
 
                         {/* Deadline Selector */}
-                        <div className="space-y-1.5">
-                            <Label className="text-zinc-300 text-xs uppercase font-semibold">Deadline</Label>
-                            <Select
-                                value={assignmentData.deadlineType}
-                                onValueChange={(v) => setAssignmentData({ ...assignmentData, deadlineType: v })}
-                            >
-                                <SelectTrigger className={inputClasses}><SelectValue placeholder="Select deadline" /></SelectTrigger>
-                                <SelectContent className="bg-[#1a1b2e] border-zinc-800 text-white rounded-xl">
-                                    <SelectItem value="1" className="focus:bg-[#5b4fff]/20 focus:text-white">1 Day</SelectItem>
-                                    <SelectItem value="2" className="focus:bg-[#5b4fff]/20 focus:text-white">2 Days</SelectItem>
-                                    <SelectItem value="3" className="focus:bg-[#5b4fff]/20 focus:text-white">3 Days</SelectItem>
-                                    <SelectItem value="5" className="focus:bg-[#5b4fff]/20 focus:text-white">5 Days</SelectItem>
-                                    <SelectItem value="7" className="focus:bg-[#5b4fff]/20 focus:text-white">1 Week</SelectItem>
-                                    <SelectItem value="14" className="focus:bg-[#5b4fff]/20 focus:text-white">2 Weeks</SelectItem>
-                                    <SelectItem value="custom" className="focus:bg-[#5b4fff]/20 focus:text-white">Custom Days...</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            {assignmentData.deadlineType === 'custom' && (
-                                <div className="pt-2">
-                                    <Label className="text-zinc-400 text-xs">Number of Days</Label>
-                                    <Input
-                                        type="number"
-                                        min="1"
-                                        max="365"
-                                        value={assignmentData.customDays}
-                                        onChange={(e) => setAssignmentData({ ...assignmentData, customDays: e.target.value })}
-                                        className={`${inputClasses} mt-1`}
-                                    />
-                                </div>
-                            )}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-zinc-300 text-xs uppercase font-semibold">Assignment Deadline</Label>
+                                <span className="text-[11px] text-zinc-500">Pick any custom date & time</span>
+                            </div>
+                            <Input
+                                type="datetime-local"
+                                value={assignmentData.deadline}
+                                min={getDefaultDeadline(0)}
+                                onChange={(e) => setAssignmentData({ ...assignmentData, deadline: e.target.value })}
+                                className={`${inputClasses} [color-scheme:dark]`}
+                            />
+                            {/* Quick Presets */}
+                            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                <span className="text-[11px] text-zinc-500 font-medium mr-1">Quick presets:</span>
+                                {[
+                                    { label: '+1 Day', days: 1 },
+                                    { label: '+2 Days', days: 2 },
+                                    { label: '+3 Days', days: 3 },
+                                    { label: '+5 Days', days: 5 },
+                                    { label: '+1 Week', days: 7 },
+                                    { label: '+2 Weeks', days: 14 },
+                                    { label: '+1 Month', days: 30 },
+                                ].map((preset) => (
+                                    <button
+                                        key={preset.label}
+                                        type="button"
+                                        onClick={() => setAssignmentData({ ...assignmentData, deadline: getDefaultDeadline(preset.days) })}
+                                        className="text-[11px] bg-zinc-800/80 hover:bg-[#5b4fff]/20 text-zinc-300 hover:text-[#b4afff] px-2 py-0.5 rounded-md border border-zinc-700/60 transition-colors"
+                                    >
+                                        {preset.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

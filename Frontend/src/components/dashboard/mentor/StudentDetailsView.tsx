@@ -66,7 +66,7 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
             <div className="fixed inset-0 z-50 bg-[#0a0a0a] flex items-center justify-center">
                 <div className="flex flex-col items-center">
                     <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff] mb-4" />
-                    <p className="text-zinc-400 font-medium tracking-wide">Fetching LeetCode data...</p>
+                    <p className="text-zinc-400 font-medium tracking-wide">Fetching profile data...</p>
                 </div>
             </div>
         );
@@ -201,6 +201,71 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* LeetCode Contest History */}
+                        {data.contestHistory && data.contestHistory.length > 0 && (
+                            <Card className={cardClasses}>
+                                <CardHeader className="border-b border-zinc-800/60 pb-4">
+                                    <CardTitle className="text-lg font-bold text-white tracking-tight flex items-center">
+                                        <Activity className="w-5 h-5 mr-2 text-[#ffa116]" /> LeetCode Contests
+                                        <span className="ml-auto text-xs font-semibold text-zinc-500">{data.contestHistory.length} contests</span>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-6">
+                                    <ScrollArea className="h-48 pr-4 custom-scrollbar">
+                                        <div className="space-y-3">
+                                            {data.contestHistory.slice().reverse().slice(0, 15).map((contest) => (
+                                                <div key={`lc-${contest.title}-${contest.timestamp}`} className="flex items-center justify-between p-3 bg-[#1a1b2e]/30 rounded-xl border border-zinc-800/60">
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-medium text-zinc-200 truncate">{contest.title}</p>
+                                                        <p className="text-xs text-zinc-500 mt-0.5">{formatDate(contest.timestamp)} • Rank #{contest.ranking}</p>
+                                                    </div>
+                                                    <div className="text-right shrink-0 ml-4">
+                                                        <p className="text-sm font-bold text-[#ffa116]">{Math.round(contest.rating)}</p>
+                                                        <p className="text-[10px] text-zinc-500">{contest.problemsSolved}/{contest.totalProblems} solved</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </ScrollArea>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Codeforces Contest History */}
+                        {data.codeforcesContestHistory && data.codeforcesContestHistory.length > 0 && (
+                            <Card className={cardClasses}>
+                                <CardHeader className="border-b border-zinc-800/60 pb-4">
+                                    <CardTitle className="text-lg font-bold text-white tracking-tight flex items-center">
+                                        <Activity className="w-5 h-5 mr-2 text-cyan-400" /> Codeforces Contests
+                                        <span className="ml-auto text-xs font-semibold text-zinc-500">{data.codeforcesContestHistory.length} contests</span>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-6">
+                                    <ScrollArea className="h-48 pr-4 custom-scrollbar">
+                                        <div className="space-y-3">
+                                            {data.codeforcesContestHistory.slice().reverse().slice(0, 15).map((contest) => {
+                                                const ratingDelta = contest.newRating - contest.oldRating;
+                                                return (
+                                                    <div key={`cf-${contest.contestId}-${contest.ratingUpdateTimeSeconds}`} className="flex items-center justify-between p-3 bg-[#1a1b2e]/30 rounded-xl border border-zinc-800/60">
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="text-sm font-medium text-zinc-200 truncate">{contest.contestName}</p>
+                                                            <p className="text-xs text-zinc-500 mt-0.5">{formatDate(contest.ratingUpdateTimeSeconds)} • Rank #{contest.rank}</p>
+                                                        </div>
+                                                        <div className="text-right shrink-0 ml-4">
+                                                            <p className="text-sm font-bold text-cyan-400">{contest.newRating}</p>
+                                                            <p className={`text-[10px] font-semibold ${ratingDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                                {ratingDelta >= 0 ? '+' : ''}{ratingDelta}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </ScrollArea>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
 
                     {/* Right Column */}

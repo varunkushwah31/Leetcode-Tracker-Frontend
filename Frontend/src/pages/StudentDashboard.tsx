@@ -77,10 +77,7 @@ export function StudentDashboard() {
         return !!dashboardData?.recentSubmissions?.some(sub => {
             const platformMatches = !assignment.platform || !sub.platform || assignment.platform === sub.platform;
             const normSub = sub.titleSlug ? sub.titleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : '';
-            return platformMatches &&
-                normSub === normTarget &&
-                sub.timestamp >= assignment.startTimestamp &&
-                sub.timestamp <= assignment.endTimestamp;
+            return platformMatches && normSub === normTarget;
         });
     };
 
@@ -89,7 +86,7 @@ export function StudentDashboard() {
             <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#09090B]">
                 <div className="flex flex-col items-center space-y-4">
                     <Loader2 className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-500" />
-                    <p className="font-medium text-zinc-500 dark:text-zinc-400">Decrypting LeetCode stats...</p>
+                    <p className="font-medium text-zinc-500 dark:text-zinc-400">Loading your stats...</p>
                 </div>
             </div>
         );

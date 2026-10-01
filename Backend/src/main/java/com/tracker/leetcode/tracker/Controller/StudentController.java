@@ -112,6 +112,9 @@ public class StudentController {
         Student freshStudentData = studentRepository.findById(currentStudent.getId())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
+        // Auto-validate all pending assignments across all enrolled classrooms
+        classroomService.autoValidatePendingAssignmentsForStudent(freshStudentData);
+
         // 1. Build the base DTO
         StudentExtendedDTO dto = mapper.toExtendedDTO(freshStudentData);
 

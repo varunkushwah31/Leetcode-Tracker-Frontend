@@ -64,6 +64,7 @@ export interface RecentSubmission {
 export interface AssignmentDTO {
     id: string;
     platform?: Platform;
+    problemNumber?: string;
     title?: string;
     titleSlug: string;
     questionLink: string;

@@ -281,15 +281,13 @@ public class StudentService {
                     boolean matched = student.getRecentSubmissions().stream().anyMatch(sub -> {
                         boolean platformMatch = assignment.getPlatform() == null || sub.getPlatform() == assignment.getPlatform();
                         boolean slugMatch = isProblemSlugMatch(sub.getTitleSlug(), assignment.getTitleSlug());
-                        boolean timeMatch = (assignment.getStartTimestamp() == 0 || sub.getTimestamp() >= assignment.getStartTimestamp())
-                                && (assignment.getEndTimestamp() == 0 || sub.getTimestamp() <= assignment.getEndTimestamp());
-                        return platformMatch && slugMatch && timeMatch;
+                        return platformMatch && slugMatch;
                     });
 
                     if (matched) {
                         student.getManuallyCompletedAssignments().add(assignment.getId());
                         updated = true;
-                        log.info("Auto-validated assignment [{}] for student [{}]", assignment.getId(), student.getLeetcodeUsername());
+                        log.info("Auto-validated assignment [{}] for student [{}]", assignment.getId(), student.getName());
                     }
                 }
             }
