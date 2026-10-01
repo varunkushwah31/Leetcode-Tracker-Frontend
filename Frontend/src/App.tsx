@@ -19,9 +19,6 @@ const LandingPage = React.lazy(() =>
 const ContactPage = React.lazy(() =>
     import('./pages/ContactPage').then((m) => ({ default: m.ContactPage }))
 );
-const OAuth2RedirectHandler = React.lazy(() =>
-    import('./pages/OAuth2RedirectHandler').then((m) => ({ default: m.OAuth2RedirectHandler }))
-);
 
 const FullPageLoader = () => (
     <div className="flex h-screen items-center justify-center bg-slate-50" role="status" aria-live="polite" aria-label="Loading">
@@ -75,7 +72,6 @@ function App() {
 
                         <Route path="/login" element={<PublicRoute><AuthPage /></PublicRoute>} />
                         <Route path="/register" element={<PublicRoute><AuthPage /></PublicRoute>} />
-                        <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
 
                         {/* 3. Added the missing Contact route! */}
                         <Route path="/contact" element={<ContactPage />} />

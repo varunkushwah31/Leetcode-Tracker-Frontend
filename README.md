@@ -16,10 +16,7 @@ This platform automates the tracking of coding assignments by integrating direct
 * **Enterprise Security**
   Stateless JWT authentication with short-lived access tokens and secure HTTP-only refresh tokens.
 
-* **OAuth2 Integration**
-  Seamless **Login with Google** for quick onboarding.
-
-* **Automated LeetCode Sync**
+* **Automated LeetCode & Codeforces Sync**
   Fetches solved problems, contest ratings, badges, and submissions instantly.
 
 * **Classroom Management**
@@ -39,7 +36,7 @@ This platform automates the tracking of coding assignments by integrating direct
 
 * Java 17+
 * Spring Boot 3
-* Spring Security (JWT + OAuth2)
+* Spring Security (JWT)
 * MongoDB (Spring Data MongoDB)
 * Maven
 
@@ -86,8 +83,6 @@ cd Leetcode-Tracker-Frontend
    ```
    MONGO_URI=mongodb://localhost:27017/LeetcodeTracker
    JWT_SECRET=your_secret_key
-   GOOGLE_CLIENT_ID=your_google_client_id
-   GOOGLE_CLIENT_SECRET=your_google_client_secret
    ```
 
 3. Run backend:
