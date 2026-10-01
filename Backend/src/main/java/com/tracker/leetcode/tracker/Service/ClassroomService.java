@@ -300,21 +300,25 @@ public class ClassroomService {
         List<String> failedUsernames = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String leetcodeUsername;
+            String studentIdentifier;
             // Read the CSV line by line
-            while ((leetcodeUsername = reader.readLine()) != null) {
-                leetcodeUsername = leetcodeUsername.trim();
+            while ((studentIdentifier = reader.readLine()) != null) {
+                studentIdentifier = studentIdentifier.trim();
                 // Skip empty lines or CSV header if it exists
-                if (leetcodeUsername.isEmpty() || leetcodeUsername.equalsIgnoreCase("username") || leetcodeUsername.equalsIgnoreCase("leetcode_username")) {
+                if (studentIdentifier.isEmpty()
+                        || studentIdentifier.equalsIgnoreCase("username")
+                        || studentIdentifier.equalsIgnoreCase("leetcode_username")
+                        || studentIdentifier.equalsIgnoreCase("codeforces_handle")
+                        || studentIdentifier.equalsIgnoreCase("handle")
+                        || studentIdentifier.equalsIgnoreCase("identifier")) {
                     continue;
                 }
 
                 try {
-                    // FIXED: Changed to the correct method name!
-                    addStudentToClassroom(classroomId, leetcodeUsername);
+                    addStudentToClassroom(classroomId, studentIdentifier);
                 } catch (Exception e) {
-                    log.warn("Failed to bulk add student: {}", leetcodeUsername);
-                    failedUsernames.add(leetcodeUsername); // Track failures
+                    log.warn("Failed to bulk add student: {}", studentIdentifier);
+                    failedUsernames.add(studentIdentifier); // Track failures
                 }
             }
         } catch (Exception e) {
@@ -414,17 +418,20 @@ public class ClassroomService {
         long oneWeekAgo = System.currentTimeMillis() / 1000 - (7 * 86400);
 
         for (Student s : students) {
-            // 1. Calculate Difficulties
+            // 1. Calculate Difficulties and Total Solved across platforms
+            int studentLcSolved = 0;
             if (s.getProblemStats() != null) {
                 for (var stat : s.getProblemStats()) {
                     switch (stat.getDifficulty().toLowerCase()) {
-                        case "all" -> totalSolved += stat.getCount();
+                        case "all" -> studentLcSolved += stat.getCount();
                         case "easy" -> totalEasy += stat.getCount();
                         case "medium" -> totalMed += stat.getCount();
                         case "hard" -> totalHard += stat.getCount();
                     }
                 }
             }
+            int studentCfSolved = s.getCodeforcesSolvedCount() != null ? s.getCodeforcesSolvedCount() : 0;
+            totalSolved += (studentLcSolved + studentCfSolved);
 
             // 2. Check Engagement (Active in last 7 days)
             boolean isActive = s.getRecentSubmissions() != null && s.getRecentSubmissions().stream()

@@ -46,7 +46,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const [selectedPathId, setSelectedPathId] = useState<string>('');
     const [newPath, setNewPath] = useState({ title: '', description: '' });
     const [pathQuestions, setPathQuestions] = useState<Array<PathQuestion & { tempId: string }>>([
-        { tempId: 'question-initial-1', titleSlug: '', daysToComplete: 3 }
+        { tempId: 'question-initial-1', platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }
     ]);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -153,11 +153,19 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const handleCreatePath = async () => {
         setCreatePathError(null);
         try {
-            const sanitizedQuestions = pathQuestions.map(({ titleSlug, daysToComplete }) => ({ titleSlug, daysToComplete }));
+            const sanitizedQuestions = pathQuestions.map(({ platform, title, titleSlug, daysToComplete }) => {
+                const p = platform || 'LEETCODE';
+                return {
+                    platform: p,
+                    title: title?.trim() || undefined,
+                    titleSlug: parseProblemInput(titleSlug, p),
+                    daysToComplete: daysToComplete || 3
+                };
+            });
             await PathService.createPath({ mentorId, title: newPath.title, description: newPath.description, questions: sanitizedQuestions });
             setCreatePathOpen(false);
             setNewPath({ title: '', description: '' });
-            setPathQuestions([{ tempId: `question-reset-${Date.now()}`, titleSlug: '', daysToComplete: 3 }]);
+            setPathQuestions([{ tempId: `question-reset-${Date.now()}`, platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }]);
             onRefresh();
         } catch (err: unknown) {
             setCreatePathError(getErrMsg(err, 'Failed to create learning path.'));
@@ -218,7 +226,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                             <div className="flex gap-2">
                                 <Input
-                                    placeholder="LeetCode Username"
+                                    placeholder="LeetCode username or Codeforces handle"
                                     value={newStudentUsername}
                                     onChange={(e) => {
                                         setNewStudentUsername(e.target.value);
@@ -241,7 +249,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />
 
-                            <p className="text-xs text-zinc-400">Upload a .csv file with LeetCode usernames.</p>
+                            <p className="text-xs text-zinc-400">Upload a .csv file with student identifiers (LeetCode usernames or Codeforces handles).</p>
                             <div className="flex gap-2">
                                 <Input type="file" accept=".csv" onChange={(e) => { setUploadFile(e.target.files ? e.target.files[0] : null); if(bulkUploadError) setBulkUploadError(null); }} className={`cursor-pointer file:bg-emerald-500/10 file:text-emerald-400 file:border-0 file:rounded-md file:px-2 file:py-1 ${inputClasses}`} />
                                 <Button onClick={handleBulkUpload} disabled={!uploadFile || isUploading} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
@@ -440,48 +448,96 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                     variant="outline"
                                     size="sm"
                                     className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 rounded-lg h-8"
-                                    onClick={() => setPathQuestions(prev => [...prev, { tempId: `question-new-${Date.now()}-${prev.length}`, titleSlug: '', daysToComplete: 3 }])}
+                                    onClick={() => setPathQuestions(prev => [...prev, { tempId: `question-new-${Date.now()}-${prev.length}`, platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }])}
                                 >
                                     <PlusIcon className="w-3 h-3 mr-1" /> Add
                                 </Button>
                             </div>
                             <div className="space-y-3">
                                 {pathQuestions.map((q, idx) => (
-                                    <div key={q.tempId} className="flex items-center gap-3 bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-800/60">
-                                        <div className="flex-1">
-                                            <Label className="text-xs text-zinc-400">Slug</Label>
+                                    <div key={q.tempId} className="bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-800/60 space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            {/* Platform Selector */}
+                                            <div className="flex rounded-lg overflow-hidden border border-zinc-800 text-xs">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newQs = [...pathQuestions];
+                                                        newQs[idx].platform = 'LEETCODE';
+                                                        setPathQuestions(newQs);
+                                                    }}
+                                                    className={`px-2.5 py-1.5 transition-all text-xs font-semibold cursor-pointer ${
+                                                        (q.platform ?? 'LEETCODE') === 'LEETCODE'
+                                                            ? 'bg-[#ffa116]/20 text-[#ffa116]'
+                                                            : 'bg-[#141522] text-zinc-500 hover:text-zinc-300'
+                                                    }`}
+                                                >
+                                                    LC
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newQs = [...pathQuestions];
+                                                        newQs[idx].platform = 'CODEFORCES';
+                                                        setPathQuestions(newQs);
+                                                    }}
+                                                    className={`px-2.5 py-1.5 transition-all text-xs font-semibold cursor-pointer ${
+                                                        q.platform === 'CODEFORCES'
+                                                            ? 'bg-cyan-500/20 text-cyan-400'
+                                                            : 'bg-[#141522] text-zinc-500 hover:text-zinc-300'
+                                                    }`}
+                                                >
+                                                    CF
+                                                </button>
+                                            </div>
+                                            <div className="flex-1">
+                                                <Input
+                                                    placeholder={q.platform === 'CODEFORCES' ? 'Problem ID (e.g. 4A or CF link)' : 'Slug (e.g. two-sum or LC link)'}
+                                                    className={inputClasses}
+                                                    value={q.titleSlug}
+                                                    onChange={e => {
+                                                        const newQs = [...pathQuestions];
+                                                        newQs[idx].titleSlug = e.target.value;
+                                                        setPathQuestions(newQs);
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="w-24">
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    placeholder="Days"
+                                                    className={inputClasses}
+                                                    value={q.daysToComplete}
+                                                    onChange={e => {
+                                                        const newQs = [...pathQuestions];
+                                                        newQs[idx].daysToComplete = Number.parseInt(e.target.value) || 1;
+                                                        setPathQuestions(newQs);
+                                                    }}
+                                                />
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+                                                onClick={() => setPathQuestions(prev => prev.filter(item => item.tempId !== q.tempId))}
+                                                disabled={pathQuestions.length === 1}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                        <div className="pl-1">
                                             <Input
-                                                className={`mt-1 ${inputClasses}`}
-                                                value={q.titleSlug}
+                                                placeholder="Optional Title (e.g. Watermelon or Two Sum)"
+                                                className={`h-8 text-xs ${inputClasses}`}
+                                                value={q.title ?? ''}
                                                 onChange={e => {
                                                     const newQs = [...pathQuestions];
-                                                    newQs[idx].titleSlug = e.target.value;
+                                                    newQs[idx].title = e.target.value;
                                                     setPathQuestions(newQs);
                                                 }}
                                             />
                                         </div>
-                                        <div className="w-32">
-                                            <Label className="text-xs text-zinc-400">Days</Label>
-                                            <Input
-                                                type="number"
-                                                className={`mt-1 ${inputClasses}`}
-                                                value={q.daysToComplete}
-                                                onChange={e => {
-                                                    const newQs = [...pathQuestions];
-                                                    newQs[idx].daysToComplete = Number.parseInt(e.target.value) || 1;
-                                                    setPathQuestions(newQs);
-                                                }}
-                                            />
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="mt-6 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
-                                            onClick={() => setPathQuestions(prev => prev.filter(item => item.tempId !== q.tempId))}
-                                            disabled={pathQuestions.length === 1}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
                                     </div>
                                 ))}
                             </div>

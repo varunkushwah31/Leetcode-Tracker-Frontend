@@ -134,6 +134,8 @@ export interface StudentRegisterRequest extends MentorRegisterRequest {
 }
 
 export interface PathQuestion {
+    platform?: 'LEETCODE' | 'CODEFORCES';
+    title?: string;
     titleSlug: string;
     daysToComplete: number;
 }
