@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { TerminalIcon, PulseIcon as Activity, WarningCircleIcon as AlertCircle, UsersIcon, SquaresFourIcon as LayoutDashboard, GlobeIcon, SpinnerIcon as Loader2, ArrowLeftIcon } from '@phosphor-icons/react';
+import { TerminalIcon, PulseIcon as Activity, WarningCircleIcon as AlertCircle, UsersIcon, SquaresFourIcon as LayoutDashboard, GlobeIcon, SpinnerIcon as Loader2, ArrowLeftIcon, CodeIcon, EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import { useAuth } from '../hooks/useAuth';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
@@ -15,6 +15,7 @@ export function AuthPage() {
   const [role, setRole] = useState<'student' | 'mentor'>('student');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login, registerMentor, registerStudent } = useAuth();
 
@@ -151,13 +152,13 @@ export function AuthPage() {
 
             {/* Standard Login / Register Form */}
             {!isLogin && (
-                <div className="flex bg-[#1a1a1a] p-1 rounded-xl mb-4 border border-zinc-800">
+                <div className="grid grid-cols-2 gap-1.5 p-1 bg-zinc-950/60 rounded-xl mb-4 border border-zinc-800/80">
                   <button
                       type="button"
-                      className={`flex-1 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
+                      className={`py-2 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
                           role === 'student'
-                              ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50'
-                              : 'text-zinc-500 hover:text-white'
+                              ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/60'
+                              : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                       }`}
                       onClick={() => { setRole('student'); clearError(); }}
                   >
@@ -165,10 +166,10 @@ export function AuthPage() {
                   </button>
                   <button
                       type="button"
-                      className={`flex-1 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
+                      className={`py-2 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
                           role === 'mentor'
-                              ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50'
-                              : 'text-zinc-500 hover:text-white'
+                              ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/60'
+                              : 'text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                       }`}
                       onClick={() => { setRole('mentor'); clearError(); }}
                   >
@@ -176,10 +177,10 @@ export function AuthPage() {
                   </button>
                 </div>
             )}
-            <form onSubmit={handleAuth} className="space-y-3">
+            <form onSubmit={handleAuth} className="space-y-3.5">
               {!isLogin ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Full Name</Label>
                       <Input
                           required
@@ -187,10 +188,10 @@ export function AuthPage() {
                           placeholder="John Doe"
                           value={formData.name}
                           onChange={(e) => { setFormData({...formData, name: e.target.value}); clearError(); }}
-                          className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-10 rounded-xl w-full transition-all px-3.5 text-sm"
+                          className="bg-[#18181b] border border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] focus-visible:border-transparent h-10 rounded-xl w-full transition-all px-3.5 text-sm hover:border-zinc-700"
                       />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Email Address</Label>
                       <Input
                           type="email"
@@ -199,12 +200,12 @@ export function AuthPage() {
                           placeholder="you@example.com"
                           value={formData.email}
                           onChange={(e) => { setFormData({...formData, email: e.target.value}); clearError(); }}
-                          className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-10 rounded-xl w-full transition-all px-3.5 text-sm"
+                          className="bg-[#18181b] border border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] focus-visible:border-transparent h-10 rounded-xl w-full transition-all px-3.5 text-sm hover:border-zinc-700"
                       />
                     </div>
                   </div>
               ) : (
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Email Address</Label>
                     <Input
                         type="email"
@@ -213,57 +214,72 @@ export function AuthPage() {
                         placeholder="you@example.com"
                         value={formData.email}
                         onChange={(e) => { setFormData({...formData, email: e.target.value}); clearError(); }}
-                        className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-10 rounded-xl w-full transition-all px-3.5 text-sm"
+                        className="bg-[#18181b] border border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] focus-visible:border-transparent h-10 rounded-xl w-full transition-all px-3.5 text-sm hover:border-zinc-700"
                     />
                   </div>
               )}
 
               {!isLogin && role === 'student' && (
-                  <div className="space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="py-2 px-3 rounded-xl bg-[#5b4fff]/10 border border-[#5b4fff]/20 text-[11px] sm:text-xs text-zinc-300 flex items-center gap-2">
-                      <span>💡</span>
-                      <span>Enter your <strong className="text-white">LeetCode</strong> or <strong className="text-white">Codeforces</strong> handle (or both).</span>
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center justify-between pb-1 border-b border-zinc-800/60">
+                      <div className="flex items-center gap-2">
+                        <CodeIcon className="w-4 h-4 text-[#968fff]" weight="bold" />
+                        <span className="text-xs font-semibold text-zinc-200 tracking-wide uppercase">Coding Platforms</span>
+                      </div>
+                      <span className="text-[10px] text-zinc-400 font-medium px-2 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-700/60">
+                        At least 1 required
+                      </span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1">
+                      <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">LeetCode</Label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#ffa116]" />
+                            <Label className="uppercase text-[10px] tracking-wider text-zinc-300 font-semibold">LeetCode</Label>
+                          </div>
                           <span className="text-[10px] text-zinc-500 font-normal">optional</span>
                         </div>
                         <div className="relative">
                           <GlobeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                           <Input
                               autoComplete="username"
-                              placeholder="neetcode123"
+                              placeholder="username"
                               value={formData.leetcodeUsername}
                               onChange={(e) => { setFormData({...formData, leetcodeUsername: e.target.value}); clearError(); }}
-                              className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-9 h-10 rounded-xl w-full transition-all text-sm"
+                              className="bg-[#141416] border border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] focus-visible:border-transparent pl-9 h-10 rounded-xl w-full transition-all text-sm hover:border-zinc-700"
                           />
                         </div>
                       </div>
 
-                      <div className="space-y-1">
+                      <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Codeforces</Label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                            <Label className="uppercase text-[10px] tracking-wider text-zinc-300 font-semibold">Codeforces</Label>
+                          </div>
                           <span className="text-[10px] text-zinc-500 font-normal">optional</span>
                         </div>
                         <div className="relative">
                           <TerminalIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                           <Input
                               autoComplete="username"
-                              placeholder="tourist"
+                              placeholder="handle"
                               value={formData.codeforcesHandle}
                               onChange={(e) => { setFormData({...formData, codeforcesHandle: e.target.value}); clearError(); }}
-                              className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-9 h-10 rounded-xl w-full transition-all text-sm"
+                              className="bg-[#141416] border border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] focus-visible:border-transparent pl-9 h-10 rounded-xl w-full transition-all text-sm hover:border-zinc-700"
                           />
                         </div>
                       </div>
                     </div>
+
+                    <p className="text-[11px] text-zinc-500 leading-relaxed">
+                      Provide your handle for either platform to initialize tracking. You can connect the remaining platform at any time from your dashboard.
+                    </p>
                   </div>
               )}
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Password</Label>
                   {isLogin && (
@@ -278,16 +294,33 @@ export function AuthPage() {
                       </button>
                   )}
                 </div>
-                <Input
-                    type="password"
-                    required
-                    autoComplete={isLogin ? "current-password" : "new-password"}
-                    placeholder="••••••••"
-                    minLength={6}
-                    value={formData.password}
-                    onChange={(e) => { setFormData({...formData, password: e.target.value}); clearError(); }}
-                    className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-10 rounded-xl w-full tracking-widest font-mono transition-all px-3.5 text-sm"
-                />
+                <div className="relative">
+                  <Input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      autoComplete={isLogin ? "current-password" : "new-password"}
+                      placeholder="••••••••"
+                      minLength={6}
+                      value={formData.password}
+                      onChange={(e) => { setFormData({...formData, password: e.target.value}); clearError(); }}
+                      className="bg-[#18181b] border border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] focus-visible:border-transparent h-10 rounded-xl w-full tracking-widest font-mono transition-all px-3.5 pr-10 text-sm hover:border-zinc-700"
+                  />
+                  <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors p-1 cursor-pointer focus:outline-none"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                        <EyeSlashIcon className="w-4 h-4" />
+                    ) : (
+                        <EyeIcon className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                {!isLogin && (
+                    <p className="text-[11px] text-zinc-500">Minimum 6 characters required.</p>
+                )}
               </div>
               <Button
                   type="submit"

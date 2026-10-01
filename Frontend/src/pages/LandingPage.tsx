@@ -366,7 +366,7 @@ export function LandingPage() {
                 </div>
 
                 <div className="relative z-20 text-zinc-600 text-xs sm:text-sm font-medium tracking-wide mt-auto pointer-events-auto flex flex-col sm:flex-row items-center justify-between w-full max-w-7xl px-4 sm:px-6">
-                    <span>© {new Date().getFullYear()} MentorSync. Built for educators • Made with ❤️ in India.</span>
+                    <span>© {new Date().getFullYear()} MentorSync. Built for educators • Crafted in India.</span>
                     <span className="mt-2 sm:mt-0 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> All systems operational</span>
                 </div>
             </footer>
