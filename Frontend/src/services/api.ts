@@ -63,7 +63,7 @@ function extractRefreshErrorMessage(refreshError: unknown): { message: string; s
     return { message: "Session expired. Please log in again." };
 }
 
-function extractErrorMessage(error: AxiosError<{ message?: string } | string>): string {
+function extractErrorMessage(error: AxiosError<{ message?: string; validationErrors?: Record<string, string> } | string>): string {
     if (!error.response) {
         if (error.request) {
             return "The backend server is not responding. Please ensure it is running.";
@@ -71,10 +71,28 @@ function extractErrorMessage(error: AxiosError<{ message?: string } | string>): 
         return "Unable to connect to the server. Please check your internet connection.";
     }
 
-    const { status, statusText, data } = error.response;
+    const { status, statusText, data, headers } = error.response;
 
-    if (data && typeof data === 'object' && data.message) {
-        return data.message;
+    // Rate limiting: 429 Too Many Requests
+    if (status === 429) {
+        const retryAfter = headers?.['retry-after'];
+        if (data && typeof data === 'object' && data.message) {
+            return data.message;
+        }
+        return `Rate limit exceeded. Please wait ${retryAfter ? `${retryAfter} seconds` : 'a few moments'} before trying again.`;
+    }
+
+    // Structured server error response
+    if (data && typeof data === 'object') {
+        if (data.validationErrors && Object.keys(data.validationErrors).length > 0) {
+            const formattedFields = Object.entries(data.validationErrors)
+                .map(([field, msg]) => `${field}: ${msg}`)
+                .join(', ');
+            return `${data.message || 'Validation failed'} (${formattedFields})`;
+        }
+        if (data.message) {
+            return data.message;
+        }
     }
 
     if (typeof data === 'string' && data !== '') {
@@ -87,7 +105,7 @@ function extractErrorMessage(error: AxiosError<{ message?: string } | string>): 
         return data;
     }
 
-    return `Server Error (${status}): ${statusText}`;
+    return `Server Error (${status}): ${statusText || 'Unexpected server error'}`;
 }
 
 async function handle401Refresh(originalRequest: RetryableRequest) {
@@ -140,6 +158,9 @@ api.interceptors.response.use(
 
         // --- PART B: Global Error Formatting (For all other errors) ---
         const specificErrorMessage = extractErrorMessage(error);
+        if (error.response?.status === 429) {
+            console.warn(`[RateLimit 429] Too Many Requests for ${originalRequest?.url}:`, specificErrorMessage);
+        }
         throw toFormattedError(specificErrorMessage, error.response?.status);
     }
 );
