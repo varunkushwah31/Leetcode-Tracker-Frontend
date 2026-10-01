@@ -301,11 +301,15 @@ export function LandingPage() {
 
                         <div className="md:col-span-2 bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-white/5 shadow-2xl flex flex-col justify-end gap-6 relative overflow-hidden group hover:border-white/10 hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="flex items-end gap-2 sm:gap-3 relative z-10 w-full h-28 sm:h-32 shrink-0 overflow-visible pt-5 opacity-60 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
-                                <div className="h-[40%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[60%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-75 group-hover:scale-y-110 origin-bottom"></div>
-                                <div className="h-[30%] min-h-8 flex-1 max-w-14 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-100 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[80%] min-h-8 flex-1 max-w-14 bg-[#5b4fff]/40 rounded-t-lg backdrop-blur-md transition-transform duration-300 delay-150 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-full flex-1 max-w-14 bg-[#5b4fff] rounded-t-lg shadow-[0_0_30px_rgba(91,79,255,0.6)] relative transition-transform duration-300 delay-200 group-hover:scale-y-105 origin-bottom">
+                                <div className="h-[40%] min-h-8 flex-1 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[60%] min-h-8 flex-1 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-75 group-hover:scale-y-110 origin-bottom"></div>
+                                <div className="h-[30%] min-h-8 flex-1 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-100 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[70%] min-h-8 flex-1 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-150 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[50%] min-h-8 flex-1 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-200 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[80%] min-h-8 flex-1 bg-[#5b4fff]/40 rounded-t-lg backdrop-blur-md transition-transform duration-300 delay-250 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[55%] min-h-8 flex-1 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-300 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[65%] min-h-8 flex-1 bg-[#1a1a1a] border border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-350 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-full flex-1 bg-[#5b4fff] rounded-t-lg shadow-[0_0_30px_rgba(91,79,255,0.6)] relative transition-transform duration-300 delay-400 group-hover:scale-y-105 origin-bottom">
                                     <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white] animate-pulse"></div>
                                 </div>
                             </div>
