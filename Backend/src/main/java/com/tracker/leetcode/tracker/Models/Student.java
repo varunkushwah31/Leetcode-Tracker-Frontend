@@ -22,7 +22,7 @@ public class Student implements UserDetails {
     @Id
     private String id;
     private String name;
-    @Indexed(unique = true)
+    @Indexed(unique = true, sparse = true)
     private String leetcodeUsername;
     private String about;
     private String rank;
@@ -37,7 +37,7 @@ public class Student implements UserDetails {
     private String avatarUrl;
 
 
-    @Indexed(sparse = true)
+    @Indexed(unique = true, sparse = true)
     private String codeforcesHandle;
     private Integer codeforcesRating;
     private Integer codeforcesMaxRating;

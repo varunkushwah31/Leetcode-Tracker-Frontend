@@ -55,16 +55,17 @@ export function StudentDashboard() {
     useEffect(() => { void fetchDashboard(); }, [fetchDashboard]);
 
     const handleSync = async () => {
-        if (!dashboardData?.leetcodeUsername) return;
+        const identifier = dashboardData?.leetcodeUsername || dashboardData?.codeforcesHandle || dashboardData?.id;
+        if (!identifier) return;
 
         setSyncError(null);
         setIsSyncing(true);
 
         try {
-            const response = await StudentService.syncProfile(dashboardData.leetcodeUsername);
+            const response = await StudentService.syncProfile(identifier);
             setDashboardData(response.data);
         } catch (err: unknown) {
-            setSyncError(getErrorMessage(err, 'Failed to sync with LeetCode.'));
+            setSyncError(getErrorMessage(err, 'Failed to sync profiles.'));
         } finally {
             setIsSyncing(false);
         }
@@ -149,7 +150,7 @@ export function StudentDashboard() {
                             </Avatar>
                             <div className="text-right hidden sm:block">
                                 <p className="text-sm font-bold text-zinc-900 dark:text-white">{dashboardData?.name || user?.name}</p>
-                                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">@{dashboardData?.leetcodeUsername || 'student'}</p>
+                                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">@{dashboardData?.leetcodeUsername || dashboardData?.codeforcesHandle || 'student'}</p>
                             </div>
                         </div>
                         <Button variant="ghost" size="icon" onClick={logout} className="hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 text-zinc-500 dark:text-zinc-400">

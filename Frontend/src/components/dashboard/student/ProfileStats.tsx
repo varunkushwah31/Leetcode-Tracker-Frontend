@@ -45,14 +45,16 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
     };
 
     const handleSaveHandles = async () => {
-        if (!lcUsername.trim()) {
-            setEditError('LeetCode username is required.');
+        const lcTrim = lcUsername.trim();
+        const cfTrim = cfHandle.trim();
+        if (!lcTrim && !cfTrim) {
+            setEditError('At least one platform username (LeetCode or Codeforces) is required.');
             return;
         }
         setIsSaving(true);
         setEditError(null);
         try {
-            await StudentService.updateHandles(lcUsername.trim(), cfHandle.trim() || undefined);
+            await StudentService.updateHandles(lcTrim || undefined, cfTrim || undefined);
             setIsEditOpen(false);
             if (onProfileUpdated) {
                 onProfileUpdated();
@@ -115,18 +117,28 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     </div>
                                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-1">
                                         {/* LeetCode Pill */}
-                                        <div className="flex items-center gap-1.5 bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-zinc-800 text-xs">
-                                            <span className="text-[#ffa116] font-semibold">LC:</span>
-                                            <span className="text-zinc-300">@{data.leetcodeUsername}</span>
-                                            <a
-                                                href={`https://leetcode.com/${data.leetcodeUsername}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-zinc-500 hover:text-white transition-colors ml-0.5"
+                                        {data.leetcodeUsername ? (
+                                            <div className="flex items-center gap-1.5 bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-zinc-800 text-xs">
+                                                <span className="text-[#ffa116] font-semibold">LC:</span>
+                                                <span className="text-zinc-300">@{data.leetcodeUsername}</span>
+                                                <a
+                                                    href={`https://leetcode.com/${data.leetcodeUsername}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-zinc-500 hover:text-white transition-colors ml-0.5"
+                                                >
+                                                    <ExternalLink className="w-3.5 h-3.5" />
+                                                </a>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={handleOpenEdit}
+                                                className="text-xs text-zinc-500 hover:text-[#ffa116] border border-dashed border-zinc-700 hover:border-[#ffa116] px-2 py-0.5 rounded-md transition-colors"
                                             >
-                                                <ExternalLink className="w-3.5 h-3.5" />
-                                            </a>
-                                        </div>
+                                                + Link LeetCode
+                                            </button>
+                                        )}
 
                                         {/* Codeforces Pill */}
                                         {data.codeforcesHandle ? (
@@ -239,7 +251,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 className="bg-[#1a1a1a] border-zinc-700 text-white"
                             />
                             <p className="text-xs text-zinc-500">
-                                Enter your Codeforces handle to track your rating, contest history, and accepted problems.
+                                Link either LeetCode, Codeforces, or both. You need at least one platform linked to your account.
                             </p>
                         </div>
                     </div>

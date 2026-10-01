@@ -55,17 +55,35 @@ public class AuthenticationService {
         if (studentRepository.findByEmail(request.email()).isPresent() || mentorRepository.findByEmail(request.email()).isPresent()){
             throw new DuplicateStudentException("Student email already in use.");
         }
-        if (studentRepository.findByLeetcodeUsername(request.leetcodeUsername()).isPresent()){
-            throw new DuplicateStudentException("LeetCode username '" + request.leetcodeUsername() + "' already in use.");
+
+        String lcUsername = request.leetcodeUsername() != null ? request.leetcodeUsername().trim() : null;
+        if (lcUsername != null && lcUsername.isEmpty()) {
+            lcUsername = null;
         }
+
+        String cfHandle = request.codeforcesHandle() != null ? request.codeforcesHandle().trim() : null;
+        if (cfHandle != null && cfHandle.isEmpty()) {
+            cfHandle = null;
+        }
+
+        if (lcUsername == null && cfHandle == null) {
+            throw new IllegalArgumentException("Please provide at least one platform username (LeetCode or Codeforces).");
+        }
+
+        if (lcUsername != null && studentRepository.findByLeetcodeUsername(lcUsername).isPresent()){
+            throw new DuplicateStudentException("LeetCode username '" + lcUsername + "' already in use.");
+        }
+
+        if (cfHandle != null && studentRepository.findByCodeforcesHandle(cfHandle).isPresent()){
+            throw new DuplicateStudentException("Codeforces handle '" + cfHandle + "' already in use.");
+        }
+
         Student student = new Student();
         student.setName(request.name());
         student.setEmail(request.email());
         student.setPassword(passwordEncoder.encode(request.password()));
-        student.setLeetcodeUsername(request.leetcodeUsername());
-        if (request.codeforcesHandle() != null && !request.codeforcesHandle().isBlank()) {
-            student.setCodeforcesHandle(request.codeforcesHandle().trim());
-        }
+        student.setLeetcodeUsername(lcUsername);
+        student.setCodeforcesHandle(cfHandle);
         student.setRole(Role.STUDENT);
         student.setAuthProvider(AuthProvider.LOCAL);
         student.setEnabled(true);
@@ -74,10 +92,10 @@ public class AuthenticationService {
 
         java.util.concurrent.CompletableFuture.runAsync(() -> {
             try {
-                log.info("Auto-syncing LeetCode data in background for new student: {}", savedStudent.getLeetcodeUsername());
-                studentService.syncAllProfileData(savedStudent.getLeetcodeUsername());
+                log.info("Auto-syncing profile data in background for new student ID: {}", savedStudent.getId());
+                studentService.syncAllProfileData(savedStudent);
             } catch (Exception e) {
-                log.warn("Failed to auto-sync LeetCode data for {}. Error: {}", savedStudent.getLeetcodeUsername(), e.getMessage());
+                log.warn("Failed to auto-sync profile data for student ID: {}. Error: {}", savedStudent.getId(), e.getMessage());
             }
         });
 

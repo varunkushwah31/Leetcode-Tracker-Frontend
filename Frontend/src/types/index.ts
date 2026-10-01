@@ -129,7 +129,7 @@ export interface MentorRegisterRequest {
 }
 
 export interface StudentRegisterRequest extends MentorRegisterRequest {
-    leetcodeUsername: string;
+    leetcodeUsername?: string;
     codeforcesHandle?: string;
 }
 

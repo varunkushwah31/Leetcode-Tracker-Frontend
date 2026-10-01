@@ -29,8 +29,9 @@ export const AuthService = {
 export const StudentService = {
     getDashboard: () => api.get('/students/me/dashboard'),
     
-    // The new Auto-Sync endpoint!
-    syncProfile: (username: string) => api.post(`/students/${username}/sync`),
+    // The Auto-Sync endpoint (can sync by username/handle or current session)
+    syncProfile: (identifier?: string) =>
+        identifier ? api.post(`/students/${identifier}/sync`) : api.post('/students/me/sync'),
 
     getExtendedProfile: (username: string) => api.post(`/students/${username}/extended/fetch`),
 
@@ -40,7 +41,7 @@ export const StudentService = {
     autoValidateSubmission: (classroomId: string, assignmentId: string) =>
         api.post(`/students/me/classrooms/${classroomId}/assignments/${assignmentId}/auto-validate`),
 
-    updateHandles: (leetcodeUsername: string, codeforcesHandle?: string) =>
+    updateHandles: (leetcodeUsername?: string, codeforcesHandle?: string) =>
         api.put('/students/me/handles', { leetcodeUsername, codeforcesHandle }),
 };
 

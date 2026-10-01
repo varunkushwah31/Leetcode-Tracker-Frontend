@@ -73,7 +73,18 @@ export function StudentRightSidebar({ data, totalSolved }: Readonly<{
  <div className="bg-[#1a1b2e] p-1.5 rounded-lg group-hover:bg-[#5b4fff] transition-colors">
  <CheckCircle2 className="w-4 h-4 text-[#968fff] group-hover:text-white"/>
  </div>
+ <div className="min-w-0 flex items-center gap-2">
  <p className="text-[13.5px] font-bold text-zinc-200 tracking-tight truncate">{sub.title}</p>
+ {sub.platform && (
+ <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded shrink-0 ${
+ sub.platform === 'CODEFORCES'
+ ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+ : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+ }`}>
+ {sub.platform === 'CODEFORCES' ? 'CF' : 'LC'}
+ </span>
+ )}
+ </div>
  </div>
  <span className="text-[11px] font-bold text-zinc-500 shrink-0 uppercase tracking-wider">{formatDate(sub.timestamp)}</span>
  </a>

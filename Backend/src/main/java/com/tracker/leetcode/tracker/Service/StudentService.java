@@ -1,5 +1,6 @@
 package com.tracker.leetcode.tracker.Service;
 
+import com.tracker.leetcode.tracker.Exception.DuplicateStudentException;
 import com.tracker.leetcode.tracker.Exception.StudentNotFoundException;
 import com.tracker.leetcode.tracker.Models.*;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
@@ -28,21 +29,29 @@ public class StudentService {
     private final CodeforcesApiClient codeforcesApiClient;
     private final SimpMessagingTemplate messagingTemplate;
 
-    // Helper method to keep code DRY
-    private Student getStudentOrThrow(String username) {
-        return studentRepository.findByLeetcodeUsername(username)
-                .orElseThrow(() -> new StudentNotFoundException("Student '" + username + "' not found in database. Please add them first!"));
+    // Helper method to keep code DRY - supports LeetCode username, Codeforces handle, or ID
+    public Student getStudentOrThrow(String identifier) {
+        if (identifier == null || identifier.isBlank()) {
+            throw new StudentNotFoundException("Student identifier cannot be blank.");
+        }
+        return studentRepository.findByLeetcodeUsername(identifier)
+                .or(() -> studentRepository.findByCodeforcesHandle(identifier))
+                .or(() -> studentRepository.findById(identifier))
+                .orElseThrow(() -> new StudentNotFoundException("Student '" + identifier + "' not found in database. Please add them first!"));
     }
 
     /**
      * Fetches and updates student progress (calendar heatmap)
      * Results are cached for 30 minutes
      */
-    @Cacheable(value = "student-progress", key = "#username")
-    public Student fetchAndUpdateStudentProgress(String username) {
-        log.info("Updating calendar heatmap for user: {}", username);
-        Student student = getStudentOrThrow(username);
-        student.setProgressHistory(leetCodeApiClient.fetchCalendarData(username));
+    @Cacheable(value = "student-progress", key = "#identifier")
+    public Student fetchAndUpdateStudentProgress(String identifier) {
+        log.info("Updating calendar heatmap for user: {}", identifier);
+        Student student = getStudentOrThrow(identifier);
+        if (student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
+            student.setProgressHistory(leetCodeApiClient.fetchCalendarData(student.getLeetcodeUsername()));
+        }
+        syncCodeforcesData(student);
         return studentRepository.save(student);
     }
 
@@ -50,11 +59,13 @@ public class StudentService {
      * Fetches and updates problem statistics
      * Results are cached for 30 minutes
      */
-    @Cacheable(value = "student-stats", key = "#username")
-    public Student fetchAndUpdateProblemStats(String username) {
-        log.info("Updating problem stats for user: {}", username);
-        Student student = getStudentOrThrow(username);
-        student.setProblemStats(leetCodeApiClient.fetchProblemStats(username));
+    @Cacheable(value = "student-stats", key = "#identifier")
+    public Student fetchAndUpdateProblemStats(String identifier) {
+        log.info("Updating problem stats for user: {}", identifier);
+        Student student = getStudentOrThrow(identifier);
+        if (student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
+            student.setProblemStats(leetCodeApiClient.fetchProblemStats(student.getLeetcodeUsername()));
+        }
         return studentRepository.save(student);
     }
 
@@ -62,11 +73,14 @@ public class StudentService {
      * Fetches and updates recent submissions
      * Results are cached for 30 minutes
      */
-    @Cacheable(value = "student-recent", key = "#username")
-    public Student fetchAndUpdateRecentSubmissions(String username) {
-        log.info("Updating recent submissions for user: {}", username);
-        Student student = getStudentOrThrow(username);
-        student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(username, 5));
+    @Cacheable(value = "student-recent", key = "#identifier")
+    public Student fetchAndUpdateRecentSubmissions(String identifier) {
+        log.info("Updating recent submissions for user: {}", identifier);
+        Student student = getStudentOrThrow(identifier);
+        if (student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
+            student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(student.getLeetcodeUsername(), 5));
+        }
+        syncCodeforcesData(student);
         return studentRepository.save(student);
     }
 
@@ -74,21 +88,28 @@ public class StudentService {
      * Fetches and updates extended profile (socials, contests, badges)
      * Results are cached for 1 hour
      */
-    @Cacheable(value = "student-profile", key = "#username")
-    public Student fetchAndUpdateExtendedProfile(String username) {
-        log.info("Updating extended profile (Socials, Contests, Badges) for user: {}", username);
-        Student student = getStudentOrThrow(username);
+    @Cacheable(value = "student-profile", key = "#identifier")
+    public Student fetchAndUpdateExtendedProfile(String identifier) {
+        log.info("Updating extended profile for user: {}", identifier);
+        Student student = getStudentOrThrow(identifier);
 
-        Student extendedData = leetCodeApiClient.fetchExtendedProfileDetails(username);
-
-        student.setAbout(extendedData.getAbout());
-        student.setRank(extendedData.getRank());
-        student.setCurrentContestRating(extendedData.getCurrentContestRating());
-        student.setSocialMedia(extendedData.getSocialMedia());
-        student.setBadges(extendedData.getBadges());
-        student.setContestHistory(extendedData.getContestHistory());
-        student.setAvatarUrl(extendedData.getAvatarUrl());
-        student.setSkills(leetCodeApiClient.fetchSkillStats(username));
+        if (student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
+            try {
+                Student extendedData = leetCodeApiClient.fetchExtendedProfileDetails(student.getLeetcodeUsername());
+                student.setAbout(extendedData.getAbout());
+                student.setRank(extendedData.getRank());
+                student.setCurrentContestRating(extendedData.getCurrentContestRating());
+                student.setSocialMedia(extendedData.getSocialMedia());
+                student.setBadges(extendedData.getBadges());
+                student.setContestHistory(extendedData.getContestHistory());
+                if (extendedData.getAvatarUrl() != null && !extendedData.getAvatarUrl().isBlank()) {
+                    student.setAvatarUrl(extendedData.getAvatarUrl());
+                }
+                student.setSkills(leetCodeApiClient.fetchSkillStats(student.getLeetcodeUsername()));
+            } catch (Exception e) {
+                log.warn("Failed fetching LeetCode extended data for {}: {}", student.getLeetcodeUsername(), e.getMessage());
+            }
+        }
 
         // If student has Codeforces handle, sync CF details as well
         syncCodeforcesData(student);
@@ -97,40 +118,49 @@ public class StudentService {
     }
 
     /**
-     * Syncs all profile data from LeetCode AND Codeforces, merges metrics, and auto-validates assignments
+     * Syncs all profile data from LeetCode AND/OR Codeforces, merges metrics, and auto-validates assignments
      */
-    @CacheEvict(value = {"student-progress", "student-stats", "student-recent", "student-profile"},
-                key = "#username")
-    public Student syncAllProfileData(String username) {
-        log.info("Performing FULL multi-platform profile sync for user: {}", username);
-        Student student = getStudentOrThrow(username);
+    public Student syncAllProfileData(Student student) {
+        log.info("Performing FULL multi-platform profile sync for student ID: {}", student.getId());
 
-        // 1. Sync LeetCode Data
-        try {
-            student.setProgressHistory(leetCodeApiClient.fetchCalendarData(username));
-            student.setProblemStats(leetCodeApiClient.fetchProblemStats(username));
-            student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(username, 20));
-            student.setSkills(leetCodeApiClient.fetchSkillStats(username));
+        // 1. Sync LeetCode Data (if present)
+        String lcUsername = student.getLeetcodeUsername();
+        if (lcUsername != null && !lcUsername.isBlank()) {
+            try {
+                student.setProgressHistory(leetCodeApiClient.fetchCalendarData(lcUsername));
+                student.setProblemStats(leetCodeApiClient.fetchProblemStats(lcUsername));
+                student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(lcUsername, 20));
+                student.setSkills(leetCodeApiClient.fetchSkillStats(lcUsername));
 
-            Student extendedData = leetCodeApiClient.fetchExtendedProfileDetails(username);
-            student.setAbout(extendedData.getAbout());
-            student.setRank(extendedData.getRank());
-            student.setCurrentContestRating(extendedData.getCurrentContestRating());
-            student.setSocialMedia(extendedData.getSocialMedia());
-            student.setBadges(extendedData.getBadges());
-            student.setContestHistory(extendedData.getContestHistory());
-            student.setAvatarUrl(extendedData.getAvatarUrl());
-        } catch (Exception e) {
-            log.warn("Failed fetching LeetCode data for {}: {}", username, e.getMessage());
+                Student extendedData = leetCodeApiClient.fetchExtendedProfileDetails(lcUsername);
+                student.setAbout(extendedData.getAbout());
+                student.setRank(extendedData.getRank());
+                student.setCurrentContestRating(extendedData.getCurrentContestRating());
+                student.setSocialMedia(extendedData.getSocialMedia());
+                student.setBadges(extendedData.getBadges());
+                student.setContestHistory(extendedData.getContestHistory());
+                if (extendedData.getAvatarUrl() != null && !extendedData.getAvatarUrl().isBlank()) {
+                    student.setAvatarUrl(extendedData.getAvatarUrl());
+                }
+            } catch (Exception e) {
+                log.warn("Failed fetching LeetCode data for {}: {}", lcUsername, e.getMessage());
+            }
         }
 
-        // 2. Sync Codeforces Data (if handle is present)
+        // 2. Sync Codeforces Data (if present)
         syncCodeforcesData(student);
 
         // 3. Auto-validate any pending assignments
         autoValidateAssignmentsForStudent(student);
 
         return studentRepository.save(student);
+    }
+
+    @CacheEvict(value = {"student-progress", "student-stats", "student-recent", "student-profile"},
+                key = "#identifier")
+    public Student syncAllProfileData(String identifier) {
+        Student student = getStudentOrThrow(identifier);
+        return syncAllProfileData(student);
     }
 
     /**
@@ -290,16 +320,32 @@ public class StudentService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Student not found with ID: " + studentId));
 
-        if (leetcodeUsername != null && !leetcodeUsername.isBlank()) {
-            student.setLeetcodeUsername(leetcodeUsername.trim());
-        }
-        if (codeforcesHandle != null) {
-            String trimmed = codeforcesHandle.trim();
-            student.setCodeforcesHandle(trimmed.isEmpty() ? null : trimmed);
+        String newLc = (leetcodeUsername != null && !leetcodeUsername.trim().isEmpty()) ? leetcodeUsername.trim() : null;
+        String newCf = (codeforcesHandle != null && !codeforcesHandle.trim().isEmpty()) ? codeforcesHandle.trim() : null;
+
+        if (newLc == null && newCf == null) {
+            throw new IllegalArgumentException("At least one platform username (LeetCode or Codeforces) must remain linked.");
         }
 
-        studentRepository.save(student);
-        return syncAllProfileData(student.getLeetcodeUsername());
+        if (newLc != null && !newLc.equalsIgnoreCase(student.getLeetcodeUsername())) {
+            Optional<Student> existing = studentRepository.findByLeetcodeUsername(newLc);
+            if (existing.isPresent() && !existing.get().getId().equals(student.getId())) {
+                throw new DuplicateStudentException("LeetCode username '" + newLc + "' is already in use.");
+            }
+        }
+
+        if (newCf != null && !newCf.equalsIgnoreCase(student.getCodeforcesHandle())) {
+            Optional<Student> existing = studentRepository.findByCodeforcesHandle(newCf);
+            if (existing.isPresent() && !existing.get().getId().equals(student.getId())) {
+                throw new DuplicateStudentException("Codeforces handle '" + newCf + "' is already in use.");
+            }
+        }
+
+        student.setLeetcodeUsername(newLc);
+        student.setCodeforcesHandle(newCf);
+
+        Student saved = studentRepository.save(student);
+        return syncAllProfileData(saved);
     }
 
     /**

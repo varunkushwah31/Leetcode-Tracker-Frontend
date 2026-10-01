@@ -61,7 +61,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
 
     const filteredStudents = students?.filter(s =>
         s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.leetcodeUsername.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (s.leetcodeUsername && s.leetcodeUsername.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (s.codeforcesHandle && s.codeforcesHandle.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
@@ -119,7 +119,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                         </thead>
                         <tbody className="divide-y divide-zinc-800/60">
                         {filteredStudents?.map((student, index) => (
-                            <tr key={student.id} className="hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername)}>
+                            <tr key={student.id} className="hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername || student.codeforcesHandle || student.id || '')}>
                                 <td className="py-4 px-6">
                                     <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto ${getRankBadgeClass(index)}`}>
                                         {index + 1}
@@ -134,7 +134,9 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                         <div>
                                             <p className="font-semibold text-white group-hover:text-[#b4afff] transition-colors">{student.name}</p>
                                             <div className="flex items-center gap-1.5 flex-wrap">
-                                                <span className="text-xs text-zinc-500 font-medium tracking-wide">@{student.leetcodeUsername}</span>
+                                                {student.leetcodeUsername && (
+                                                    <span className="text-xs text-zinc-500 font-medium tracking-wide">@{student.leetcodeUsername}</span>
+                                                )}
                                                 {student.codeforcesHandle && (
                                                     <span className="text-[10px] font-semibold text-blue-400 bg-blue-500/10 px-1.5 py-0.2 rounded border border-blue-500/20">
                                                         CF: @{student.codeforcesHandle}

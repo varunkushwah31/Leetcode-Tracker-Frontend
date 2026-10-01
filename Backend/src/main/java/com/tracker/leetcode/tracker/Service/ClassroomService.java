@@ -64,13 +64,16 @@ public class ClassroomService {
 
     // 2. Add Student
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
-    public Classroom addStudentToClassroom(String classroomId, String leetcodeUsername) {
-        log.info("Adding student {} to classroom ID: {}", leetcodeUsername, classroomId);
+    public Classroom addStudentToClassroom(String classroomId, String identifier) {
+        log.info("Adding student {} to classroom ID: {}", identifier, classroomId);
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
 
-        Student student = studentRepository.findByLeetcodeUsername(leetcodeUsername)
-                .orElseThrow(() -> new StudentNotFoundException("Student not found in database. Please add them first."));
+        Student student = studentRepository.findByLeetcodeUsername(identifier)
+                .or(() -> studentRepository.findByCodeforcesHandle(identifier))
+                .or(() -> studentRepository.findByEmail(identifier))
+                .or(() -> studentRepository.findById(identifier))
+                .orElseThrow(() -> new StudentNotFoundException("Student not found with identifier: " + identifier));
 
         // Prevent duplicate enrollments in the same class
         if (classroom.getStudentIds().contains(student.getId())) {
@@ -276,6 +279,9 @@ public class ClassroomService {
             return codeforcesApiClient.verifySubmission(student.getCodeforcesHandle(), assignment.getTitleSlug(), submissionUrl);
         } else {
             // LeetCode verification
+            if (student.getLeetcodeUsername() == null || student.getLeetcodeUsername().isBlank()) {
+                throw new ValidationFailedException("You must link a LeetCode username to your profile to validate LeetCode assignments.");
+            }
             if (submissionUrl != null && !submissionUrl.isBlank()) {
                 String submissionId = extractSubmissionIdFromUrl(submissionUrl);
                 return leetCodeApiClient.verifySubmission(submissionId, student.getLeetcodeUsername(), assignment.getTitleSlug());
@@ -283,7 +289,7 @@ public class ClassroomService {
                 // Auto-validate from student's recent submissions
                 return student.getRecentSubmissions() != null && student.getRecentSubmissions().stream()
                         .anyMatch(sub -> (sub.getPlatform() == null || sub.getPlatform() == Platform.LEETCODE)
-                                && sub.getTitleSlug().equalsIgnoreCase(assignment.getTitleSlug()));
+                                && StudentService.isProblemSlugMatch(sub.getTitleSlug(), assignment.getTitleSlug()));
             }
         }
     }

@@ -131,9 +131,11 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
                             <div>
                                 <h1 className="text-3xl font-extrabold mb-1 text-white tracking-tight">{data.name}</h1>
                                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                                    <a href={`https://leetcode.com/${data.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-[#1a1b2e]/60 px-2.5 py-1 rounded-lg border border-zinc-800">
-                                        LC: @{data.leetcodeUsername} <ExternalLink className="h-3 w-3 ml-1.5" />
-                                    </a>
+                                    {data.leetcodeUsername && (
+                                        <a href={`https://leetcode.com/${data.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-[#1a1b2e]/60 px-2.5 py-1 rounded-lg border border-zinc-800">
+                                            LC: @{data.leetcodeUsername} <ExternalLink className="h-3 w-3 ml-1.5" />
+                                        </a>
+                                    )}
                                     {data.codeforcesHandle && (
                                         <a href={`https://codeforces.com/profile/${data.codeforcesHandle}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center text-xs font-medium bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
                                             CF: @{data.codeforcesHandle} <ExternalLink className="h-3 w-3 ml-1.5" />

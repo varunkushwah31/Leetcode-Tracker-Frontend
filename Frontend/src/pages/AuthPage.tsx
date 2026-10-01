@@ -30,7 +30,18 @@ export function AuthPage() {
       if (isLogin) {
         await login({ email: formData.email, password: formData.password });
       } else if (role === 'student') {
-        await registerStudent(formData);
+        const lcTrim = formData.leetcodeUsername?.trim();
+        const cfTrim = formData.codeforcesHandle?.trim();
+        if (!lcTrim && !cfTrim) {
+          setError("Please provide at least one platform username (LeetCode or Codeforces).");
+          setIsLoading(false);
+          return;
+        }
+        await registerStudent({
+          ...formData,
+          leetcodeUsername: lcTrim || undefined,
+          codeforcesHandle: cfTrim || undefined,
+        });
       } else {
         await registerMentor({
           name: formData.name, email: formData.email, password: formData.password
@@ -194,13 +205,19 @@ export function AuthPage() {
               </div>
 
               {!isLogin && role === 'student' && (
-                  <>
-                    <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">LeetCode Username</Label>
+                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="p-3 rounded-xl bg-[#5b4fff]/10 border border-[#5b4fff]/20 text-xs text-zinc-300">
+                      💡 Enter your <strong className="text-white">LeetCode</strong> or <strong className="text-white">Codeforces</strong> username (or both). You can link the remaining platform anytime later!
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">LeetCode Username</Label>
+                        <span className="text-[11px] text-zinc-500 font-normal">optional if CF provided</span>
+                      </div>
                       <div className="relative">
                         <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                         <Input
-                            required
                             autoComplete="username"
                             placeholder="neetcode123"
                             value={formData.leetcodeUsername}
@@ -210,8 +227,11 @@ export function AuthPage() {
                       </div>
                     </div>
 
-                    <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Codeforces Handle <span className="text-zinc-500 font-normal lowercase">(optional)</span></Label>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Codeforces Handle</Label>
+                        <span className="text-[11px] text-zinc-500 font-normal">optional if LC provided</span>
+                      </div>
                       <div className="relative">
                         <TerminalIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                         <Input
@@ -223,7 +243,7 @@ export function AuthPage() {
                         />
                       </div>
                     </div>
-                  </>
+                  </div>
               )}
 
               <div className="space-y-1.5">

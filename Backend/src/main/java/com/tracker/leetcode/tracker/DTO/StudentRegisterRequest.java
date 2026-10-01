@@ -16,7 +16,6 @@ public record StudentRegisterRequest(
         @Size(min = 6, message = "Password must be at least 6 characters")
         String password,
 
-        @NotBlank(message = "LeetCode username is required")
         String leetcodeUsername,
 
         String codeforcesHandle
