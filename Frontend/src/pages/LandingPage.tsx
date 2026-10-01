@@ -74,7 +74,7 @@ export function LandingPage() {
 
                     <h1 className="text-[11vw] leading-[1.1] sm:text-7xl md:text-8xl font-extrabold tracking-tight mb-6 sm:mb-8 sm:leading-[1.05] animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 text-balance">
                         Track LeetCode <br className="hidden sm:block"/>
-                        <span className="text-transparent bg-clip-text bg-linear-to-br from-white via-white to-[#5b4fff]">Like Never Before.</span>
+                        <span className="text-transparent bg-clip-text bg-linear-to-br from-white via-white to-[#5b4fff]">Like Never Before</span>
                     </h1>
 
                     <p className="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
