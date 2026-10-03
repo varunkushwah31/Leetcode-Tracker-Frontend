@@ -30,7 +30,7 @@ export function LandingPage() {
         <div className="min-h-screen bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
 
             {/* Background Base with Theme Adaptation */}
-            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] bg-[radial-gradient(rgba(50,205,50,0.14)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.035)_1px,transparent_1px)] bg-size-[30px_30px] bg-fixed transition-colors duration-200 pointer-events-none">
+            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] bg-[radial-gradient(rgba(100,116,139,0.12)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed transition-colors duration-200 pointer-events-none">
                 <div className="hidden dark:block">
                     <AmbientGlow />
                 </div>
@@ -126,8 +126,8 @@ export function LandingPage() {
                         {activeTab === 'mentor' ? (
                             <div className="grid md:grid-cols-2 gap-10 items-center animate-in fade-in slide-in-from-right-4 duration-500">
                                 <div>
-                                    <div className="bg-[#1a1b2e] w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl mb-6 border border-[#5b4fff]/20">
-                                        <UsersIcon className="h-6 w-6 text-[#968fff]" weight="bold" />
+                                    <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl mb-6 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                        <UsersIcon className="h-6 w-6 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                     </div>
                                     <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-zinc-900 dark:text-white">Manage Entire Cohorts</h3>
                                     <ul className="space-y-4">
@@ -181,8 +181,8 @@ export function LandingPage() {
                                     </div>
                                 </div>
                                 <div className="order-1 md:order-2">
-                                    <div className="bg-[#1a1b2e] w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl mb-6 border border-[#5b4fff]/20">
-                                        <TargetIcon className="h-6 w-6 text-[#968fff]" weight="bold" />
+                                    <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl mb-6 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                        <TargetIcon className="h-6 w-6 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                     </div>
                                     <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-zinc-900 dark:text-white">Compete, Learn, Grow</h3>
                                     <ul className="space-y-4">
@@ -221,8 +221,8 @@ export function LandingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:auto-rows-[minmax(300px,auto)]">
                         <div className="md:col-span-2 bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c] transition-all duration-500">
                             <div className="absolute top-0 right-0 p-8 sm:p-10">
-                                <div className="bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                    <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#968fff]" weight="bold" />
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                    <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                 </div>
                             </div>
                             <div className="absolute top-[10%] right-[10%] w-50 h-50 bg-[#5b4fff]/15 blur-[90px] rounded-full pointer-events-none"></div>
@@ -240,8 +240,8 @@ export function LandingPage() {
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
 
                             {/* Top Icon */}
-                            <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20 relative z-10">
-                                <CheckCircleIcon className="h-7 w-7 text-[#968fff]" weight="bold" />
+                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
+                                <CheckCircleIcon className="h-7 w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                             </div>
 
                             {/* Sleek Abstract Verification Graphic */}
@@ -272,8 +272,8 @@ export function LandingPage() {
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
 
                             {/* Top Icon */}
-                            <div className="bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20 relative z-10">
-                                <LayoutDashboard className="h-7 w-7 text-[#968fff]" weight="bold" />
+                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
+                                <LayoutDashboard className="h-7 w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                             </div>
 
                             {/* Sleek Problem Set Graphic */}
@@ -315,8 +315,8 @@ export function LandingPage() {
                             </div>
 
                             <div className="relative z-10 w-full md:max-w-[75%] flex flex-col justify-end">
-                                <div className="bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 transition-transform duration-300 border border-[#5b4fff]/20">
-                                    <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#968fff]" weight="bold" />
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                    <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                 </div>
                                 <h3 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight text-zinc-900 dark:text-white">Deep Analytics</h3>
                                 <p className="text-zinc-600 dark:text-zinc-400 text-[15px] sm:text-base leading-relaxed relative z-10">
@@ -366,7 +366,7 @@ export function LandingPage() {
                 </div>
 
                 <div className="absolute bottom-5 sm:bottom-7.5 left-1/2 -translate-x-1/2 w-[200%] sm:w-[120%] text-center whitespace-nowrap pointer-events-none">
-                    <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-zinc-900 dark:text-white opacity-[0.03] dark:opacity-[0.02] select-none uppercase leading-none">
+                    <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-zinc-900 dark:text-white opacity-[0.015] dark:opacity-[0.02] select-none uppercase leading-none">
                         MENTORSYNC
                     </h1>
                 </div>

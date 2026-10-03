@@ -81,7 +81,7 @@ https://codeforces.com/profile/petr`;
         <div className="min-h-screen bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
 
             {/* Background Base matching Landing Page */}
-            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] bg-[radial-gradient(rgba(50,205,50,0.14)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.035)_1px,transparent_1px)] bg-size-[30px_30px] bg-fixed transition-colors duration-200 pointer-events-none">
+            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] bg-[radial-gradient(rgba(100,116,139,0.12)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed transition-colors duration-200 pointer-events-none">
                 <div className="hidden dark:block">
                     <AmbientGlow />
                 </div>
@@ -140,7 +140,7 @@ https://codeforces.com/profile/petr`;
 
                     <h1 className="text-[10vw] leading-[1.1] sm:text-7xl md:text-8xl font-extrabold tracking-tight mb-6 sm:mb-8 sm:leading-[1.05] animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 text-balance text-zinc-900 dark:text-white">
                         How to Use <br className="hidden sm:block" />
-                        <span className="text-transparent bg-clip-text bg-linear-to-br from-[#4338ca] via-[#5b4fff] to-[#7c3aed] dark:from-white dark:via-white dark:to-[#5b4fff]">
+                        <span className="text-[#5b4fff] dark:text-[#968fff]">
                             MentorSync
                         </span>
                     </h1>
@@ -183,7 +183,7 @@ https://codeforces.com/profile/petr`;
                     {(activeSection === 'all' || activeSection === 'faq') && (
                         <section className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-12 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 transition-all duration-300">
                             <div className="flex items-center gap-4 mb-8">
-                                <div className="bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-xl border border-[#5b4fff]/20 text-[#968fff]">
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl border border-indigo-100 dark:border-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
                                     <Shield className="w-6 h-6" weight="bold" />
                                 </div>
                                 <div>
@@ -244,7 +244,7 @@ https://codeforces.com/profile/petr`;
                     {(activeSection === 'all' || activeSection === 'mentor') && (
                         <section className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-12 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 transition-all duration-300 space-y-8">
                             <div className="flex items-center gap-4">
-                                <div className="bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-xl border border-[#5b4fff]/20 text-[#968fff]">
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl border border-indigo-100 dark:border-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
                                     <MentorIcon className="w-6 h-6" weight="bold" />
                                 </div>
                                 <div>
@@ -341,7 +341,7 @@ https://codeforces.com/profile/petr`;
                         <section className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-12 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 transition-all duration-300 space-y-8">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-xl border border-emerald-500/20 text-emerald-400">
+                                    <div className="bg-emerald-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                                         <FileSpreadsheet className="w-6 h-6" weight="bold" />
                                     </div>
                                     <div>
@@ -507,7 +507,7 @@ https://codeforces.com/profile/petr`;
                     {(activeSection === 'all' || activeSection === 'student') && (
                         <section className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-12 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 transition-all duration-300 space-y-8">
                             <div className="flex items-center gap-4">
-                                <div className="bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-xl border border-cyan-500/20 text-cyan-400">
+                                <div className="bg-cyan-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl border border-cyan-100 dark:border-cyan-500/20 text-cyan-600 dark:text-cyan-400">
                                     <StudentIcon className="w-6 h-6" weight="bold" />
                                 </div>
                                 <div>
@@ -564,7 +564,7 @@ https://codeforces.com/profile/petr`;
                     {(activeSection === 'all' || activeSection === 'reports') && (
                         <section className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-12 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 transition-all duration-300 space-y-8">
                             <div className="flex items-center gap-4">
-                                <div className="bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-xl border border-indigo-500/20 text-indigo-400">
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl border border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                                     <Download className="w-6 h-6" weight="bold" />
                                 </div>
                                 <div>
@@ -614,7 +614,7 @@ https://codeforces.com/profile/petr`;
                     {(activeSection === 'all' || activeSection === 'faq') && (
                         <section className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-12 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 transition-all duration-300 space-y-6">
                             <div className="flex items-center gap-4 mb-2">
-                                <div className="bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-xl border border-amber-500/20 text-amber-400">
+                                <div className="bg-amber-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl border border-amber-100 dark:border-amber-500/20 text-amber-600 dark:text-amber-400">
                                     <HelpCircle className="w-6 h-6" weight="bold" />
                                 </div>
                                 <div>
@@ -726,7 +726,7 @@ https://codeforces.com/profile/petr`;
                 </div>
 
                 <div className="absolute bottom-5 sm:bottom-7.5 left-1/2 -translate-x-1/2 w-[200%] sm:w-[120%] text-center whitespace-nowrap pointer-events-none">
-                    <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-zinc-900 dark:text-white opacity-[0.03] dark:opacity-[0.02] select-none uppercase leading-none">
+                    <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-zinc-900 dark:text-white opacity-[0.015] dark:opacity-[0.02] select-none uppercase leading-none">
                         MENTORSYNC
                     </h1>
                 </div>

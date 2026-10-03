@@ -67,8 +67,8 @@ export function ContactPage() {
 
                     <div className="grid gap-4">
                         <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors flex items-center gap-4 shadow-xs">
-                            <div className="bg-[#1a1b2e] w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
-                                <Mail className="h-5 w-5 text-[#968fff]" />
+                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
+                                <Mail className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
                             <div>
                                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-0.5 tracking-tight">Email Us</h3>
@@ -76,8 +76,8 @@ export function ContactPage() {
                             </div>
                         </div>
                         <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors flex items-center gap-4 shadow-xs">
-                            <div className="bg-[#1a1b2e] w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
-                                <PhoneIcon className="h-5 w-5 text-[#968fff]" />
+                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
+                                <PhoneIcon className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
                             <div>
                                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-0.5 tracking-tight">Call Us</h3>
@@ -85,8 +85,8 @@ export function ContactPage() {
                             </div>
                         </div>
                         <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors flex items-center gap-4 shadow-xs">
-                            <div className="bg-[#1a1b2e] w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
-                                <MapPinIcon className="h-5 w-5 text-[#968fff]" />
+                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
+                                <MapPinIcon className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
                             <div>
                                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-0.5 tracking-tight">Headquarters</h3>
@@ -99,7 +99,7 @@ export function ContactPage() {
 
             {/* Right Panel - Form */}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#f8fafc] dark:bg-[#0a0a0a] overflow-hidden transition-colors duration-200">
-                <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.14)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.035)_1px,transparent_1px)] bg-size-[30px_30px] pointer-events-none"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(rgba(100,116,139,0.12)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none"></div>
                 <div className="hidden dark:block">
                     <AmbientGlow variant="center" />
                 </div>

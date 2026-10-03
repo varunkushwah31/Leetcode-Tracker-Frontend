@@ -96,29 +96,29 @@ export function AuthPage() {
             </p>
             <div className="grid grid-cols-2 gap-3 xl:gap-4">
               <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors shadow-xs">
-                <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
-                  <Activity className="h-4 w-4 text-[#968fff]" />
+                <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+                  <Activity className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Live Tracking</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Real-time sync with LeetCode & Codeforces</p>
               </div>
               <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors shadow-xs">
-                <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
-                  <AlertCircle className="h-4 w-4 text-[#968fff]" />
+                <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+                  <AlertCircle className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Smart Assignments</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Automated validation & scoring</p>
               </div>
               <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors shadow-xs">
-                <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
-                  <UsersIcon className="h-4 w-4 text-[#968fff]" />
+                <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+                  <UsersIcon className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Leaderboards</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Gamified cohort rankings</p>
               </div>
               <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors shadow-xs">
-                <div className="bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center mb-3">
-                  <LayoutDashboard className="h-4 w-4 text-[#968fff]" />
+                <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+                  <LayoutDashboard className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Analytics</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Progress heatmaps & reports</p>
@@ -129,7 +129,7 @@ export function AuthPage() {
 
         {/* Right Panel - Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative bg-[#f8fafc] dark:bg-[#0a0a0a] min-h-screen overflow-y-auto transition-colors duration-200">
-          <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.14)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.035)_1px,transparent_1px)] bg-size-[30px_30px] pointer-events-none"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(rgba(100,116,139,0.12)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none"></div>
           <div className="hidden dark:block">
             <AmbientGlow variant="center" />
           </div>
