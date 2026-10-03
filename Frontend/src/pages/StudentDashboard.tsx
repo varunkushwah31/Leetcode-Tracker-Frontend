@@ -80,7 +80,7 @@ export function StudentDashboard() {
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#09090B]">
+            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
                 <div className="flex flex-col items-center space-y-4">
                     <Loader2 className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-500" />
                     <p className="font-medium text-zinc-500 dark:text-zinc-400">Loading your stats...</p>
@@ -106,7 +106,7 @@ export function StudentDashboard() {
     });
 
     return (
-        <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-[#09090B] transition-colors duration-200 relative">
+        <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed transition-colors duration-200 relative">
             <div className="hidden dark:block">
                 <AmbientGlow />
             </div>
