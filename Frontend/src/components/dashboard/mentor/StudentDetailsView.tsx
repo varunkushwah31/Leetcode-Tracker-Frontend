@@ -11,14 +11,14 @@ import { StudentService } from '@/services/endpoints';
 import type { StudentExtendedDTO } from '@/types';
 import { ActivityHeatmap } from '../student/ActivityHeatmap';
 import { ErrorBanner } from "@/components/ui/ErrorBanner.tsx";
-import { AmbientGlow } from '@/components/ui/AmbientGlow';
 
 interface StudentDetailsViewProps {
     username: string;
+    classroomName?: string;
     onBack: () => void;
 }
 
-export function StudentDetailsView({ username, onBack }: Readonly<StudentDetailsViewProps>) {
+export function StudentDetailsView({ username, classroomName, onBack }: Readonly<StudentDetailsViewProps>) {
     const [data, setData] = useState<StudentExtendedDTO | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null); // <-- 2. Add Error State
@@ -63,7 +63,7 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
 
     if (loading) {
         return (
-            <div className="fixed inset-0 z-50 bg-[#0a0a0a] flex items-center justify-center">
+            <div className="w-full max-w-7xl mx-auto p-6 lg:p-10 min-h-[60vh] flex items-center justify-center">
                 <div className="flex flex-col items-center">
                     <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff] mb-4" />
                     <p className="text-zinc-400 font-medium tracking-wide">Fetching profile data...</p>
@@ -75,7 +75,7 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
     // --- 3. Handle the Error State gracefully ---
     if (error) {
         return (
-            <div className="fixed inset-0 z-50 bg-[#0a0a0a] flex items-center justify-center p-6 animate-in fade-in duration-300">
+            <div className="w-full max-w-7xl mx-auto p-6 lg:p-10 min-h-[60vh] flex items-center justify-center">
                 <div className="max-w-md w-full bg-[#111111] border border-zinc-800 rounded-2xl p-6 shadow-2xl">
                     <h2 className="text-xl font-bold text-white mb-4 text-center">Profile Sync Failed</h2>
                     <ErrorBanner message={error} />
@@ -95,28 +95,31 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
     const cardClasses = "border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
 
     return (
-        <div className="fixed inset-0 z-50 bg-[#0a0a0a] flex flex-col overflow-y-auto animate-in fade-in duration-300">
-            {/* Unique dot grid texture background */}
-            <div className="absolute inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-40 pointer-events-none"></div>
-            {/* Subtle ambient glow behind content */}
-            <AmbientGlow />
-
-            <header className="sticky top-0 z-50 bg-[#111111]/90 backdrop-blur-xl border-b border-zinc-800/60 px-4 md:px-8 py-3.5 shadow-lg">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <Button
-                        variant="outline"
-                        onClick={onBack}
-                        className="bg-[#1a1b2e] border-zinc-700 text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all rounded-xl shadow-sm hover:-translate-x-0.5"
-                    >
-                        <ArrowLeftIcon className="h-4 w-4 mr-2" /> Back to Classroom
-                    </Button>
-                    <span className="hidden sm:inline text-sm text-zinc-500 font-medium">
-                        Press <kbd className="bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-300 font-mono text-xs mx-1">Esc</kbd> to close
+        <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 space-y-6 relative z-10 animate-in fade-in duration-200">
+            {/* Top Navigation Bar with Back button */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
+                <Button
+                    variant="outline"
+                    onClick={onBack}
+                    className="bg-[#1a1b2e] border-zinc-700 text-white hover:bg-zinc-800 hover:border-zinc-600 hover:text-white transition-all rounded-xl shadow-md flex items-center gap-2 px-4 py-2 text-sm font-medium hover:-translate-x-0.5 cursor-pointer"
+                >
+                    <ArrowLeftIcon className="w-4 h-4 text-[#968fff]" weight="bold" />
+                    <span>Back to {classroomName || 'Classroom'}</span>
+                </Button>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-zinc-500 font-medium hidden sm:inline-flex items-center gap-1.5">
+                        Viewing Student Profile • Press <kbd className="bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-300 font-mono text-xs border border-zinc-700">Esc</kbd> to return
                     </span>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={onBack}
+                        className="text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-lg text-xs"
+                    >
+                        Close
+                    </Button>
                 </div>
-            </header>
-
-            <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 space-y-6 relative z-10">
+            </div>
 
                 {/* Top Banner */}
                 <Card className={`p-8 ${cardClasses}`}>
@@ -334,7 +337,6 @@ export function StudentDetailsView({ username, onBack }: Readonly<StudentDetails
                         )}
                     </div>
                 </div>
-            </main>
         </div>
     );
 }
