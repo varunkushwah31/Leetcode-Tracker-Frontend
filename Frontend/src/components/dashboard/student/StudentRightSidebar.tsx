@@ -24,10 +24,10 @@ export function StudentRightSidebar({ data, totalSolved }: Readonly<{
         <div className="space-y-8 min-w-0">
             {/* Difficulty Breakdown */}
             <Card className="relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
-                <CardHeader>
-                    <CardTitle className="text-lg text-zinc-900 dark:text-white tracking-tight">Difficulty Breakdown</CardTitle>
+                <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
+                    <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Difficulty Breakdown</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 pt-6">
                     <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
                             <span className="font-bold text-zinc-700 dark:text-zinc-300">Easy</span>
@@ -58,38 +58,52 @@ export function StudentRightSidebar({ data, totalSolved }: Readonly<{
                 </CardContent>
             </Card>
 
-            {/* Recent Submissions */}
-            <Card className="relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white tracking-tight">
-                        <ClockIcon className="w-5 h-5 text-[#5b4fff]"/> Recent Submissions
+            {/* Recent Activity */}
+            <Card className="flex flex-col relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+                <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
+                    <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center">
+                        <ClockIcon className="w-5 h-5 mr-2 text-[#5b4fff]"/> Recent Activity
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="p-4 pt-0">
-                    <ScrollArea className="h-70 pr-4">
-                        <div className="flex flex-col gap-2.5">
-                            {data?.recentSubmissions?.slice(0, 10).map((sub) => (
-                                <a key={`${sub.titleSlug || sub.title}-${sub.timestamp}`} href={sub.questionLink} target="_blank" rel="noreferrer" className="flex items-center justify-between p-3 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 hover:bg-zinc-100/90 dark:hover:bg-[#1a1a1a] border border-zinc-200/80 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-xl transition-all group">
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <div className="bg-indigo-50 dark:bg-[#1a1b2e] p-1.5 rounded-lg group-hover:bg-[#5b4fff] transition-colors">
-                                            <CheckCircle2 className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff] group-hover:text-white"/>
-                                        </div>
-                                        <div className="min-w-0 flex items-center gap-2">
-                                            <p className="text-[13.5px] font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white tracking-tight truncate">{sub.title}</p>
+                <CardContent className="flex-1 p-0 px-6 pb-6 pt-6">
+                    <ScrollArea className="h-64 pr-4 custom-scrollbar">
+                        <div className="space-y-4">
+                            {data?.recentSubmissions?.slice(0, 15).map((sub) => (
+                                <div key={`${sub.platform || 'LC'}-${sub.titleSlug || sub.title}-${sub.timestamp}`} className="flex items-start space-x-3 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/60 last:border-0 last:pb-0">
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mt-0.5 shrink-0" />
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            {sub.questionLink ? (
+                                                <a
+                                                    href={sub.questionLink}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-[14px] font-medium leading-tight text-zinc-900 dark:text-white truncate hover:text-[#5b4fff] dark:hover:text-[#b4afff] transition-colors"
+                                                >
+                                                    {sub.title}
+                                                </a>
+                                            ) : (
+                                                <p className="text-[14px] font-medium leading-tight text-zinc-900 dark:text-white truncate">{sub.title}</p>
+                                            )}
                                             {sub.platform && (
                                                 <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded shrink-0 ${
                                                     sub.platform === 'CODEFORCES'
-                                                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
-                                                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                        ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
+                                                        : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20'
                                                 }`}>
                                                     {sub.platform === 'CODEFORCES' ? 'CF' : 'LC'}
                                                 </span>
                                             )}
                                         </div>
+                                        <p className="text-xs text-zinc-500">{formatDate(sub.timestamp)}</p>
                                     </div>
-                                    <span className="text-[11px] font-bold text-zinc-500 shrink-0 uppercase tracking-wider">{formatDate(sub.timestamp)}</span>
-                                </a>
+                                </div>
                             ))}
+                            {(!data?.recentSubmissions || data.recentSubmissions.length === 0) && (
+                                <p className="text-center text-sm font-medium text-zinc-500 dark:text-zinc-400 py-6">
+                                    No recent activity yet.
+                                </p>
+                            )}
                         </div>
                     </ScrollArea>
                 </CardContent>
