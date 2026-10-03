@@ -117,4 +117,17 @@ class StudentServiceTest {
         assertTrue(ex.getMessage().contains("At least one platform username"));
         verify(studentRepository, never()).save(mockStudent);
     }
+
+    @Test
+    void generateStudentReportCsv_ShouldReturnFormattedCsv() {
+        when(studentRepository.findById("123")).thenReturn(Optional.of(mockStudent));
+        when(classroomRepository.findByStudentIdsContaining("123")).thenReturn(java.util.Collections.emptyList());
+
+        String report = studentService.generateStudentReportCsv("123");
+
+        assertNotNull(report);
+        assertTrue(report.contains("MENTORSYNC - STUDENT PERFORMANCE REPORT"));
+        assertTrue(report.contains("Test Student"));
+        assertTrue(report.contains("test_user"));
+    }
 }

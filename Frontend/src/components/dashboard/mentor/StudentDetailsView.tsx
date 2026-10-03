@@ -5,7 +5,7 @@ import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import {
-    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, PulseIcon as Activity
+    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, PulseIcon as Activity, DownloadSimpleIcon as Download
 } from '@phosphor-icons/react';
 import { StudentService } from '@/services/endpoints';
 import type { StudentExtendedDTO } from '@/types';
@@ -24,6 +24,27 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
     const [data, setData] = useState<StudentExtendedDTO | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null); // <-- 2. Add Error State
+    const [isExporting, setIsExporting] = useState(false);
+
+    const handleExportReport = async () => {
+        setIsExporting(true);
+        try {
+            const res = await StudentService.exportStudentReport(username);
+            const blob = new Blob([res.data], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${username}_Performance_Report.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err: unknown) {
+            console.error('Failed to export student report:', err);
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
@@ -108,9 +129,19 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
                     <ArrowLeftIcon className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                     <span>Back to {classroomName || 'Classroom'}</span>
                 </Button>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleExportReport}
+                        disabled={isExporting}
+                        className="bg-white dark:bg-[#1a1b2e] border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl text-xs font-semibold h-9 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5"
+                    >
+                        {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Download className="w-3.5 h-3.5 text-[#5b4fff] dark:text-[#968fff] mr-1" />}
+                        Export Report (CSV)
+                    </Button>
                     <span className="text-xs text-zinc-500 font-medium hidden sm:inline-flex items-center gap-1.5">
-                        Viewing Student Profile • Press <kbd className="bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-300 font-mono text-xs border border-zinc-200 dark:border-zinc-700">Esc</kbd> to return
+                        Press <kbd className="bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-300 font-mono text-xs border border-zinc-200 dark:border-zinc-700">Esc</kbd> to return
                     </span>
                     <Button
                         variant="ghost"

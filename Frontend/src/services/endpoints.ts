@@ -5,7 +5,8 @@ import type {
     LoginRequest, 
     StudentRegisterRequest, 
     MentorRegisterRequest, 
-    LearningPath
+    LearningPath,
+    BulkImportResponseDTO
 } from '@/types';
 
 export const AuthService = {
@@ -43,6 +44,14 @@ export const StudentService = {
 
     updateHandles: (leetcodeUsername?: string, codeforcesHandle?: string) =>
         api.put('/students/me/handles', { leetcodeUsername, codeforcesHandle }),
+
+    // Individual Student Report CSV download
+    exportStudentReport: (username: string) =>
+        api.get(`/students/${username}/report`, { responseType: 'blob' }),
+
+    // Logged-in Student's own Report CSV download
+    exportMyReport: () =>
+        api.get('/students/me/report', { responseType: 'blob' }),
 };
 
 export const MentorService = {
@@ -95,13 +104,19 @@ export const ClassroomService = {
     bulkAddStudents: (classroomId: string, file: File) => {
         const formData = new FormData();
         formData.append('file', file);
-        return api.post(`/classrooms/${classroomId}/students/bulk`, formData);
+        return api.post<BulkImportResponseDTO>(`/classrooms/${classroomId}/students/bulk`, formData);
     },
 
     deleteClassroom: (classroomId: string, mentorId: string) => api.delete(`/classrooms/${classroomId}`, { params: { mentorId } }),
     
-    // Download CSV 
-    exportClassroom: (classroomId: string) => api.get(`/classrooms/${classroomId}/export`, { responseType: 'blob' })
+    // Download Leaderboard CSV 
+    exportClassroom: (classroomId: string) => api.get(`/classrooms/${classroomId}/export`, { responseType: 'blob' }),
+
+    // Download Assignment Matrix CSV
+    exportAssignmentMatrix: (classroomId: string) => api.get(`/classrooms/${classroomId}/export/assignments`, { responseType: 'blob' }),
+
+    // Download Sample CSV Template
+    downloadTemplateCsv: () => api.get('/classrooms/template/csv', { responseType: 'blob' })
 };
 
 

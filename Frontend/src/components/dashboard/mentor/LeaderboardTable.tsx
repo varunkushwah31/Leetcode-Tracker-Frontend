@@ -3,9 +3,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
-import { FlameIcon, DownloadSimpleIcon as Download, MagnifyingGlassIcon as Search, BellIcon } from '@phosphor-icons/react';
+import { FlameIcon, DownloadSimpleIcon as Download, MagnifyingGlassIcon as Search, BellIcon, SpinnerIcon as Loader2, TableIcon as Table } from '@phosphor-icons/react';
 import type { StudentSummaryDTO } from '@/types';
-import { ClassroomService } from '@/services/endpoints';
+import { ClassroomService, StudentService } from '@/services/endpoints';
 import { useState } from 'react';
 
 interface LeaderboardTableProps {
@@ -44,6 +44,51 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
     const [searchQuery, setSearchQuery] = useState("");
     const [nudgingStudentId, setNudgingStudentId] = useState<string | null>(null);
     const [nudgedStudents, setNudgedStudents] = useState<Record<string, boolean>>({});
+    const [isExportingMatrix, setIsExportingMatrix] = useState(false);
+    const [exportingReportStudent, setExportingReportStudent] = useState<string | null>(null);
+
+    const handleExportAssignmentMatrix = async () => {
+        if (!classroomId) return;
+        setIsExportingMatrix(true);
+        try {
+            const response = await ClassroomService.exportAssignmentMatrix(classroomId);
+            const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `assignments_matrix_${classroomId}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err: unknown) {
+            console.error('Failed to export assignment matrix:', err);
+        } finally {
+            setIsExportingMatrix(false);
+        }
+    };
+
+    const handleExportStudentReport = async (e: React.MouseEvent, username: string) => {
+        e.stopPropagation();
+        if (!username) return;
+        setExportingReportStudent(username);
+        try {
+            const response = await StudentService.exportStudentReport(username);
+            const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${username}_Performance_Report.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err: unknown) {
+            console.error('Failed to export student report:', err);
+        } finally {
+            setExportingReportStudent(null);
+        }
+    };
 
     const handleNudge = async (e: React.MouseEvent, studentId: string) => {
         e.stopPropagation();
@@ -84,9 +129,24 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 className="bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent rounded-xl py-2.5 pl-10 pr-4 text-[14px] focus:outline-none focus:ring-1 focus:ring-[#5b4fff] text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 w-full sm:w-64 transition-all"
                             />
                         </div>
-                        <Button variant="outline" onClick={onExportCSV} className="text-zinc-700 dark:text-white bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl h-10 px-4 transition-colors">
-                            <Download className="w-4 h-4 mr-2 text-zinc-500 dark:text-zinc-400" /> Export CSV
+                        <Button variant="outline" onClick={onExportCSV} className="text-zinc-700 dark:text-white bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl h-10 px-3.5 transition-colors cursor-pointer text-xs font-semibold">
+                            <Download className="w-4 h-4 mr-1.5 text-zinc-500 dark:text-zinc-400" /> Export Leaderboard
                         </Button>
+                        {classroomId && (
+                            <Button
+                                variant="outline"
+                                onClick={handleExportAssignmentMatrix}
+                                disabled={isExportingMatrix}
+                                className="text-zinc-700 dark:text-white bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl h-10 px-3.5 transition-colors cursor-pointer text-xs font-semibold"
+                            >
+                                {isExportingMatrix ? (
+                                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-[#5b4fff]" />
+                                ) : (
+                                    <Table className="w-4 h-4 mr-1.5 text-[#5b4fff] dark:text-[#968fff]" />
+                                )}
+                                Export Matrix
+                            </Button>
+                        )}
                         <div className="flex items-center gap-2">
                             <Select value={sortBy} onValueChange={onSortChange}>
                                 <SelectTrigger className="w-44 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white h-10 rounded-xl focus:ring-1 focus:ring-[#5b4fff]">
@@ -170,28 +230,44 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 </td>
                                 <td className="py-4 px-6">
                                     <div className="flex flex-col items-end gap-1.5">
-                                        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.completedAssignments || 0} Done</Badge>
-                                        {(student.pendingAssignments ?? 0) > 0 && (
-                                            <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1.5">
+                                            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.completedAssignments || 0} Done</Badge>
+                                            {Boolean(student.pendingAssignments && student.pendingAssignments > 0) && (
                                                 <Badge variant="outline" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.pendingAssignments} Pending</Badge>
-                                                {classroomId && student.id && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => handleNudge(e, student.id!)}
-                                                        disabled={nudgingStudentId === student.id || Boolean(nudgedStudents[student.id])}
-                                                        title="Send reminder email to student"
-                                                        className={`group/nudge inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border transition-all ${
-                                                            nudgedStudents[student.id]
-                                                                ? 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 cursor-default'
-                                                                : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 dark:bg-zinc-800'
-                                                        }`}
-                                                    >
-                                                        <BellIcon className="w-2.5 h-2.5 group-hover/nudge:animate-bell-ring" />
-                                                        {getNudgeButtonLabel(nudgingStudentId === student.id, Boolean(nudgedStudents[student.id]))}
-                                                    </button>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                onClick={(e) => handleExportStudentReport(e, student.leetcodeUsername || student.codeforcesHandle || student.id || '')}
+                                                disabled={exportingReportStudent === (student.leetcodeUsername || student.codeforcesHandle || student.id)}
+                                                title="Download student performance report (CSV)"
+                                                className="group/report inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-50 dark:bg-zinc-800/80 transition-all cursor-pointer"
+                                            >
+                                                {exportingReportStudent === (student.leetcodeUsername || student.codeforcesHandle || student.id) ? (
+                                                    <Loader2 className="w-2.5 h-2.5 animate-spin text-[#5b4fff]" />
+                                                ) : (
+                                                    <Download className="w-2.5 h-2.5 text-zinc-500 group-hover/report:text-[#5b4fff]" />
                                                 )}
-                                            </div>
-                                        )}
+                                                <span>Report CSV</span>
+                                            </button>
+                                            {(student.pendingAssignments ?? 0) > 0 && classroomId && student.id && (
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => handleNudge(e, student.id!)}
+                                                    disabled={nudgingStudentId === student.id || Boolean(nudgedStudents[student.id])}
+                                                    title="Send reminder email to student"
+                                                    className={`group/nudge inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border transition-all ${
+                                                        nudgedStudents[student.id]
+                                                            ? 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 cursor-default'
+                                                            : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 dark:bg-zinc-800 cursor-pointer'
+                                                    }`}
+                                                >
+                                                    <BellIcon className="w-2.5 h-2.5 group-hover/nudge:animate-bell-ring" />
+                                                    {getNudgeButtonLabel(nudgingStudentId === student.id, Boolean(nudgedStudents[student.id]))}
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

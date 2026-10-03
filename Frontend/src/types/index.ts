@@ -190,3 +190,13 @@ export interface ClassroomDashboardDTO {
     enrolledStudents: StudentSummaryDTO[];
     assignments?: AssignmentDTO[];
 }
+
+export interface BulkImportResponseDTO {
+    totalProcessed: number;
+    addedCount: number;
+    alreadyEnrolledCount: number;
+    failedCount: number;
+    addedStudents: string[];
+    alreadyEnrolledStudents: string[];
+    failures: string[];
+}

@@ -4,9 +4,9 @@ import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { UserPlusIcon, ClipboardTextIcon as ClipboardList, MapTrifoldIcon as Map, PlusIcon, TrashIcon as Trash2, CloudArrowUpIcon as UploadCloud, SpinnerIcon as Loader2, WarningIcon as AlertTriangle, ClockIcon } from '@phosphor-icons/react';
+import { UserPlusIcon, ClipboardTextIcon as ClipboardList, MapTrifoldIcon as Map, PlusIcon, TrashIcon as Trash2, CloudArrowUpIcon as UploadCloud, SpinnerIcon as Loader2, WarningIcon as AlertTriangle, ClockIcon, DownloadSimpleIcon as Download, CheckCircleIcon as CheckCircle, InfoIcon as Info } from '@phosphor-icons/react';
 import { ClassroomService, PathService } from '@/services/endpoints.ts';
-import type { ClassroomDashboardDTO, LearningPath, PathQuestion } from '@/types';
+import type { ClassroomDashboardDTO, LearningPath, PathQuestion, BulkImportResponseDTO } from '@/types';
 import {ErrorBanner} from "@/components/ui/ErrorBanner.tsx";// <-- 1. Import the Banner
 
 interface MentorActionsProps {
@@ -28,7 +28,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const [newStudentUsername, setNewStudentUsername] = useState('');
     const [uploadFile, setUploadFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadFailures, setUploadFailures] = useState<string[]>([]);
+    const [bulkResult, setBulkResult] = useState<BulkImportResponseDTO | null>(null);
+    const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
 
     const getDefaultDeadline = (daysAhead: number = 3) => {
         const d = new Date(Date.now() + daysAhead * 86400 * 1000);
@@ -88,20 +89,42 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
     const handleBulkUpload = async () => {
         setBulkUploadError(null);
+        setBulkResult(null);
         if (!uploadFile) return;
 
         setIsUploading(true);
-        setUploadFailures([]);
 
         try {
             const response = await ClassroomService.bulkAddStudents(selectedClassroom.classroomId, uploadFile);
-            if (response.data?.length > 0) setUploadFailures(response.data);
-            else { setAddStudentOpen(false); setUploadFile(null); }
+            setBulkResult(response.data);
+            if (response.data.failedCount === 0 && response.data.addedCount > 0) {
+                setUploadFile(null);
+            }
             onRefresh();
         } catch (err: unknown) {
             setBulkUploadError(getErrMsg(err, 'Failed to upload students.'));
         } finally {
             setIsUploading(false);
+        }
+    };
+
+    const handleDownloadTemplate = async () => {
+        try {
+            setIsDownloadingTemplate(true);
+            const response = await ClassroomService.downloadTemplateCsv();
+            const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'student_import_template.csv');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err: unknown) {
+            setBulkUploadError(getErrMsg(err, 'Failed to download sample CSV template.'));
+        } finally {
+            setIsDownloadingTemplate(false);
         }
     };
 
@@ -227,7 +250,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     return (
         <div className="flex flex-wrap gap-3">
             {/* 1. ADD STUDENT DIALOG */}
-            <Dialog open={addStudentOpen} onOpenChange={(open) => { setAddStudentOpen(open); if(!open) { setAddStudentError(null); setBulkUploadError(null); } }}>
+            <Dialog open={addStudentOpen} onOpenChange={(open) => { setAddStudentOpen(open); if(!open) { setAddStudentError(null); setBulkUploadError(null); setBulkResult(null); setUploadFile(null); } }}>
                 <DialogTrigger asChild>
                     <Button variant="outline" className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">
                         <UserPlusIcon className="w-4 h-4 mr-2" />Add Student
@@ -287,10 +310,20 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                     <span className="w-5 h-5 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-black flex items-center justify-center">2</span>
                                     Bulk Import (CSV)
                                 </Label>
-                                <span className="text-[11px] font-medium text-zinc-500">.csv format</span>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleDownloadTemplate}
+                                    disabled={isDownloadingTemplate}
+                                    className="h-7 px-2.5 text-[11px] font-semibold text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer flex items-center gap-1"
+                                >
+                                    {isDownloadingTemplate ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Download className="w-3.5 h-3.5 mr-1" />}
+                                    Download Template (.csv)
+                                </Button>
                             </div>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                Upload a CSV file containing LeetCode usernames or Codeforces handles in a single column.
+                                Upload a CSV file containing students. Supports columns: <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">Name, Email, LeetCode Username, Codeforces Handle</code> or a single column of handles.
                             </p>
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />
@@ -307,7 +340,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                         <p className="text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300">
                                             <span className="text-[#5b4fff] dark:text-[#968fff] font-bold">Choose CSV file</span> or drag & drop
                                         </p>
-                                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Student handles list (.csv)</p>
+                                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Comma, semicolon, or tab-delimited (.csv)</p>
                                     </div>
                                 )}
                                 <input
@@ -317,6 +350,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                     onChange={(e) => {
                                         setUploadFile(e.target.files ? e.target.files[0] : null);
                                         if (bulkUploadError) setBulkUploadError(null);
+                                        setBulkResult(null);
                                     }}
                                 />
                             </label>
@@ -325,17 +359,51 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 <Button
                                     onClick={handleBulkUpload}
                                     disabled={isUploading}
-                                    className="w-full bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl h-10 font-semibold shadow-sm"
+                                    className="w-full bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl h-10 font-semibold shadow-sm cursor-pointer"
                                 >
                                     {isUploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UploadCloud className="w-4 h-4 mr-2" />}
                                     Import {uploadFile.name}
                                 </Button>
                             )}
 
-                            {uploadFailures.length > 0 && (
-                                <div className="mt-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-600 dark:text-rose-400">
-                                    <span className="font-bold">Failed to add ({uploadFailures.length}):</span>
-                                    <ul className="list-disc pl-5 mt-1 max-h-24 overflow-y-auto custom-scrollbar">{uploadFailures.map((f) => <li key={`fail-${f}`}>{f}</li>)}</ul>
+                            {bulkResult && (
+                                <div className="space-y-2 pt-1 animate-in fade-in duration-200">
+                                    {bulkResult.addedCount > 0 && (
+                                        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-600 dark:text-emerald-400 flex items-start gap-2">
+                                            <CheckCircle className="w-4 h-4 shrink-0 mt-0.5 text-emerald-500" />
+                                            <div>
+                                                <p className="font-bold">Added {bulkResult.addedCount} student{bulkResult.addedCount > 1 ? 's' : ''} successfully!</p>
+                                                {bulkResult.addedStudents?.length > 0 && (
+                                                    <p className="text-[11px] opacity-90 mt-0.5 font-mono">
+                                                        {bulkResult.addedStudents.slice(0, 10).join(', ')}{bulkResult.addedStudents.length > 10 ? ` and ${bulkResult.addedStudents.length - 10} more` : ''}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {bulkResult.alreadyEnrolledCount > 0 && (
+                                        <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-xl text-xs text-blue-600 dark:text-blue-400 flex items-start gap-2">
+                                            <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-500" />
+                                            <div>
+                                                <p className="font-semibold">{bulkResult.alreadyEnrolledCount} student{bulkResult.alreadyEnrolledCount > 1 ? 's were' : ' was'} already enrolled in this classroom.</p>
+                                                {bulkResult.alreadyEnrolledStudents?.length > 0 && (
+                                                    <p className="text-[11px] opacity-80 mt-0.5 font-mono">
+                                                        {bulkResult.alreadyEnrolledStudents.slice(0, 8).join(', ')}{bulkResult.alreadyEnrolledStudents.length > 8 ? ` and ${bulkResult.alreadyEnrolledStudents.length - 8} more` : ''}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {bulkResult.failedCount > 0 && (
+                                        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-600 dark:text-rose-400">
+                                            <span className="font-bold">Failed rows ({bulkResult.failedCount}):</span>
+                                            <ul className="list-disc pl-5 mt-1 max-h-24 overflow-y-auto custom-scrollbar space-y-0.5">
+                                                {bulkResult.failures.map((f, i) => <li key={`fail-${i}-${f}`}>{f}</li>)}
+                                            </ul>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

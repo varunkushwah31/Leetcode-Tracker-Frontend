@@ -453,4 +453,155 @@ public class StudentService {
         }
         return CompletableFuture.completedFuture(null);
     }
+
+    /**
+     * Generates a comprehensive CSV report of a student's profile, difficulty breakdown,
+     * topic mastery, assignments, submissions, and contest history.
+     */
+    public String generateStudentReportCsv(String identifier) {
+        Student student = getStudentOrThrow(identifier);
+
+        StringBuilder csv = new StringBuilder();
+        csv.append("================================================================================\n");
+        csv.append("MENTORSYNC - STUDENT PERFORMANCE REPORT\n");
+        csv.append("================================================================================\n");
+        csv.append("Student Name,").append(escapeCsv(student.getName())).append("\n");
+        csv.append("Email,").append(escapeCsv(student.getEmail())).append("\n");
+        csv.append("LeetCode Username,").append(escapeCsv(student.getLeetcodeUsername())).append("\n");
+        csv.append("Codeforces Handle,").append(escapeCsv(student.getCodeforcesHandle())).append("\n");
+        csv.append("Report Generated At,").append(java.time.LocalDateTime.now()).append("\n");
+
+        List<Classroom> classrooms = classroomRepository.findByStudentIdsContaining(student.getId());
+        String classroomNames = classrooms != null ? classrooms.stream().map(Classroom::getClassName).collect(Collectors.joining("; ")) : "";
+        csv.append("Enrolled Classrooms,").append(escapeCsv(classroomNames)).append("\n\n");
+
+        // Section 1: Summary Statistics
+        csv.append("--- SUMMARY STATISTICS ---\n");
+        int easyCount = 0, medCount = 0, hardCount = 0;
+        if (student.getProblemStats() != null) {
+            for (var stat : student.getProblemStats()) {
+                if ("Easy".equalsIgnoreCase(stat.getDifficulty())) easyCount = stat.getCount();
+                else if ("Medium".equalsIgnoreCase(stat.getDifficulty())) medCount = stat.getCount();
+                else if ("Hard".equalsIgnoreCase(stat.getDifficulty())) hardCount = stat.getCount();
+            }
+        }
+        int lcSolved = easyCount + medCount + hardCount;
+        int cfSolved = student.getCodeforcesSolvedCount() != null ? student.getCodeforcesSolvedCount() : 0;
+        int totalSolved = lcSolved + cfSolved;
+
+        csv.append("Metric,Value\n");
+        csv.append("Total Problems Solved,").append(totalSolved).append("\n");
+        csv.append("LeetCode Problems Solved,").append(lcSolved).append("\n");
+        csv.append("  - LeetCode Easy,").append(easyCount).append("\n");
+        csv.append("  - LeetCode Medium,").append(medCount).append("\n");
+        csv.append("  - LeetCode Hard,").append(hardCount).append("\n");
+        csv.append("Codeforces Problems Solved,").append(cfSolved).append("\n");
+        csv.append("LeetCode Contest Rating,").append(Math.round(student.getCurrentContestRating())).append("\n");
+        csv.append("LeetCode Global Rank,").append(escapeCsv(student.getRank())).append("\n");
+        csv.append("Codeforces Rating,").append(student.getCodeforcesRating() != null ? student.getCodeforcesRating() : 0).append("\n");
+        csv.append("Codeforces Max Rating,").append(student.getCodeforcesMaxRating() != null ? student.getCodeforcesMaxRating() : 0).append("\n");
+        csv.append("Codeforces Rank,").append(escapeCsv(student.getCodeforcesRank())).append("\n");
+        int streak = student.getProgressHistory() != null ? studentMapper.calculateStreak(student.getProgressHistory()) : 0;
+        csv.append("Daily Streak,").append(streak).append("\n\n");
+
+        // Section 2: Topic & Skill Mastery
+        csv.append("--- TOPIC & SKILL PROFICIENCY ---\n");
+        csv.append("Topic Name,Problems Solved\n");
+        if (student.getSkills() != null && !student.getSkills().isEmpty()) {
+            for (var skill : student.getSkills()) {
+                csv.append(escapeCsv(skill.getTagName())).append(",")
+                        .append(skill.getProblemsSolved()).append("\n");
+            }
+        } else {
+            csv.append("No topic data recorded,0\n");
+        }
+        csv.append("\n");
+
+        // Section 3: Classroom Assignments
+        csv.append("--- CLASSROOM ASSIGNMENTS ---\n");
+        csv.append("Classroom,Assignment Title,Platform,Problem Slug,Deadline,Status\n");
+        boolean hasAssignments = false;
+        if (classrooms != null && !classrooms.isEmpty()) {
+            for (Classroom c : classrooms) {
+                if (c.getAssignments() != null) {
+                    for (Assignment a : c.getAssignments()) {
+                        hasAssignments = true;
+                        boolean isDone = student.getManuallyCompletedAssignments() != null
+                                && student.getManuallyCompletedAssignments().contains(a.getId());
+                        if (!isDone && student.getRecentSubmissions() != null) {
+                            String normTarget = a.getTitleSlug() != null ? a.getTitleSlug().replace("-", "").toLowerCase() : "";
+                            isDone = student.getRecentSubmissions().stream().anyMatch(sub -> {
+                                String normSub = sub.getTitleSlug() != null ? sub.getTitleSlug().replace("-", "").toLowerCase() : "";
+                                return normSub.equals(normTarget);
+                            });
+                        }
+                        String deadlineStr = a.getEndTimestamp() > 0 ? java.time.Instant.ofEpochSecond(a.getEndTimestamp()).toString() : "No deadline";
+                        csv.append(escapeCsv(c.getClassName())).append(",")
+                                .append(escapeCsv(a.getTitle() != null ? a.getTitle() : a.getTitleSlug())).append(",")
+                                .append(a.getPlatform() != null ? a.getPlatform().name() : "LEETCODE").append(",")
+                                .append(escapeCsv(a.getTitleSlug())).append(",")
+                                .append(deadlineStr).append(",")
+                                .append(isDone ? "COMPLETED" : "PENDING").append("\n");
+                    }
+                }
+            }
+        }
+        if (!hasAssignments) {
+            csv.append("None,N/A,N/A,N/A,N/A,N/A\n");
+        }
+        csv.append("\n");
+
+        // Section 4: Recent Submissions
+        csv.append("--- RECENT SUBMISSIONS ---\n");
+        csv.append("Platform,Problem Title,Problem Slug,Submission Timestamp\n");
+        if (student.getRecentSubmissions() != null && !student.getRecentSubmissions().isEmpty()) {
+            for (var sub : student.getRecentSubmissions()) {
+                String timeStr = sub.getTimestamp() > 0 ? java.time.Instant.ofEpochSecond(sub.getTimestamp()).toString() : "N/A";
+                csv.append(sub.getPlatform() != null ? sub.getPlatform().name() : "LEETCODE").append(",")
+                        .append(escapeCsv(sub.getTitle())).append(",")
+                        .append(escapeCsv(sub.getTitleSlug())).append(",")
+                        .append(timeStr).append("\n");
+            }
+        } else {
+            csv.append("No recent submissions recorded,,,N/A\n");
+        }
+        csv.append("\n");
+
+        // Section 5: Contest Rating Progression
+        csv.append("--- CONTEST HISTORY ---\n");
+        csv.append("Platform,Contest Name,Rating,Global Rank,Date\n");
+        boolean hasContests = false;
+        if (student.getContestHistory() != null && !student.getContestHistory().isEmpty()) {
+            hasContests = true;
+            for (var ch : student.getContestHistory()) {
+                csv.append("LEETCODE,")
+                        .append(escapeCsv(ch.getTitle())).append(",")
+                        .append(Math.round(ch.getRating())).append(",")
+                        .append(ch.getRanking()).append(",")
+                        .append(ch.getTimestamp() > 0 ? java.time.Instant.ofEpochSecond(ch.getTimestamp()).toString() : "N/A")
+                        .append("\n");
+            }
+        }
+        if (student.getCodeforcesContestHistory() != null && !student.getCodeforcesContestHistory().isEmpty()) {
+            hasContests = true;
+            for (var cfh : student.getCodeforcesContestHistory()) {
+                csv.append("CODEFORCES,")
+                        .append(escapeCsv(cfh.getContestName())).append(",")
+                        .append(cfh.getNewRating()).append(",")
+                        .append(cfh.getRank()).append(",")
+                        .append(cfh.getRatingUpdateTimeSeconds() > 0 ? java.time.Instant.ofEpochSecond(cfh.getRatingUpdateTimeSeconds()).toString() : "N/A")
+                        .append("\n");
+            }
+        }
+        if (!hasContests) {
+            csv.append("No contest history recorded,,,,N/A\n");
+        }
+
+        return csv.toString();
+    }
+
+    private String escapeCsv(String val) {
+        if (val == null) return "";
+        return "\"" + val.replace("\"", "\"\"") + "\"";
+    }
 }

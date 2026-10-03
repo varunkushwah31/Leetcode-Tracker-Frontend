@@ -1,5 +1,6 @@
 package com.tracker.leetcode.tracker.Controller;
 
+import com.tracker.leetcode.tracker.DTO.BulkImportResponseDTO;
 import com.tracker.leetcode.tracker.DTO.ClassroomAnalyticsDTO;
 import com.tracker.leetcode.tracker.DTO.ClassroomDashboardDTO;
 import com.tracker.leetcode.tracker.DTO.SubmissionUrlRequest;
@@ -115,24 +116,44 @@ public class ClassroomController {
 
     // 1. Endpoint for Bulk Import (Receives a file)
     @PostMapping("/{classroomId}/students/bulk")
-    public ResponseEntity<List<String>> bulkAddStudents(
+    public ResponseEntity<BulkImportResponseDTO> bulkAddStudents(
             @PathVariable String classroomId,
             @RequestParam("file") MultipartFile file) {
 
-        List<String> failedAdds = classroomService.bulkAddStudents(classroomId, file);
-        return ResponseEntity.ok(failedAdds);
+        BulkImportResponseDTO result = classroomService.bulkAddStudents(classroomId, file);
+        return ResponseEntity.ok(result);
     }
 
-    // 2. Endpoint for CSV Export (Returns a downloadable file)
+    // 1b. Download Sample CSV Template
+    @GetMapping(value = "/template/csv", produces = "text/csv")
+    public ResponseEntity<byte[]> downloadStudentTemplate() {
+        String csvData = classroomService.generateStudentTemplateCsv();
+        byte[] output = csvData.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"student_import_template.csv\"");
+        return new ResponseEntity<>(output, headers, HttpStatus.OK);
+    }
+
+    // 2. Endpoint for CSV Export (Leaderboard)
     @GetMapping(value = "/{classroomId}/export", produces = "text/csv")
     public ResponseEntity<byte[]> exportClassroom(@PathVariable String classroomId) {
         String csvData = classroomService.generateClassroomCsv(classroomId);
-        byte[] output = csvData.getBytes();
+        byte[] output = csvData.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
         HttpHeaders headers = new HttpHeaders();
-        // This header tells the browser to download it as a file rather than displaying it as text
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"leaderboard_" + classroomId + ".csv\"");
+        return new ResponseEntity<>(output, headers, HttpStatus.OK);
+    }
 
+    // 2b. Endpoint for Assignment Matrix CSV Export
+    @GetMapping(value = "/{classroomId}/export/assignments", produces = "text/csv")
+    public ResponseEntity<byte[]> exportClassroomAssignments(@PathVariable String classroomId) {
+        String csvData = classroomService.generateClassroomAssignmentMatrixCsv(classroomId);
+        byte[] output = csvData.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"assignments_matrix_" + classroomId + ".csv\"");
         return new ResponseEntity<>(output, headers, HttpStatus.OK);
     }
 

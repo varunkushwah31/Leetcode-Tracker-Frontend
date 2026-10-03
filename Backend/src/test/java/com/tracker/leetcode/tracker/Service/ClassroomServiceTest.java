@@ -6,6 +6,7 @@ import com.tracker.leetcode.tracker.Exception.ClassroomNotFoundException;
 import com.tracker.leetcode.tracker.Mapper.StudentMapper;
 import com.tracker.leetcode.tracker.Models.Assignment;
 import com.tracker.leetcode.tracker.Models.Classroom;
+import com.tracker.leetcode.tracker.Models.Student;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
@@ -119,5 +120,31 @@ class ClassroomServiceTest {
         assertThrows(AssignmentNotFoundException.class, () ->
                 classroomService.deleteAssignment("class-1", "non-existent-assign", "mentor-123")
         );
+    }
+
+    @Test
+    void generateStudentTemplateCsv_ShouldReturnValidCsvTemplate() {
+        String template = classroomService.generateStudentTemplateCsv();
+        assertNotNull(template);
+        assertTrue(template.contains("Name,Email,LeetCode Username,Codeforces Handle"));
+    }
+
+    @Test
+    void generateClassroomAssignmentMatrixCsv_ShouldGenerateMatrix() {
+        mockClassroom.setStudentIds(new ArrayList<>(List.of("std-1")));
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+
+        Student student = new Student();
+        student.setId("std-1");
+        student.setName("Alice");
+        student.setEmail("alice@test.com");
+        student.setLeetcodeUsername("alice_lc");
+        student.setManuallyCompletedAssignments(new ArrayList<>(List.of("assign-1")));
+        when(studentRepository.findAllById(any())).thenReturn(List.of(student));
+
+        String matrix = classroomService.generateClassroomAssignmentMatrixCsv("class-1");
+        assertNotNull(matrix);
+        assertTrue(matrix.contains("Alice"));
+        assertTrue(matrix.contains("COMPLETED"));
     }
 }

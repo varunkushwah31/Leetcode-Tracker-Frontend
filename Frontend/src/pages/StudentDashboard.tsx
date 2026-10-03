@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { SpinnerIcon as Loader2, TerminalIcon, SignOutIcon as LogOut, PulseIcon as Activity } from '@phosphor-icons/react';
+import { SpinnerIcon as Loader2, TerminalIcon, SignOutIcon as LogOut, PulseIcon as Activity, DownloadSimpleIcon as Download } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../hooks/useAuth';
@@ -26,6 +26,7 @@ export function StudentDashboard() {
     // UI States
     const [isLoading, setIsLoading] = useState(true);
     const [isSyncing, setIsSyncing] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
     const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
 
     // --- NEW: Specific Error States ---
@@ -66,6 +67,27 @@ export function StudentDashboard() {
             setSyncError(getErrorMessage(err, 'Failed to sync profiles.'));
         } finally {
             setIsSyncing(false);
+        }
+    };
+
+    const handleExportReport = async () => {
+        setIsExporting(true);
+        try {
+            const response = await StudentService.exportMyReport();
+            const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const username = dashboardData?.leetcodeUsername || dashboardData?.codeforcesHandle || 'my';
+            link.setAttribute('download', `${username}_Performance_Report.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err: unknown) {
+            setPageError(getErrorMessage(err, 'Failed to export performance report.'));
+        } finally {
+            setIsExporting(false);
         }
     };
 
@@ -126,8 +148,13 @@ export function StudentDashboard() {
                         </span>
                     </div>
                     <div className="flex items-center gap-3 sm:gap-4">
-                        <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl" onClick={handleSync} disabled={isSyncing}>
-                            {isSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin text-zinc-500" /> : <Activity className="w-4 h-4 mr-2 text-zinc-500 dark:text-zinc-400" />}
+                        <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer text-xs font-semibold h-10 px-3.5" onClick={handleExportReport} disabled={isExporting}>
+                            {isExporting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-zinc-500" /> : <Download className="w-4 h-4 mr-1.5 text-[#5b4fff] dark:text-[#968fff]" />}
+                            <span>Export Report (CSV)</span>
+                        </Button>
+
+                        <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer text-xs font-semibold h-10 px-3.5" onClick={handleSync} disabled={isSyncing}>
+                            {isSyncing ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-zinc-500" /> : <Activity className="w-4 h-4 mr-1.5 text-zinc-500 dark:text-zinc-400" />}
                             <span>Sync Profile</span>
                         </Button>
 

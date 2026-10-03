@@ -11,6 +11,8 @@ import com.tracker.leetcode.tracker.Service.ClassroomService;
 import com.tracker.leetcode.tracker.Service.StudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -186,5 +188,30 @@ public class StudentController {
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
 
         return ResponseEntity.ok(mapper.toSummaryDTO(updatedStudent, classroom.getAssignments()));
+    }
+
+    // 8. Individual Student Report CSV Export
+    @GetMapping(value = "/{username}/report", produces = "text/csv")
+    public ResponseEntity<byte[]> exportStudentReport(@PathVariable String username) {
+        String csvData = studentService.generateStudentReportCsv(username);
+        byte[] output = csvData.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"student_report_" + username + ".csv\"");
+        return new ResponseEntity<>(output, headers, HttpStatus.OK);
+    }
+
+    // 9. Authenticated Student's Own Report CSV Export
+    @GetMapping(value = "/me/report", produces = "text/csv")
+    public ResponseEntity<byte[]> exportMyReport(@AuthenticationPrincipal Student currentStudent) {
+        String identifier = currentStudent.getLeetcodeUsername() != null ? currentStudent.getLeetcodeUsername()
+                : currentStudent.getCodeforcesHandle() != null ? currentStudent.getCodeforcesHandle()
+                : currentStudent.getId();
+        String csvData = studentService.generateStudentReportCsv(identifier);
+        byte[] output = csvData.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"my_student_report.csv\"");
+        return new ResponseEntity<>(output, headers, HttpStatus.OK);
     }
 }

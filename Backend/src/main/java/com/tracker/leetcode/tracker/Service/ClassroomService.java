@@ -1,5 +1,6 @@
 package com.tracker.leetcode.tracker.Service;
 
+import com.tracker.leetcode.tracker.DTO.BulkImportResponseDTO;
 import com.tracker.leetcode.tracker.DTO.ClassroomAnalyticsDTO;
 import com.tracker.leetcode.tracker.DTO.ClassroomDashboardDTO;
 import com.tracker.leetcode.tracker.DTO.StudentSummaryDTO;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -45,6 +47,10 @@ public class ClassroomService {
     @Lazy
     @Autowired
     private ClassroomService self;
+
+    @Lazy
+    @Autowired
+    private StudentService studentService;
 
     // 1. Create Classroom
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics", "mentors-all", "mentor"}, allEntries = true)
@@ -72,11 +78,41 @@ public class ClassroomService {
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
 
         String trimmed = identifier != null ? identifier.trim() : "";
+        if (trimmed.isEmpty()) {
+            throw new ValidationFailedException("Student identifier cannot be blank.");
+        }
+
         Student student = studentRepository.findById(trimmed)
                 .or(() -> studentRepository.findByEmail(trimmed))
                 .or(() -> studentRepository.findByLeetcodeUsername(trimmed))
                 .or(() -> studentRepository.findByCodeforcesHandle(trimmed))
-                .orElseThrow(() -> new StudentNotFoundException("Student not found with identifier: " + trimmed));
+                .orElse(null);
+
+        if (student == null) {
+            student = new Student();
+            student.setName(trimmed);
+            if (trimmed.contains("@")) {
+                student.setEmail(trimmed);
+            } else {
+                student.setLeetcodeUsername(trimmed);
+                student.setEmail(trimmed.toLowerCase().replaceAll("[^a-z0-9]", "") + "_" + UUID.randomUUID().toString().substring(0, 6) + "@student.mentorsync.local");
+            }
+            student.setRole(Role.STUDENT);
+            student.setAuthProvider(AuthProvider.LOCAL);
+            student.setEnabled(true);
+            student = studentRepository.save(student);
+
+            final Student created = student;
+            if (studentService != null) {
+                java.util.concurrent.CompletableFuture.runAsync(() -> {
+                    try {
+                        studentService.syncAllProfileData(created);
+                    } catch (Exception e) {
+                        log.warn("Background profile sync failed for newly provisioned student [{}]: {}", created.getName(), e.getMessage());
+                    }
+                });
+            }
+        }
 
         // Prevent duplicate enrollments in the same class
         if (classroom.getStudentIds().contains(student.getId())) {
@@ -84,7 +120,9 @@ public class ClassroomService {
         }
 
         classroom.getStudentIds().add(student.getId());
-        return classroomRepository.save(classroom);
+        Classroom saved = classroomRepository.save(classroom);
+        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Student added: " + student.getName());
+        return saved;
     }
 
     // 3. Get Dashboard (with Sorting & Fetching restored!)
@@ -526,53 +564,240 @@ public class ClassroomService {
 
 
     // 1. BULK IMPORT: Read CSV and add students
-    public List<String> bulkAddStudents(String classroomId, MultipartFile file) {
-        List<String> failedUsernames = new ArrayList<>();
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
+    public BulkImportResponseDTO bulkAddStudents(String classroomId, MultipartFile file) {
+        log.info("Starting bulk CSV student import for classroom ID: {}", classroomId);
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String studentIdentifier;
-            // Read the CSV line by line
-            while ((studentIdentifier = reader.readLine()) != null) {
-                studentIdentifier = studentIdentifier.trim();
-                // Skip empty lines or CSV header if it exists
-                if (studentIdentifier.isEmpty()
-                        || studentIdentifier.equalsIgnoreCase("username")
-                        || studentIdentifier.equalsIgnoreCase("leetcode_username")
-                        || studentIdentifier.equalsIgnoreCase("codeforces_handle")
-                        || studentIdentifier.equalsIgnoreCase("handle")
-                        || studentIdentifier.equalsIgnoreCase("identifier")) {
+        if (file == null || file.isEmpty()) {
+            throw new ValidationFailedException("Uploaded CSV file is empty.");
+        }
+
+        BulkImportResponseDTO result = new BulkImportResponseDTO();
+        List<Student> studentsToSync = new ArrayList<>();
+        boolean classroomUpdated = false;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+            List<String> rawLines = new ArrayList<>();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    rawLines.add(line);
+                }
+            }
+
+            if (rawLines.isEmpty()) {
+                throw new ValidationFailedException("CSV file contains no data.");
+            }
+
+            // Detect delimiter from the first line
+            char delimiter = detectDelimiter(rawLines.get(0));
+
+            // Parse header if present
+            List<String> firstRow = parseCsvLine(rawLines.get(0), delimiter);
+            int nameIdx = -1, emailIdx = -1, lcIdx = -1, cfIdx = -1, genericIdx = -1;
+            boolean hasHeader = false;
+
+            for (int i = 0; i < firstRow.size(); i++) {
+                String col = cleanHeader(firstRow.get(i));
+                if (col.equals("name") || col.equals("fullname") || col.equals("studentname") || col.equals("student")) {
+                    nameIdx = i; hasHeader = true;
+                } else if (col.equals("email") || col.equals("studentemail") || col.equals("emailaddress") || col.equals("mail")) {
+                    emailIdx = i; hasHeader = true;
+                } else if (col.equals("leetcode") || col.equals("leetcodeusername") || col.equals("lc") || col.equals("lcusername") || col.equals("leetcodehandle")) {
+                    lcIdx = i; hasHeader = true;
+                } else if (col.equals("codeforces") || col.equals("codeforceshandle") || col.equals("cf") || col.equals("cfhandle") || col.equals("codeforcesusername")) {
+                    cfIdx = i; hasHeader = true;
+                } else if (col.equals("username") || col.equals("handle") || col.equals("identifier") || col.equals("id")) {
+                    genericIdx = i; hasHeader = true;
+                }
+            }
+
+            int startIndex = hasHeader ? 1 : 0;
+            result.setTotalProcessed(rawLines.size() - startIndex);
+
+            for (int lineNum = startIndex; lineNum < rawLines.size(); lineNum++) {
+                String currentLine = rawLines.get(lineNum);
+                List<String> cols = parseCsvLine(currentLine, delimiter);
+                if (cols.isEmpty() || cols.stream().allMatch(String::isBlank)) {
+                    continue;
+                }
+
+                String name = "";
+                String email = "";
+                String lcUsername = "";
+                String cfHandle = "";
+                String genericId = "";
+
+                if (hasHeader) {
+                    if (nameIdx >= 0 && nameIdx < cols.size()) name = cols.get(nameIdx).trim();
+                    if (emailIdx >= 0 && emailIdx < cols.size()) email = cols.get(emailIdx).trim();
+                    if (lcIdx >= 0 && lcIdx < cols.size()) lcUsername = cols.get(lcIdx).trim();
+                    if (cfIdx >= 0 && cfIdx < cols.size()) cfHandle = cols.get(cfIdx).trim();
+                    if (genericIdx >= 0 && genericIdx < cols.size()) genericId = cols.get(genericIdx).trim();
+                } else {
+                    // Positional mapping
+                    if (cols.size() == 1) {
+                        genericId = cols.get(0).trim();
+                    } else if (cols.size() == 2) {
+                        lcUsername = cols.get(0).trim();
+                        cfHandle = cols.get(1).trim();
+                    } else if (cols.size() == 3) {
+                        name = cols.get(0).trim();
+                        lcUsername = cols.get(1).trim();
+                        cfHandle = cols.get(2).trim();
+                    } else {
+                        name = cols.get(0).trim();
+                        email = cols.get(1).trim();
+                        lcUsername = cols.get(2).trim();
+                        cfHandle = cols.get(3).trim();
+                    }
+                }
+
+                // If generic identifier provided, resolve type
+                if (lcUsername.isBlank() && cfHandle.isBlank() && !genericId.isBlank()) {
+                    if (genericId.contains("@")) {
+                        email = genericId;
+                    } else if (genericId.toLowerCase().contains("codeforces.com")) {
+                        cfHandle = extractHandleFromUrl(genericId);
+                    } else if (genericId.toLowerCase().contains("leetcode.com")) {
+                        lcUsername = extractHandleFromUrl(genericId);
+                    } else {
+                        lcUsername = genericId;
+                    }
+                }
+
+                // Clean handles
+                if (lcUsername.toLowerCase().contains("leetcode.com")) {
+                    lcUsername = extractHandleFromUrl(lcUsername);
+                }
+                if (cfHandle.toLowerCase().contains("codeforces.com")) {
+                    cfHandle = extractHandleFromUrl(cfHandle);
+                }
+
+                if (name.isBlank() && email.isBlank() && lcUsername.isBlank() && cfHandle.isBlank()) {
+                    result.setFailedCount(result.getFailedCount() + 1);
+                    result.getFailures().add("Row " + (lineNum + 1) + ": Empty or invalid student data");
                     continue;
                 }
 
                 try {
-                    addStudentToClassroom(classroomId, studentIdentifier);
-                } catch (Exception e) {
-                    log.warn("Failed to bulk add student: {}", studentIdentifier);
-                    failedUsernames.add(studentIdentifier); // Track failures
+                    // 1. Look up existing student
+                    Student student = null;
+                    if (!email.isBlank()) {
+                        student = studentRepository.findByEmail(email).orElse(null);
+                    }
+                    if (student == null && !lcUsername.isBlank()) {
+                        student = studentRepository.findByLeetcodeUsername(lcUsername).orElse(null);
+                    }
+                    if (student == null && !cfHandle.isBlank()) {
+                        student = studentRepository.findByCodeforcesHandle(cfHandle).orElse(null);
+                    }
+
+                    if (student != null) {
+                        boolean studentModified = false;
+                        if ((student.getName() == null || student.getName().isBlank()) && !name.isBlank()) {
+                            student.setName(name);
+                            studentModified = true;
+                        }
+                        if ((student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank()) && !cfHandle.isBlank()) {
+                            student.setCodeforcesHandle(cfHandle);
+                            studentModified = true;
+                        }
+                        if ((student.getLeetcodeUsername() == null || student.getLeetcodeUsername().isBlank()) && !lcUsername.isBlank()) {
+                            student.setLeetcodeUsername(lcUsername);
+                            studentModified = true;
+                        }
+                        if (studentModified) {
+                            student = studentRepository.save(student);
+                        }
+
+                        // Check enrollment
+                        if (classroom.getStudentIds().contains(student.getId())) {
+                            result.setAlreadyEnrolledCount(result.getAlreadyEnrolledCount() + 1);
+                            result.getAlreadyEnrolledStudents().add(student.getName() != null ? student.getName() : student.getId());
+                        } else {
+                            classroom.getStudentIds().add(student.getId());
+                            classroomUpdated = true;
+                            result.setAddedCount(result.getAddedCount() + 1);
+                            result.getAddedStudents().add(student.getName() != null ? student.getName() : student.getId());
+                        }
+                    } else {
+                        // Provision new student
+                        Student newStudent = new Student();
+                        String effectiveName = !name.isBlank() ? name
+                                : !lcUsername.isBlank() ? lcUsername
+                                : !cfHandle.isBlank() ? cfHandle
+                                : email;
+                        newStudent.setName(effectiveName);
+
+                        if (!email.isBlank()) {
+                            newStudent.setEmail(email);
+                        } else {
+                            String handleSeed = !lcUsername.isBlank() ? lcUsername : !cfHandle.isBlank() ? cfHandle : "user";
+                            newStudent.setEmail(handleSeed.toLowerCase().replaceAll("[^a-z0-9]", "") + "_" + UUID.randomUUID().toString().substring(0, 6) + "@student.mentorsync.local");
+                        }
+
+                        if (!lcUsername.isBlank()) newStudent.setLeetcodeUsername(lcUsername);
+                        if (!cfHandle.isBlank()) newStudent.setCodeforcesHandle(cfHandle);
+                        newStudent.setRole(Role.STUDENT);
+                        newStudent.setAuthProvider(AuthProvider.LOCAL);
+                        newStudent.setEnabled(true);
+
+                        Student saved = studentRepository.save(newStudent);
+                        classroom.getStudentIds().add(saved.getId());
+                        classroomUpdated = true;
+                        result.setAddedCount(result.getAddedCount() + 1);
+                        result.getAddedStudents().add(saved.getName());
+                        studentsToSync.add(saved);
+                    }
+                } catch (Exception ex) {
+                    log.warn("Error importing row {}: {}", lineNum + 1, ex.getMessage());
+                    result.setFailedCount(result.getFailedCount() + 1);
+                    String idDisplay = !lcUsername.isBlank() ? lcUsername : !cfHandle.isBlank() ? cfHandle : !email.isBlank() ? email : "Row " + (lineNum + 1);
+                    result.getFailures().add(idDisplay + ": " + ex.getMessage());
                 }
             }
+
+            if (classroomUpdated) {
+                classroomRepository.save(classroom);
+                webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Bulk students imported successfully");
+            }
+
+            // Background sync newly provisioned profiles
+            if (studentService != null && !studentsToSync.isEmpty()) {
+                CompletableFuture.runAsync(() -> {
+                    for (Student s : studentsToSync) {
+                        try {
+                            studentService.syncAllProfileData(s);
+                        } catch (Exception e) {
+                            log.warn("Async profile sync error for {}: {}", s.getId(), e.getMessage());
+                        }
+                    }
+                });
+            }
+
         } catch (Exception e) {
             log.error("Failed to parse uploaded CSV file for classroom [{}]: {}", classroomId, e.getMessage());
             throw new ValidationFailedException("Failed to parse CSV file: " + e.getMessage());
         }
 
-        return failedUsernames;
+        return result;
     }
 
-    // 2. EXPORT: Generate CSV string of the leaderboard
-    //
+    // 2. EXPORT: Generate comprehensive CSV string of the leaderboard
     public String generateClassroomCsv(String classroomId) {
-        // Reuse your existing dashboard logic to get sorted, fully-calculated stats!
         ClassroomDashboardDTO dashboard = self.getClassroomDashboard(classroomId, "solved");
 
         StringBuilder csv = new StringBuilder();
-        // Add the standard CSV Header row
-        csv.append("Rank,Name,LeetCode Username,Codeforces Handle,Daily Streak,Total Solved,LC Solved,CF Solved,LC Rating,CF Rating,Done Assignments,Pending Assignments\n");
+        csv.append("Rank,Name,Email,LeetCode Username,Codeforces Handle,Daily Streak,Total Solved,LC Solved,CF Solved,LC Rating,LC Global Rank,CF Rating,CF Max Rating,CF Rank,Done Assignments,Pending Assignments\n");
 
         int rank = 1;
         for (StudentSummaryDTO s : dashboard.getEnrolledStudents()) {
             csv.append(rank++).append(",")
                     .append("\"").append(s.getName() != null ? s.getName().replace("\"", "\"\"") : "").append("\",")
+                    .append("\"").append(s.getEmail() != null ? s.getEmail().replace("\"", "\"\"") : "").append("\",")
                     .append(s.getLeetcodeUsername() != null ? s.getLeetcodeUsername() : "").append(",")
                     .append(s.getCodeforcesHandle() != null ? s.getCodeforcesHandle() : "").append(",")
                     .append(s.getConsistencyStreak()).append(",")
@@ -580,11 +805,121 @@ public class ClassroomService {
                     .append(s.getLeetcodeSolvedCount()).append(",")
                     .append(s.getCodeforcesSolvedCount()).append(",")
                     .append(Math.round(s.getCurrentContestRating())).append(",")
+                    .append("\"").append(s.getRank() != null ? s.getRank() : "").append("\",")
                     .append(s.getCodeforcesRating() != null ? s.getCodeforcesRating() : 0).append(",")
+                    .append(s.getCodeforcesMaxRating() != null ? s.getCodeforcesMaxRating() : 0).append(",")
+                    .append("\"").append(s.getCodeforcesRank() != null ? s.getCodeforcesRank() : "").append("\",")
                     .append(s.getCompletedAssignments()).append(",")
                     .append(s.getPendingAssignments()).append("\n");
         }
         return csv.toString();
+    }
+
+    // 2b. EXPORT: Generate Assignment Completion Matrix CSV for classroom
+    public String generateClassroomAssignmentMatrixCsv(String classroomId) {
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+        List<Student> students = studentRepository.findAllById(classroom.getStudentIds());
+        List<Assignment> assignments = classroom.getAssignments() != null ? classroom.getAssignments() : Collections.emptyList();
+
+        StringBuilder csv = new StringBuilder();
+        csv.append("Student Name,Email,LeetCode Username,Codeforces Handle,Completed Assignments,Pending Assignments");
+        for (Assignment a : assignments) {
+            String title = a.getTitle() != null && !a.getTitle().isBlank() ? a.getTitle() : a.getTitleSlug();
+            csv.append(",\"").append(title.replace("\"", "\"\""))
+                    .append(" (").append(a.getPlatform() != null ? a.getPlatform().name() : "LC").append(")\"");
+        }
+        csv.append("\n");
+
+        for (Student s : students) {
+            int completed = 0;
+            int pending = 0;
+            List<String> statuses = new ArrayList<>();
+            for (Assignment a : assignments) {
+                boolean isDone = s.getManuallyCompletedAssignments() != null && s.getManuallyCompletedAssignments().contains(a.getId());
+                if (!isDone && s.getRecentSubmissions() != null) {
+                    String normTarget = a.getTitleSlug() != null ? a.getTitleSlug().replace("-", "").toLowerCase() : "";
+                    isDone = s.getRecentSubmissions().stream().anyMatch(sub -> {
+                        String normSub = sub.getTitleSlug() != null ? sub.getTitleSlug().replace("-", "").toLowerCase() : "";
+                        return normSub.equals(normTarget);
+                    });
+                }
+                if (isDone) {
+                    completed++;
+                    statuses.add("COMPLETED");
+                } else {
+                    pending++;
+                    statuses.add("PENDING");
+                }
+            }
+
+            csv.append("\"").append(s.getName() != null ? s.getName().replace("\"", "\"\"") : "").append("\",")
+                    .append("\"").append(s.getEmail() != null ? s.getEmail().replace("\"", "\"\"") : "").append("\",")
+                    .append(s.getLeetcodeUsername() != null ? s.getLeetcodeUsername() : "").append(",")
+                    .append(s.getCodeforcesHandle() != null ? s.getCodeforcesHandle() : "").append(",")
+                    .append(completed).append(",")
+                    .append(pending);
+
+            for (String status : statuses) {
+                csv.append(",").append(status);
+            }
+            csv.append("\n");
+        }
+
+        return csv.toString();
+    }
+
+    // 2c. Sample CSV Template for Mentors
+    public String generateStudentTemplateCsv() {
+        return "Name,Email,LeetCode Username,Codeforces Handle\n" +
+                "Alex Turner,alex@example.com,alex_turner,alex_cf\n" +
+                "Sarah Connor,sarah@example.com,sarah_c,\n" +
+                "David Miller,david@example.com,,david_cf\n";
+    }
+
+    private char detectDelimiter(String line) {
+        if (line.contains(",")) return ',';
+        if (line.contains(";")) return ';';
+        if (line.contains("\t")) return '\t';
+        return ',';
+    }
+
+    private String cleanHeader(String col) {
+        return col != null ? col.trim().toLowerCase().replaceAll("[^a-z0-9]", "") : "";
+    }
+
+    private String extractHandleFromUrl(String url) {
+        if (url == null || url.isBlank()) return "";
+        String trimmed = url.trim();
+        while (trimmed.endsWith("/")) {
+            trimmed = trimmed.substring(0, trimmed.length() - 1);
+        }
+        int lastSlash = trimmed.lastIndexOf('/');
+        return lastSlash >= 0 ? trimmed.substring(lastSlash + 1) : trimmed;
+    }
+
+    private List<String> parseCsvLine(String line, char delimiter) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '"') {
+                if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    sb.append('"');
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (c == delimiter && !inQuotes) {
+                tokens.add(sb.toString().trim());
+                sb.setLength(0);
+            } else {
+                sb.append(c);
+            }
+        }
+        tokens.add(sb.toString().trim());
+        return tokens;
     }
 
 
