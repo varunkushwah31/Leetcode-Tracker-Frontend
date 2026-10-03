@@ -217,7 +217,7 @@ export function LeetCodeRatingGraph({
                     <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
                         {/* Contest Rating */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate whitespace-nowrap">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Contest Rating
                             </p>
                             <p className="text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight mt-0.5">
@@ -227,7 +227,7 @@ export function LeetCodeRatingGraph({
 
                         {/* Global Ranking */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate whitespace-nowrap">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Global Ranking
                             </p>
                             <p className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100 mt-1 sm:mt-0.5">
@@ -237,7 +237,7 @@ export function LeetCodeRatingGraph({
 
                         {/* Attended */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate whitespace-nowrap">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Attended
                             </p>
                             <p className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100 mt-1 sm:mt-0.5">

@@ -65,7 +65,7 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
 
     if (loading) {
         return (
-            <div className="w-full max-w-[1680px] mx-auto p-6 lg:p-10 min-h-[60vh] flex items-center justify-center">
+            <div className="w-full max-w-7xl mx-auto p-6 lg:p-10 min-h-[60vh] flex items-center justify-center">
                 <div className="flex flex-col items-center">
                     <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff] mb-4" />
                     <p className="text-zinc-400 font-medium tracking-wide">Fetching profile data...</p>
@@ -77,7 +77,7 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
     // --- 3. Handle the Error State gracefully ---
     if (error) {
         return (
-            <div className="w-full max-w-[1680px] mx-auto p-6 lg:p-10 min-h-[60vh] flex items-center justify-center">
+            <div className="w-full max-w-7xl mx-auto p-6 lg:p-10 min-h-[60vh] flex items-center justify-center">
                 <div className="max-w-md w-full bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xl dark:shadow-2xl">
                     <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4 text-center">Profile Sync Failed</h2>
                     <ErrorBanner message={error} />
@@ -97,7 +97,7 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
     const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
 
     return (
-        <div className="w-full max-w-[1680px] mx-auto p-4 sm:p-6 lg:p-10 space-y-6 relative z-10 animate-in fade-in duration-200">
+        <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 space-y-6 relative z-10 animate-in fade-in duration-200">
             {/* Top Navigation Bar with Back button */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
                 <Button

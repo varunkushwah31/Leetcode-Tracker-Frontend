@@ -621,7 +621,7 @@ export function MentorDashboard() {
                         }
 
                         return (
-                            <div className="max-w-[1680px] mx-auto p-6 lg:p-10 min-h-full w-full">
+                            <div className="max-w-7xl mx-auto p-6 lg:p-10 min-h-full w-full">
                                 {/* Main Dashboard Error Banner */}
                                 <ErrorBanner message={error} />
 

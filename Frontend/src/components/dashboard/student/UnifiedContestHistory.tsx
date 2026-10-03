@@ -94,7 +94,7 @@ export function UnifiedContestHistory({
 
     return (
         <Card className={`${cardClassName || defaultCardClass} ${className}`}>
-            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
+            <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-2">
                     <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white tracking-tight">
                         <TrophyIcon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" /> Contest History
@@ -143,7 +143,7 @@ export function UnifiedContestHistory({
                 )}
             </CardHeader>
 
-            <CardContent className="p-4 pt-4">
+            <CardContent className="p-4 pt-0">
                 <ScrollArea className={`${scrollHeightClass} pr-4`}>
                     <div className="flex flex-col gap-2.5">
                         {displayedItems.map((contest) => (

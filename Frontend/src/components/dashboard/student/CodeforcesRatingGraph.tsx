@@ -235,7 +235,7 @@ export function CodeforcesRatingGraph({
                     <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
                         {/* Contest Rating */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate whitespace-nowrap">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Contest Rating
                             </p>
                             <p className="text-xl sm:text-2xl font-extrabold text-cyan-600 dark:text-cyan-400 tracking-tight mt-0.5">
@@ -245,7 +245,7 @@ export function CodeforcesRatingGraph({
 
                         {/* Rank Tier */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate whitespace-nowrap">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Rank Tier
                             </p>
                             <div className="mt-1 sm:mt-0.5 flex items-center">
@@ -263,7 +263,7 @@ export function CodeforcesRatingGraph({
 
                         {/* Attended & Max */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate whitespace-nowrap">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Attended
                             </p>
                             <p className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100 mt-1 sm:mt-0.5">
