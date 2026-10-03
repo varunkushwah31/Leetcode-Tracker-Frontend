@@ -51,13 +51,13 @@ export function LeetCodeRatingGraph({
         return [...contestHistory].sort((a, b) => a.timestamp - b.timestamp);
     }, [contestHistory]);
 
-    // Active hovered point; default to the latest contest if available
+    // Hovered index tracking
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
     // SVG coordinates config
     const viewBoxWidth = 500;
-    const viewBoxHeight = 170;
-    const padding = { top: 32, bottom: 28, left: 24, right: 28 };
+    const viewBoxHeight = 175;
+    const padding = { top: 35, bottom: 28, left: 24, right: 28 };
     const plotWidth = viewBoxWidth - padding.left - padding.right;
     const plotHeight = viewBoxHeight - padding.top - padding.bottom;
 
@@ -123,9 +123,13 @@ export function LeetCodeRatingGraph({
     }, []);
 
     // Format display values
-    const displayRating = activePoint
-        ? Math.round(activePoint.contest.rating).toLocaleString()
-        : Math.round(currentContestRating).toLocaleString();
+    const effectiveRating = activePoint
+        ? Math.round(activePoint.contest.rating)
+        : Math.round(currentContestRating);
+
+    const displayRating = effectiveRating > 0
+        ? effectiveRating.toLocaleString()
+        : (sortedContests.length > 0 ? Math.round(sortedContests[sortedContests.length - 1].rating).toLocaleString() : '—');
 
     const displayRank = useMemo(() => {
         if (activePoint?.contest.ranking) {
@@ -157,231 +161,273 @@ export function LeetCodeRatingGraph({
         });
     };
 
+    // Calculate pill position relative to active point
+    const pillMetrics = useMemo(() => {
+        if (!activePoint) return null;
+        const pillWidth = 52;
+        const pillHeight = 22;
+
+        let pillX: number;
+        if (activePoint.x > viewBoxWidth - 70) {
+            pillX = activePoint.x - pillWidth - 6;
+        } else if (activePoint.x < 70) {
+            pillX = activePoint.x + 6;
+        } else {
+            pillX = activePoint.x - pillWidth / 2;
+        }
+
+        let pillY: number;
+        let stemStartY: number;
+        let stemEndY: number;
+
+        if (activePoint.y < 55) {
+            // Place below point if near top
+            pillY = activePoint.y + 14;
+            stemStartY = activePoint.y + 5;
+            stemEndY = pillY;
+        } else {
+            // Place above point
+            pillY = activePoint.y - pillHeight - 12;
+            stemStartY = activePoint.y - 5;
+            stemEndY = pillY + pillHeight;
+        }
+
+        const stemStartX = activePoint.x;
+        const stemEndX = pillX + pillWidth / 2;
+
+        return { pillX, pillY, pillWidth, pillHeight, stemStartX, stemStartY, stemEndX, stemEndY };
+    }, [activePoint, viewBoxWidth]);
+
     return (
-        <Card className={`relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden transition-all ${className}`}>
-            <CardContent className="p-5 sm:p-6">
-                {/* Header Stats Matching LeetCode Contest UI */}
-                <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="grid grid-cols-3 gap-6 sm:gap-10">
+        <Card className={`relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden transition-all h-full flex flex-col justify-between ${className}`}>
+            <CardContent className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                <div>
+                    {/* Dedicated Title & Brand Bar */}
+                    <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-800/60">
+                        <div className="flex items-center gap-2">
+                            <TrophyIcon className="w-4 h-4 text-amber-400" weight="bold" />
+                            <span className="text-sm font-bold text-white tracking-tight">LeetCode Contests</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-md shrink-0">
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider">LeetCode</span>
+                        </div>
+                    </div>
+
+                    {/* Full-Width Stats Row */}
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
                         {/* Contest Rating */}
-                        <div>
-                            <p className="text-[11px] sm:text-xs font-semibold text-zinc-400 tracking-wide uppercase">
+                        <div className="min-w-0">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-400 tracking-wider uppercase truncate">
                                 Contest Rating
                             </p>
-                            <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-0.5">
+                            <p className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
                                 {displayRating}
                             </p>
                         </div>
 
                         {/* Global Ranking */}
-                        <div>
-                            <p className="text-[11px] sm:text-xs font-semibold text-zinc-400 tracking-wide uppercase">
+                        <div className="min-w-0">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-400 tracking-wider uppercase truncate">
                                 Global Ranking
                             </p>
-                            <p className="text-base sm:text-xl font-bold text-white mt-1 sm:mt-1.5 truncate">
+                            <p className="text-sm sm:text-base font-bold text-zinc-100 mt-1 sm:mt-0.5">
                                 {displayRank}
                             </p>
                         </div>
 
                         {/* Attended */}
-                        <div>
-                            <p className="text-[11px] sm:text-xs font-semibold text-zinc-400 tracking-wide uppercase">
+                        <div className="min-w-0">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-400 tracking-wider uppercase truncate">
                                 Attended
                             </p>
-                            <p className="text-base sm:text-xl font-bold text-white mt-1 sm:mt-1.5">
+                            <p className="text-sm sm:text-base font-bold text-zinc-100 mt-1 sm:mt-0.5">
                                 {attendedCount}
                             </p>
                         </div>
                     </div>
 
-                    {/* Platform Badge */}
-                    <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-lg shrink-0">
-                        <TrophyIcon className="w-3.5 h-3.5" weight="bold" />
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider">LeetCode</span>
-                    </div>
+                    {/* Graph Visualization */}
+                    {sortedContests.length === 0 ? (
+                        <div className="h-44 flex flex-col items-center justify-center text-center p-4 rounded-xl border border-dashed border-zinc-800/80 bg-zinc-900/20">
+                            <TrophyIcon className="w-8 h-8 text-amber-500/30 mb-2" />
+                            <p className="text-sm font-semibold text-zinc-400">No LeetCode contest rating recorded</p>
+                            <p className="text-xs text-zinc-500 mt-1 max-w-xs">
+                                Participate in weekly or biweekly LeetCode contests to track your rating progression.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="relative select-none">
+                            <svg
+                                ref={svgRef}
+                                viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+                                className="w-full h-40 sm:h-44 overflow-visible cursor-crosshair"
+                                onMouseMove={handleMouseMove}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                <defs>
+                                    <linearGradient id="lc-rating-gradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#ffa116" stopOpacity="0.25" />
+                                        <stop offset="100%" stopColor="#ffa116" stopOpacity="0.0" />
+                                    </linearGradient>
+                                    <filter id="lc-glow-filter" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="#ffa116" floodOpacity="0.6" />
+                                    </filter>
+                                </defs>
+
+                                {/* Horizontal guide lines */}
+                                <line
+                                    x1={padding.left}
+                                    y1={padding.top}
+                                    x2={viewBoxWidth - padding.right}
+                                    y2={padding.top}
+                                    stroke="rgba(255,255,255,0.05)"
+                                    strokeDasharray="3 3"
+                                />
+                                <line
+                                    x1={padding.left}
+                                    y1={viewBoxHeight - padding.bottom}
+                                    x2={viewBoxWidth - padding.right}
+                                    y2={viewBoxHeight - padding.bottom}
+                                    stroke="rgba(255,255,255,0.05)"
+                                />
+
+                                {/* Gradient Area under curve */}
+                                <path
+                                    d={areaPath}
+                                    fill="url(#lc-rating-gradient)"
+                                />
+
+                                {/* Main Curve Line */}
+                                <path
+                                    d={linePath}
+                                    fill="none"
+                                    stroke="#ffa116"
+                                    strokeWidth="2.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    filter="url(#lc-glow-filter)"
+                                />
+
+                                {/* Active Point Indicator & Attached Rating Tag (Matching Screenshot) */}
+                                {activePoint && pillMetrics && (
+                                    <g className="transition-all duration-100 ease-out">
+                                        {/* Vertical dashed guide line */}
+                                        <line
+                                            x1={activePoint.x}
+                                            y1={padding.top}
+                                            x2={activePoint.x}
+                                            y2={viewBoxHeight - padding.bottom}
+                                            stroke="rgba(255, 161, 22, 0.3)"
+                                            strokeDasharray="2 2"
+                                            strokeWidth="1"
+                                        />
+
+                                        {/* Glowing White/Amber Marker Circle */}
+                                        <circle
+                                            cx={activePoint.x}
+                                            cy={activePoint.y}
+                                            r="5.5"
+                                            fill="#ffffff"
+                                            stroke="#ffa116"
+                                            strokeWidth="2.5"
+                                            className="drop-shadow-[0_0_6px_rgba(255,161,22,0.9)]"
+                                        />
+
+                                        {/* Stem line to floating rating badge */}
+                                        <line
+                                            x1={pillMetrics.stemStartX}
+                                            y1={pillMetrics.stemStartY}
+                                            x2={pillMetrics.stemEndX}
+                                            y2={pillMetrics.stemEndY}
+                                            stroke="#52525b"
+                                            strokeWidth="1"
+                                        />
+
+                                        {/* Floating rating badge box */}
+                                        <g transform={`translate(${pillMetrics.pillX}, ${pillMetrics.pillY})`}>
+                                            <rect
+                                                x="0"
+                                                y="0"
+                                                width={pillMetrics.pillWidth}
+                                                height={pillMetrics.pillHeight}
+                                                rx="5"
+                                                fill="#18181b"
+                                                stroke="#3f3f46"
+                                                strokeWidth="1"
+                                                className="shadow-xl"
+                                            />
+                                            <text
+                                                x={pillMetrics.pillWidth / 2}
+                                                y="15"
+                                                textAnchor="middle"
+                                                fill="#f4f4f5"
+                                                fontSize="11"
+                                                fontWeight="bold"
+                                                fontFamily="monospace"
+                                            >
+                                                {Math.round(activePoint.contest.rating).toLocaleString()}
+                                            </text>
+                                        </g>
+                                    </g>
+                                )}
+
+                                {/* X-axis Timeline Year markers at bottom */}
+                                {startYear && (
+                                    <text
+                                        x={padding.left}
+                                        y={viewBoxHeight - 8}
+                                        fill="#71717a"
+                                        fontSize="11"
+                                        fontWeight="600"
+                                    >
+                                        {startYear}
+                                    </text>
+                                )}
+                                {endYear && startYear !== endYear && (
+                                    <text
+                                        x={viewBoxWidth - padding.right}
+                                        y={viewBoxHeight - 8}
+                                        textAnchor="end"
+                                        fill="#71717a"
+                                        fontSize="11"
+                                        fontWeight="600"
+                                    >
+                                        {endYear}
+                                    </text>
+                                )}
+                            </svg>
+                        </div>
+                    )}
                 </div>
 
-                {/* Graph Visualization */}
-                {sortedContests.length === 0 ? (
-                    <div className="h-40 flex flex-col items-center justify-center text-center p-4 rounded-xl border border-dashed border-zinc-800/80 bg-zinc-900/20">
-                        <TrophyIcon className="w-8 h-8 text-amber-500/40 mb-2" />
-                        <p className="text-sm font-semibold text-zinc-400">No LeetCode contest rating recorded yet</p>
-                        <p className="text-xs text-zinc-500 mt-1 max-w-sm">
-                            Participate in weekly or biweekly LeetCode contests to track your rating progression here.
-                        </p>
+                {/* Bottom Details Footer Bar */}
+                {activePoint ? (
+                    <div className="mt-3 p-3 bg-zinc-900/90 border border-zinc-800 rounded-xl backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                            <span className="font-bold text-zinc-100 truncate">{activePoint.contest.title}</span>
+                            <span className="text-zinc-500">•</span>
+                            <span className="text-zinc-400 flex items-center gap-1 shrink-0">
+                                <Calendar className="w-3 h-3 text-zinc-500" />
+                                {formatDate(activePoint.contest.timestamp)}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-zinc-300 shrink-0">
+                            <span>
+                                Rank: <strong className="text-white font-semibold">#{activePoint.contest.ranking?.toLocaleString() || 'N/A'}</strong>
+                            </span>
+                            <span>
+                                Solved: <strong className="text-amber-400 font-semibold">{activePoint.contest.problemsSolved}/{activePoint.contest.totalProblems}</strong>
+                            </span>
+                            <span className="flex items-center gap-1 text-amber-400 font-bold">
+                                <TrendingUp className="w-3.5 h-3.5" />
+                                {Math.round(activePoint.contest.rating).toLocaleString()}
+                            </span>
+                        </div>
                     </div>
                 ) : (
-                    <div className="relative select-none">
-                        <svg
-                            ref={svgRef}
-                            viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-                            className="w-full h-40 sm:h-44 overflow-visible cursor-crosshair"
-                            onMouseMove={handleMouseMove}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            <defs>
-                                <linearGradient id="lc-rating-gradient" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#ffa116" stopOpacity="0.28" />
-                                    <stop offset="100%" stopColor="#ffa116" stopOpacity="0.0" />
-                                </linearGradient>
-                                <filter id="lc-glow-filter" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="#ffa116" floodOpacity="0.6" />
-                                </filter>
-                            </defs>
-
-                            {/* Horizontal guide lines */}
-                            <line
-                                x1={padding.left}
-                                y1={padding.top}
-                                x2={viewBoxWidth - padding.right}
-                                y2={padding.top}
-                                stroke="rgba(255,255,255,0.05)"
-                                strokeDasharray="3 3"
-                            />
-                            <line
-                                x1={padding.left}
-                                y1={viewBoxHeight - padding.bottom}
-                                x2={viewBoxWidth - padding.right}
-                                y2={viewBoxHeight - padding.bottom}
-                                stroke="rgba(255,255,255,0.05)"
-                            />
-
-                            {/* Gradient Area under curve */}
-                            <path
-                                d={areaPath}
-                                fill="url(#lc-rating-gradient)"
-                            />
-
-                            {/* Main Curve Line */}
-                            <path
-                                d={linePath}
-                                fill="none"
-                                stroke="#ffa116"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                filter="url(#lc-glow-filter)"
-                            />
-
-                            {/* Active Point Indicator & Attached Rating Tag (Matching Screenshot) */}
-                            {activePoint && (
-                                <g className="transition-all duration-100 ease-out">
-                                    {/* Vertical dashed guide line */}
-                                    <line
-                                        x1={activePoint.x}
-                                        y1={padding.top}
-                                        x2={activePoint.x}
-                                        y2={viewBoxHeight - padding.bottom}
-                                        stroke="rgba(255, 161, 22, 0.3)"
-                                        strokeDasharray="2 2"
-                                        strokeWidth="1"
-                                    />
-
-                                    {/* Glowing White/Amber Marker Circle */}
-                                    <circle
-                                        cx={activePoint.x}
-                                        cy={activePoint.y}
-                                        r="6"
-                                        fill="#ffffff"
-                                        stroke="#ffa116"
-                                        strokeWidth="2.5"
-                                        className="drop-shadow-[0_0_6px_rgba(255,161,22,0.9)]"
-                                    />
-
-                                    {/* Pointer line to floating rating badge */}
-                                    <line
-                                        x1={activePoint.x}
-                                        y1={activePoint.y + 6}
-                                        x2={activePoint.x > viewBoxWidth - 80 ? activePoint.x - 18 : activePoint.x - 12}
-                                        y2={activePoint.y + 18}
-                                        stroke="#52525b"
-                                        strokeWidth="1"
-                                    />
-
-                                    {/* Floating rating badge box */}
-                                    <g transform={`translate(${
-                                        activePoint.x > viewBoxWidth - 80
-                                            ? activePoint.x - 52
-                                            : Math.max(8, activePoint.x - 24)
-                                    }, ${Math.min(viewBoxHeight - 48, activePoint.y + 16)})`}>
-                                        <rect
-                                            x="0"
-                                            y="0"
-                                            width="48"
-                                            height="20"
-                                            rx="4"
-                                            fill="#18181b"
-                                            stroke="#3f3f46"
-                                            strokeWidth="1"
-                                            className="shadow-lg"
-                                        />
-                                        <text
-                                            x="24"
-                                            y="14"
-                                            textAnchor="middle"
-                                            fill="#e4e4e7"
-                                            fontSize="11"
-                                            fontWeight="bold"
-                                            fontFamily="monospace"
-                                        >
-                                            {Math.round(activePoint.contest.rating)}
-                                        </text>
-                                    </g>
-                                </g>
-                            )}
-
-                            {/* X-axis Timeline Year markers at bottom */}
-                            {startYear && (
-                                <text
-                                    x={padding.left}
-                                    y={viewBoxHeight - 8}
-                                    fill="#71717a"
-                                    fontSize="11"
-                                    fontWeight="600"
-                                >
-                                    {startYear}
-                                </text>
-                            )}
-                            {endYear && startYear !== endYear && (
-                                <text
-                                    x={viewBoxWidth - padding.right}
-                                    y={viewBoxHeight - 8}
-                                    textAnchor="end"
-                                    fill="#71717a"
-                                    fontSize="11"
-                                    fontWeight="600"
-                                >
-                                    {endYear}
-                                </text>
-                            )}
-                        </svg>
-
-                        {/* Interactive Tooltip on Active Point */}
-                        {activePoint && (
-                            <div className="mt-3 p-3 bg-zinc-900/90 border border-zinc-800 rounded-xl backdrop-blur-md flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-amber-400" />
-                                    <span className="font-bold text-zinc-100">{activePoint.contest.title}</span>
-                                    <span className="text-zinc-500">•</span>
-                                    <span className="text-zinc-400 flex items-center gap-1">
-                                        <Calendar className="w-3 h-3 text-zinc-500" />
-                                        {formatDate(activePoint.contest.timestamp)}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-3 text-zinc-300">
-                                    <span>
-                                        Rank: <strong className="text-white font-semibold">#{activePoint.contest.ranking?.toLocaleString() || 'N/A'}</strong>
-                                    </span>
-                                    <span>
-                                        Solved: <strong className="text-amber-400 font-semibold">{activePoint.contest.problemsSolved}/{activePoint.contest.totalProblems}</strong>
-                                    </span>
-                                    <span className="flex items-center gap-1 text-amber-400 font-bold">
-                                        <TrendingUp className="w-3.5 h-3.5" />
-                                        {Math.round(activePoint.contest.rating)}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
+                    <div className="mt-3 p-2.5 bg-zinc-900/40 border border-zinc-800/40 rounded-xl flex items-center justify-center text-xs text-zinc-500">
+                        <span>No contest details available</span>
                     </div>
                 )}
             </CardContent>

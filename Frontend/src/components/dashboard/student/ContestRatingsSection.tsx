@@ -87,7 +87,7 @@ export function ContestRatingsSection({
             </div>
 
             {/* Graphs Layout */}
-            <div className={`grid gap-6 ${
+            <div className={`grid gap-6 items-stretch ${
                 activeTab === 'all'
                     ? 'grid-cols-1 xl:grid-cols-2'
                     : 'grid-cols-1'
