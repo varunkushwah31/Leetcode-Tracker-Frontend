@@ -115,14 +115,14 @@ function EmptyClassroomState({
 
     return (
         <div className="h-full flex items-center justify-center p-4 sm:p-8 my-auto">
-            <div className="text-center max-w-xl w-full relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)]">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1a1b2e] rounded-2xl mb-6 shadow-lg border border-[#5b4fff]/20">
-                    <BookOpenIcon className="w-8 h-8 text-[#968fff]" weight="bold" />
+            <div className="text-center max-w-xl w-full relative z-10 bg-white/95 dark:bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xl dark:shadow-[0_8px_40px_rgb(0,0,0,0.5)]">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 dark:bg-[#1a1b2e] rounded-2xl mb-6 shadow-sm border border-[#5b4fff]/20">
+                    <BookOpenIcon className="w-8 h-8 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                 </div>
-                <h2 className="text-2xl sm:text-[28px] font-bold text-white tracking-tight mb-3">
+                <h2 className="text-2xl sm:text-[28px] font-bold text-zinc-900 dark:text-white tracking-tight mb-3">
                     {hasClassrooms ? 'Select a Classroom' : 'No Classroom Selected'}
                 </h2>
-                <p className="text-zinc-400 text-sm sm:text-[15px] mb-6 max-w-md mx-auto leading-relaxed">
+                <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-[15px] mb-6 max-w-md mx-auto leading-relaxed">
                     {hasClassrooms
                         ? 'Select one of your existing cohorts below to monitor submissions, or create a brand new classroom.'
                         : 'Select a classroom from the sidebar, or create a new one to start tracking progress.'}
@@ -135,15 +135,15 @@ function EmptyClassroomState({
                                 <button
                                     key={c.classroomId}
                                     onClick={() => onSelectClassroom(c)}
-                                    className="p-4 bg-[#16161a] hover:bg-[#1f2038] border border-zinc-800 hover:border-[#5b4fff]/50 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between hover:-translate-y-0.5"
+                                    className="p-4 bg-zinc-50 dark:bg-[#16161a] hover:bg-zinc-100 dark:hover:bg-[#1f2038] border border-zinc-200 dark:border-zinc-800 hover:border-[#5b4fff]/50 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between hover:-translate-y-0.5"
                                 >
                                     <div className="flex items-center justify-between mb-2">
-                                        <span className="font-semibold text-white group-hover:text-[#968fff] transition-colors truncate">
+                                        <span className="font-semibold text-zinc-900 dark:text-white group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors truncate">
                                             {c.className}
                                         </span>
-                                        <CaretRightIcon className="w-4 h-4 text-zinc-500 group-hover:text-white transition-transform group-hover:translate-x-0.5" />
+                                        <CaretRightIcon className="w-4 h-4 text-zinc-400 dark:text-zinc-500 group-hover:text-[#5b4fff] dark:group-hover:text-white transition-transform group-hover:translate-x-0.5" />
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                                    <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
                                         <UsersIcon className="w-3.5 h-3.5 text-[#5b4fff]" />
                                         <span>{c.enrolledStudents?.length || 0} students</span>
                                     </div>
@@ -304,7 +304,7 @@ export function MentorDashboard() {
 
     if (isLoading && classrooms.length === 0) {
         return (
-            <div className="flex h-screen items-center justify-center bg-zinc-50 dark:bg-[#09090e]">
+            <div className="flex h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#09090e]">
                 <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
             </div>
         );
@@ -442,7 +442,7 @@ export function MentorDashboard() {
     );
 
     return (
-        <div className="h-screen bg-zinc-50 dark:bg-[#09090e] text-zinc-900 dark:text-white flex overflow-hidden selection:bg-[#5b4fff] selection:text-white">
+        <div className="h-screen bg-[#f1f3f7] dark:bg-[#09090e] text-zinc-900 dark:text-white flex overflow-hidden selection:bg-[#5b4fff] selection:text-white">
             {/* Mobile Drawer Backdrop */}
             {mobileSidebarOpen && (
                 <div
@@ -467,14 +467,14 @@ export function MentorDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative bg-zinc-50 dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
+            <main className="flex-1 overflow-y-auto relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(15,23,42,0.07)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
                 {/* Luminous Multi-Layer Ambient Glow */}
                 <div className="hidden dark:block">
                     <AmbientGlow />
                 </div>
 
                 {/* Top Navigation Header */}
-                <header className="sticky top-0 z-30 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800/60 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-sm">
+                <header className="sticky top-0 z-30 bg-white/90 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800/60 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
                     <div className="flex items-center gap-3">
                         {/* Mobile Sidebar Hamburger */}
                         <button

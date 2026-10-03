@@ -118,14 +118,14 @@ export function PendingAssignments({
         const diff = timestamp - now;
         const days = Math.ceil(diff / 86400);
 
-        if (days < 0) return { text: 'Overdue', color: 'text-rose-400 font-bold' };
-        if (days === 0) return { text: 'Due today', color: 'text-amber-400 font-bold' };
-        if (days === 1) return { text: 'Due tomorrow', color: 'text-amber-400' };
-        return { text: `${days} days left`, color: 'text-zinc-400' };
+        if (days < 0) return { text: 'Overdue', color: 'text-rose-600 dark:text-rose-400 font-bold' };
+        if (days === 0) return { text: 'Due today', color: 'text-amber-600 dark:text-amber-400 font-bold' };
+        if (days === 1) return { text: 'Due tomorrow', color: 'text-amber-600 dark:text-amber-400' };
+        return { text: `${days} days left`, color: 'text-zinc-600 dark:text-zinc-400' };
     };
 
     return (
-        <Card className="relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+        <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
             <CardHeader className="bg-transparent border-b border-zinc-200/80 dark:border-zinc-800/60 flex flex-row items-center justify-between">
                 <div>
                     <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white tracking-tight">

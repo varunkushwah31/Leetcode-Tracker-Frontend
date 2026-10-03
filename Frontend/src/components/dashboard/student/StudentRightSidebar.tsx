@@ -23,7 +23,7 @@ export function StudentRightSidebar({ data, totalSolved }: Readonly<{
     return (
         <div className="space-y-8 min-w-0">
             {/* Difficulty Breakdown */}
-            <Card className="relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+            <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
                 <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                     <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Difficulty Breakdown</CardTitle>
                 </CardHeader>
@@ -59,7 +59,7 @@ export function StudentRightSidebar({ data, totalSolved }: Readonly<{
             </Card>
 
             {/* Recent Activity */}
-            <Card className="flex flex-col relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+            <Card className="flex flex-col relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
                 <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                     <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center">
                         <ClockIcon className="w-5 h-5 mr-2 text-[#5b4fff]"/> Recent Activity

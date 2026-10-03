@@ -90,7 +90,7 @@ export function UnifiedContestHistory({
         return null;
     }
 
-    const defaultCardClass = "relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200";
+    const defaultCardClass = "relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200";
 
     return (
         <Card className={`${cardClassName || defaultCardClass} ${className}`}>

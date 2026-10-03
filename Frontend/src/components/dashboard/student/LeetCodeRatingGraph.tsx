@@ -199,7 +199,7 @@ export function LeetCodeRatingGraph({
     }, [activePoint, viewBoxWidth]);
 
     return (
-        <Card className={`relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-all h-full flex flex-col justify-between ${className}`}>
+        <Card className={`relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-all h-full flex flex-col justify-between ${className}`}>
             <CardContent className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
                 <div>
                     {/* Dedicated Title & Brand Bar */}
@@ -404,31 +404,31 @@ export function LeetCodeRatingGraph({
 
                 {/* Bottom Details Footer Bar */}
                 {activePoint ? (
-                    <div className="mt-3 p-3 bg-zinc-900/90 border border-zinc-800 rounded-xl backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="mt-3 p-3 bg-zinc-50/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 rounded-xl backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs transition-colors">
                         <div className="flex items-center gap-2 min-w-0">
-                            <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
-                            <span className="font-bold text-zinc-100 truncate">{activePoint.contest.title}</span>
-                            <span className="text-zinc-500">•</span>
-                            <span className="text-zinc-400 flex items-center gap-1 shrink-0">
-                                <Calendar className="w-3 h-3 text-zinc-500" />
+                            <div className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                            <span className="font-bold text-zinc-800 dark:text-zinc-100 truncate">{activePoint.contest.title}</span>
+                            <span className="text-zinc-400 dark:text-zinc-500">•</span>
+                            <span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1 shrink-0">
+                                <Calendar className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                                 {formatDate(activePoint.contest.timestamp)}
                             </span>
                         </div>
-                        <div className="flex items-center gap-3 text-zinc-300 shrink-0">
+                        <div className="flex items-center gap-3 text-zinc-600 dark:text-zinc-300 shrink-0">
                             <span>
-                                Rank: <strong className="text-white font-semibold">#{activePoint.contest.ranking?.toLocaleString() || 'N/A'}</strong>
+                                Rank: <strong className="text-zinc-900 dark:text-white font-semibold">#{activePoint.contest.ranking?.toLocaleString() || 'N/A'}</strong>
                             </span>
                             <span>
-                                Solved: <strong className="text-amber-400 font-semibold">{activePoint.contest.problemsSolved}/{activePoint.contest.totalProblems}</strong>
+                                Solved: <strong className="text-amber-600 dark:text-amber-400 font-semibold">{activePoint.contest.problemsSolved}/{activePoint.contest.totalProblems}</strong>
                             </span>
-                            <span className="flex items-center gap-1 text-amber-400 font-bold">
+                            <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
                                 <TrendingUp className="w-3.5 h-3.5" />
                                 {Math.round(activePoint.contest.rating).toLocaleString()}
                             </span>
                         </div>
                     </div>
                 ) : (
-                    <div className="mt-3 p-2.5 bg-zinc-900/40 border border-zinc-800/40 rounded-xl flex items-center justify-center text-xs text-zinc-500">
+                    <div className="mt-3 p-2.5 bg-zinc-50/60 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/40 rounded-xl flex items-center justify-center text-xs text-zinc-500">
                         <span>No contest details available</span>
                     </div>
                 )}

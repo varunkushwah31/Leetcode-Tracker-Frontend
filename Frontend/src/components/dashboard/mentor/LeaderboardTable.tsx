@@ -66,7 +66,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
     );
 
     return (
-        <Card className="mb-6 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/80 dark:border-zinc-800/60 bg-white/90 dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
+        <Card className="mb-6 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
             <CardHeader className="bg-transparent border-b border-zinc-200/80 dark:border-zinc-800/60 pb-5">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>

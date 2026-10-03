@@ -80,7 +80,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                 <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-75 h-75 bg-emerald-500 opacity-10 blur-[100px] rounded-full pointer-events-none"></div>
             </div>
 
-            <Card className="relative z-10 bg-white/90 dark:bg-[#111111]/60 backdrop-blur-3xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-md dark:shadow-2xl overflow-hidden rounded-[2rem] transition-colors duration-200">
+            <Card className="relative z-10 bg-white dark:bg-[#111111]/60 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-md dark:shadow-2xl overflow-hidden rounded-[2rem] transition-colors duration-200">
                 {/* Gradient subtle top border */}
                 <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#5b4fff]/40 dark:via-[#5b4fff]/50 to-transparent"></div>
 

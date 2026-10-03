@@ -81,10 +81,10 @@ export function StudentDashboard() {
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
+            <div className="flex min-h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(15,23,42,0.07)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
                 <div className="flex flex-col items-center space-y-4">
                     <Loader2 className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-500" />
-                    <p className="font-medium text-zinc-500 dark:text-zinc-400">Loading your stats...</p>
+                    <p className="font-medium text-zinc-600 dark:text-zinc-400">Loading your stats...</p>
                 </div>
             </div>
         );
@@ -107,12 +107,12 @@ export function StudentDashboard() {
     });
 
     return (
-        <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed transition-colors duration-200 relative">
+        <div className="min-h-screen flex flex-col bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(15,23,42,0.07)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed transition-colors duration-200 relative">
             <div className="hidden dark:block">
                 <AmbientGlow />
             </div>
 
-            <header className="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-20 shadow-sm transition-colors duration-200">
+            <header className="bg-white/90 dark:bg-zinc-900/60 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800 sticky top-0 z-20 shadow-xs transition-colors duration-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Link to="/" className="flex items-center gap-3 group">

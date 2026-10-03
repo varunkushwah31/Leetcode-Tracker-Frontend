@@ -6,7 +6,7 @@ import type { ClassroomAnalyticsDTO } from '@/types';
 export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | null }) {
     if (!data || data.totalStudents === 0) {
         return (
-            <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/80 dark:border-zinc-800/60 bg-white/90 dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl">
+            <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl">
                 <CardContent className="flex flex-col items-center justify-center py-16">
                     <div className="w-16 h-16 bg-zinc-100 dark:bg-[#1a1b2e] rounded-2xl flex items-center justify-center mb-6 shadow-sm">
                         <Activity className="w-8 h-8 text-[#5b4fff] dark:text-[#968fff]" />
@@ -18,7 +18,7 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
         );
     }
 
-    const cardClasses = "border border-zinc-200/80 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white/90 dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
+    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
 
     return (
         <div className="space-y-6">

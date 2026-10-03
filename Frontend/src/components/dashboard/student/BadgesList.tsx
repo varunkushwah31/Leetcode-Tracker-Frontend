@@ -4,7 +4,7 @@ import type { Badge } from '@/types';
 
 export function BadgesList({ badges }: Readonly<{ badges?: Badge[] }>) {
     return (
-        <Card className="relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+        <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
             <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                 <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center">
                     <Award className="w-5 h-5 mr-2 text-amber-500" /> Earned Badges
@@ -15,7 +15,7 @@ export function BadgesList({ badges }: Readonly<{ badges?: Badge[] }>) {
                     {badges?.slice(0, 6).map((badge, index) => (
                         <div
                             key={`${badge.title}-${badge.icon}-${index}`}
-                            className="aspect-square bg-zinc-100/80 dark:bg-[#1a1b2e]/40 rounded-2xl flex items-center justify-center border border-zinc-200/80 dark:border-zinc-800/60 p-2 shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 hover:scale-105 transition-all duration-200 group cursor-pointer"
+                            className="aspect-square bg-zinc-50 dark:bg-[#1a1b2e]/40 rounded-2xl flex items-center justify-center border border-zinc-200/80 dark:border-zinc-800/60 p-2 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 hover:scale-105 transition-all duration-200 group cursor-pointer"
                             title={badge.title}
                         >
                             <img

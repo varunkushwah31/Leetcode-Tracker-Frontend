@@ -109,7 +109,7 @@ export function ManageAssignments({ classroomId, mentorId, assignments = [], onR
     };
 
     return (
-        <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/80 dark:border-zinc-800/60 bg-white/90 dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
+        <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
             <CardHeader className="bg-transparent border-b border-zinc-200/80 dark:border-zinc-800/60 pb-5">
                 <CardTitle className="text-[22px] font-bold text-zinc-900 dark:text-white tracking-tight">Manage Assignments</CardTitle>
                 <CardDescription className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Review active assignments, extend deadlines, and manage questions.</CardDescription>

@@ -10,7 +10,7 @@ interface ClassroomListProps {
 
 export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassroom }: ClassroomListProps) {
     return (
-        <Card className="relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+        <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white tracking-tight">
                     <BookOpenIcon className="w-5 h-5 text-[#5b4fff]"/> My Classrooms

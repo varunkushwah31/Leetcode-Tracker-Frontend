@@ -3,11 +3,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../
 import type { ProgressRecord } from '@/types';
 
 const getIntensityColor = (count: number) => {
-    if (count === 0) return 'bg-zinc-200/70 dark:bg-[#1a1a1a]';
-    if (count <= 2) return 'bg-emerald-600 dark:bg-emerald-800';
-    if (count <= 5) return 'bg-emerald-500 dark:bg-emerald-500';
-    if (count <= 8) return 'bg-emerald-400 dark:bg-emerald-400';
-    return 'bg-emerald-300 dark:bg-emerald-300';
+    if (count === 0) return 'bg-zinc-200/80 dark:bg-[#1a1a1a]';
+    if (count <= 2) return 'bg-emerald-300 dark:bg-emerald-800';
+    if (count <= 5) return 'bg-emerald-400 dark:bg-emerald-600';
+    if (count <= 8) return 'bg-emerald-500 dark:bg-emerald-500';
+    return 'bg-emerald-600 dark:bg-emerald-400';
 };
 
 const generateHeatmapDays = (progressHistory: ProgressRecord[]) => {
@@ -49,7 +49,7 @@ export function ActivityHeatmap({ progressHistory = [], consistencyStreak = 0 }:
     const totalSubmissions = heatmapDays.reduce((acc, day) => acc + day.count, 0);
 
     return (
-        <Card className="relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+        <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between pb-6">
                 <div>
                     <CardTitle className="text-[15px] text-zinc-600 dark:text-zinc-300 font-medium tracking-wide">

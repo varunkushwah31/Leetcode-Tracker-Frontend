@@ -217,7 +217,7 @@ export function CodeforcesRatingGraph({
     }, [activePoint, viewBoxWidth]);
 
     return (
-        <Card className={`relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-all h-full flex flex-col justify-between ${className}`}>
+        <Card className={`relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-all h-full flex flex-col justify-between ${className}`}>
             <CardContent className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
                 <div>
                     {/* Dedicated Title & Brand Bar */}

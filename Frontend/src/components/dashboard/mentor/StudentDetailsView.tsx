@@ -94,7 +94,7 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
 
     if (!data) return null;
 
-    const cardClasses = "border border-zinc-200/80 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white/90 dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
+    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
 
     return (
         <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 space-y-6 relative z-10 animate-in fade-in duration-200">
