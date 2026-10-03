@@ -11,6 +11,7 @@ import { StudentService } from '@/services/endpoints';
 import type { StudentExtendedDTO } from '@/types';
 import { ActivityHeatmap } from '../student/ActivityHeatmap';
 import { ContestRatingsSection } from '../student/ContestRatingsSection';
+import { UnifiedContestHistory } from '../student/UnifiedContestHistory';
 import { ErrorBanner } from "@/components/ui/ErrorBanner.tsx";
 
 interface StudentDetailsViewProps {
@@ -217,70 +218,12 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
                             codeforcesMaxRank={data.codeforcesMaxRank}
                         />
 
-                        {/* LeetCode Contest History */}
-                        {data.contestHistory && data.contestHistory.length > 0 && (
-                            <Card className={cardClasses}>
-                                <CardHeader className="border-b border-zinc-800/60 pb-4">
-                                    <CardTitle className="text-lg font-bold text-white tracking-tight flex items-center">
-                                        <Activity className="w-5 h-5 mr-2 text-[#ffa116]" /> LeetCode Contests
-                                        <span className="ml-auto text-xs font-semibold text-zinc-500">{data.contestHistory.length} contests</span>
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-6">
-                                    <ScrollArea className="h-48 pr-4 custom-scrollbar">
-                                        <div className="space-y-3">
-                                            {data.contestHistory.slice().reverse().slice(0, 15).map((contest) => (
-                                                <div key={`lc-${contest.title}-${contest.timestamp}`} className="flex items-center justify-between p-3 bg-[#1a1b2e]/30 rounded-xl border border-zinc-800/60">
-                                                    <div className="min-w-0 flex-1">
-                                                        <p className="text-sm font-medium text-zinc-200 truncate">{contest.title}</p>
-                                                        <p className="text-xs text-zinc-500 mt-0.5">{formatDate(contest.timestamp)} • Rank #{contest.ranking}</p>
-                                                    </div>
-                                                    <div className="text-right shrink-0 ml-4">
-                                                        <p className="text-sm font-bold text-[#ffa116]">{Math.round(contest.rating)}</p>
-                                                        <p className="text-[10px] text-zinc-500">{contest.problemsSolved}/{contest.totalProblems} solved</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </ScrollArea>
-                                </CardContent>
-                            </Card>
-                        )}
-
-                        {/* Codeforces Contest History */}
-                        {data.codeforcesContestHistory && data.codeforcesContestHistory.length > 0 && (
-                            <Card className={cardClasses}>
-                                <CardHeader className="border-b border-zinc-800/60 pb-4">
-                                    <CardTitle className="text-lg font-bold text-white tracking-tight flex items-center">
-                                        <Activity className="w-5 h-5 mr-2 text-cyan-400" /> Codeforces Contests
-                                        <span className="ml-auto text-xs font-semibold text-zinc-500">{data.codeforcesContestHistory.length} contests</span>
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-6">
-                                    <ScrollArea className="h-48 pr-4 custom-scrollbar">
-                                        <div className="space-y-3">
-                                            {data.codeforcesContestHistory.slice().reverse().slice(0, 15).map((contest) => {
-                                                const ratingDelta = contest.newRating - contest.oldRating;
-                                                return (
-                                                    <div key={`cf-${contest.contestId}-${contest.ratingUpdateTimeSeconds}`} className="flex items-center justify-between p-3 bg-[#1a1b2e]/30 rounded-xl border border-zinc-800/60">
-                                                        <div className="min-w-0 flex-1">
-                                                            <p className="text-sm font-medium text-zinc-200 truncate">{contest.contestName}</p>
-                                                            <p className="text-xs text-zinc-500 mt-0.5">{formatDate(contest.ratingUpdateTimeSeconds)} • Rank #{contest.rank}</p>
-                                                        </div>
-                                                        <div className="text-right shrink-0 ml-4">
-                                                            <p className="text-sm font-bold text-cyan-400">{contest.newRating}</p>
-                                                            <p className={`text-[10px] font-semibold ${ratingDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                                                {ratingDelta >= 0 ? '+' : ''}{ratingDelta}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </ScrollArea>
-                                </CardContent>
-                            </Card>
-                        )}
+                        {/* Unified Contest History */}
+                        <UnifiedContestHistory
+                            contestHistory={data.contestHistory}
+                            codeforcesContestHistory={data.codeforcesContestHistory}
+                            cardClassName={cardClasses}
+                        />
                     </div>
 
                     {/* Right Column */}
