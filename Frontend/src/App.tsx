@@ -19,6 +19,9 @@ const LandingPage = React.lazy(() =>
 const ContactPage = React.lazy(() =>
     import('./pages/ContactPage').then((m) => ({ default: m.ContactPage }))
 );
+const HowToUsePage = React.lazy(() =>
+    import('./pages/HowToUsePage').then((m) => ({ default: m.HowToUsePage }))
+);
 
 const FullPageLoader = () => (
     <div className="flex h-screen items-center justify-center bg-slate-50" role="status" aria-live="polite" aria-label="Loading">
@@ -73,8 +76,9 @@ function App() {
                         <Route path="/login" element={<PublicRoute><AuthPage /></PublicRoute>} />
                         <Route path="/register" element={<PublicRoute><AuthPage /></PublicRoute>} />
 
-                        {/* 3. Added the missing Contact route! */}
+                        {/* 3. Added Contact and How to Use routes */}
                         <Route path="/contact" element={<ContactPage />} />
+                        <Route path="/how-to-use" element={<HowToUsePage />} />
 
                         <Route
                             path="/dashboard"

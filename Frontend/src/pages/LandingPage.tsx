@@ -42,7 +42,7 @@ export function LandingPage() {
                     </div>
                     <span className="text-xl font-bold tracking-tight text-white hidden sm:block group-hover:text-zinc-200 transition-colors">MentorSync</span>
                 </Link>
-                <nav className="flex items-center gap-4 sm:gap-6">
+                <nav className="flex items-center gap-3.5 sm:gap-6">
                     <button
                         type="button"
                         onClick={scrollToFeatures}
@@ -50,6 +50,9 @@ export function LandingPage() {
                     >
                         Features
                     </button>
+                    <Link to="/how-to-use" className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors hidden sm:block">
+                        How to Use
+                    </Link>
                     <Link to="/contact" className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors hidden md:block">
                         Contact
                     </Link>
@@ -342,12 +345,29 @@ export function LandingPage() {
                         </p>
                     </div>
 
-                    <div>
-                        <h4 className="text-white font-semibold mb-4 tracking-tight">Open Source</h4>
-                        <a href="https://github.com/varunkushwah31/Leetcode-Tracker-Frontend" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 px-4 py-2 rounded-xl text-sm font-medium transition-all group outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050508]">
-                            <Code2Icon className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
-                            <span className="text-zinc-300 group-hover:text-white transition-colors">Star on GitHub</span>
-                        </a>
+                    <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
+                        <div>
+                            <h4 className="text-white font-semibold mb-3 tracking-tight text-sm">Resources</h4>
+                            <ul className="space-y-2 text-xs text-zinc-400">
+                                <li>
+                                    <Link to="/how-to-use" className="hover:text-white transition-colors">How to Use & Docs</Link>
+                                </li>
+                                <li>
+                                    <Link to="/contact" className="hover:text-white transition-colors">Support & Contact</Link>
+                                </li>
+                                <li>
+                                    <Link to="/login" className="hover:text-white transition-colors">Sign In</Link>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="text-white font-semibold mb-3 tracking-tight text-sm">Open Source</h4>
+                            <a href="https://github.com/varunkushwah31/Leetcode-Tracker-Frontend" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 px-4 py-2 rounded-xl text-sm font-medium transition-all group outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050508]">
+                                <Code2Icon className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
+                                <span className="text-zinc-300 group-hover:text-white transition-colors">Star on GitHub</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
