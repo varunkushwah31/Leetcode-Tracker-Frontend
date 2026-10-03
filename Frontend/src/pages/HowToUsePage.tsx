@@ -119,7 +119,7 @@ https://codeforces.com/profile/petr`;
                     <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10" />
                     <Link
                         to="/login"
-                        className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-4 sm:px-6 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0"
+                        className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-4 sm:px-6 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 shimmer-sweep interactive-press"
                     >
                         Get Started
                     </Link>
@@ -162,7 +162,7 @@ https://codeforces.com/profile/petr`;
                             <button
                                 key={id}
                                 onClick={() => setActiveSection(id as typeof activeSection)}
-                                className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                                className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer interactive-press ${
                                     activeSection === id
                                         ? 'bg-[#5b4fff] text-white shadow-md shadow-[#5b4fff]/25 scale-102'
                                         : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5'
@@ -353,7 +353,7 @@ https://codeforces.com/profile/petr`;
                                 <Button
                                     onClick={handleDownloadTemplate}
                                     disabled={isDownloadingTemplate}
-                                    className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-md text-xs font-semibold h-11 px-5 self-start sm:self-auto cursor-pointer flex items-center gap-2 transition-all hover:-translate-y-0.5"
+                                    className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-md text-xs font-semibold h-11 px-5 self-start sm:self-auto cursor-pointer flex items-center gap-2 transition-all hover:-translate-y-0.5 interactive-press"
                                 >
                                     <Download className="w-4 h-4" />
                                     Download CSV Template
@@ -447,7 +447,7 @@ https://codeforces.com/profile/petr`;
                                         <span className="text-[12px] font-mono text-zinc-300 font-semibold">sample_students.csv (Multi-column)</span>
                                         <button
                                             onClick={() => handleCopy(csvSampleMultiColumn, 1)}
-                                            className="text-xs text-zinc-400 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
+                                            className="text-xs text-zinc-400 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors interactive-press"
                                         >
                                             {copiedIndex === 1 ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> : <CopyIcon className="w-3.5 h-3.5" />}
                                             {copiedIndex === 1 ? 'Copied' : 'Copy'}
@@ -474,7 +474,7 @@ https://codeforces.com/profile/petr`;
                                         <span className="text-[12px] font-mono text-zinc-300 font-semibold">handles_only.csv</span>
                                         <button
                                             onClick={() => handleCopy(csvSampleSingleColumn, 2)}
-                                            className="text-xs text-zinc-400 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
+                                            className="text-xs text-zinc-400 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors interactive-press"
                                         >
                                             {copiedIndex === 2 ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> : <CopyIcon className="w-3.5 h-3.5" />}
                                             {copiedIndex === 2 ? 'Copied' : 'Copy'}

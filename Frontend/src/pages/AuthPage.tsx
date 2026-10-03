@@ -324,7 +324,7 @@ export function AuthPage() {
               <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-10 mt-3 bg-[#5b4fff] hover:bg-[#4d40ea] text-white text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                  className="w-full h-10 mt-3 bg-[#5b4fff] hover:bg-[#4d40ea] text-white text-sm font-medium rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shimmer-sweep interactive-press"
               >
                 {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                 {isLogin ? 'Sign In' : 'Create Account'}
@@ -338,7 +338,7 @@ export function AuthPage() {
               <button
                   type="button"
                   onClick={() => { setIsLogin(!isLogin); setError(null); }}
-                  className="border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white rounded-lg px-3 py-1 text-xs sm:text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  className="border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white rounded-lg px-3 py-1 text-xs sm:text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer interactive-press"
               >
                 {isLogin ? 'Sign up' : 'Sign in'}
               </button>

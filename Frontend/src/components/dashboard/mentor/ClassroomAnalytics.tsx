@@ -18,7 +18,7 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
         );
     }
 
-    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
+    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl interactive-card";
 
     return (
         <div className="space-y-6">
@@ -93,7 +93,7 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
                                 <h4 className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3">Top Strengths</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {data.topStrengths?.map((skill, i) => (
-                                        <div key={i} className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2 shadow-sm">
+                                        <div key={i} className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2 shadow-sm hover:scale-105 transition-transform duration-200 cursor-default">
                                             <span className="text-[13px] font-medium text-emerald-700 dark:text-emerald-100">{skill.tagName}</span>
                                             <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded-md">{skill.problemsSolved}</span>
                                         </div>
@@ -107,7 +107,7 @@ export function ClassroomAnalytics({ data }: { data: ClassroomAnalyticsDTO | nul
                                 <h4 className="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-3">Needs Attention</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {data.criticalWeaknesses?.map((skill, i) => (
-                                        <div key={i} className="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-2 shadow-sm">
+                                        <div key={i} className="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-2 shadow-sm hover:scale-105 transition-transform duration-200 cursor-default">
                                             <span className="text-[13px] font-medium text-rose-700 dark:text-rose-100">{skill.tagName}</span>
                                             <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 bg-rose-500/20 px-1.5 py-0.5 rounded-md">{skill.problemsSolved}</span>
                                         </div>

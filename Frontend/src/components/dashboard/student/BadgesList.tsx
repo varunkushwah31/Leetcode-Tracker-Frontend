@@ -15,13 +15,13 @@ export function BadgesList({ badges }: Readonly<{ badges?: Badge[] }>) {
                     {badges?.slice(0, 6).map((badge, index) => (
                         <div
                             key={`${badge.title}-${badge.icon}-${index}`}
-                            className="aspect-square bg-zinc-50 dark:bg-[#1a1b2e]/40 rounded-2xl flex items-center justify-center border border-zinc-200/80 dark:border-zinc-800/60 p-2 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 hover:scale-105 transition-all duration-200 group cursor-pointer"
+                            className="aspect-square bg-zinc-50 dark:bg-[#1a1b2e]/40 rounded-2xl flex items-center justify-center border border-zinc-200/80 dark:border-zinc-800/60 p-2 shadow-xs hover:border-[#5b4fff]/40 hover:shadow-lg dark:hover:shadow-[#5b4fff]/10 hover:scale-110 hover:-rotate-3 transition-all duration-300 group cursor-pointer"
                             title={badge.title}
                         >
                             <img
                                 src={badge.icon.startsWith('http') ? badge.icon : `https://leetcode.com${badge.icon}`}
                                 alt={badge.title}
-                                className="w-10 h-10 sm:w-11 sm:h-11 object-contain transition-transform group-hover:scale-110"
+                                className="w-10 h-10 sm:w-11 sm:h-11 object-contain transition-transform duration-300 group-hover:scale-115 drop-shadow-sm group-hover:drop-shadow-md"
                             />
                         </div>
                     ))}

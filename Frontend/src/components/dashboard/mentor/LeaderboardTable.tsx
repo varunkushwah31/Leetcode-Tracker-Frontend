@@ -19,13 +19,13 @@ interface LeaderboardTableProps {
 
 function getRankBadgeClass(index: number): string {
     if (index === 0) {
-        return 'bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#b4afff] border border-[#5b4fff]/30';
+        return 'bg-amber-400/20 text-amber-600 dark:text-amber-400 border border-amber-400/40 shadow-[0_0_12px_rgba(251,191,36,0.3)] font-extrabold';
     }
     if (index === 1) {
-        return 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700';
+        return 'bg-slate-200/90 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-500 font-extrabold';
     }
     if (index === 2) {
-        return 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20';
+        return 'bg-amber-700/15 text-amber-700 dark:text-amber-500 border border-amber-700/30 font-extrabold';
     }
     return 'bg-zinc-100 dark:bg-[#222] text-zinc-500 dark:text-zinc-500 border border-transparent';
 }
@@ -129,7 +129,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 className="bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent rounded-xl py-2.5 pl-10 pr-4 text-[14px] focus:outline-none focus:ring-1 focus:ring-[#5b4fff] text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 w-full sm:w-64 transition-all"
                             />
                         </div>
-                        <Button variant="outline" onClick={onExportCSV} className="text-zinc-700 dark:text-white bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl h-10 px-3.5 transition-colors cursor-pointer text-xs font-semibold">
+                        <Button variant="outline" onClick={onExportCSV} className="text-zinc-700 dark:text-white bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl h-10 px-3.5 transition-all cursor-pointer text-xs font-semibold interactive-press">
                             <Download className="w-4 h-4 mr-1.5 text-zinc-500 dark:text-zinc-400" /> Export Leaderboard
                         </Button>
                         {classroomId && (
@@ -137,7 +137,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 variant="outline"
                                 onClick={handleExportAssignmentMatrix}
                                 disabled={isExportingMatrix}
-                                className="text-zinc-700 dark:text-white bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl h-10 px-3.5 transition-colors cursor-pointer text-xs font-semibold"
+                                className="text-zinc-700 dark:text-white bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl h-10 px-3.5 transition-all cursor-pointer text-xs font-semibold interactive-press"
                             >
                                 {isExportingMatrix ? (
                                     <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-[#5b4fff]" />
@@ -181,7 +181,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                         {filteredStudents?.map((student, index) => (
                             <tr key={student.id} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername || student.codeforcesHandle || student.id || '')}>
                                 <td className="py-4 px-6">
-                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto ${getRankBadgeClass(index)}`}>
+                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto transition-transform duration-200 group-hover:scale-115 ${getRankBadgeClass(index)}`}>
                                         {index + 1}
                                     </div>
                                 </td>
@@ -242,7 +242,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                 onClick={(e) => handleExportStudentReport(e, student.leetcodeUsername || student.codeforcesHandle || student.id || '')}
                                                 disabled={exportingReportStudent === (student.leetcodeUsername || student.codeforcesHandle || student.id)}
                                                 title="Download student performance report (CSV)"
-                                                className="group/report inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-50 dark:bg-zinc-800/80 transition-all cursor-pointer"
+                                                className="group/report inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-50 dark:bg-zinc-800/80 transition-all cursor-pointer interactive-press"
                                             >
                                                 {exportingReportStudent === (student.leetcodeUsername || student.codeforcesHandle || student.id) ? (
                                                     <Loader2 className="w-2.5 h-2.5 animate-spin text-[#5b4fff]" />
@@ -257,7 +257,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                     onClick={(e) => handleNudge(e, student.id!)}
                                                     disabled={nudgingStudentId === student.id || Boolean(nudgedStudents[student.id])}
                                                     title="Send reminder email to student"
-                                                    className={`group/nudge inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border transition-all ${
+                                                    className={`group/nudge inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border transition-all interactive-press ${
                                                         nudgedStudents[student.id]
                                                             ? 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 cursor-default'
                                                             : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 dark:bg-zinc-800 cursor-pointer'

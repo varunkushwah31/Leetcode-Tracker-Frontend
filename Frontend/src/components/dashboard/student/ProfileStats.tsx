@@ -112,7 +112,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                             type="button"
                                             onClick={handleOpenEdit}
                                             title="Edit profile handles"
-                                            className="p-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                            className="p-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200 cursor-pointer interactive-press hover:rotate-45"
                                         >
                                             <Settings className="w-4 h-4" />
                                         </button>
@@ -120,7 +120,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-1">
                                         {/* LeetCode Pill */}
                                         {data.leetcodeUsername ? (
-                                            <div className="flex items-center gap-1.5 bg-amber-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-amber-500/20 dark:border-zinc-800 text-xs">
+                                            <div className="flex items-center gap-1.5 bg-amber-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-amber-500/20 dark:border-zinc-800 text-xs interactive-press">
                                                 <span className="text-[#ffa116] font-semibold">LC:</span>
                                                 <span className="text-zinc-700 dark:text-zinc-300 font-medium">@{data.leetcodeUsername}</span>
                                                 <a
@@ -136,7 +136,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                             <button
                                                 type="button"
                                                 onClick={handleOpenEdit}
-                                                className="text-xs text-zinc-500 hover:text-[#ffa116] border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-[#ffa116] px-2 py-0.5 rounded-md transition-colors"
+                                                className="text-xs text-zinc-500 hover:text-[#ffa116] border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-[#ffa116] px-2 py-0.5 rounded-md transition-colors cursor-pointer interactive-press"
                                             >
                                                 + Link LeetCode
                                             </button>
@@ -144,7 +144,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
 
                                         {/* Codeforces Pill */}
                                         {data.codeforcesHandle ? (
-                                            <div className="flex items-center gap-1.5 bg-cyan-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-cyan-500/20 dark:border-zinc-800 text-xs">
+                                            <div className="flex items-center gap-1.5 bg-cyan-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-cyan-500/20 dark:border-zinc-800 text-xs interactive-press">
                                                 <span className="text-cyan-600 dark:text-cyan-400 font-semibold">CF:</span>
                                                 <span className="text-zinc-700 dark:text-zinc-300 font-medium">@{data.codeforcesHandle}</span>
                                                 <a
@@ -160,7 +160,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                             <button
                                                 type="button"
                                                 onClick={handleOpenEdit}
-                                                className="text-xs text-zinc-500 hover:text-cyan-500 border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-cyan-500 px-2 py-0.5 rounded-md transition-colors"
+                                                className="text-xs text-zinc-500 hover:text-cyan-500 border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-cyan-500 px-2 py-0.5 rounded-md transition-colors cursor-pointer interactive-press"
                                             >
                                                 + Link Codeforces
                                             </button>
@@ -168,29 +168,29 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     </div>
                                 </div>
 
-                                <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-[#1a1b2e]/60 border border-amber-500/20 dark:border-[#5b4fff]/20 px-4 py-2 rounded-full self-center md:self-auto shadow-xs dark:shadow-none">
+                                <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-[#1a1b2e]/60 border border-amber-500/20 dark:border-[#5b4fff]/20 px-4 py-2 rounded-full self-center md:self-auto shadow-xs dark:shadow-none hover:scale-105 transition-transform duration-200 cursor-default">
                                     <FlameIcon className="w-4 h-4 text-orange-500 animate-flame" />
                                     <span className="text-sm font-bold text-zinc-900 dark:text-white"><span className="text-orange-500 dark:text-orange-400 mr-1.5">{data.consistencyStreak || 0}</span>Day Combined Streak</span>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-colors group relative overflow-hidden shadow-xs dark:shadow-none">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">LeetCode Rank</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center">
+                                    <p className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center transition-transform duration-300 group-hover:scale-105 origin-left">
                                         <TrophyIcon className="w-5 h-5 text-amber-500 mr-2 shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]" />
                                         {data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : 'N/A'}
                                     </p>
                                 </div>
 
-                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-colors group relative overflow-hidden shadow-xs dark:shadow-none">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <div className="flex items-center justify-between">
                                         <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Total Solved</p>
                                         <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Unified</span>
                                     </div>
-                                    <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.25)] tracking-tight">
+                                    <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
                                         {totalSolved}
                                     </p>
                                     <p className="text-xs text-zinc-500 mt-1">
@@ -198,19 +198,19 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     </p>
                                 </div>
 
-                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-colors group relative overflow-hidden shadow-xs dark:shadow-none">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-[#5b4fff]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">LeetCode Rating</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight">
+                                    <p className="text-2xl sm:text-3xl font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
                                         {rating}
                                     </p>
                                     <p className="text-xs text-zinc-500 mt-1">Contest Rating</p>
                                 </div>
 
-                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-colors group relative overflow-hidden shadow-xs dark:shadow-none">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Codeforces Rating</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight">
+                                    <p className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
                                         {cfRating > 0 ? cfRating : 'N/A'}
                                     </p>
                                     <p className={`text-xs capitalize font-semibold mt-1 ${cfRankColor}`}>

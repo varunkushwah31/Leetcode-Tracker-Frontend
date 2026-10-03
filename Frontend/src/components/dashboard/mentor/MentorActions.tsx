@@ -252,7 +252,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             {/* 1. ADD STUDENT DIALOG */}
             <Dialog open={addStudentOpen} onOpenChange={(open) => { setAddStudentOpen(open); if(!open) { setAddStudentError(null); setBulkUploadError(null); setBulkResult(null); setUploadFile(null); } }}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">
+                    <Button variant="outline" className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-all cursor-pointer interactive-press">
                         <UserPlusIcon className="w-4 h-4 mr-2" />Add Student
                     </Button>
                 </DialogTrigger>
@@ -414,7 +414,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             {/* 2. ASSIGN QUESTION DIALOG */}
             <Dialog open={assignQuestionOpen} onOpenChange={(open) => { setAssignQuestionOpen(open); if(!open) setAssignQuestionError(null); }}>
                 <DialogTrigger asChild>
-                    <Button className="bg-white dark:bg-[#222] text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-[#333] border border-zinc-200 dark:border-transparent rounded-xl transition-colors shadow-sm">
+                    <Button className="bg-white dark:bg-[#222] text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-[#333] border border-zinc-200 dark:border-transparent rounded-xl transition-all shadow-sm cursor-pointer interactive-press">
                         <ClipboardList className="w-4 h-4 mr-2 text-[#5b4fff] dark:text-[#968fff]" />Assign Question
                     </Button>
                 </DialogTrigger>
@@ -563,7 +563,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
             {/* 3. ASSIGN PATH DIALOG */}
             <Dialog open={assignPathOpen} onOpenChange={(open) => { setAssignPathOpen(open); if(!open) setAssignPathError(null); }}>
-                <DialogTrigger asChild><Button className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white border border-transparent rounded-xl shadow-lg shadow-[#5b4fff]/20 transition-all hover:-translate-y-0.5"><Map className="w-4 h-4 mr-2" /> Assign Path</Button></DialogTrigger>
+                <DialogTrigger asChild><Button className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white border border-transparent rounded-xl shadow-lg shadow-[#5b4fff]/20 transition-all hover:-translate-y-0.5 cursor-pointer interactive-press"><Map className="w-4 h-4 mr-2" /> Assign Path</Button></DialogTrigger>
                 <DialogContent className={`sm:max-w-lg ${dialogContentClasses}`}>
                     <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Assign Learning Path</DialogTitle></DialogHeader>
 
@@ -788,7 +788,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             {/* 5. DELETE CLASSROOM DIALOG */}
             <Dialog open={deleteClassOpen} onOpenChange={(open) => { setDeleteClassOpen(open); if(!open) setDeleteClassError(null); }}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" className="border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 hover:text-rose-700 dark:hover:text-rose-300 rounded-xl transition-colors">
+                    <Button variant="outline" className="border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 hover:text-rose-700 dark:hover:text-rose-300 rounded-xl transition-all cursor-pointer interactive-press">
                         <Trash2 className="w-4 h-4 mr-2" />Delete Class
                     </Button>
                 </DialogTrigger>

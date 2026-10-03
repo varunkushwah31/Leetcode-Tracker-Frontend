@@ -57,7 +57,7 @@ export function LandingPage() {
                         Sign In
                     </Link>
                     <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10" />
-                    <Link to="/login" className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-4 sm:px-6 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0">
+                    <Link to="/login" className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-4 sm:px-6 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 shimmer-sweep interactive-press">
                         Get Started
                     </Link>
                 </nav>
@@ -83,14 +83,14 @@ export function LandingPage() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
-                        <Link to="/login" className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_30px_rgba(91,79,255,0.3)] text-white text-[15px] font-medium px-8 py-4 rounded-xl transition-all hover:-translate-y-1 flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff]">
-                            Start for Free <ChevronRight className="w-4 h-4" />
+                        <Link to="/login" className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_30px_rgba(91,79,255,0.3)] text-white text-[15px] font-medium px-8 py-4 rounded-xl transition-all hover:-translate-y-1 hover:shadow-xl active:translate-y-0 flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] group shimmer-sweep interactive-press">
+                            Start for Free <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1.5" />
                         </Link>
 
                         <button
                             type="button"
                             onClick={scrollToFeatures}
-                            className="w-full sm:w-auto bg-white dark:bg-[#0a0a0a] border border-zinc-300 dark:border-white/8 text-zinc-800 dark:text-white text-[15px] font-medium px-8 py-4 hover:bg-zinc-50 dark:hover:bg-[#111111] hover:border-zinc-400 dark:hover:border-white/15 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer"
+                            className="w-full sm:w-auto bg-white dark:bg-[#0a0a0a] border border-zinc-300 dark:border-white/8 text-zinc-800 dark:text-white text-[15px] font-medium px-8 py-4 hover:bg-zinc-50 dark:hover:bg-[#111111] hover:border-zinc-400 dark:hover:border-white/15 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 hover:shadow-md interactive-press"
                         >
                             Explore Features
                         </button>
@@ -109,13 +109,13 @@ export function LandingPage() {
                     <div className="flex bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-1.5 rounded-2xl w-max mx-auto mb-10 border border-zinc-200/80 dark:border-white/5 shadow-md transition-all">
                         <button
                             onClick={() => setActiveTab('mentor')}
-                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer ${activeTab === 'mentor' ? 'bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-white/5' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
+                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer interactive-press ${activeTab === 'mentor' ? 'bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-white/5 scale-[1.02]' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
                         >
                             For Mentors
                         </button>
                         <button
                             onClick={() => setActiveTab('student')}
-                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer ${activeTab === 'student' ? 'bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-white/5' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
+                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer interactive-press ${activeTab === 'student' ? 'bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-white/5 scale-[1.02]' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
                         >
                             For Students
                         </button>
@@ -176,7 +176,7 @@ export function LandingPage() {
                                     </div>
                                     <div className="grid grid-cols-7 gap-1.5 relative z-10 w-full rounded-lg overflow-hidden">
                                         {Array.from({length: 28}).map((_, i) => (
-                                            <div key={i} className={`w-full aspect-square rounded-[3px] shadow-xs transition-transform duration-200 hover:scale-125 cursor-pointer ${i % 5 === 0 || i % 7 === 0 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-zinc-200 dark:bg-zinc-800/80 hover:bg-zinc-300 dark:hover:bg-zinc-700'}`}></div>
+                                            <div key={i} className={`w-full aspect-square rounded-[3px] shadow-xs transition-transform duration-200 hover:scale-135 hover:z-20 cursor-pointer ${i % 5 === 0 || i % 7 === 0 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-zinc-200 dark:bg-zinc-800/80 hover:bg-zinc-300 dark:hover:bg-zinc-700'}`}></div>
                                         ))}
                                     </div>
                                 </div>
@@ -219,9 +219,9 @@ export function LandingPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:auto-rows-[minmax(300px,auto)]">
-                        <div className="md:col-span-2 bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c] transition-all duration-500">
+                        <div className="md:col-span-2 bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c]">
                             <div className="absolute top-0 right-0 p-8 sm:p-10">
-                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
                                     <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                 </div>
                             </div>
@@ -235,12 +235,12 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c] transition-all duration-500">
+                        <div className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c]">
                             {/* Ambient Purple Glow */}
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
 
                             {/* Top Icon */}
-                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
+                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
                                 <CheckCircleIcon className="h-7 w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                             </div>
 
@@ -267,12 +267,12 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c] transition-all duration-500">
+                        <div className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c]">
                             {/* Ambient Purple Glow */}
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
 
                             {/* Top Icon */}
-                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
+                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
                                 <LayoutDashboard className="h-7 w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                             </div>
 
@@ -299,7 +299,7 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="md:col-span-2 bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end gap-6 relative overflow-hidden group hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c] transition-all duration-500">
+                        <div className="md:col-span-2 bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end gap-6 relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c]">
                             <div className="flex items-end gap-2 sm:gap-3 relative z-10 w-full h-28 sm:h-32 shrink-0 overflow-visible pt-5 opacity-70 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
                                 <div className="h-[40%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 group-hover:scale-y-105 origin-bottom"></div>
                                 <div className="h-[60%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-75 group-hover:scale-y-110 origin-bottom"></div>
@@ -315,7 +315,7 @@ export function LandingPage() {
                             </div>
 
                             <div className="relative z-10 w-full md:max-w-[75%] flex flex-col justify-end">
-                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
                                     <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                 </div>
                                 <h3 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight text-zinc-900 dark:text-white">Deep Analytics</h3>
@@ -357,8 +357,8 @@ export function LandingPage() {
 
                         <div>
                             <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 tracking-tight text-sm">Open Source</h4>
-                            <a href="https://github.com/varunkushwah31/Leetcode-Tracker-Frontend" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 px-4 py-2 rounded-xl text-sm font-medium transition-all group outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] shadow-xs">
-                                <Code2Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
+                            <a href="https://github.com/varunkushwah31/Leetcode-Tracker-Frontend" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 px-4 py-2 rounded-xl text-sm font-medium transition-all group outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] shadow-xs interactive-press hover:-translate-y-0.5">
+                                <Code2Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-all duration-300 group-hover:rotate-12 group-hover:scale-110" />
                                 <span className="text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Star on GitHub</span>
                             </a>
                         </div>

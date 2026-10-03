@@ -198,7 +198,7 @@ export function ContactPage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full h-12 mt-6 bg-[#5b4fff] hover:bg-[#4d40ea] text-white text-[15px] font-medium rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer"
+                                className="w-full h-12 mt-6 bg-[#5b4fff] hover:bg-[#4d40ea] text-white text-[15px] font-medium rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer shimmer-sweep interactive-press"
                             >
                                 {isSubmitting ? (
                                     <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white mr-2"></div>

@@ -209,7 +209,7 @@ export function PendingAssignments({
                                         <Button
                                             asChild
                                             variant="outline"
-                                            className="bg-transparent border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-[14px] text-zinc-800 dark:text-white group"
+                                            className="bg-transparent border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-[14px] text-zinc-800 dark:text-white group interactive-press cursor-pointer"
                                         >
                                             <a href={item.assignment.questionLink} target="_blank" rel="noopener noreferrer">
                                                 Solve <ExternalLink className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -220,7 +220,7 @@ export function PendingAssignments({
                                         <Button
                                             onClick={() => handleAutoValidate(item.classroomId, item.assignment.id)}
                                             disabled={isAutoValidatingThis || isValidating}
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] font-medium shadow-xs"
+                                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] font-medium shadow-xs hover:shadow-md hover:shadow-emerald-500/20 interactive-press cursor-pointer"
                                         >
                                             {isAutoValidatingThis ? (
                                                  <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
@@ -233,7 +233,7 @@ export function PendingAssignments({
                                         <Button
                                             onClick={() => handleOpenSubmit(item.assignment.id)}
                                             variant="outline"
-                                            className={`text-[14px] font-medium transition-colors border ${
+                                            className={`text-[14px] font-medium transition-colors border interactive-press cursor-pointer ${
                                                 isExpanded
                                                     ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white border-zinc-300 dark:border-zinc-700'
                                                     : 'bg-transparent border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
@@ -269,7 +269,7 @@ export function PendingAssignments({
                                             <Button
                                                 onClick={() => handleValidateSubmission(item.classroomId, item.assignment.id)}
                                                 disabled={isValidating}
-                                                className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white shrink-0 font-medium"
+                                                className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white shrink-0 font-medium interactive-press cursor-pointer shadow-xs hover:shadow-md hover:shadow-indigo-500/20"
                                             >
                                                 {isValidating ? (
                                                     <>
