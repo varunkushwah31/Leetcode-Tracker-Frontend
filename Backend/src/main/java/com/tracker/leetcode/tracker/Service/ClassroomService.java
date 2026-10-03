@@ -52,6 +52,11 @@ public class ClassroomService {
     @Autowired
     private StudentService studentService;
 
+    @Lazy
+    @Autowired
+    @org.springframework.beans.factory.annotation.Qualifier("virtualThreadExecutor")
+    private java.util.concurrent.Executor virtualThreadExecutor;
+
     // 1. Create Classroom
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics", "mentors-all", "mentor"}, allEntries = true)
     public Classroom createClassroom(String mentorId, String className) {
@@ -110,7 +115,7 @@ public class ClassroomService {
                     } catch (Exception e) {
                         log.warn("Background profile sync failed for newly provisioned student [{}]: {}", created.getName(), e.getMessage());
                     }
-                });
+                }, virtualThreadExecutor != null ? virtualThreadExecutor : java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor());
             }
         }
 
@@ -139,8 +144,8 @@ public class ClassroomService {
 
         List<Student> enrolledStudents = studentRepository.findAllById(classroom.getStudentIds());
 
-        // 2. Map to DTOs and pass the classroom assignments for evaluation
-        List<StudentSummaryDTO> studentSummaries = enrolledStudents.stream()
+        // 2. Map to DTOs in parallel for maximum multi-core throughput
+        List<StudentSummaryDTO> studentSummaries = enrolledStudents.parallelStream()
                 .map(student -> studentMapper.toSummaryDTO(student, classroom.getAssignments()))
                 .collect(Collectors.toList());
 
@@ -765,16 +770,35 @@ public class ClassroomService {
                 webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Bulk students imported successfully");
             }
 
-            // Background sync newly provisioned profiles
+            // Background parallel sync newly provisioned profiles using Virtual Threads
             if (studentService != null && !studentsToSync.isEmpty()) {
-                CompletableFuture.runAsync(() -> {
-                    for (Student s : studentsToSync) {
-                        try {
-                            studentService.syncAllProfileData(s);
-                        } catch (Exception e) {
-                            log.warn("Async profile sync error for {}: {}", s.getId(), e.getMessage());
-                        }
+                final List<Student> studentsCopy = new ArrayList<>(studentsToSync);
+                Thread.ofVirtual().name("bulk-csv-sync-", 1).start(() -> {
+                    log.info("Starting virtual thread parallel sync for {} students in classroom [{}]", studentsCopy.size(), classroomId);
+                    java.util.concurrent.Semaphore semaphore = new java.util.concurrent.Semaphore(6);
+                    List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+                    for (Student s : studentsCopy) {
+                        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                            try {
+                                semaphore.acquire();
+                                try {
+                                    studentService.syncAllProfileData(s);
+                                } finally {
+                                    semaphore.release();
+                                }
+                            } catch (InterruptedException ie) {
+                                Thread.currentThread().interrupt();
+                            } catch (Exception e) {
+                                log.warn("Async profile sync error for {}: {}", s.getId(), e.getMessage());
+                            }
+                        }, virtualThreadExecutor != null ? virtualThreadExecutor : java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor());
+                        futures.add(future);
                     }
+
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+                    log.info("Completed virtual thread parallel sync for {} students in classroom [{}]", studentsCopy.size(), classroomId);
+                    webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "All imported student profiles synced successfully!");
                 });
             }
 
@@ -831,7 +855,7 @@ public class ClassroomService {
         }
         csv.append("\n");
 
-        for (Student s : students) {
+        List<String> rows = students.parallelStream().map(s -> {
             int completed = 0;
             int pending = 0;
             List<String> statuses = new ArrayList<>();
@@ -853,7 +877,8 @@ public class ClassroomService {
                 }
             }
 
-            csv.append("\"").append(s.getName() != null ? s.getName().replace("\"", "\"\"") : "").append("\",")
+            StringBuilder row = new StringBuilder();
+            row.append("\"").append(s.getName() != null ? s.getName().replace("\"", "\"\"") : "").append("\",")
                     .append("\"").append(s.getEmail() != null ? s.getEmail().replace("\"", "\"\"") : "").append("\",")
                     .append(s.getLeetcodeUsername() != null ? s.getLeetcodeUsername() : "").append(",")
                     .append(s.getCodeforcesHandle() != null ? s.getCodeforcesHandle() : "").append(",")
@@ -861,9 +886,13 @@ public class ClassroomService {
                     .append(pending);
 
             for (String status : statuses) {
-                csv.append(",").append(status);
+                row.append(",").append(status);
             }
-            csv.append("\n");
+            return row.toString();
+        }).collect(Collectors.toList());
+
+        for (String row : rows) {
+            csv.append(row).append("\n");
         }
 
         return csv.toString();

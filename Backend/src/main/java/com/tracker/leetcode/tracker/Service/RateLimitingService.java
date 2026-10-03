@@ -110,22 +110,22 @@ public class RateLimitingService {
         return new RateLimitResult(allowed, maxLimit, remaining, ttl);
     }
 
-    private synchronized RateLimitResult checkInMemoryLimit(String key, long maxLimit, long durationSeconds) {
+    private RateLimitResult checkInMemoryLimit(String key, long maxLimit, long durationSeconds) {
         long now = System.currentTimeMillis();
         long windowDurationMs = durationSeconds * 1000L;
 
-        InMemoryCounter counter = inMemoryStore.get(key);
-        if (counter == null || (now - counter.windowStart) >= windowDurationMs) {
-            inMemoryStore.put(key, new InMemoryCounter(now));
-            return new RateLimitResult(true, maxLimit, maxLimit - 1, durationSeconds);
-        }
+        InMemoryCounter updated = inMemoryStore.compute(key, (k, existing) -> {
+            if (existing == null || (now - existing.windowStart) >= windowDurationMs) {
+                return new InMemoryCounter(now);
+            }
+            existing.count++;
+            return existing;
+        });
 
-        counter.count++;
-        long elapsed = now - counter.windowStart;
+        long elapsed = now - updated.windowStart;
         long remainingSeconds = Math.max(1, (windowDurationMs - elapsed) / 1000L);
-
-        boolean allowed = counter.count <= maxLimit;
-        long remaining = Math.max(0, maxLimit - counter.count);
+        boolean allowed = updated.count <= maxLimit;
+        long remaining = Math.max(0, maxLimit - updated.count);
         return new RateLimitResult(allowed, maxLimit, remaining, remainingSeconds);
     }
 

@@ -25,6 +25,8 @@ public class MongoIndexInitializer implements CommandLineRunner {
         log.info("Checking and initializing MongoDB indexes safely...");
         ensureStudentIndexes();
         ensureMentorIndexes();
+        ensureClassroomIndexes();
+        ensureLearningPathIndexes();
         ensureRefreshTokenIndexes();
     }
 
@@ -63,6 +65,27 @@ public class MongoIndexInitializer implements CommandLineRunner {
             log.info("Mentor collection indexes verified and initialized.");
         } catch (Exception e) {
             log.error("Failed to initialize Mentor indexes: {}", e.getMessage(), e);
+        }
+    }
+
+    private void ensureClassroomIndexes() {
+        try {
+            var indexOps = mongoTemplate.indexOps("Classrooms");
+            indexOps.ensureIndex(new Index().on("mentorId", Sort.Direction.ASC));
+            indexOps.ensureIndex(new Index().on("studentIds", Sort.Direction.ASC));
+            log.info("Classroom collection indexes verified and initialized.");
+        } catch (Exception e) {
+            log.error("Failed to initialize Classroom indexes: {}", e.getMessage(), e);
+        }
+    }
+
+    private void ensureLearningPathIndexes() {
+        try {
+            var indexOps = mongoTemplate.indexOps("LearningPaths");
+            indexOps.ensureIndex(new Index().on("mentorId", Sort.Direction.ASC));
+            log.info("LearningPath collection indexes verified and initialized.");
+        } catch (Exception e) {
+            log.error("Failed to initialize LearningPath indexes: {}", e.getMessage(), e);
         }
     }
 

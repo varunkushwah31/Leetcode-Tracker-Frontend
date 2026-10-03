@@ -30,13 +30,19 @@ import java.util.concurrent.TimeUnit;
 public class LeetCodeApiClient {
 
     private final String LEETCODE_API_URL = "https://leetcode.com/graphql";
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpHeaders headers;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public LeetCodeApiClient(RedisTemplate<String, Object> redisTemplate) {
+        this(redisTemplate, new RestTemplate());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public LeetCodeApiClient(RedisTemplate<String, Object> redisTemplate, RestTemplate restTemplate) {
         this.redisTemplate = redisTemplate;
+        this.restTemplate = restTemplate;
         headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");

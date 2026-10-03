@@ -38,6 +38,10 @@ public class StudentService {
     private final StudentMapper studentMapper;
     private final RedisWebSocketBridge webSocketBridge;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    @org.springframework.beans.factory.annotation.Qualifier("virtualThreadExecutor")
+    private java.util.concurrent.Executor virtualThreadExecutor;
+
     // Helper method to keep code DRY - supports ID, email, LeetCode username, or Codeforces handle
     public Student getStudentOrThrow(String identifier) {
         if (identifier == null || identifier.isBlank()) {
@@ -143,45 +147,119 @@ public class StudentService {
                 });
     }
 
+    private record CfSyncPayload(Student cfUser, List<CodeforcesContestHistory> cfContests, CodeforcesApiClient.CodeforcesSubmissionData cfData) {}
+
     private Student doSyncAllProfileData(Student student) {
         log.info("Performing FULL multi-platform profile sync for student ID: {}", student.getId());
 
-        // 1. Sync LeetCode Data (if present)
         String lcUsername = student.getLeetcodeUsername();
-        if (lcUsername != null && !lcUsername.isBlank()) {
-            try {
-                student.setProgressHistory(leetCodeApiClient.fetchCalendarData(lcUsername));
-                student.setProblemStats(leetCodeApiClient.fetchProblemStats(lcUsername));
-                student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(lcUsername, 20));
-                student.setSkills(leetCodeApiClient.fetchSkillStats(lcUsername));
+        String cfHandle = student.getCodeforcesHandle();
 
-                Student extendedData = leetCodeApiClient.fetchExtendedProfileDetails(lcUsername);
-                student.setAbout(extendedData.getAbout());
-                student.setRank(extendedData.getRank());
-                student.setCurrentContestRating(extendedData.getCurrentContestRating());
-                student.setSocialMedia(extendedData.getSocialMedia());
-                student.setBadges(extendedData.getBadges());
-                student.setContestHistory(extendedData.getContestHistory());
-                if (extendedData.getAvatarUrl() != null && !extendedData.getAvatarUrl().isBlank()) {
-                    student.setAvatarUrl(extendedData.getAvatarUrl());
+        boolean hasLc = lcUsername != null && !lcUsername.isBlank();
+        boolean hasCf = cfHandle != null && !cfHandle.isBlank();
+
+        java.util.concurrent.Executor executor = virtualThreadExecutor != null
+                ? virtualThreadExecutor
+                : java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor();
+
+        // 1. Fetch LeetCode Data (concurrently on Virtual Thread if present)
+        CompletableFuture<Void> lcFuture = CompletableFuture.runAsync(() -> {
+            if (hasLc) {
+                try {
+                    log.info("Fetching LeetCode data concurrently for user [{}]", lcUsername);
+                    student.setProgressHistory(leetCodeApiClient.fetchCalendarData(lcUsername));
+                    student.setProblemStats(leetCodeApiClient.fetchProblemStats(lcUsername));
+                    student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(lcUsername, 20));
+                    student.setSkills(leetCodeApiClient.fetchSkillStats(lcUsername));
+
+                    Student extendedData = leetCodeApiClient.fetchExtendedProfileDetails(lcUsername);
+                    student.setAbout(extendedData.getAbout());
+                    student.setRank(extendedData.getRank());
+                    student.setCurrentContestRating(extendedData.getCurrentContestRating());
+                    student.setSocialMedia(extendedData.getSocialMedia());
+                    student.setBadges(extendedData.getBadges());
+                    student.setContestHistory(extendedData.getContestHistory());
+                    if (extendedData.getAvatarUrl() != null && !extendedData.getAvatarUrl().isBlank()) {
+                        student.setAvatarUrl(extendedData.getAvatarUrl());
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed fetching LeetCode data for {}: {}", lcUsername, e.getMessage());
                 }
-            } catch (Exception e) {
-                log.warn("Failed fetching LeetCode data for {}: {}", lcUsername, e.getMessage());
+            }
+        }, executor);
+
+        // 2. Fetch Codeforces Data (concurrently on Virtual Thread if present)
+        CompletableFuture<CfSyncPayload> cfFuture = CompletableFuture.supplyAsync(() -> {
+            if (hasCf) {
+                try {
+                    log.info("Fetching Codeforces data concurrently for handle [{}]", cfHandle);
+                    Student cfUser = codeforcesApiClient.fetchUserInfo(cfHandle);
+                    List<CodeforcesContestHistory> cfContests = codeforcesApiClient.fetchContestHistory(cfHandle);
+                    CodeforcesApiClient.CodeforcesSubmissionData cfData = codeforcesApiClient.fetchSubmissions(cfHandle, 500);
+                    return new CfSyncPayload(cfUser, cfContests, cfData);
+                } catch (Exception e) {
+                    log.warn("Failed fetching Codeforces data for handle [{}]: {}", cfHandle, e.getMessage());
+                }
+            }
+            return null;
+        }, executor);
+
+        // Wait for both concurrent platform fetches to complete
+        CompletableFuture.allOf(lcFuture, cfFuture).join();
+
+        // 3. Apply Codeforces Data & Merge metrics safely
+        CfSyncPayload cfResult = cfFuture.join();
+        if (cfResult != null) {
+            if (cfResult.cfUser != null) {
+                student.setCodeforcesRating(cfResult.cfUser.getCodeforcesRating());
+                student.setCodeforcesMaxRating(cfResult.cfUser.getCodeforcesMaxRating());
+                student.setCodeforcesRank(cfResult.cfUser.getCodeforcesRank());
+                student.setCodeforcesMaxRank(cfResult.cfUser.getCodeforcesMaxRank());
+                student.setCodeforcesAvatarUrl(cfResult.cfUser.getCodeforcesAvatarUrl());
+                if (student.getAvatarUrl() == null || student.getAvatarUrl().isBlank()) {
+                    student.setAvatarUrl(cfResult.cfUser.getCodeforcesAvatarUrl());
+                }
+            }
+            if (cfResult.cfContests != null) {
+                student.setCodeforcesContestHistory(cfResult.cfContests);
+            }
+            if (cfResult.cfData != null) {
+                student.setCodeforcesSolvedCount(cfResult.cfData.solvedCount());
+
+                // Merge recent submissions (LeetCode + Codeforces, sorted by timestamp descending, keep top 30)
+                List<RecentSubmission> combinedSubmissions = new ArrayList<>();
+                if (student.getRecentSubmissions() != null) {
+                    combinedSubmissions.addAll(student.getRecentSubmissions());
+                }
+                if (cfResult.cfData.recentSubmissions() != null) {
+                    combinedSubmissions.addAll(cfResult.cfData.recentSubmissions());
+                }
+                combinedSubmissions.sort((a, b) -> Long.compare(b.getTimestamp(), a.getTimestamp()));
+                if (combinedSubmissions.size() > 30) {
+                    combinedSubmissions = new ArrayList<>(combinedSubmissions.subList(0, 30));
+                }
+                student.setRecentSubmissions(combinedSubmissions);
+
+                // Merge daily activity into progressHistory for combined heatmap
+                student.setProgressHistory(mergeDailyProgress(student.getProgressHistory(), cfResult.cfData.dailyActivity()));
+
+                // Merge skills
+                student.setSkills(mergeSkills(student.getSkills(), cfResult.cfData.skills()));
+
+                log.info("Successfully merged Codeforces data for handle [{}]. Solved: {}, Rating: {}",
+                        cfHandle, cfResult.cfData.solvedCount(), cfResult.cfUser != null ? cfResult.cfUser.getCodeforcesRating() : 0);
             }
         }
 
-        // 2. Sync Codeforces Data (if present)
-        syncCodeforcesData(student);
-
-        // 3. Auto-validate any pending assignments
+        // 4. Auto-validate any pending assignments
         autoValidateAssignmentsForStudent(student);
 
         Student saved = studentRepository.save(student);
 
-        // 4. Invalidate all student caches and dependent classroom dashboards
+        // 5. Invalidate all student caches and dependent classroom dashboards
         evictStudentCaches(saved);
 
-        // 5. Update real-time Redis leaderboards
+        // 6. Update real-time Redis leaderboards
         updateRedisLeaderboards(saved);
 
         return saved;

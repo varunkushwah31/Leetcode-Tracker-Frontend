@@ -29,13 +29,19 @@ import java.util.regex.Pattern;
 public class CodeforcesApiClient {
 
     private static final String BASE_URL = "https://codeforces.com/api";
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpHeaders headers;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public CodeforcesApiClient(RedisTemplate<String, Object> redisTemplate) {
+        this(redisTemplate, new RestTemplate());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public CodeforcesApiClient(RedisTemplate<String, Object> redisTemplate, RestTemplate restTemplate) {
         this.redisTemplate = redisTemplate;
+        this.restTemplate = restTemplate;
         this.headers = new HttpHeaders();
         this.headers.set(HttpHeaders.USER_AGENT, "MentorSync-Tracker/1.0 (Educational competitive programming tracker)");
     }
