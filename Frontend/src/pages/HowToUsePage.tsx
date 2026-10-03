@@ -4,7 +4,6 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import {
     TerminalIcon,
-    ArrowLeftIcon,
     DownloadSimpleIcon as Download,
     CheckCircleIcon as CheckCircle,
     CopyIcon,
@@ -21,7 +20,6 @@ import {
     SparkleIcon as Sparkles
 } from '@phosphor-icons/react';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
-import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { ClassroomService } from '@/services/endpoints';
 
 export function HowToUsePage() {
@@ -79,72 +77,61 @@ https://leetcode.com/u/alicesharma
 https://codeforces.com/profile/petr`;
 
     return (
-        <div className="min-h-screen bg-[#f1f3f7] dark:bg-[#09090e] text-zinc-900 dark:text-white bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed selection:bg-[#5b4fff] selection:text-white font-sans relative transition-colors duration-200">
+        <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative">
 
-            {/* Ambient Background Glow for Dark Mode */}
-            <div className="hidden dark:block">
+            {/* Background Base matching Landing Page */}
+            <div className="fixed inset-0 z-0 bg-[#050505]">
+                <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-size-[24px_24px] opacity-[0.03] pointer-events-none"></div>
                 <AmbientGlow />
             </div>
 
-            {/* Floating Top Navigation Header */}
-            <header className="sticky top-0 z-50 bg-white/85 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800/60 px-4 sm:px-8 py-3.5 transition-colors">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <Link to="/" className="flex items-center gap-3 group">
-                            <div className="bg-[#5b4fff] p-2.5 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
-                            </div>
-                            <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">
-                                MentorSync
-                            </span>
-                        </Link>
-                        <span className="hidden sm:inline-flex text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
-                            Docs & Manual
-                        </span>
+            {/* Floating Header matching Landing Page exactly */}
+            <header className="fixed top-6 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-[#0a0a0a]/70 backdrop-blur-2xl border border-white/5 shadow-2xl px-4 sm:px-6 py-3 flex items-center justify-between transition-all">
+                <Link to="/" className="flex items-center gap-3 group">
+                    <div className="bg-[#5b4fff] p-2.5 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                        <TerminalIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" weight="bold" />
                     </div>
+                    <span className="text-xl font-bold tracking-tight text-white hidden sm:block group-hover:text-zinc-200 transition-colors">
+                        MentorSync
+                    </span>
+                </Link>
 
-                    <nav className="flex items-center gap-3 sm:gap-5">
-                        <Link
-                            to="/"
-                            className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors hidden md:inline-flex items-center gap-1.5"
-                        >
-                            <ArrowLeftIcon className="w-3.5 h-3.5" /> Home
-                        </Link>
-                        <Link
-                            to="/how-to-use"
-                            className="text-xs sm:text-sm font-semibold text-[#5b4fff] dark:text-[#968fff] transition-colors hidden md:block"
-                        >
-                            How to Use
-                        </Link>
-                        <Link
-                            to="/contact"
-                            className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors hidden md:block"
-                        >
-                            Contact
-                        </Link>
-
-                        <ThemeToggle />
-
-                        <div className="w-px h-6 bg-zinc-200 dark:bg-zinc-800 hidden sm:block mx-1" />
-
-                        <Link
-                            to="/login"
-                            className="text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white px-3 py-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                        >
-                            Sign In
-                        </Link>
-                        <Link
-                            to="/login"
-                            className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-xl transition-all shadow-md shadow-[#5b4fff]/20 hover:-translate-y-0.5"
-                        >
-                            Get Started
-                        </Link>
-                    </nav>
-                </div>
+                <nav className="flex items-center gap-3.5 sm:gap-6">
+                    <Link
+                        to="/#features"
+                        className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors hidden md:block"
+                    >
+                        Features
+                    </Link>
+                    <Link
+                        to="/how-to-use"
+                        className="text-[14px] font-medium text-white transition-colors hidden sm:block"
+                    >
+                        How to Use
+                    </Link>
+                    <Link
+                        to="/contact"
+                        className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors hidden md:block"
+                    >
+                        Contact
+                    </Link>
+                    <Link
+                        to="/login"
+                        className="text-[14px] font-medium text-zinc-400 hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
+                    >
+                        Sign In
+                    </Link>
+                    <Link
+                        to="/login"
+                        className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-5 sm:px-6 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                        Get Started
+                    </Link>
+                </nav>
             </header>
 
             {/* Main Content Area */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 relative z-10">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 sm:pt-44 pb-16 sm:pb-24 relative z-10">
 
                 {/* Hero Title Section */}
                 <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
