@@ -62,9 +62,9 @@ export function ActivityHeatmap({ progressHistory = [], consistencyStreak = 0 }:
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="overflow-x-auto pb-4 custom-scrollbar" dir="rtl">
+                <div className="overflow-x-auto pb-2 custom-scrollbar flex justify-start xl:justify-center">
                     <TooltipProvider>
-                        <div className="inline-grid grid-flow-col gap-1" style={{ gridTemplateRows: 'repeat(7, 1fr)' }} dir="ltr">
+                        <div className="inline-grid grid-flow-col gap-1 w-max" style={{ gridTemplateRows: 'repeat(7, 1fr)' }}>
                             {heatmapDays.map((day, index) => (
                                 <Tooltip key={index}>
                                     <TooltipTrigger asChild>
