@@ -304,7 +304,7 @@ export function MentorDashboard() {
 
     if (isLoading && classrooms.length === 0) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#09090e] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(50,205,50,0.35)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
+            <div className="flex h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#09090e] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
                 <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
             </div>
         );
@@ -467,7 +467,7 @@ export function MentorDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(50,205,50,0.35)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
+            <main className="flex-1 overflow-y-auto relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
                 {/* Luminous Multi-Layer Ambient Glow */}
                 <div className="hidden dark:block">
                     <AmbientGlow />
