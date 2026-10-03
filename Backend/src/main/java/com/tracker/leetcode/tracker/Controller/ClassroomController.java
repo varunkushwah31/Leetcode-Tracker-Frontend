@@ -197,4 +197,21 @@ public class ClassroomController {
         Classroom updated = classroomService.updateAssignmentDeadline(classroomId, assignmentId, effectiveMentorId, effectiveDeadline);
         return ResponseEntity.ok(updated);
     }
+
+    // 10. Redis Real-time Classroom Leaderboard
+    @GetMapping("/{classroomId}/leaderboard")
+    public ResponseEntity<List<com.tracker.leetcode.tracker.DTO.LeaderboardEntryDTO>> getClassroomLeaderboard(
+            @PathVariable String classroomId,
+            @RequestParam(defaultValue = "solved") String metric,
+            @RequestParam(defaultValue = "50") int limit) {
+        return ResponseEntity.ok(classroomService.getRedisLeaderboard(classroomId, metric, limit));
+    }
+
+    // 11. Redis Real-time Global Leaderboard
+    @GetMapping("/leaderboard")
+    public ResponseEntity<List<com.tracker.leetcode.tracker.DTO.LeaderboardEntryDTO>> getGlobalLeaderboard(
+            @RequestParam(defaultValue = "solved") String metric,
+            @RequestParam(defaultValue = "50") int limit) {
+        return ResponseEntity.ok(classroomService.getRedisLeaderboard(null, metric, limit));
+    }
 }

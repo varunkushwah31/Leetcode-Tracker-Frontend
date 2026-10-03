@@ -39,6 +39,8 @@ public class ClassroomService {
     private final LeetCodeApiClient leetCodeApiClient;
     private final CodeforcesApiClient codeforcesApiClient;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RedisLeaderboardService redisLeaderboardService;
+    private final RedisWebSocketBridge webSocketBridge;
 
     @Lazy
     @Autowired
@@ -165,6 +167,7 @@ public class ClassroomService {
                 "/topic/classrooms/" + classroomId,
                 (Object) Map.of("action", "UPDATE", "message", "New assignment added!")
         );
+        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "New assignment added!");
 
         return savedClassroom;
     }
@@ -270,6 +273,7 @@ public class ClassroomService {
         }
     }
 
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
     public Student validateManualSubmission(String classroomId, String studentIdentifier, String assignmentId, String submissionUrl) {
         log.info("Validating manual submission for {} on assignment {}", studentIdentifier, assignmentId);
 
@@ -304,14 +308,16 @@ public class ClassroomService {
         student.getManuallyCompletedAssignments().add(assignmentId);
         Student savedStudent = studentRepository.save(student);
 
-        messagingTemplate.convertAndSend(
-                "/topic/classrooms/" + classroomId,
-                (Object) Map.of("action", "UPDATE", "message", "Leaderboard changed!")
-        );
+        // Update real-time Redis leaderboard
+        updateStudentInRedisLeaderboards(savedStudent, classroomId);
+
+        // Broadcast the update via Redis Pub/Sub WebSocket bridge
+        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Leaderboard changed!");
 
         return savedStudent;
     }
 
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
     public Student validateSubmissionAsStudent(Student student, String classroomId, String assignmentId, String submissionUrl) {
         log.info("Student {} is self-validating assignment {}", student.getName(), assignmentId);
 
@@ -343,16 +349,17 @@ public class ClassroomService {
         student.getManuallyCompletedAssignments().add(assignmentId);
         Student savedStudent = studentRepository.save(student);
 
-        // Broadcast the update to anyone listening to this classroom
+        // Update real-time Redis leaderboard
+        updateStudentInRedisLeaderboards(savedStudent, classroomId);
+
+        // Broadcast the update to anyone listening to this classroom via Redis Pub/Sub
         log.info("Broadcasting leaderboard update for classroom: {}", classroomId);
-        messagingTemplate.convertAndSend(
-                "/topic/classrooms/" + classroomId,
-                (Object) Map.of("action", "UPDATE", "message", "Leaderboard changed!")
-        );
+        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Leaderboard changed!");
 
         return savedStudent;
     }
 
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
     public Student autoValidateAssignment(Student student, String classroomId, String assignmentId) {
         return validateSubmissionAsStudent(student, classroomId, assignmentId, null);
     }
@@ -434,6 +441,7 @@ public class ClassroomService {
      * Automatically validates all pending assignments across all classrooms for a student.
      * Called whenever a student visits their dashboard, so they never need to do manual validation.
      */
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
     public void autoValidatePendingAssignmentsForStudent(Student student) {
         try {
             List<Classroom> classrooms = classroomRepository.findByStudentIdsContaining(student.getId());
@@ -503,12 +511,12 @@ public class ClassroomService {
             }
 
             if (updated) {
-                studentRepository.save(student);
-                if (messagingTemplate != null) {
-                    for (Classroom classroom : classrooms) {
-                        messagingTemplate.convertAndSend("/topic/classrooms/" + classroom.getId(),
-                                (Object) Map.of("action", "UPDATE", "message", "Assignment auto-validated!"));
-                    }
+                Student saved = studentRepository.save(student);
+                List<String> classroomIds = classrooms.stream().map(Classroom::getId).toList();
+                updateStudentInRedisLeaderboards(saved, classroomIds);
+
+                for (Classroom classroom : classrooms) {
+                    webSocketBridge.broadcastClassroomUpdate(classroom.getId(), "UPDATE", "Assignment auto-validated!");
                 }
             }
         } catch (Exception e) {
@@ -722,6 +730,9 @@ public class ClassroomService {
 
         // 4. Delete the actual classroom document
         classroomRepository.delete(classroom);
+
+        // 5. Clean up Redis leaderboards for this classroom
+        redisLeaderboardService.deleteClassroomLeaderboards(classroomId);
         log.info("Successfully deleted classroom ID: {}", classroomId);
     }
 
@@ -747,11 +758,12 @@ public class ClassroomService {
             throw new AssignmentNotFoundException("Assignment not found with ID: " + assignmentId);
         }
 
-        // Broadcast the update via WebSocket
+        // Broadcast the update via local messagingTemplate and Redis Pub/Sub WebSocket bridge
         messagingTemplate.convertAndSend(
                 "/topic/classrooms/" + classroomId,
                 (Object) Map.of("action", "UPDATE", "message", "Assignment deleted!")
         );
+        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Assignment deleted!");
         log.info("Successfully deleted assignment {} from classroom {}", assignmentId, classroomId);
     }
 
@@ -785,13 +797,52 @@ public class ClassroomService {
         targetAssignment.setEndTimestamp(newEndTimestamp);
         Classroom saved = classroomRepository.save(classroom);
 
-        // Broadcast the update via WebSocket
+        // Broadcast the update via local messagingTemplate and Redis Pub/Sub WebSocket bridge
         messagingTemplate.convertAndSend(
                 "/topic/classrooms/" + classroomId,
                 (Object) Map.of("action", "UPDATE", "message", "Assignment deadline updated!")
         );
+        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Assignment deadline updated!");
 
         log.info("Successfully updated deadline for assignment {} to {}", assignmentId, newEndTimestamp);
         return saved;
+    }
+
+    public List<com.tracker.leetcode.tracker.DTO.LeaderboardEntryDTO> getRedisLeaderboard(String classroomId, String metric, int limit) {
+        return redisLeaderboardService.getLeaderboard(classroomId, metric, limit);
+    }
+
+    private void updateStudentInRedisLeaderboards(Student student, String classroomId) {
+        if (student == null) return;
+        List<String> cids = (classroomId != null) ? List.of(classroomId) : Collections.emptyList();
+        updateStudentInRedisLeaderboards(student, cids);
+    }
+
+    private void updateStudentInRedisLeaderboards(Student student, List<String> classroomIds) {
+        if (student == null || student.getId() == null) return;
+        try {
+            int lcSolved = student.getProblemStats() != null ? studentMapper.calculateLeetcodeSolved(student.getProblemStats()) : 0;
+            int cfSolved = student.getCodeforcesSolvedCount() != null ? student.getCodeforcesSolvedCount() : 0;
+            int solved = lcSolved + cfSolved;
+            double rating = Math.max(
+                    student.getCurrentContestRating(),
+                    student.getCodeforcesRating() != null ? student.getCodeforcesRating() : 0.0
+            );
+            int streak = student.getProgressHistory() != null ? studentMapper.calculateStreak(student.getProgressHistory()) : 0;
+
+            redisLeaderboardService.updateStudentMetrics(
+                    student.getId(),
+                    student.getName(),
+                    student.getLeetcodeUsername(),
+                    student.getCodeforcesHandle(),
+                    student.getAvatarUrl(),
+                    solved,
+                    rating,
+                    streak,
+                    classroomIds
+            );
+        } catch (Exception ex) {
+            log.warn("Failed updating student in Redis leaderboards: {}", ex.getMessage());
+        }
     }
 }

@@ -17,7 +17,13 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+
+import java.util.*;
 
 @Slf4j
 @Service
@@ -30,6 +36,9 @@ public class AdminService {
     private final MentorService mentorService;
     private final ClassroomService classroomService;
     private final StudentService studentService;
+    private final CacheManager cacheManager;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final RedisConnectionFactory redisConnectionFactory;
 
     public SystemOverviewDTO getSystemOverview(){
         log.info("Super Admin requested the master system overview.");
@@ -111,5 +120,73 @@ public class AdminService {
 
         log.info("SUPER ADMIN ACTION: Forced global sync completed.");
         return Map.of("message", "Successfully synced " + successCount + " out of " + allStudents.size() + " students.");
+    }
+
+    public Map<String, Object> getCacheStats() {
+        Map<String, Object> stats = new LinkedHashMap<>();
+
+        // 1. Connection & Server Info
+        try (RedisConnection connection = redisConnectionFactory.getConnection()) {
+            stats.put("redisStatus", "CONNECTED");
+            Properties memoryInfo = connection.serverCommands().info("memory");
+            if (memoryInfo != null) {
+                stats.put("usedMemoryHuman", memoryInfo.getProperty("used_memory_human", "N/A"));
+                stats.put("usedMemoryPeakHuman", memoryInfo.getProperty("used_memory_peak_human", "N/A"));
+            }
+            Properties serverInfo = connection.serverCommands().info("server");
+            if (serverInfo != null) {
+                stats.put("redisVersion", serverInfo.getProperty("redis_version", "N/A"));
+                stats.put("uptimeInSeconds", serverInfo.getProperty("uptime_in_seconds", "N/A"));
+            }
+        } catch (Exception ex) {
+            stats.put("redisStatus", "DISCONNECTED: " + ex.getMessage());
+        }
+
+        // 2. Spring Cache Names
+        Collection<String> cacheNames = cacheManager.getCacheNames();
+        stats.put("configuredCaches", cacheNames);
+
+        // 3. Key Count Estimations by Namespace
+        Map<String, Long> keyCounts = new LinkedHashMap<>();
+        List<String> prefixes = List.of(
+                "student-progress*", "student-stats*", "student-recent*", "student-profile*",
+                "classroom-dashboard*", "classroom-analytics*", "mentor*", "mentors-all*",
+                "learning-paths-by-mentor*", "blacklist:jwt:*", "blacklist:user:*",
+                "lock:*", "ratelimit:*", "leaderboard:*"
+        );
+
+        for (String prefix : prefixes) {
+            try {
+                Set<String> keys = stringRedisTemplate.keys(prefix);
+                keyCounts.put(prefix, keys != null ? (long) keys.size() : 0L);
+            } catch (Exception ex) {
+                keyCounts.put(prefix, -1L);
+            }
+        }
+        stats.put("namespaceKeyCounts", keyCounts);
+
+        return stats;
+    }
+
+    public Map<String, String> clearCache(String cacheName) {
+        if (cacheName == null || cacheName.isBlank() || "all".equalsIgnoreCase(cacheName)) {
+            for (String name : cacheManager.getCacheNames()) {
+                Cache cache = cacheManager.getCache(name);
+                if (cache != null) {
+                    cache.clear();
+                }
+            }
+            log.info("SUPER ADMIN ACTION: Cleared ALL Spring Redis caches.");
+            return Map.of("message", "All caches successfully cleared.");
+        }
+
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            cache.clear();
+            log.info("SUPER ADMIN ACTION: Cleared cache '{}'.", cacheName);
+            return Map.of("message", "Cache '" + cacheName + "' successfully cleared.");
+        } else {
+            return Map.of("error", "Cache '" + cacheName + "' not found.");
+        }
     }
 }

@@ -129,4 +129,15 @@ public class RedisConfig {
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
         return new StringRedisTemplate(connectionFactory);
     }
+
+    @Bean
+    public org.springframework.data.redis.listener.RedisMessageListenerContainer redisMessageListenerContainer(
+            RedisConnectionFactory connectionFactory,
+            @org.springframework.context.annotation.Lazy com.tracker.leetcode.tracker.Service.RedisWebSocketBridge webSocketBridge) {
+        org.springframework.data.redis.listener.RedisMessageListenerContainer container =
+                new org.springframework.data.redis.listener.RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(webSocketBridge, webSocketBridge.getChannelTopic());
+        return container;
+    }
 }

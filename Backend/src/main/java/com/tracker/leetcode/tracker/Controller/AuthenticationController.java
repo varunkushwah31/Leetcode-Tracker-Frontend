@@ -17,12 +17,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
+import com.tracker.leetcode.tracker.Service.RefreshTokenService;
+import com.tracker.leetcode.tracker.Service.TokenBlacklistService;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${application.security.cookie.secure:false}")
     private boolean cookieSecure;
@@ -102,8 +107,22 @@ public class AuthenticationController {
 
     // Logout Endpoint
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        // Clear refresh_token cookie
+    public ResponseEntity<?> logout(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authHeader,
+            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response) {
+
+        // 1. Blacklist the access token in Redis
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            tokenBlacklistService.blacklistToken(authHeader.substring(7));
+        }
+
+        // 2. Revoke the refresh token in database
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            refreshTokenService.deleteByToken(refreshToken);
+        }
+
+        // 3. Clear refresh_token cookie
         ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(cookieSecure)

@@ -49,4 +49,8 @@ public class RefreshTokenService {
     public void deleteByMentorId(String mentorId) {
         refreshTokenRepository.deleteByMentorId(mentorId);
     }
+
+    public void deleteByToken(String token) {
+        refreshTokenRepository.findByToken(token).ifPresent(refreshTokenRepository::delete);
+    }
 }

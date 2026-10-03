@@ -133,7 +133,7 @@ public class StudentMapper {
 
     // --- Helper Methods ---
 
-    private int calculateLeetcodeSolved(List<ProblemStats> stats) {
+    public int calculateLeetcodeSolved(List<ProblemStats> stats) {
         if (stats == null || stats.isEmpty()) return 0;
         return stats.stream()
                 .filter(stat -> "All".equalsIgnoreCase(stat.getDifficulty()))
@@ -142,14 +142,14 @@ public class StudentMapper {
                 .orElse(0);
     }
 
-    private boolean isProblemSlugMatch(String subSlug, String assignSlug) {
+    public static boolean isProblemSlugMatch(String subSlug, String assignSlug) {
         if (subSlug == null || assignSlug == null) return false;
         String cleanSub = subSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
         String cleanAssign = assignSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
         return cleanSub.equalsIgnoreCase(cleanAssign);
     }
 
-    private int calculateStreak(List<DailyProgress> history) {
+    public int calculateStreak(List<DailyProgress> history) {
         if (history == null || history.isEmpty()) return 0;
 
         List<LocalDate> activeDates = history.stream()

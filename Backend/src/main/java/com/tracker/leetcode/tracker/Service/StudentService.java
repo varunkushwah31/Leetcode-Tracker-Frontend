@@ -7,12 +7,16 @@ import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.tracker.leetcode.tracker.Mapper.StudentMapper;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +32,11 @@ public class StudentService {
     private final LeetCodeApiClient leetCodeApiClient;
     private final CodeforcesApiClient codeforcesApiClient;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RedisDistributedLockService lockService;
+    private final RedisLeaderboardService leaderboardService;
+    private final CacheManager cacheManager;
+    private final StudentMapper studentMapper;
+    private final RedisWebSocketBridge webSocketBridge;
 
     // Helper method to keep code DRY - supports ID, email, LeetCode username, or Codeforces handle
     public Student getStudentOrThrow(String identifier) {
@@ -120,9 +129,21 @@ public class StudentService {
     }
 
     /**
-     * Syncs all profile data from LeetCode AND/OR Codeforces, merges metrics, and auto-validates assignments
+     * Syncs all profile data from LeetCode AND/OR Codeforces, merges metrics, and auto-validates assignments.
+     * Uses Redis Distributed Lock to prevent duplicate concurrent syncs.
      */
     public Student syncAllProfileData(Student student) {
+        String lockIdentifier = student.getId() != null ? student.getId() : student.getLeetcodeUsername();
+        String lockKey = "sync:student:" + lockIdentifier;
+
+        return lockService.executeWithLock(lockKey, Duration.ofSeconds(45), () -> doSyncAllProfileData(student))
+                .orElseGet(() -> {
+                    log.info("Concurrent sync already in progress for student [{}] - returning existing profile", lockIdentifier);
+                    return student;
+                });
+    }
+
+    private Student doSyncAllProfileData(Student student) {
         log.info("Performing FULL multi-platform profile sync for student ID: {}", student.getId());
 
         // 1. Sync LeetCode Data (if present)
@@ -155,7 +176,15 @@ public class StudentService {
         // 3. Auto-validate any pending assignments
         autoValidateAssignmentsForStudent(student);
 
-        return studentRepository.save(student);
+        Student saved = studentRepository.save(student);
+
+        // 4. Invalidate all student caches and dependent classroom dashboards
+        evictStudentCaches(saved);
+
+        // 5. Update real-time Redis leaderboards
+        updateRedisLeaderboards(saved);
+
+        return saved;
     }
 
     @CacheEvict(value = {"student-progress", "student-stats", "student-recent", "student-profile"},
@@ -163,6 +192,70 @@ public class StudentService {
     public Student syncAllProfileData(String identifier) {
         Student student = getStudentOrThrow(identifier);
         return syncAllProfileData(student);
+    }
+
+    /**
+     * Invalidate caches across all known student identifiers (id, LC, CF, email) and classroom dashboards.
+     */
+    public void evictStudentCaches(Student student) {
+        if (student == null || cacheManager == null) return;
+        Set<String> keys = new HashSet<>();
+        if (student.getId() != null) keys.add(student.getId());
+        if (student.getLeetcodeUsername() != null) keys.add(student.getLeetcodeUsername());
+        if (student.getCodeforcesHandle() != null) keys.add(student.getCodeforcesHandle());
+        if (student.getEmail() != null) keys.add(student.getEmail());
+
+        List<String> cacheNames = List.of("student-progress", "student-stats", "student-recent", "student-profile");
+        for (String cName : cacheNames) {
+            Cache cache = cacheManager.getCache(cName);
+            if (cache != null) {
+                for (String k : keys) {
+                    cache.evict(k);
+                }
+            }
+        }
+
+        // Evict classroom dashboard cache so mentors immediately see refreshed student stats
+        Cache dashCache = cacheManager.getCache("classroom-dashboard");
+        if (dashCache != null) {
+            dashCache.clear();
+        }
+    }
+
+    /**
+     * Updates student metrics in Redis real-time leaderboards.
+     */
+    public void updateRedisLeaderboards(Student student) {
+        if (student == null || student.getId() == null) return;
+        try {
+            List<Classroom> classrooms = classroomRepository.findByStudentIdsContaining(student.getId());
+            List<String> classroomIds = classrooms != null
+                    ? classrooms.stream().map(Classroom::getId).toList()
+                    : Collections.emptyList();
+
+            int lcSolved = student.getProblemStats() != null ? studentMapper.calculateLeetcodeSolved(student.getProblemStats()) : 0;
+            int cfSolved = student.getCodeforcesSolvedCount() != null ? student.getCodeforcesSolvedCount() : 0;
+            int totalSolved = lcSolved + cfSolved;
+            double rating = Math.max(
+                    student.getCurrentContestRating(),
+                    student.getCodeforcesRating() != null ? student.getCodeforcesRating() : 0.0
+            );
+            int streak = studentMapper.calculateStreak(student.getProgressHistory());
+
+            leaderboardService.updateStudentMetrics(
+                    student.getId(),
+                    student.getName(),
+                    student.getLeetcodeUsername(),
+                    student.getCodeforcesHandle(),
+                    student.getAvatarUrl(),
+                    totalSolved,
+                    rating,
+                    streak,
+                    classroomIds
+            );
+        } catch (Exception ex) {
+            log.warn("Failed updating student metrics in Redis leaderboards: {}", ex.getMessage());
+        }
     }
 
     /**
@@ -293,10 +386,9 @@ public class StudentService {
                     }
                 }
             }
-            if (updated && messagingTemplate != null) {
+            if (updated) {
                 for (Classroom classroom : classrooms) {
-                    messagingTemplate.convertAndSend("/topic/classrooms/" + classroom.getId(),
-                            (Object) Map.of("action", "UPDATE", "message", "Assignment auto-validated!"));
+                    webSocketBridge.broadcastClassroomUpdate(classroom.getId(), "UPDATE", "Assignment auto-validated!");
                 }
             }
         } catch (Exception e) {

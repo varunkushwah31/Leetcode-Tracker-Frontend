@@ -39,4 +39,13 @@ public class AdminController {
         return ResponseEntity.ok(adminService.forceGlobalSync());
     }
 
+    @GetMapping("/cache/stats")
+    public ResponseEntity<Map<String, Object>> getCacheStats() {
+        return ResponseEntity.ok(adminService.getCacheStats());
+    }
+
+    @PostMapping("/cache/clear")
+    public ResponseEntity<Map<String, String>> clearCache(@RequestParam(required = false) String cacheName) {
+        return ResponseEntity.ok(adminService.clearCache(cacheName));
+    }
 }

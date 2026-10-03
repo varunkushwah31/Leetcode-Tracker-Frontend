@@ -48,6 +48,12 @@ class ClassroomServiceTest {
     @Mock
     private SimpMessagingTemplate messagingTemplate;
 
+    @Mock
+    private RedisLeaderboardService redisLeaderboardService;
+
+    @Mock
+    private RedisWebSocketBridge webSocketBridge;
+
     @InjectMocks
     private ClassroomService classroomService;
 
@@ -83,6 +89,7 @@ class ClassroomServiceTest {
         assertTrue(mockClassroom.getAssignments().isEmpty());
         verify(classroomRepository, times(1)).save(mockClassroom);
         verify(messagingTemplate, times(1)).convertAndSend(eq("/topic/classrooms/class-1"), (Object) any());
+        verify(webSocketBridge, times(1)).broadcastClassroomUpdate(eq("class-1"), eq("UPDATE"), eq("Assignment deleted!"));
     }
 
     @Test

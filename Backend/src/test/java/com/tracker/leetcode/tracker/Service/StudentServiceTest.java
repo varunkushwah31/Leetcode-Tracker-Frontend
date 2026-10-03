@@ -32,6 +32,21 @@ class StudentServiceTest {
     @Mock
     private ClassroomRepository classroomRepository;
 
+    @Mock
+    private RedisDistributedLockService lockService;
+
+    @Mock
+    private RedisLeaderboardService leaderboardService;
+
+    @Mock
+    private org.springframework.cache.CacheManager cacheManager;
+
+    @Mock
+    private com.tracker.leetcode.tracker.Mapper.StudentMapper studentMapper;
+
+    @Mock
+    private RedisWebSocketBridge webSocketBridge;
+
     @InjectMocks
     private StudentService studentService;
 
@@ -43,6 +58,12 @@ class StudentServiceTest {
         mockStudent.setId("123");
         mockStudent.setName("Test Student");
         mockStudent.setLeetcodeUsername("test_user");
+
+        lenient().when(lockService.executeWithLock(anyString(), any(), any()))
+                .thenAnswer(invocation -> {
+                    java.util.function.Supplier<?> task = invocation.getArgument(2);
+                    return Optional.ofNullable(task.get());
+                });
     }
 
     @Test

@@ -28,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final MentorRepository mentorRepository;
     private final StudentRepository studentRepository;
+    private final com.tracker.leetcode.tracker.Service.TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -47,6 +48,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 2. Extract the token (Remove "Bearer " from the string)
         jwt = authHeader.substring(7);
+
+        // Check if token was blacklisted via Redis
+        if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"Token has been revoked or logged out.\"}");
+            return;
+        }
 
         // 3. Extract the email from the token
         try {
