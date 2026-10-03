@@ -129,7 +129,7 @@ export function AuthPage() {
 
         {/* Right Panel - Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative bg-[#f8fafc] dark:bg-[#0a0a0a] min-h-screen overflow-y-auto transition-colors duration-200">
-          <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.4)_1px,transparent_1px)] dark:bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-60 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.14)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.035)_1px,transparent_1px)] bg-size-[30px_30px] pointer-events-none"></div>
           <div className="hidden dark:block">
             <AmbientGlow variant="center" />
           </div>

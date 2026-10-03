@@ -30,7 +30,7 @@ export function LandingPage() {
         <div className="min-h-screen bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
 
             {/* Background Base with Theme Adaptation */}
-            <div className="fixed inset-0 z-0 bg-[#f1f3f7] dark:bg-[#050505] bg-[radial-gradient(rgba(50,205,50,0.5)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed transition-colors duration-200 pointer-events-none">
+            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] bg-[radial-gradient(rgba(50,205,50,0.14)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.035)_1px,transparent_1px)] bg-size-[30px_30px] bg-fixed transition-colors duration-200 pointer-events-none">
                 <div className="hidden dark:block">
                     <AmbientGlow />
                 </div>
