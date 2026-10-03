@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { SpinnerIcon as Loader2, TerminalIcon, SignOutIcon as LogOut, PulseIcon as Activity, DownloadSimpleIcon as Download } from '@phosphor-icons/react';
+import { SpinnerIcon as Loader2, SignOutIcon as LogOut, PulseIcon as Activity, DownloadSimpleIcon as Download } from '@phosphor-icons/react';
+import { BrandLogo } from '../components/common/BrandLogo';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../hooks/useAuth';
@@ -137,12 +138,7 @@ export function StudentDashboard() {
             <header className="bg-white/90 dark:bg-zinc-900/60 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800 sticky top-0 z-20 shadow-xs transition-colors duration-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <Link to="/" className="flex items-center gap-3 group">
-                            <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                                <TerminalIcon className="w-5 h-5 text-white" weight="bold" />
-                            </div>
-                            <span className="text-xl font-bold text-zinc-900 dark:text-white group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">MentorSync</span>
-                        </Link>
+                        <BrandLogo size="md" />
                         <span className="hidden sm:inline-flex text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
                             Student
                         </span>

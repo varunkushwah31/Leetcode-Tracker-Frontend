@@ -1,12 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#6c61ff"/>
-      <stop offset="1" stop-color="#4639e6"/>
+    <linearGradient id="ms-fav-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="50%" stop-color="#5b4fff"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="ms-fav-sync" x1="25" y1="34" x2="39" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#00f2fe"/>
+    </linearGradient>
+    <linearGradient id="ms-fav-border" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0.15"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="16" fill="url(#g)"/>
-  <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
-  <path d="M18 22l-8 9 8 9" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="32" y1="42" x2="50" y2="42" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Squircle Base -->
+  <rect width="64" height="64" rx="16" fill="url(#ms-fav-bg)"/>
+
+  <!-- Frosted Border Highlight -->
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" stroke="url(#ms-fav-border)" stroke-width="1.5"/>
+
+  <!-- Geometric Monogram M with Code Chevrons -->
+  <path d="M 17 44 V 22.5 C 17 20.6 18.8 19.5 20.5 20.3 L 32 28 L 43.5 20.3 C 45.2 19.5 47 20.6 47 22.5 V 44" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Upward Kinetic Sync Chevron -->
+  <path d="M 25 39.5 L 32 34.5 L 39 39.5" stroke="url(#ms-fav-sync)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Telemetry Pulse Spark Node -->
+  <circle cx="32" cy="18" r="2.8" fill="#38bdf8"/>
+  <circle cx="32" cy="18" r="1.4" fill="#ffffff"/>
 </svg>

@@ -7,6 +7,7 @@ import { TerminalIcon, PulseIcon as Activity, WarningCircleIcon as AlertCircle, 
 import { useAuth } from '../hooks/useAuth';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { BrandLogo } from '../components/common/BrandLogo';
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -78,13 +79,8 @@ export function AuthPage() {
         <div className="hidden lg:flex lg:w-1/2 relative bg-[#09090e] border-r border-zinc-900 flex-col justify-center p-10 xl:p-16">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
           <div className="relative z-10 w-full max-w-lg mx-auto">
-            <div className="flex items-center gap-3 mb-8">
-              <Link to="/" className="flex items-center gap-3 group w-max">
-                <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                  <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
-                </div>
-                <span className="text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">MentorSync</span>
-              </Link>
+            <div className="mb-8">
+              <BrandLogo size="md" theme="dark" />
             </div>
             <h1 className="text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight mb-4 text-white">
               The modern OS for <br />
@@ -133,12 +129,7 @@ export function AuthPage() {
           <div className="w-full max-w-lg relative z-10 bg-[#111111]/90 backdrop-blur-2xl p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto mt-14 sm:my-auto">
             {/* Mobile Header with Logo */}
             <div className="flex items-center mb-4 pb-3 border-b border-zinc-800/60 lg:hidden">
-              <div className="flex items-center gap-2.5">
-                <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg">
-                  <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
-                </div>
-                <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
-              </div>
+              <BrandLogo size="sm" theme="dark" />
             </div>
             <div className="mb-4 sm:mb-5">
               <h2 className="text-2xl sm:text-[26px] font-bold text-white tracking-tight mb-1">

@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import {
     SignOutIcon as LogOut,
     PlusIcon,
-    TerminalIcon,
     BookOpenIcon,
     SpinnerIcon as Loader2,
     ShieldWarningIcon as ShieldAlert,
@@ -23,6 +22,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { useAuth } from '../hooks/useAuth';
+import { BrandLogo } from '../components/common/BrandLogo';
 import { MentorService, ClassroomService, PathService, StudentService } from '../services/endpoints';
 import type { ClassroomDashboardDTO, LearningPath, ClassroomAnalyticsDTO } from '@/types';
 
@@ -314,12 +314,7 @@ export function MentorDashboard() {
         <div className="relative z-10 flex flex-col h-full w-full">
             <div className="p-6 border-b border-zinc-200 dark:border-zinc-900">
                 <div className="flex items-center justify-between mb-6">
-                    <Link to="/" className="flex items-center gap-3 group">
-                        <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                            <TerminalIcon className="w-5 h-5 text-white" weight="bold" />
-                        </div>
-                        <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">MentorSync</span>
-                    </Link>
+                    <BrandLogo size="md" subtext="Educator Portal" />
                     {isMobile && (
                         <button
                             type="button"

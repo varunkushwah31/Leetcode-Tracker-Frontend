@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import {
-    TerminalIcon,
     DownloadSimpleIcon as Download,
     CheckCircleIcon as CheckCircle,
     CopyIcon,
@@ -21,6 +20,7 @@ import {
     CaretRightIcon as ChevronRight
 } from '@phosphor-icons/react';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { BrandLogo } from '../components/common/BrandLogo';
 import { ClassroomService } from '@/services/endpoints';
 
 export function HowToUsePage() {
@@ -87,14 +87,7 @@ https://codeforces.com/profile/petr`;
 
             {/* Floating Header matching Landing Page exactly */}
             <header className="fixed top-6 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-[#0a0a0a]/70 backdrop-blur-2xl border border-white/5 shadow-2xl px-4 sm:px-6 py-3 flex items-center justify-between transition-all">
-                <Link to="/" className="flex items-center gap-3 group">
-                    <div className="bg-[#5b4fff] p-2.5 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                        <TerminalIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" weight="bold" />
-                    </div>
-                    <span className="text-xl font-bold tracking-tight text-white hidden sm:block group-hover:text-zinc-200 transition-colors">
-                        MentorSync
-                    </span>
-                </Link>
+                <BrandLogo size="md" theme="dark" />
 
                 <nav className="flex items-center gap-3.5 sm:gap-6">
                     <Link
@@ -695,11 +688,8 @@ https://codeforces.com/profile/petr`;
             <footer className="relative w-full overflow-hidden flex flex-col items-center justify-end z-10 pt-20 pb-8 sm:pb-10 border-t border-zinc-900 bg-[#050508]/80 backdrop-blur-sm">
                 <div className="w-full max-w-7xl px-4 sm:px-6 flex flex-col md:flex-row justify-between items-start gap-12 mb-24 relative z-20 pointer-events-auto">
                     <div className="max-w-xs">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="bg-[#5b4fff] p-2 rounded-lg flex items-center justify-center">
-                                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
-                            </div>
-                            <span className="text-xl font-bold tracking-tight text-white">MentorSync</span>
+                        <div className="mb-6">
+                            <BrandLogo size="md" theme="dark" asLink={false} />
                         </div>
                         <p className="text-zinc-500 text-sm leading-relaxed">
                             The operating system for modern coding bootcamps. Empowering educators to track Scalable cohorts natively.

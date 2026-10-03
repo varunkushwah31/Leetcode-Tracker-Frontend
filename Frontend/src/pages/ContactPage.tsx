@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { TerminalIcon, PaperPlaneTiltIcon as Send, ArrowLeftIcon, EnvelopeIcon as Mail, MapPinIcon, PhoneIcon } from '@phosphor-icons/react';
+import { PaperPlaneTiltIcon as Send, ArrowLeftIcon, EnvelopeIcon as Mail, MapPinIcon, PhoneIcon } from '@phosphor-icons/react';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { BrandLogo } from '../components/common/BrandLogo';
 
 export function ContactPage() {
     const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
@@ -45,12 +46,7 @@ export function ContactPage() {
 
                 <div className="relative z-10 w-full max-w-lg mx-auto">
                     <div className="flex items-center justify-between mb-12">
-                        <Link to="/" className="flex items-center gap-3 group">
-                            <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
-                            </div>
-                            <span className="text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">MentorSync</span>
-                        </Link>
+                        <BrandLogo size="md" theme="dark" />
                         <Link
                             to="/"
                             className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-medium hover:-translate-x-0.5"
@@ -108,12 +104,7 @@ export function ContactPage() {
                 <div className="w-full max-w-120 relative z-10 bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-800/60 shadow-[0_8px_40px_rgb(0,0,0,0.5)] my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
 
                     <div className="lg:hidden flex items-center justify-between mb-8">
-                        <Link to="/" className="flex items-center gap-3 group">
-                            <div className="bg-[#5b4fff] p-2 rounded-lg shadow-lg group-hover:scale-105 transition-transform">
-                                <TerminalIcon className="h-5 w-5 text-white" weight="bold" />
-                            </div>
-                            <span className="text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">MentorSync</span>
-                        </Link>
+                        <BrandLogo size="md" theme="dark" />
                         <Link
                             to="/"
                             className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:-translate-x-0.5"
