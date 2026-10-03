@@ -69,11 +69,12 @@ public class ClassroomService {
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
 
-        Student student = studentRepository.findByLeetcodeUsername(identifier)
-                .or(() -> studentRepository.findByCodeforcesHandle(identifier))
-                .or(() -> studentRepository.findByEmail(identifier))
-                .or(() -> studentRepository.findById(identifier))
-                .orElseThrow(() -> new StudentNotFoundException("Student not found with identifier: " + identifier));
+        String trimmed = identifier != null ? identifier.trim() : "";
+        Student student = studentRepository.findById(trimmed)
+                .or(() -> studentRepository.findByEmail(trimmed))
+                .or(() -> studentRepository.findByLeetcodeUsername(trimmed))
+                .or(() -> studentRepository.findByCodeforcesHandle(trimmed))
+                .orElseThrow(() -> new StudentNotFoundException("Student not found with identifier: " + trimmed));
 
         // Prevent duplicate enrollments in the same class
         if (classroom.getStudentIds().contains(student.getId())) {
@@ -280,9 +281,11 @@ public class ClassroomService {
                 .findFirst()
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found in this classroom."));
 
-        Student student = studentRepository.findByLeetcodeUsername(studentIdentifier)
-                .or(() -> studentRepository.findByCodeforcesHandle(studentIdentifier))
-                .or(() -> studentRepository.findById(studentIdentifier))
+        String trimmed = studentIdentifier != null ? studentIdentifier.trim() : "";
+        Student student = studentRepository.findById(trimmed)
+                .or(() -> studentRepository.findByEmail(trimmed))
+                .or(() -> studentRepository.findByLeetcodeUsername(trimmed))
+                .or(() -> studentRepository.findByCodeforcesHandle(trimmed))
                 .orElseThrow(() -> new StudentNotFoundException("Student not found."));
 
         // If they already validated it, skip the network call and return

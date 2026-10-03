@@ -29,15 +29,17 @@ public class StudentService {
     private final CodeforcesApiClient codeforcesApiClient;
     private final SimpMessagingTemplate messagingTemplate;
 
-    // Helper method to keep code DRY - supports LeetCode username, Codeforces handle, or ID
+    // Helper method to keep code DRY - supports ID, email, LeetCode username, or Codeforces handle
     public Student getStudentOrThrow(String identifier) {
         if (identifier == null || identifier.isBlank()) {
             throw new StudentNotFoundException("Student identifier cannot be blank.");
         }
-        return studentRepository.findByLeetcodeUsername(identifier)
-                .or(() -> studentRepository.findByCodeforcesHandle(identifier))
-                .or(() -> studentRepository.findById(identifier))
-                .orElseThrow(() -> new StudentNotFoundException("Student '" + identifier + "' not found in database. Please add them first!"));
+        String trimmed = identifier.trim();
+        return studentRepository.findById(trimmed)
+                .or(() -> studentRepository.findByEmail(trimmed))
+                .or(() -> studentRepository.findByLeetcodeUsername(trimmed))
+                .or(() -> studentRepository.findByCodeforcesHandle(trimmed))
+                .orElseThrow(() -> new StudentNotFoundException("Student '" + trimmed + "' not found in database. Please add them first!"));
     }
 
     /**

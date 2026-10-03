@@ -36,11 +36,14 @@ import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 
-async function syncStudentsInBatches(students: { leetcodeUsername: string }[], batchSize = 3): Promise<void> {
+async function syncStudentsInBatches(students: { id?: string; leetcodeUsername?: string; codeforcesHandle?: string }[], batchSize = 3): Promise<void> {
     for (let i = 0; i < students.length; i += batchSize) {
         const batch = students.slice(i, i + batchSize);
         await Promise.allSettled(
-            batch.map(student => StudentService.syncProfile(student.leetcodeUsername))
+            batch.map(student => {
+                const target = student.id || student.leetcodeUsername || student.codeforcesHandle;
+                return target ? StudentService.syncProfile(target) : Promise.resolve();
+            })
         );
         if (i + batchSize < students.length) {
             await new Promise(resolve => setTimeout(resolve, 2000));

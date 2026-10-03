@@ -55,14 +55,11 @@ export function StudentDashboard() {
     useEffect(() => { void fetchDashboard(); }, [fetchDashboard]);
 
     const handleSync = async () => {
-        const identifier = dashboardData?.leetcodeUsername || dashboardData?.codeforcesHandle || dashboardData?.id;
-        if (!identifier) return;
-
         setSyncError(null);
         setIsSyncing(true);
 
         try {
-            const response = await StudentService.syncProfile(identifier);
+            const response = await StudentService.syncProfile();
             setDashboardData(response.data);
         } catch (err: unknown) {
             setSyncError(getErrorMessage(err, 'Failed to sync profiles.'));
