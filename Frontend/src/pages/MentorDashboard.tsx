@@ -35,6 +35,7 @@ import { AdminOverview } from "@/pages/AdminOverview.tsx";
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { ThemeToggle } from '../components/ui/ThemeToggle';
 
 async function syncStudentsInBatches(students: { id?: string; leetcodeUsername?: string; codeforcesHandle?: string }[], batchSize = 3): Promise<void> {
     for (let i = 0; i < students.length; i += batchSize) {
@@ -303,7 +304,7 @@ export function MentorDashboard() {
 
     if (isLoading && classrooms.length === 0) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#09090e]">
+            <div className="flex h-screen items-center justify-center bg-zinc-50 dark:bg-[#09090e]">
                 <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
             </div>
         );
@@ -311,19 +312,19 @@ export function MentorDashboard() {
 
     const renderSidebarContent = (isMobile = false) => (
         <div className="relative z-10 flex flex-col h-full w-full">
-            <div className="p-6 border-b border-zinc-900">
+            <div className="p-6 border-b border-zinc-200 dark:border-zinc-900">
                 <div className="flex items-center justify-between mb-6">
                     <Link to="/" className="flex items-center gap-3 group">
                         <div className="bg-[#5b4fff] p-2 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
                             <TerminalIcon className="w-5 h-5 text-white" weight="bold" />
                         </div>
-                        <span className="text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">MentorSync</span>
+                        <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">MentorSync</span>
                     </Link>
                     {isMobile && (
                         <button
                             type="button"
                             onClick={() => setMobileSidebarOpen(false)}
-                            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                            className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                             aria-label="Close menu"
                         >
                             <XIcon className="w-5 h-5" />
@@ -333,14 +334,14 @@ export function MentorDashboard() {
 
                 <Dialog open={createClassOpen} onOpenChange={(open) => { setCreateClassOpen(open); if(!open) setCreateClassError(null); }}>
                     <DialogTrigger asChild>
-                        <Button className="w-full bg-transparent border border-zinc-800 text-white hover:bg-[#5b4fff] hover:border-transparent rounded-xl transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-sm">
+                        <Button className="w-full bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-white hover:bg-[#5b4fff] hover:text-white hover:border-transparent rounded-xl transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-sm">
                             <PlusIcon className="w-4 h-4 mr-2" weight="bold" />Create New Class
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-[#111111] border-zinc-800 text-white sm:rounded-2xl">
+                    <DialogContent className="bg-white dark:bg-[#111111] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white sm:rounded-2xl">
                         <DialogHeader>
-                            <DialogTitle className="text-white text-xl font-bold">Create New Classroom</DialogTitle>
-                            <DialogDescription className="text-zinc-400 text-sm">
+                            <DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Create New Classroom</DialogTitle>
+                            <DialogDescription className="text-zinc-500 dark:text-zinc-400 text-sm">
                                 Enter the name of the new classroom to start managing students and assignments.
                             </DialogDescription>
                         </DialogHeader>
@@ -350,9 +351,9 @@ export function MentorDashboard() {
 
                         <div className="space-y-4 py-2">
                             <div className="space-y-1.5">
-                                <Label className="uppercase text-[11px] tracking-wider text-zinc-400 font-semibold block">Classroom Name</Label>
+                                <Label className="uppercase text-[11px] tracking-wider text-zinc-600 dark:text-zinc-400 font-semibold block">Classroom Name</Label>
                                 <Input
-                                    className="bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4"
+                                    className="bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-none text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4"
                                     placeholder="e.g., Data Structures 101"
                                     value={newClassName}
                                     onChange={(e) => { setNewClassName(e.target.value); if(createClassError) setCreateClassError(null); }}
@@ -360,7 +361,7 @@ export function MentorDashboard() {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" className="bg-transparent border border-zinc-700 text-white hover:bg-zinc-800 hover:text-white rounded-xl" onClick={() => setCreateClassOpen(false)}>Cancel</Button>
+                            <Button variant="outline" className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white rounded-xl" onClick={() => setCreateClassOpen(false)}>Cancel</Button>
                             <Button className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl" onClick={handleCreateClass} disabled={!newClassName}>Create Classroom</Button>
                         </DialogFooter>
                     </DialogContent>
@@ -382,12 +383,12 @@ export function MentorDashboard() {
                             }}
                             className={`w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 flex justify-between items-center group ${
                                 selectedClassroom?.classroomId === c.classroomId && !showAdminOverview
-                                    ? 'bg-[#1a1b2e] border border-[#5b4fff]/40 text-white font-medium shadow-[0_0_15px_rgba(91,79,255,0.15)] ring-1 ring-[#5b4fff]/30'
-                                    : 'text-zinc-400 hover:bg-zinc-900/60 hover:text-white border border-transparent'
+                                    ? 'bg-zinc-100 dark:bg-[#1a1b2e] border border-[#5b4fff]/40 text-[#5b4fff] dark:text-white font-medium shadow-sm ring-1 ring-[#5b4fff]/30'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 hover:text-zinc-900 dark:hover:text-white border border-transparent'
                             }`}
                         >
                             <span className="truncate group-hover:translate-x-0.5 transition-transform">{c.className}</span>
-                            <Badge className={`border-transparent transition-colors ${selectedClassroom?.classroomId === c.classroomId && !showAdminOverview ? 'bg-[#5b4fff] text-white' : 'bg-zinc-800/80 text-zinc-400 group-hover:text-zinc-200'}`}>
+                            <Badge className={`border-transparent transition-colors ${selectedClassroom?.classroomId === c.classroomId && !showAdminOverview ? 'bg-[#5b4fff] text-white' : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-200'}`}>
                                 {c.enrolledStudents?.length || 0}
                             </Badge>
                         </button>
@@ -400,20 +401,20 @@ export function MentorDashboard() {
                 </div>
             </ScrollArea>
 
-            <div className="p-4 border-t border-zinc-900 space-y-2 bg-[#09090e]/80 backdrop-blur-md">
+            <div className="p-4 border-t border-zinc-200 dark:border-zinc-900 space-y-2 bg-white/80 dark:bg-[#09090e]/80 backdrop-blur-md">
                 <div className="flex items-center gap-3 px-3 py-2 mb-2">
-                    <Avatar className="border border-zinc-800 w-9 h-9">
-                        <AvatarFallback className="bg-[#1a1b2e] text-[#968fff] font-bold">{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    <Avatar className="border border-zinc-200 dark:border-zinc-800 w-9 h-9">
+                        <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] font-bold">{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
+                        <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">{user?.name}</p>
                         <p className="text-xs text-zinc-500">Mentor</p>
                     </div>
                 </div>
 
                 <Link
                     to="/contact"
-                    className="w-full flex items-center px-3 py-2 text-xs rounded-xl text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors border border-transparent"
+                    className="w-full flex items-center px-3 py-2 text-xs rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white transition-colors border border-transparent"
                     onClick={() => { if (isMobile) setMobileSidebarOpen(false); }}
                 >
                     <LifebuoyIcon className="w-4 h-4 mr-2 text-zinc-500" /> Help & Support
@@ -427,13 +428,13 @@ export function MentorDashboard() {
                             setError(null);
                             if (isMobile) setMobileSidebarOpen(false);
                         }}
-                        className={`w-full flex items-center px-3 py-2.5 text-sm rounded-xl transition-all ${showAdminOverview ? 'bg-[#5b4fff]/10 text-[#968fff] border border-[#5b4fff]/20 font-medium' : 'text-zinc-400 hover:bg-zinc-900 hover:text-white border border-transparent'}`}
+                        className={`w-full flex items-center px-3 py-2.5 text-sm rounded-xl transition-all ${showAdminOverview ? 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20 font-medium' : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white border border-transparent'}`}
                     >
                         <ShieldAlert className="w-4 h-4 mr-2" /> Admin Overview
                     </button>
                 )}
 
-                <button onClick={logout} aria-label="Sign out" className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300 border border-transparent hover:border-red-500/20">
+                <button onClick={logout} aria-label="Sign out" className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-red-500/10 transition-colors text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 border border-transparent hover:border-red-500/20">
                     <LogOut className="w-4 h-4 mr-2" /> Sign Out
                 </button>
             </div>
@@ -441,75 +442,77 @@ export function MentorDashboard() {
     );
 
     return (
-        <div className="h-screen bg-[#09090e] text-white flex overflow-hidden selection:bg-[#5b4fff] selection:text-white">
+        <div className="h-screen bg-zinc-50 dark:bg-[#09090e] text-zinc-900 dark:text-white flex overflow-hidden selection:bg-[#5b4fff] selection:text-white">
             {/* Mobile Drawer Backdrop */}
             {mobileSidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden transition-opacity"
+                    className="fixed inset-0 z-40 bg-black/50 dark:bg-black/70 backdrop-blur-sm lg:hidden transition-opacity"
                     onClick={() => setMobileSidebarOpen(false)}
                     aria-hidden="true"
                 />
             )}
 
             {/* Mobile Drawer */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#09090e] border-r border-zinc-900 flex flex-col transition-transform duration-300 lg:hidden ${
+            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-[#09090e] border-r border-zinc-200 dark:border-zinc-900 flex flex-col transition-transform duration-300 lg:hidden ${
                 mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
             }`}>
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
                 {renderSidebarContent(true)}
             </div>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-72 relative bg-[#09090e] border-r border-zinc-900 flex-col z-20 shrink-0">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
+            <aside className="hidden lg:flex w-72 relative bg-white dark:bg-[#09090e] border-r border-zinc-200 dark:border-zinc-900 flex-col z-20 shrink-0">
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
                 {renderSidebarContent(false)}
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative bg-[#0a0a0a] bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
+            <main className="flex-1 overflow-y-auto relative bg-zinc-50 dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
                 {/* Luminous Multi-Layer Ambient Glow */}
-                <AmbientGlow />
+                <div className="hidden dark:block">
+                    <AmbientGlow />
+                </div>
 
                 {/* Top Navigation Header */}
-                <header className="sticky top-0 z-30 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/60 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-sm">
+                <header className="sticky top-0 z-30 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800/60 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-3">
                         {/* Mobile Sidebar Hamburger */}
                         <button
                             type="button"
                             onClick={() => setMobileSidebarOpen(true)}
                             aria-label="Open sidebar menu"
-                            className="lg:hidden p-2 rounded-xl bg-[#111111] border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors"
+                            className="lg:hidden p-2 rounded-xl bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                         >
                             <MenuIcon className="w-5 h-5" weight="bold" />
                         </button>
 
                         {/* Breadcrumbs */}
                         <div className="flex items-center gap-2 text-sm">
-                            <Link to="/" className="text-zinc-500 hover:text-zinc-300 transition-colors hidden sm:flex items-center gap-1 font-medium">
+                            <Link to="/" className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors hidden sm:flex items-center gap-1 font-medium">
                                 <HouseIcon className="w-4 h-4" />
                                 <span>Home</span>
                             </Link>
-                            <span className="text-zinc-600 hidden sm:inline">/</span>
+                            <span className="text-zinc-400 dark:text-zinc-600 hidden sm:inline">/</span>
                             <button
                                 type="button"
                                 onClick={() => {
                                     setViewingStudentUsername(null);
                                     setShowAdminOverview(false);
                                 }}
-                                className="text-zinc-400 hover:text-white transition-colors font-medium cursor-pointer"
+                                className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors font-medium cursor-pointer"
                             >
                                 Classrooms
                             </button>
                             {selectedClassroom && !showAdminOverview && (
                                 <>
-                                    <span className="text-zinc-600">/</span>
+                                    <span className="text-zinc-400 dark:text-zinc-600">/</span>
                                     <button
                                         type="button"
                                         onClick={() => setViewingStudentUsername(null)}
                                         className={`font-semibold tracking-tight truncate max-w-40 sm:max-w-xs transition-colors cursor-pointer ${
                                             viewingStudentUsername
-                                                ? 'text-zinc-400 hover:text-white'
-                                                : 'text-white'
+                                                ? 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'
+                                                : 'text-zinc-900 dark:text-white'
                                         }`}
                                     >
                                         {selectedClassroom.className}
@@ -518,16 +521,16 @@ export function MentorDashboard() {
                             )}
                             {viewingStudentUsername && (
                                 <>
-                                    <span className="text-zinc-600">/</span>
-                                    <span className="text-[#968fff] font-semibold tracking-tight truncate max-w-40 sm:max-w-xs">
+                                    <span className="text-zinc-400 dark:text-zinc-600">/</span>
+                                    <span className="text-[#5b4fff] dark:text-[#968fff] font-semibold tracking-tight truncate max-w-40 sm:max-w-xs">
                                         {viewingStudentUsername}
                                     </span>
                                 </>
                             )}
                             {showAdminOverview && (
                                 <>
-                                    <span className="text-zinc-600">/</span>
-                                    <span className="text-[#968fff] font-semibold tracking-tight">Admin Overview</span>
+                                    <span className="text-zinc-400 dark:text-zinc-600">/</span>
+                                    <span className="text-[#5b4fff] dark:text-[#968fff] font-semibold tracking-tight">Admin Overview</span>
                                 </>
                             )}
                         </div>
@@ -549,7 +552,7 @@ export function MentorDashboard() {
                                             setError(null);
                                         }
                                     }}
-                                    className="bg-[#1a1b2e] border border-zinc-800 text-xs font-semibold text-zinc-200 rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-[#5b4fff] focus:outline-none transition-colors cursor-pointer"
+                                    className="bg-white dark:bg-[#1a1b2e] border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-800 dark:text-zinc-200 rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-[#5b4fff] focus:outline-none transition-colors cursor-pointer"
                                 >
                                     <option value="" disabled>Switch Classroom...</option>
                                     {classrooms.map(c => (
@@ -563,15 +566,17 @@ export function MentorDashboard() {
 
                         <Link
                             to="/contact"
-                            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-800 bg-[#111111]/80 hover:bg-zinc-800/80 text-xs font-medium text-zinc-400 hover:text-white transition-colors"
+                            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-[#111111]/80 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                         >
                             <LifebuoyIcon className="w-3.5 h-3.5" />
                             Support
                         </Link>
 
-                        <div className="flex items-center gap-2 pl-2 border-l border-zinc-800">
-                            <Avatar className="w-8 h-8 border border-zinc-800">
-                                <AvatarFallback className="bg-[#1a1b2e] text-[#968fff] text-xs font-bold">
+                        <ThemeToggle />
+
+                        <div className="flex items-center gap-2 pl-2 border-l border-zinc-200 dark:border-zinc-800">
+                            <Avatar className="w-8 h-8 border border-zinc-200 dark:border-zinc-800">
+                                <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] text-xs font-bold">
                                     {user?.name?.substring(0, 2).toUpperCase() || 'ME'}
                                 </AvatarFallback>
                             </Avatar>
@@ -622,8 +627,8 @@ export function MentorDashboard() {
 
                                 <div className="mb-8 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
                                     <div>
-                                        <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">{selectedClassroom.className}</h1>
-                                        <p className="text-[15px] text-zinc-400 flex items-center gap-1.5"><BookOpenIcon className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
+                                        <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-2">{selectedClassroom.className}</h1>
+                                        <p className="text-[15px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><BookOpenIcon className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Button
@@ -631,9 +636,9 @@ export function MentorDashboard() {
                                             disabled={isClassroomSyncing}
                                             variant="outline"
                                             aria-label="Sync classroom data"
-                                            className="bg-transparent border-zinc-700 text-white hover:bg-zinc-800 rounded-xl"
+                                            className="bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl"
                                         >
-                                            {isClassroomSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2 text-zinc-400" />}
+                                            {isClassroomSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2 text-zinc-500 dark:text-zinc-400" />}
                                             {isClassroomSyncing ? 'Syncing Class...' : 'Sync Class Data'}
                                         </Button>
 
@@ -641,21 +646,21 @@ export function MentorDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="flex bg-[#111111]/85 backdrop-blur-2xl p-1.5 rounded-xl w-max mb-8 border border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
+                                <div className="flex bg-white/90 dark:bg-[#111111]/85 backdrop-blur-2xl p-1.5 rounded-xl w-max mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
                                     <button
-                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'leaderboard' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
+                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'leaderboard' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('leaderboard')}
                                     >
                                         Class Leaderboard
                                     </button>
                                     <button
-                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'analytics' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
+                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'analytics' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('analytics')}
                                     >
                                         Weakness & Analytics
                                     </button>
                                     <button
-                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'assignments' ? 'bg-[#2a2a2a] text-white shadow-md border border-zinc-700/50' : 'text-zinc-500 hover:text-white'}`}
+                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'assignments' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('assignments')}
                                     >
                                         Manage Assignments

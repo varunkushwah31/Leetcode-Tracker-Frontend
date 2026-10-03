@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Card, CardContent } from '../../ui/card';
 import { TrophyIcon, CalendarBlankIcon as Calendar, TrendUpIcon as TrendingUp } from '@phosphor-icons/react';
 import type { ContestHistory } from '@/types';
@@ -199,16 +199,16 @@ export function LeetCodeRatingGraph({
     }, [activePoint, viewBoxWidth]);
 
     return (
-        <Card className={`relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden transition-all h-full flex flex-col justify-between ${className}`}>
+        <Card className={`relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-all h-full flex flex-col justify-between ${className}`}>
             <CardContent className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
                 <div>
                     {/* Dedicated Title & Brand Bar */}
-                    <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-800/60">
+                    <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-200/80 dark:border-zinc-800/60">
                         <div className="flex items-center gap-2">
-                            <TrophyIcon className="w-4 h-4 text-amber-400" weight="bold" />
-                            <span className="text-sm font-bold text-white tracking-tight">LeetCode Contests</span>
+                            <TrophyIcon className="w-4 h-4 text-amber-500 dark:text-amber-400" weight="bold" />
+                            <span className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">LeetCode Contests</span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-md shrink-0">
+                        <div className="flex items-center gap-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-md shrink-0">
                             <span className="text-[10px] font-extrabold uppercase tracking-wider">LeetCode</span>
                         </div>
                     </div>
@@ -217,30 +217,30 @@ export function LeetCodeRatingGraph({
                     <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
                         {/* Contest Rating */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-400 tracking-wider uppercase truncate">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Contest Rating
                             </p>
-                            <p className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5">
+                            <p className="text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight mt-0.5">
                                 {displayRating}
                             </p>
                         </div>
 
                         {/* Global Ranking */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-400 tracking-wider uppercase truncate">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Global Ranking
                             </p>
-                            <p className="text-sm sm:text-base font-bold text-zinc-100 mt-1 sm:mt-0.5">
+                            <p className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100 mt-1 sm:mt-0.5">
                                 {displayRank}
                             </p>
                         </div>
 
                         {/* Attended */}
                         <div className="min-w-0">
-                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-400 tracking-wider uppercase truncate">
+                            <p className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase truncate">
                                 Attended
                             </p>
-                            <p className="text-sm sm:text-base font-bold text-zinc-100 mt-1 sm:mt-0.5">
+                            <p className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100 mt-1 sm:mt-0.5">
                                 {attendedCount}
                             </p>
                         </div>
@@ -248,9 +248,9 @@ export function LeetCodeRatingGraph({
 
                     {/* Graph Visualization */}
                     {sortedContests.length === 0 ? (
-                        <div className="h-44 flex flex-col items-center justify-center text-center p-4 rounded-xl border border-dashed border-zinc-800/80 bg-zinc-900/20">
+                        <div className="h-44 flex flex-col items-center justify-center text-center p-4 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/80 dark:bg-zinc-900/20">
                             <TrophyIcon className="w-8 h-8 text-amber-500/30 mb-2" />
-                            <p className="text-sm font-semibold text-zinc-400">No LeetCode contest rating recorded</p>
+                            <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-400">No LeetCode contest rating recorded</p>
                             <p className="text-xs text-zinc-500 mt-1 max-w-xs">
                                 Participate in weekly or biweekly LeetCode contests to track your rating progression.
                             </p>
@@ -280,7 +280,8 @@ export function LeetCodeRatingGraph({
                                     y1={padding.top}
                                     x2={viewBoxWidth - padding.right}
                                     y2={padding.top}
-                                    stroke="rgba(255,255,255,0.05)"
+                                    stroke="currentColor"
+                                    className="text-zinc-200 dark:text-zinc-800"
                                     strokeDasharray="3 3"
                                 />
                                 <line
@@ -288,7 +289,8 @@ export function LeetCodeRatingGraph({
                                     y1={viewBoxHeight - padding.bottom}
                                     x2={viewBoxWidth - padding.right}
                                     y2={viewBoxHeight - padding.bottom}
-                                    stroke="rgba(255,255,255,0.05)"
+                                    stroke="currentColor"
+                                    className="text-zinc-200 dark:text-zinc-800"
                                 />
 
                                 {/* Gradient Area under curve */}

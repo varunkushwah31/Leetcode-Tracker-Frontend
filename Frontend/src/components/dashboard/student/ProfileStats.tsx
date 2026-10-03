@@ -17,15 +17,15 @@ interface ProfileStatsProps {
 }
 
 function getCodeforcesRankColor(rank?: string): string {
-    if (!rank) return 'text-zinc-400';
+    if (!rank) return 'text-zinc-500 dark:text-zinc-400';
     const r = rank.toLowerCase();
-    if (r.includes('grandmaster')) return 'text-rose-500';
-    if (r.includes('master')) return 'text-orange-400';
-    if (r.includes('candidate')) return 'text-purple-400';
-    if (r.includes('expert')) return 'text-blue-400';
-    if (r.includes('specialist')) return 'text-cyan-400';
-    if (r.includes('pupil')) return 'text-emerald-400';
-    return 'text-zinc-400';
+    if (r.includes('grandmaster')) return 'text-rose-600 dark:text-rose-500';
+    if (r.includes('master')) return 'text-orange-500 dark:text-orange-400';
+    if (r.includes('candidate')) return 'text-purple-600 dark:text-purple-400';
+    if (r.includes('expert')) return 'text-blue-600 dark:text-blue-400';
+    if (r.includes('specialist')) return 'text-cyan-600 dark:text-cyan-400';
+    if (r.includes('pupil')) return 'text-emerald-600 dark:text-emerald-400';
+    return 'text-zinc-500 dark:text-zinc-400';
 }
 
 export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Readonly<ProfileStatsProps>) {
@@ -74,27 +74,29 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
 
     return (
         <div className="mb-10 relative">
-            {/* Ambient glow behind profile */}
-            <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-75 h-75 bg-[#5b4fff] opacity-20 blur-[100px] rounded-full pointer-events-none"></div>
-            <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-75 h-75 bg-emerald-500 opacity-10 blur-[100px] rounded-full pointer-events-none"></div>
+            {/* Ambient glow behind profile in dark mode only */}
+            <div className="hidden dark:block">
+                <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-75 h-75 bg-[#5b4fff] opacity-20 blur-[100px] rounded-full pointer-events-none"></div>
+                <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-75 h-75 bg-emerald-500 opacity-10 blur-[100px] rounded-full pointer-events-none"></div>
+            </div>
 
-            <Card className="relative z-10 bg-[#111111]/60 backdrop-blur-3xl border-zinc-800/50 shadow-2xl overflow-hidden rounded-[2rem]">
+            <Card className="relative z-10 bg-white/90 dark:bg-[#111111]/60 backdrop-blur-3xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-md dark:shadow-2xl overflow-hidden rounded-[2rem] transition-colors duration-200">
                 {/* Gradient subtle top border */}
-                <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent"></div>
+                <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#5b4fff]/40 dark:via-[#5b4fff]/50 to-transparent"></div>
 
                 <CardContent className="p-8 sm:p-10">
                     <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
 
                         {/* Avatar with pulsing glow */}
                         <div className="relative group">
-                            <div className="absolute inset-0 bg-[#5b4fff] rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
-                            <Avatar className="w-28 h-28 border-[3px] border-[#1a1b2e] ring-4 ring-[#5b4fff]/20 shadow-2xl relative z-10">
+                            <div className="absolute inset-0 bg-[#5b4fff] rounded-full blur-2xl opacity-10 dark:opacity-20 group-hover:opacity-30 dark:group-hover:opacity-40 transition-opacity duration-700"></div>
+                            <Avatar className="w-28 h-28 border-[3px] border-white dark:border-[#1a1b2e] ring-4 ring-[#5b4fff]/10 dark:ring-[#5b4fff]/20 shadow-xl dark:shadow-2xl relative z-10">
                                 <AvatarImage src={data.avatarUrl} className="object-cover" />
-                                <AvatarFallback className="bg-linear-to-br from-[#1a1b2e] to-[#2a2b4e] text-[#968fff] text-3xl font-bold">
+                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-[#1a1b2e] dark:to-[#2a2b4e] text-[#5b4fff] dark:text-[#968fff] text-3xl font-bold">
                                     {data.name?.substring(0, 2) || 'ST'}
                                 </AvatarFallback>
                             </Avatar>
-                            <div className="absolute -bottom-2 -right-2 bg-zinc-900 border border-zinc-700 p-1.5 rounded-full z-20 shadow-lg">
+                            <div className="absolute -bottom-2 -right-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-1.5 rounded-full z-20 shadow-md">
                                 <FlameIcon className="w-5 h-5 text-orange-500 animate-flame" />
                             </div>
                         </div>
@@ -103,14 +105,14 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                                 <div>
                                     <div className="flex items-center justify-center md:justify-start gap-3">
-                                        <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-400 tracking-tight mb-1">
+                                        <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-transparent dark:bg-clip-text dark:bg-linear-to-r dark:from-white dark:to-zinc-400 tracking-tight mb-1">
                                             {data.name || 'Student'}
                                         </h2>
                                         <button
                                             type="button"
                                             onClick={handleOpenEdit}
                                             title="Edit profile handles"
-                                            className="p-1.5 text-zinc-500 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
+                                            className="p-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                                         >
                                             <Settings className="w-4 h-4" />
                                         </button>
@@ -118,14 +120,14 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-1">
                                         {/* LeetCode Pill */}
                                         {data.leetcodeUsername ? (
-                                            <div className="flex items-center gap-1.5 bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-zinc-800 text-xs">
+                                            <div className="flex items-center gap-1.5 bg-amber-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-amber-500/20 dark:border-zinc-800 text-xs">
                                                 <span className="text-[#ffa116] font-semibold">LC:</span>
-                                                <span className="text-zinc-300">@{data.leetcodeUsername}</span>
+                                                <span className="text-zinc-700 dark:text-zinc-300 font-medium">@{data.leetcodeUsername}</span>
                                                 <a
                                                     href={`https://leetcode.com/${data.leetcodeUsername}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-zinc-500 hover:text-white transition-colors ml-0.5"
+                                                    className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors ml-0.5"
                                                 >
                                                     <ExternalLink className="w-3.5 h-3.5" />
                                                 </a>
@@ -134,7 +136,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                             <button
                                                 type="button"
                                                 onClick={handleOpenEdit}
-                                                className="text-xs text-zinc-500 hover:text-[#ffa116] border border-dashed border-zinc-700 hover:border-[#ffa116] px-2 py-0.5 rounded-md transition-colors"
+                                                className="text-xs text-zinc-500 hover:text-[#ffa116] border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-[#ffa116] px-2 py-0.5 rounded-md transition-colors"
                                             >
                                                 + Link LeetCode
                                             </button>
@@ -142,14 +144,14 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
 
                                         {/* Codeforces Pill */}
                                         {data.codeforcesHandle ? (
-                                            <div className="flex items-center gap-1.5 bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-zinc-800 text-xs">
-                                                <span className="text-cyan-400 font-semibold">CF:</span>
-                                                <span className="text-zinc-300">@{data.codeforcesHandle}</span>
+                                            <div className="flex items-center gap-1.5 bg-cyan-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-cyan-500/20 dark:border-zinc-800 text-xs">
+                                                <span className="text-cyan-600 dark:text-cyan-400 font-semibold">CF:</span>
+                                                <span className="text-zinc-700 dark:text-zinc-300 font-medium">@{data.codeforcesHandle}</span>
                                                 <a
                                                     href={`https://codeforces.com/profile/${data.codeforcesHandle}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-zinc-500 hover:text-white transition-colors ml-0.5"
+                                                    className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors ml-0.5"
                                                 >
                                                     <ExternalLink className="w-3.5 h-3.5" />
                                                 </a>
@@ -158,7 +160,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                             <button
                                                 type="button"
                                                 onClick={handleOpenEdit}
-                                                className="text-xs text-zinc-500 hover:text-cyan-400 border border-dashed border-zinc-700 hover:border-cyan-400 px-2 py-0.5 rounded-md transition-colors"
+                                                className="text-xs text-zinc-500 hover:text-cyan-500 border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-cyan-500 px-2 py-0.5 rounded-md transition-colors"
                                             >
                                                 + Link Codeforces
                                             </button>
@@ -166,49 +168,49 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     </div>
                                 </div>
 
-                                <div className="inline-flex items-center gap-2 bg-[#1a1b2e]/60 border border-[#5b4fff]/20 px-4 py-2 rounded-full self-center md:self-auto">
+                                <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-[#1a1b2e]/60 border border-amber-500/20 dark:border-[#5b4fff]/20 px-4 py-2 rounded-full self-center md:self-auto shadow-xs dark:shadow-none">
                                     <FlameIcon className="w-4 h-4 text-orange-500 animate-flame" />
-                                    <span className="text-sm font-bold text-white"><span className="text-orange-400 mr-1.5">{data.consistencyStreak || 0}</span>Day Combined Streak</span>
+                                    <span className="text-sm font-bold text-zinc-900 dark:text-white"><span className="text-orange-500 dark:text-orange-400 mr-1.5">{data.consistencyStreak || 0}</span>Day Combined Streak</span>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-                                <div className="bg-zinc-900/40 border border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-800/40 transition-colors group relative overflow-hidden">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-colors group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <p className="text-sm font-medium text-zinc-400 mb-2">LeetCode Rank</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center">
-                                        <TrophyIcon className="w-5 h-5 text-amber-500 mr-2 shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">LeetCode Rank</p>
+                                    <p className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center">
+                                        <TrophyIcon className="w-5 h-5 text-amber-500 mr-2 shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]" />
                                         {data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : 'N/A'}
                                     </p>
                                 </div>
 
-                                <div className="bg-zinc-900/40 border border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-800/40 transition-colors group relative overflow-hidden">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-colors group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <div className="flex items-center justify-between">
-                                        <p className="text-sm font-medium text-zinc-400 mb-1">Total Solved</p>
-                                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Unified</span>
+                                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Total Solved</p>
+                                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Unified</span>
                                     </div>
-                                    <p className="text-2xl sm:text-3xl font-black text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.3)] tracking-tight">
+                                    <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.25)] tracking-tight">
                                         {totalSolved}
                                     </p>
                                     <p className="text-xs text-zinc-500 mt-1">
-                                        LC: <span className="text-zinc-300 font-medium">{lcSolved}</span> • CF: <span className="text-zinc-300 font-medium">{cfSolved}</span>
+                                        LC: <span className="text-zinc-800 dark:text-zinc-300 font-semibold">{lcSolved}</span> • CF: <span className="text-zinc-800 dark:text-zinc-300 font-semibold">{cfSolved}</span>
                                     </p>
                                 </div>
 
-                                <div className="bg-zinc-900/40 border border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-800/40 transition-colors group relative overflow-hidden">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-colors group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-[#5b4fff]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <p className="text-sm font-medium text-zinc-400 mb-1">LeetCode Rating</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.3)] tracking-tight">
+                                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">LeetCode Rating</p>
+                                    <p className="text-2xl sm:text-3xl font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight">
                                         {rating}
                                     </p>
                                     <p className="text-xs text-zinc-500 mt-1">Contest Rating</p>
                                 </div>
 
-                                <div className="bg-zinc-900/40 border border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-800/40 transition-colors group relative overflow-hidden">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-colors group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <p className="text-sm font-medium text-zinc-400 mb-1">Codeforces Rating</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)] tracking-tight">
+                                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Codeforces Rating</p>
+                                    <p className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight">
                                         {cfRating > 0 ? cfRating : 'N/A'}
                                     </p>
                                     <p className={`text-xs capitalize font-semibold mt-1 ${cfRankColor}`}>
@@ -223,9 +225,9 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
 
             {/* Handle Management Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent className="bg-[#111111] border border-zinc-800 text-white rounded-2xl max-w-md">
+                <DialogContent className="bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-2xl max-w-md shadow-2xl">
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                        <DialogTitle className="text-xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
                             <TerminalIcon className="w-5 h-5 text-[#5b4fff]" /> Link Competitive Profiles
                         </DialogTitle>
                     </DialogHeader>
@@ -234,21 +236,21 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
 
                     <div className="space-y-4 py-3">
                         <div className="space-y-1.5">
-                            <label className="text-xs uppercase font-semibold text-zinc-400">LeetCode Username</label>
+                            <label className="text-xs uppercase font-semibold text-zinc-600 dark:text-zinc-400">LeetCode Username</label>
                             <Input
                                 value={lcUsername}
                                 onChange={(e) => setLcUsername(e.target.value)}
                                 placeholder="neetcode123"
-                                className="bg-[#1a1a1a] border-zinc-700 text-white"
+                                className="bg-zinc-50 dark:bg-[#1a1a1a] border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs uppercase font-semibold text-zinc-400">Codeforces Handle</label>
+                            <label className="text-xs uppercase font-semibold text-zinc-600 dark:text-zinc-400">Codeforces Handle</label>
                             <Input
                                 value={cfHandle}
                                 onChange={(e) => setCfHandle(e.target.value)}
                                 placeholder="tourist"
-                                className="bg-[#1a1a1a] border-zinc-700 text-white"
+                                className="bg-zinc-50 dark:bg-[#1a1a1a] border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white"
                             />
                             <p className="text-xs text-zinc-500">
                                 Link either LeetCode, Codeforces, or both. You need at least one platform linked to your account.
@@ -260,7 +262,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                         <Button
                             variant="outline"
                             onClick={() => setIsEditOpen(false)}
-                            className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+                            className="bg-transparent border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
                             Cancel
                         </Button>

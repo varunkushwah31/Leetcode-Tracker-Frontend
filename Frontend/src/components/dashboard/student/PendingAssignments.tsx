@@ -125,19 +125,19 @@ export function PendingAssignments({
     };
 
     return (
-        <Card className="relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden">
-            <CardHeader className="bg-transparent border-b border-zinc-800/60 flex flex-row items-center justify-between">
+        <Card className="relative bg-white/80 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+            <CardHeader className="bg-transparent border-b border-zinc-200/80 dark:border-zinc-800/60 flex flex-row items-center justify-between">
                 <div>
-                    <CardTitle className="flex items-center gap-2 text-lg text-white tracking-tight">
-                        <BookOpenIcon className="w-5 h-5 text-[#968fff]" /> Pending Assignments
+                    <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white tracking-tight">
+                        <BookOpenIcon className="w-5 h-5 text-[#5b4fff] dark:text-[#968fff]" /> Pending Assignments
                     </CardTitle>
-                    <CardDescription className="mt-1 text-zinc-400">
+                    <CardDescription className="mt-1 text-zinc-500 dark:text-zinc-400">
                         {selectedClassroomId ? 'Filtered by selected classroom' : 'Assigned by your mentors on LeetCode & Codeforces'}
                     </CardDescription>
                 </div>
                 <div className="flex gap-2">
                     {selectedClassroomId && (
-                        <Button onClick={onClearFilter} variant="ghost" className="text-zinc-400 hover:text-white">
+                        <Button onClick={onClearFilter} variant="ghost" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
                             Clear Filter
                         </Button>
                     )}
@@ -145,7 +145,7 @@ export function PendingAssignments({
                         onClick={onSync}
                         disabled={isSyncing}
                         variant="outline"
-                        className="bg-transparent border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800"
+                        className="bg-transparent border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
                     >
                         {isSyncing ? (
                             <>
@@ -166,7 +166,7 @@ export function PendingAssignments({
                         <span>{successMessage}</span>
                     </div>
                 )}
-                <div className="divide-y divide-zinc-800/50">
+                <div className="divide-y divide-zinc-200 dark:divide-zinc-800/50">
                     {assignments.map((item) => {
                         const dueInfo = getDaysUntilDue(item.assignment.endTimestamp);
                         const isExpanded = activeAssignmentId === item.assignment.id;
@@ -174,13 +174,13 @@ export function PendingAssignments({
                         const isAutoValidatingThis = isAutoValidating === item.assignment.id;
 
                         return (
-                            <div key={`${item.classroomId}-${item.assignment.id}`} className="p-6 hover:bg-zinc-800/30 transition-colors">
+                            <div key={`${item.classroomId}-${item.assignment.id}`} className="p-6 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors">
                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                                     <div>
                                         <div className="flex items-center gap-2 mb-2">
                                             <Badge
                                                 variant="outline"
-                                                className="bg-[#1a1a1a] text-zinc-400 border-zinc-700 uppercase tracking-wider text-[10px] font-bold"
+                                                className="bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 uppercase tracking-wider text-[10px] font-bold"
                                             >
                                                 {item.className}
                                             </Badge>
@@ -188,20 +188,20 @@ export function PendingAssignments({
                                                 variant="outline"
                                                 className={
                                                     isCf
-                                                        ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[10px] uppercase font-bold'
-                                                        : 'bg-[#ffa116]/10 text-[#ffa116] border-[#ffa116]/20 text-[10px] uppercase font-bold'
+                                                        ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20 text-[10px] uppercase font-bold'
+                                                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] uppercase font-bold'
                                                 }
                                             >
                                                 {item.assignment.platform || 'LEETCODE'}
                                             </Badge>
                                         </div>
-                                        <h4 className="text-lg font-bold text-white tracking-tight">
+                                        <h4 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
                                             {item.assignment.problemNumber
                                                 ? `Problem #${item.assignment.problemNumber}: ${item.assignment.title || item.assignment.titleSlug}`
                                                 : (item.assignment.title ? `${item.assignment.title} (${item.assignment.titleSlug})` : item.assignment.titleSlug)}
                                         </h4>
                                         <div className="flex items-center gap-1.5 mt-2 text-sm">
-                                            <Calendar className="w-4 h-4 text-zinc-400" />
+                                            <Calendar className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                                             <span className={`font-medium ${dueInfo.color}`}>{dueInfo.text}</span>
                                         </div>
                                     </div>
@@ -209,7 +209,7 @@ export function PendingAssignments({
                                         <Button
                                             asChild
                                             variant="outline"
-                                            className="bg-transparent border border-zinc-700 hover:bg-zinc-800 text-[14px] text-white group"
+                                            className="bg-transparent border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-[14px] text-zinc-800 dark:text-white group"
                                         >
                                             <a href={item.assignment.questionLink} target="_blank" rel="noopener noreferrer">
                                                 Solve <ExternalLink className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -220,7 +220,7 @@ export function PendingAssignments({
                                         <Button
                                             onClick={() => handleAutoValidate(item.classroomId, item.assignment.id)}
                                             disabled={isAutoValidatingThis || isValidating}
-                                            className="bg-emerald-600/90 hover:bg-emerald-600 text-white text-[14px] font-medium"
+                                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] font-medium shadow-xs"
                                         >
                                             {isAutoValidatingThis ? (
                                                  <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
@@ -233,10 +233,10 @@ export function PendingAssignments({
                                         <Button
                                             onClick={() => handleOpenSubmit(item.assignment.id)}
                                             variant="outline"
-                                            className={`text-[14px] font-medium transition-colors border-zinc-700 ${
+                                            className={`text-[14px] font-medium transition-colors border ${
                                                 isExpanded
-                                                    ? 'bg-zinc-800 text-white'
-                                                    : 'bg-transparent text-zinc-300 hover:text-white hover:bg-zinc-800'
+                                                    ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white border-zinc-300 dark:border-zinc-700'
+                                                    : 'bg-transparent border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                             }`}
                                         >
                                             <Link2 className="w-4 h-4 mr-1.5" />
@@ -246,8 +246,8 @@ export function PendingAssignments({
                                 </div>
 
                                 {isExpanded && (
-                                    <div className="mt-4 pt-4 border-t border-zinc-800/60 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <p className="text-xs text-zinc-400">
+                                    <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800/60 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                             {isCf
                                                 ? 'Paste your full Codeforces submission URL (e.g. https://codeforces.com/contest/4/submission/12345678):'
                                                 : 'Paste your full accepted LeetCode submission URL (e.g. https://leetcode.com/problems/two-sum/submissions/123456789/):'}
@@ -264,7 +264,7 @@ export function PendingAssignments({
                                                     setSubmissionUrl(e.target.value);
                                                     setValidationError(null);
                                                 }}
-                                                className="bg-[#1a1a1a] border-zinc-700 text-white placeholder:text-zinc-600 focus-visible:ring-[#5b4fff] text-sm"
+                                                className="bg-zinc-50 dark:bg-[#1a1a1a] border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-[#5b4fff] text-sm"
                                             />
                                             <Button
                                                 onClick={() => handleValidateSubmission(item.classroomId, item.assignment.id)}
@@ -283,7 +283,7 @@ export function PendingAssignments({
                                             </Button>
                                         </div>
                                         {validationError && (
-                                            <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg flex items-center gap-2 text-rose-400 text-xs">
+                                            <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg flex items-center gap-2 text-rose-600 dark:text-rose-400 text-xs">
                                                 <AlertCircle className="w-4 h-4 shrink-0" />
                                                 <span>{validationError}</span>
                                             </div>
@@ -296,9 +296,9 @@ export function PendingAssignments({
 
                     {assignments.length === 0 && (
                         <div className="p-12 text-center text-zinc-500">
-                            <CheckIcon className="w-12 h-12 mx-auto text-emerald-500/40 mb-3" />
-                            <h5 className="text-white font-semibold">All Caught Up!</h5>
-                            <p className="text-sm mt-1">You have no pending assignments on LeetCode or Codeforces.</p>
+                            <CheckIcon className="w-12 h-12 mx-auto text-emerald-500/50 mb-3" />
+                            <h5 className="text-zinc-900 dark:text-white font-semibold">All Caught Up!</h5>
+                            <p className="text-sm mt-1 text-zinc-500 dark:text-zinc-400">You have no pending assignments on LeetCode or Codeforces.</p>
                         </div>
                     )}
                 </div>

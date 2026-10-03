@@ -221,24 +221,24 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
         }
     };
 
-    const inputClasses = "bg-[#222] border-none text-white placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10";
-    const dialogContentClasses = "bg-[#111111] border-zinc-800 text-white sm:rounded-2xl";
+    const inputClasses = "bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10";
+    const dialogContentClasses = "bg-white dark:bg-[#111111] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white sm:rounded-2xl";
 
     return (
         <div className="flex flex-wrap gap-3">
             {/* 1. ADD STUDENT DIALOG */}
             <Dialog open={addStudentOpen} onOpenChange={(open) => { setAddStudentOpen(open); if(!open) { setAddStudentError(null); setBulkUploadError(null); } }}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" className="border-zinc-700 bg-transparent text-white hover:bg-zinc-800 rounded-xl transition-colors">
+                    <Button variant="outline" className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">
                         <UserPlusIcon className="w-4 h-4 mr-2" />Add Student
                     </Button>
                 </DialogTrigger>
                 <DialogContent className={dialogContentClasses}>
-                    <DialogHeader><DialogTitle className="text-white text-xl font-bold">Add Students</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Add Students</DialogTitle></DialogHeader>
                     <div className="space-y-6 py-4">
 
-                        <div className="space-y-2 p-4 bg-[#1a1b2e]/40 rounded-xl border border-zinc-800">
-                            <Label className="text-[#968fff] font-bold">1. Add Single Student</Label>
+                        <div className="space-y-2 p-4 bg-zinc-50 dark:bg-[#1a1b2e]/40 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                            <Label className="text-[#5b4fff] dark:text-[#968fff] font-bold">1. Add Single Student</Label>
 
                             <ErrorBanner message={addStudentError} className="mb-2" />
 
@@ -262,20 +262,20 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             </div>
                         </div>
 
-                        <div className="space-y-3 p-4 bg-[#1a1b2e]/40 rounded-xl border border-zinc-800">
-                            <Label className="text-emerald-400 font-bold">2. Bulk Import (CSV)</Label>
+                        <div className="space-y-3 p-4 bg-zinc-50 dark:bg-[#1a1b2e]/40 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                            <Label className="text-emerald-600 dark:text-emerald-400 font-bold">2. Bulk Import (CSV)</Label>
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />
 
-                            <p className="text-xs text-zinc-400">Upload a .csv file with student identifiers (LeetCode usernames or Codeforces handles).</p>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">Upload a .csv file with student identifiers (LeetCode usernames or Codeforces handles).</p>
                             <div className="flex gap-2">
-                                <Input type="file" accept=".csv" onChange={(e) => { setUploadFile(e.target.files ? e.target.files[0] : null); if(bulkUploadError) setBulkUploadError(null); }} className={`cursor-pointer file:bg-emerald-500/10 file:text-emerald-400 file:border-0 file:rounded-md file:px-2 file:py-1 ${inputClasses}`} />
+                                <Input type="file" accept=".csv" onChange={(e) => { setUploadFile(e.target.files ? e.target.files[0] : null); if(bulkUploadError) setBulkUploadError(null); }} className={`cursor-pointer file:bg-emerald-500/10 file:text-emerald-600 dark:file:text-emerald-400 file:border-0 file:rounded-md file:px-2 file:py-1 ${inputClasses}`} />
                                 <Button onClick={handleBulkUpload} disabled={!uploadFile || isUploading} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
                                     {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />} Import
                                 </Button>
                             </div>
                             {uploadFailures.length > 0 && (
-                                <div className="mt-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-sm text-rose-400">
+                                <div className="mt-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-sm text-rose-600 dark:text-rose-400">
                                     <span className="font-bold">Failed to add:</span>
                                     <ul className="list-disc pl-5 mt-1">{uploadFailures.map((f) => <li key={`fail-${f}`}>{f}</li>)}</ul>
                                 </div>
@@ -288,27 +288,27 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             {/* 2. ASSIGN QUESTION DIALOG */}
             <Dialog open={assignQuestionOpen} onOpenChange={(open) => { setAssignQuestionOpen(open); if(!open) setAssignQuestionError(null); }}>
                 <DialogTrigger asChild>
-                    <Button className="bg-[#222] text-white hover:bg-[#333] border border-transparent rounded-xl transition-colors">
-                        <ClipboardList className="w-4 h-4 mr-2 text-[#968fff]" />Assign Question
+                    <Button className="bg-white dark:bg-[#222] text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-[#333] border border-zinc-200 dark:border-transparent rounded-xl transition-colors shadow-sm">
+                        <ClipboardList className="w-4 h-4 mr-2 text-[#5b4fff] dark:text-[#968fff]" />Assign Question
                     </Button>
                 </DialogTrigger>
                 <DialogContent className={dialogContentClasses}>
-                    <DialogHeader><DialogTitle className="text-white text-xl font-bold">Assign Question</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Assign Question</DialogTitle></DialogHeader>
 
                     <ErrorBanner message={assignQuestionError} />
 
                     <div className="space-y-4 py-3">
                         {/* Platform Selector */}
                         <div className="space-y-1.5">
-                            <Label className="text-zinc-300 text-xs uppercase font-semibold">Platform</Label>
+                            <Label className="text-zinc-700 dark:text-zinc-300 text-xs uppercase font-semibold">Platform</Label>
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setAssignmentData({ ...assignmentData, platform: 'LEETCODE' })}
                                     className={`py-2 px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                                         assignmentData.platform === 'LEETCODE'
-                                            ? 'bg-[#ffa116]/15 border-[#ffa116] text-[#ffa116] shadow-md shadow-[#ffa116]/10'
-                                            : 'bg-[#1a1a1a] border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800'
+                                            ? 'bg-amber-500/15 border-amber-500 text-amber-600 dark:text-[#ffa116] shadow-sm'
+                                            : 'bg-zinc-100 dark:bg-[#1a1a1a] border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800'
                                     }`}
                                 >
                                     <span>LeetCode</span>
@@ -318,8 +318,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                     onClick={() => setAssignmentData({ ...assignmentData, platform: 'CODEFORCES' })}
                                     className={`py-2 px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                                         assignmentData.platform === 'CODEFORCES'
-                                            ? 'bg-cyan-500/15 border-cyan-400 text-cyan-400 shadow-md shadow-cyan-500/10'
-                                            : 'bg-[#1a1a1a] border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800'
+                                            ? 'bg-cyan-500/15 border-cyan-500 text-cyan-600 dark:text-cyan-400 shadow-sm'
+                                            : 'bg-zinc-100 dark:bg-[#1a1a1a] border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800'
                                     }`}
                                 >
                                     <span>Codeforces</span>
@@ -330,7 +330,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         {/* Problem URL or Slug/ID */}
                         <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
-                                <Label className="text-zinc-300 text-xs uppercase font-semibold">
+                                <Label className="text-zinc-700 dark:text-zinc-300 text-xs uppercase font-semibold">
                                     Problem URL
                                 </Label>
                                 <span className="text-[11px] text-zinc-500">Paste whole URL or ID</span>
@@ -366,9 +366,9 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             {assignmentData.titleSlug.trim().length > 0 && (() => {
                                 const parsed = parseProblemInput(assignmentData.titleSlug, assignmentData.platform);
                                 return (
-                                    <div className="flex items-center gap-2 pt-1 text-xs text-zinc-400">
+                                    <div className="flex items-center gap-2 pt-1 text-xs text-zinc-500 dark:text-zinc-400">
                                         <span className="font-semibold text-zinc-500">Extracted:</span>
-                                        <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-md font-mono text-[11px]">
+                                        <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300 px-2 py-0.5 rounded-md font-mono text-[11px] border border-zinc-200 dark:border-zinc-700">
                                             {parsed.detectedPlatform === 'CODEFORCES'
                                                 ? `CF Problem #${parsed.problemNumber || parsed.slug}`
                                                 : `LeetCode: ${parsed.slug}`}
@@ -380,7 +380,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                         {/* Problem Title (Optional) */}
                         <div className="space-y-1.5">
-                            <Label className="text-zinc-300 text-xs uppercase font-semibold">
+                            <Label className="text-zinc-700 dark:text-zinc-300 text-xs uppercase font-semibold">
                                 Problem Title <span className="text-zinc-500 font-normal lowercase">(optional - auto-fetched from platform)</span>
                             </Label>
                             <Input
@@ -394,7 +394,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         {/* Deadline Selector */}
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <Label className="text-zinc-300 text-xs uppercase font-semibold">Assignment Deadline</Label>
+                                <Label className="text-zinc-700 dark:text-zinc-300 text-xs uppercase font-semibold">Assignment Deadline</Label>
                                 <span className="text-[11px] text-zinc-500">Pick any custom date & time</span>
                             </div>
                             <Input
@@ -402,7 +402,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 value={assignmentData.deadline}
                                 min={getDefaultDeadline(0)}
                                 onChange={(e) => setAssignmentData({ ...assignmentData, deadline: e.target.value })}
-                                className={`${inputClasses} [color-scheme:dark]`}
+                                className={inputClasses}
                             />
                             {/* Quick Presets */}
                             <div className="flex flex-wrap items-center gap-1.5 pt-1">
@@ -420,7 +420,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                         key={preset.label}
                                         type="button"
                                         onClick={() => setAssignmentData({ ...assignmentData, deadline: getDefaultDeadline(preset.days) })}
-                                        className="text-[11px] bg-zinc-800/80 hover:bg-[#5b4fff]/20 text-zinc-300 hover:text-[#b4afff] px-2 py-0.5 rounded-md border border-zinc-700/60 transition-colors"
+                                        className="text-[11px] bg-zinc-100 dark:bg-zinc-800/80 hover:bg-[#5b4fff]/10 dark:hover:bg-[#5b4fff]/20 text-zinc-700 dark:text-zinc-300 hover:text-[#5b4fff] dark:hover:text-[#b4afff] px-2 py-0.5 rounded-md border border-zinc-200 dark:border-zinc-700/60 transition-colors"
                                     >
                                         {preset.label}
                                     </button>
@@ -429,7 +429,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" className="border-zinc-700 bg-transparent text-white hover:bg-zinc-800 rounded-xl" onClick={() => setAssignQuestionOpen(false)}>Cancel</Button>
+                        <Button variant="outline" className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl" onClick={() => setAssignQuestionOpen(false)}>Cancel</Button>
                         <Button onClick={handleAssignQuestion} className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl">Assign</Button>
                     </DialogFooter>
                 </DialogContent>
@@ -439,14 +439,14 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             <Dialog open={assignPathOpen} onOpenChange={(open) => { setAssignPathOpen(open); if(!open) setAssignPathError(null); }}>
                 <DialogTrigger asChild><Button className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white border border-transparent rounded-xl shadow-lg shadow-[#5b4fff]/20 transition-all hover:-translate-y-0.5"><Map className="w-4 h-4 mr-2" /> Assign Path</Button></DialogTrigger>
                 <DialogContent className={dialogContentClasses}>
-                    <DialogHeader><DialogTitle className="text-white text-xl font-bold">Assign Learning Path</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Assign Learning Path</DialogTitle></DialogHeader>
 
                     <ErrorBanner message={assignPathError} />
 
                     <div className="space-y-4 py-4">
                         {learningPaths.length === 0 ? (
-                            <div className="text-center p-6 bg-[#1a1b2e]/30 rounded-xl border border-dashed border-zinc-700">
-                                <p className="text-sm text-zinc-400 mb-4">You haven't built any roadmaps yet.</p>
+                            <div className="text-center p-6 bg-zinc-50 dark:bg-[#1a1b2e]/30 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700">
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">You haven't built any roadmaps yet.</p>
                                 <Button onClick={openCreateFromAssign} className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl">
                                     <PlusIcon className="w-4 h-4 mr-2" /> Create Your First Path
                                 </Button>
@@ -454,19 +454,19 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         ) : (
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label className="text-zinc-300">Select an existing Path</Label>
+                                    <Label className="text-zinc-700 dark:text-zinc-300">Select an existing Path</Label>
                                     <Select value={selectedPathId} onValueChange={(v) => { setSelectedPathId(v); if(assignPathError) setAssignPathError(null); }}>
                                         <SelectTrigger className={inputClasses}><SelectValue placeholder="Choose a roadmap..." /></SelectTrigger>
-                                        <SelectContent className="bg-[#1a1b2e] border-zinc-800 text-white rounded-xl">
-                                            {learningPaths.map(path => <SelectItem key={path.id} value={path.id || ''} className="focus:bg-[#5b4fff]/20 focus:text-white">{path.title}</SelectItem>)}
+                                        <SelectContent className="bg-white dark:bg-[#1a1b2e] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl">
+                                            {learningPaths.map(path => <SelectItem key={path.id} value={path.id || ''} className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white">{path.title}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="relative py-2">
-                                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-zinc-800" /></div>
-                                    <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#111111] px-2 text-zinc-500 font-medium tracking-widest">Or</span></div>
+                                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-zinc-200 dark:border-zinc-800" /></div>
+                                    <div className="relative flex justify-center text-xs uppercase"><span className="bg-white dark:bg-[#111111] px-2 text-zinc-500 font-medium tracking-widest">Or</span></div>
                                 </div>
-                                <Button variant="outline" className="w-full border-[#5b4fff]/30 text-[#968fff] hover:bg-[#5b4fff]/10 bg-transparent rounded-xl h-12" onClick={openCreateFromAssign}>
+                                <Button variant="outline" className="w-full border-[#5b4fff]/30 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/10 bg-transparent rounded-xl h-12" onClick={openCreateFromAssign}>
                                     <PlusIcon className="w-4 h-4 mr-2" /> Create New Learning Path
                                 </Button>
                             </div>
@@ -483,23 +483,23 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             {/* 4. CREATE PATH DIALOG */}
             <Dialog open={createPathOpen} onOpenChange={(open) => { setCreatePathOpen(open); if(!open) setCreatePathError(null); }}>
                 <DialogContent className={`max-w-2xl ${dialogContentClasses}`}>
-                    <DialogHeader><DialogTitle className="text-white text-xl font-bold">Build a Learning Path</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Build a Learning Path</DialogTitle></DialogHeader>
 
                     <ErrorBanner message={createPathError} />
 
                     <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2"><Label className="text-zinc-300">Title</Label><Input className={inputClasses} value={newPath.title} onChange={e => { setNewPath({...newPath, title: e.target.value}); if(createPathError) setCreatePathError(null); }} /></div>
-                            <div className="space-y-2"><Label className="text-zinc-300">Description</Label><Input className={inputClasses} value={newPath.description} onChange={e => setNewPath({...newPath, description: e.target.value})} /></div>
+                            <div className="space-y-2"><Label className="text-zinc-700 dark:text-zinc-300">Title</Label><Input className={inputClasses} value={newPath.title} onChange={e => { setNewPath({...newPath, title: e.target.value}); if(createPathError) setCreatePathError(null); }} /></div>
+                            <div className="space-y-2"><Label className="text-zinc-700 dark:text-zinc-300">Description</Label><Input className={inputClasses} value={newPath.description} onChange={e => setNewPath({...newPath, description: e.target.value})} /></div>
                         </div>
                         <div className="mt-6">
                             <div className="flex items-center justify-between mb-2">
-                                <Label className="text-zinc-300">Questions</Label>
+                                <Label className="text-zinc-700 dark:text-zinc-300">Questions</Label>
                                 <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
-                                    className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 rounded-lg h-8"
+                                    className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg h-8"
                                     onClick={() => setPathQuestions(prev => [...prev, { tempId: `question-new-${Date.now()}-${prev.length}`, platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }])}
                                 >
                                     <PlusIcon className="w-3 h-3 mr-1" /> Add
@@ -507,10 +507,10 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             </div>
                             <div className="space-y-3">
                                 {pathQuestions.map((q, idx) => (
-                                    <div key={q.tempId} className="bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-800/60 space-y-2">
+                                    <div key={q.tempId} className="bg-zinc-50 dark:bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800/60 space-y-2">
                                         <div className="flex items-center gap-2">
                                             {/* Platform Selector */}
-                                            <div className="flex rounded-lg overflow-hidden border border-zinc-800 text-xs">
+                                            <div className="flex rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 text-xs">
                                                 <button
                                                     type="button"
                                                     onClick={() => {
@@ -520,8 +520,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                     }}
                                                     className={`px-2.5 py-1.5 transition-all text-xs font-semibold cursor-pointer ${
                                                         (q.platform ?? 'LEETCODE') === 'LEETCODE'
-                                                            ? 'bg-[#ffa116]/20 text-[#ffa116]'
-                                                            : 'bg-[#141522] text-zinc-500 hover:text-zinc-300'
+                                                            ? 'bg-amber-500/20 text-amber-600 dark:text-[#ffa116]'
+                                                            : 'bg-zinc-100 dark:bg-[#141522] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                                                     }`}
                                                 >
                                                     LC
@@ -535,8 +535,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                     }}
                                                     className={`px-2.5 py-1.5 transition-all text-xs font-semibold cursor-pointer ${
                                                         q.platform === 'CODEFORCES'
-                                                            ? 'bg-cyan-500/20 text-cyan-400'
-                                                            : 'bg-[#141522] text-zinc-500 hover:text-zinc-300'
+                                                            ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400'
+                                                            : 'bg-zinc-100 dark:bg-[#141522] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                                                     }`}
                                                 >
                                                     CF
@@ -571,7 +571,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+                                                className="text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300"
                                                 onClick={() => setPathQuestions(prev => prev.filter(item => item.tempId !== q.tempId))}
                                                 disabled={pathQuestions.length === 1}
                                             >
@@ -602,13 +602,13 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             {/* 5. DELETE CLASSROOM DIALOG */}
             <Dialog open={deleteClassOpen} onOpenChange={(open) => { setDeleteClassOpen(open); if(!open) setDeleteClassError(null); }}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" className="border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300 rounded-xl transition-colors">
+                    <Button variant="outline" className="border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 hover:text-rose-700 dark:hover:text-rose-300 rounded-xl transition-colors">
                         <Trash2 className="w-4 h-4 mr-2" />Delete Class
                     </Button>
                 </DialogTrigger>
                 <DialogContent className={dialogContentClasses}>
                     <DialogHeader>
-                        <DialogTitle className="text-rose-400 flex items-center text-xl font-bold">
+                        <DialogTitle className="text-rose-600 dark:text-rose-400 flex items-center text-xl font-bold">
                             <AlertTriangle className="w-5 h-5 mr-2" />
                             Delete Classroom
                         </DialogTitle>
@@ -617,15 +617,15 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                     <ErrorBanner message={deleteClassError} />
 
                     <div className="py-4">
-                        <p className="text-zinc-300">
-                            Are you sure you want to delete <strong className="text-white">{selectedClassroom.className}</strong>?
+                        <p className="text-zinc-700 dark:text-zinc-300">
+                            Are you sure you want to delete <strong className="text-zinc-900 dark:text-white">{selectedClassroom.className}</strong>?
                         </p>
                         <p className="text-sm text-zinc-500 mt-2">
                             This action cannot be undone. All tracking for this specific class will be removed from your dashboard.
                         </p>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" className="border-zinc-700 bg-transparent text-white hover:bg-zinc-800 rounded-xl" onClick={() => setDeleteClassOpen(false)} disabled={isDeleting}>
+                        <Button variant="outline" className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl" onClick={() => setDeleteClassOpen(false)} disabled={isDeleting}>
                             Cancel
                         </Button>
                         <Button onClick={handleDeleteClass} className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl" disabled={isDeleting}>

@@ -37,24 +37,24 @@ export function ContestRatingsSection({
             {/* Section Header with View Mode Switch */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
                 <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-xl bg-[#5b4fff]/10 text-[#968fff] border border-[#5b4fff]/20">
+                    <div className="p-2 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
                         <ChartLineIcon className="w-5 h-5" weight="bold" />
                     </div>
                     <div>
-                        <h2 className="text-lg font-bold text-white tracking-tight">Contest Rating Progression</h2>
-                        <p className="text-xs text-zinc-400">Track your competitive rating trends over time across platforms</p>
+                        <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Contest Rating Progression</h2>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">Track your competitive rating trends over time across platforms</p>
                     </div>
                 </div>
 
                 {/* Filter Pills */}
-                <div className="flex items-center gap-1 bg-[#141414]/80 p-1 rounded-xl border border-zinc-800/80 self-start sm:self-auto">
+                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#141414]/80 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800/80 self-start sm:self-auto shadow-xs dark:shadow-none">
                     <button
                         type="button"
                         onClick={() => setActiveTab('all')}
                         className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                             activeTab === 'all'
-                                ? 'bg-zinc-800 text-white shadow-sm'
-                                : 'text-zinc-400 hover:text-zinc-200'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                         }`}
                     >
                         Both ({lcCount + cfCount})
@@ -64,8 +64,8 @@ export function ContestRatingsSection({
                         onClick={() => setActiveTab('leetcode')}
                         className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                             activeTab === 'leetcode'
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm'
-                                : 'text-zinc-400 hover:text-amber-400'
+                                ? 'bg-amber-500/15 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-xs'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400'
                         }`}
                     >
                         <TrophyIcon className="w-3.5 h-3.5" />
@@ -76,8 +76,8 @@ export function ContestRatingsSection({
                         onClick={() => setActiveTab('codeforces')}
                         className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                             activeTab === 'codeforces'
-                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm'
-                                : 'text-zinc-400 hover:text-cyan-400'
+                                ? 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 shadow-xs'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-cyan-600 dark:hover:text-cyan-400'
                         }`}
                     >
                         <TrophyIcon className="w-3.5 h-3.5" />
