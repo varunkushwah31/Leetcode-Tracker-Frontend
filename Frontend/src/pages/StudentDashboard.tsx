@@ -11,6 +11,7 @@ import { ProfileStats } from '../components/dashboard/student/ProfileStats';
 import { ActivityHeatmap } from '../components/dashboard/student/ActivityHeatmap';
 import { PendingAssignments } from '../components/dashboard/student/PendingAssignments';
 import { ClassroomList } from '../components/dashboard/student/ClassroomList';
+import { ContestRatingsSection } from '../components/dashboard/student/ContestRatingsSection';
 import { BadgesList } from '../components/dashboard/student/BadgesList';
 import { StudentRightSidebar } from '../components/dashboard/student/StudentRightSidebar';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
@@ -174,6 +175,16 @@ export function StudentDashboard() {
                             onValidationSuccess={fetchDashboard}
                         />
                         <ClassroomList classrooms={dashboardData?.classrooms} selectedClassroomId={selectedClassroomId} onSelectClassroom={setSelectedClassroomId} />
+                        <ContestRatingsSection
+                            contestHistory={dashboardData?.contestHistory}
+                            currentContestRating={dashboardData?.currentContestRating}
+                            globalRanking={dashboardData?.rank}
+                            codeforcesContestHistory={dashboardData?.codeforcesContestHistory}
+                            codeforcesRating={dashboardData?.codeforcesRating}
+                            codeforcesMaxRating={dashboardData?.codeforcesMaxRating}
+                            codeforcesRank={dashboardData?.codeforcesRank}
+                            codeforcesMaxRank={dashboardData?.codeforcesMaxRank}
+                        />
                     </div>
 
                     <div className="space-y-8">

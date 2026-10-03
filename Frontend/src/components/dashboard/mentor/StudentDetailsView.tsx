@@ -10,6 +10,7 @@ import {
 import { StudentService } from '@/services/endpoints';
 import type { StudentExtendedDTO } from '@/types';
 import { ActivityHeatmap } from '../student/ActivityHeatmap';
+import { ContestRatingsSection } from '../student/ContestRatingsSection';
 import { ErrorBanner } from "@/components/ui/ErrorBanner.tsx";
 
 interface StudentDetailsViewProps {
@@ -204,6 +205,17 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
                                 </div>
                             </CardContent>
                         </Card>
+
+                        <ContestRatingsSection
+                            contestHistory={data.contestHistory}
+                            currentContestRating={data.currentContestRating}
+                            globalRanking={data.rank}
+                            codeforcesContestHistory={data.codeforcesContestHistory}
+                            codeforcesRating={data.codeforcesRating}
+                            codeforcesMaxRating={data.codeforcesMaxRating}
+                            codeforcesRank={data.codeforcesRank}
+                            codeforcesMaxRank={data.codeforcesMaxRank}
+                        />
 
                         {/* LeetCode Contest History */}
                         {data.contestHistory && data.contestHistory.length > 0 && (
