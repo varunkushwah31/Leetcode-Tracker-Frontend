@@ -181,10 +181,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           <span
             className={`font-bold tracking-tight leading-none ${textClass} ${primaryTextColor} ${wordmarkClassName}`}
           >
-            Mentor
-            <span className="bg-linear-to-r from-[#6366f1] via-[#818cf8] to-[#a855f7] bg-clip-text text-transparent">
-              Sync
-            </span>
+            MentorSync
           </span>
           {subtext && (
             <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-500 dark:text-zinc-400 mt-1">
