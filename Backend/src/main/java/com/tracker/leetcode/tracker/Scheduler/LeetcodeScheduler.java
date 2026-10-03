@@ -22,7 +22,6 @@ public class LeetcodeScheduler {
     private final StudentRepository studentRepository;
 
     @Scheduled(cron = "0 55 23 * * ?")
-    // <-- ADD THE LOCK HERE -->
     // name: Must be unique for this specific task
     // lockAtLeastFor: Prevents clock de-sync issues between servers (locks it for at least 5 mins)
     // lockAtMostFor: Max time the lock is held (10 mins)
@@ -31,7 +30,15 @@ public class LeetcodeScheduler {
         log.info("Executing ShedLock protected Daily Sync...");
         List<Student> students = studentRepository.findAll();
         for (Student student : students) {
-            studentService.syncProfileAsync(student.getLeetcodeUsername());
+            // Use the best available identifier — supports LC-only, CF-only, and dual-platform students
+            String identifier = student.getLeetcodeUsername();
+            if (identifier == null || identifier.isBlank()) {
+                identifier = student.getCodeforcesHandle();
+            }
+            if (identifier == null || identifier.isBlank()) {
+                identifier = student.getId();
+            }
+            studentService.syncProfileAsync(identifier);
         }
     }
 }

@@ -349,11 +349,13 @@ public class LeetCodeApiClient {
     @Retry(name = "leetcodeApi")
     @RateLimiter(name = "leetcodeApi")
     public boolean verifySubmission(String submissionId, String expectedUsername, String expectedTitleSlug) {
+        if (submissionId == null || submissionId.isBlank() || expectedUsername == null || expectedUsername.isBlank()) {
+            return false;
+        }
 
-        // Instead of querying the protected submissionDetails, we query the public recentAcSubmissionList
-        // We fetch their last 20 accepted submissions to see if the ID is in there.
+        // Query their last 50 accepted submissions to see if the ID is in there
         String query = """
-                {"query":"query recentAcSubmissions($username: String!, $limit: Int!) { recentAcSubmissionList(username: $username, limit: $limit) { id titleSlug } }","variables":{"username":"%s","limit":20}}
+                {"query":"query recentAcSubmissions($username: String!, $limit: Int!) { recentAcSubmissionList(username: $username, limit: $limit) { id titleSlug } }","variables":{"username":"%s","limit":50}}
                 """.formatted(expectedUsername);
 
         JsonNode root = executeGraphQLQuery(query, expectedUsername);
@@ -365,19 +367,23 @@ public class LeetCodeApiClient {
         }
 
         try {
+            String normExpectedSlug = expectedTitleSlug != null ? expectedTitleSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase() : "";
+
             // Loop through their recent accepted submissions looking for a match
             for (JsonNode node : submissionList) {
                 String actualId = node.path("id").asString();
                 String actualSlug = node.path("titleSlug").asString();
+                String normActualSlug = actualSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
 
                 // If the ID matches AND the question matches, it's 100% valid!
-                if (submissionId.equals(actualId) && expectedTitleSlug.equalsIgnoreCase(actualSlug)) {
+                if (submissionId.trim().equals(actualId.trim()) &&
+                        (normExpectedSlug.isEmpty() || normExpectedSlug.equals(normActualSlug) || expectedTitleSlug.equalsIgnoreCase(actualSlug))) {
                     log.info("Validation Successful -> Found ID: {} for Slug: {}", actualId, actualSlug);
                     return true;
                 }
             }
 
-            log.warn("Submission ID {} not found in the recent 20 Accepted submissions for {}.", submissionId, expectedUsername);
+            log.warn("Submission ID {} not found in the recent 50 Accepted submissions for {}.", submissionId, expectedUsername);
             return false;
 
         } catch (Exception e) {
@@ -392,8 +398,32 @@ public class LeetCodeApiClient {
     public boolean verifySubmissionFallback(String submissionId, String expectedUsername, String expectedTitleSlug, Exception ex) {
         log.warn("Circuit breaker OPEN for submission verification of {}. Denying verification during outage. Error: {}",
                 expectedUsername, ex.getMessage());
-        // During API outage, we cannot verify submissions, so return false (deny)
         return false;
+    }
+
+    // 5b. Fetch Question Details (Problem Number & Official Title)
+    public record LeetCodeQuestionInfo(String problemNumber, String title, String titleSlug, String difficulty) {}
+
+    public LeetCodeQuestionInfo fetchQuestionDetails(String titleSlug) {
+        if (titleSlug == null || titleSlug.isBlank()) return null;
+        String cleanSlug = titleSlug.trim().toLowerCase();
+        try {
+            String query = """
+                    {"query":"query questionData($titleSlug: String!) { question(titleSlug: $titleSlug) { questionFrontendId title titleSlug difficulty } }","variables":{"titleSlug":"%s"}}
+                    """.formatted(cleanSlug);
+
+            JsonNode root = executeGraphQLQuery(query, "questionDetails:" + cleanSlug);
+            JsonNode qNode = root.path("data").path("question");
+            if (qNode != null && !qNode.isMissingNode() && !qNode.isNull()) {
+                String problemNumber = qNode.path("questionFrontendId").asString("");
+                String title = qNode.path("title").asString("");
+                String difficulty = qNode.path("difficulty").asString("");
+                return new LeetCodeQuestionInfo(problemNumber, title, cleanSlug, difficulty);
+            }
+        } catch (Exception e) {
+            log.warn("Could not fetch LeetCode question details for slug [{}]: {}", cleanSlug, e.getMessage());
+        }
+        return null;
     }
 
     // 6. Fetch Skill Stats (Topic Tags)

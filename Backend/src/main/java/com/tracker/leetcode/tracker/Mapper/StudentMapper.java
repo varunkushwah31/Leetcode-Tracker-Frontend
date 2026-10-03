@@ -19,24 +19,26 @@ public class StudentMapper {
         return toSummaryDTO(student, null);
     }
 
-    // Updated Method: Now accepts the list of assignments!
+    // Updated Method: Now accepts the list of assignments and checks multi-platform completions
     public StudentSummaryDTO toSummaryDTO(Student student, List<Assignment> classroomAssignments) {
         int completed = 0;
         int pending = 0;
 
         if (classroomAssignments != null && !classroomAssignments.isEmpty()) {
             for (Assignment assignment : classroomAssignments) {
-                // 1. Check if they manually validated it first (O(1) lookup if it's a HashSet, very fast)
+                // 1. Check if they manually or automatically validated it first
                 boolean isManuallyValidated = student.getManuallyCompletedAssignments() != null &&
                         student.getManuallyCompletedAssignments().contains(assignment.getId());
 
-                // 2. Fallback: Check if the server caught it in their recent activity
+                // 2. Fallback: Check if the server caught it in their recent activity (LeetCode or Codeforces)
                 boolean isCaughtByServer = false;
                 if (!isManuallyValidated && student.getRecentSubmissions() != null) {
                     isCaughtByServer = student.getRecentSubmissions().stream()
-                            .anyMatch(sub -> sub.getTitleSlug().equals(assignment.getTitleSlug())
-                                    && sub.getTimestamp() >= assignment.getStartTimestamp()
-                                    && sub.getTimestamp() <= assignment.getEndTimestamp());
+                            .anyMatch(sub -> {
+                                boolean platformMatch = assignment.getPlatform() == null || sub.getPlatform() == assignment.getPlatform();
+                                boolean slugMatch = isProblemSlugMatch(sub.getTitleSlug(), assignment.getTitleSlug());
+                                return platformMatch && slugMatch;
+                            });
                 }
 
                 // If either is true, they get credit!
@@ -48,15 +50,24 @@ public class StudentMapper {
             }
         }
 
+        int leetcodeSolved = calculateLeetcodeSolved(student.getProblemStats());
+        int codeforcesSolved = student.getCodeforcesSolvedCount() != null ? student.getCodeforcesSolvedCount() : 0;
+        int combinedTotalSolved = leetcodeSolved + codeforcesSolved;
 
         return StudentSummaryDTO.builder()
                 .id(student.getId())
                 .name(student.getName())
                 .email(student.getEmail())
                 .leetcodeUsername(student.getLeetcodeUsername())
+                .codeforcesHandle(student.getCodeforcesHandle())
                 .rank(student.getRank() != null ? student.getRank() : "Unranked")
                 .currentContestRating(student.getCurrentContestRating())
-                .totalSolved(calculateTotalSolved(student.getProblemStats()))
+                .codeforcesRating(student.getCodeforcesRating())
+                .codeforcesMaxRating(student.getCodeforcesMaxRating())
+                .codeforcesRank(student.getCodeforcesRank())
+                .leetcodeSolvedCount(leetcodeSolved)
+                .codeforcesSolvedCount(codeforcesSolved)
+                .totalSolved(combinedTotalSolved)
                 .consistencyStreak(calculateStreak(student.getProgressHistory()))
                 .completedAssignments(completed)
                 .pendingAssignments(pending)
@@ -85,38 +96,45 @@ public class StudentMapper {
                 .build();
     }
 
-    // THE FIX IS HERE: We now pass ALL the heavy data to the Extended DTO!
     public StudentExtendedDTO toExtendedDTO(Student student) {
+        int leetcodeSolved = calculateLeetcodeSolved(student.getProblemStats());
+        int codeforcesSolved = student.getCodeforcesSolvedCount() != null ? student.getCodeforcesSolvedCount() : 0;
+        int combinedTotalSolved = leetcodeSolved + codeforcesSolved;
+
         return StudentExtendedDTO.builder()
-                .id(student.getId()) // Good practice to include ID
+                .id(student.getId())
                 .name(student.getName())
-                .email(student.getEmail()) // Added Email
+                .email(student.getEmail())
                 .leetcodeUsername(student.getLeetcodeUsername())
+                .codeforcesHandle(student.getCodeforcesHandle())
                 .about(student.getAbout())
                 .rank(student.getRank())
                 .currentContestRating(student.getCurrentContestRating())
+                .codeforcesRating(student.getCodeforcesRating())
+                .codeforcesMaxRating(student.getCodeforcesMaxRating())
+                .codeforcesRank(student.getCodeforcesRank())
+                .codeforcesMaxRank(student.getCodeforcesMaxRank())
+                .codeforcesAvatarUrl(student.getCodeforcesAvatarUrl())
+                .leetcodeSolvedCount(leetcodeSolved)
+                .codeforcesSolvedCount(codeforcesSolved)
+                .totalSolved(combinedTotalSolved)
                 .socialMedia(student.getSocialMedia())
                 .badges(student.getBadges())
                 .contestHistory(student.getContestHistory())
+                .codeforcesContestHistory(student.getCodeforcesContestHistory())
                 .consistencyStreak(calculateStreak(student.getProgressHistory()))
-                .totalSolved(calculateTotalSolved(student.getProblemStats()))
                 .skills(student.getSkills())
-
-                // --- THE MISSING ARRAYS ---
                 .problemStats(student.getProblemStats())
                 .recentSubmissions(student.getRecentSubmissions())
                 .progressHistory(student.getProgressHistory())
-
-                // Fallbacks just in case the arrays are empty
                 .avatarUrl(student.getAvatarUrl())
                 .build();
     }
 
     // --- Helper Methods ---
 
-    private int calculateTotalSolved(List<ProblemStats> stats){
+    private int calculateLeetcodeSolved(List<ProblemStats> stats) {
         if (stats == null || stats.isEmpty()) return 0;
-        // Find the stat where difficulty is "All"
         return stats.stream()
                 .filter(stat -> "All".equalsIgnoreCase(stat.getDifficulty()))
                 .mapToInt(ProblemStats::getCount)
@@ -124,28 +142,42 @@ public class StudentMapper {
                 .orElse(0);
     }
 
+    private boolean isProblemSlugMatch(String subSlug, String assignSlug) {
+        if (subSlug == null || assignSlug == null) return false;
+        String cleanSub = subSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        String cleanAssign = assignSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        return cleanSub.equalsIgnoreCase(cleanAssign);
+    }
+
     private int calculateStreak(List<DailyProgress> history) {
         if (history == null || history.isEmpty()) return 0;
 
-        // Sort history by date descending (newest first)
-        List<DailyProgress> sortedHistory = history.stream()
-                .sorted(Comparator.comparing(DailyProgress::getDate).reversed())
+        List<LocalDate> activeDates = history.stream()
+                .filter(d -> d.getQuestionSolved() > 0)
+                .map(DailyProgress::getDate)
+                .distinct()
+                .sorted(Comparator.reverseOrder())
                 .toList();
 
-        int streak = 0;
-        LocalDate expectedDate = sortedHistory.getFirst().getDate(); // Start with their most recent submission
+        if (activeDates.isEmpty()) return 0;
 
-        // If their most recent submission is more than 2 days ago, their current streak is dead (0)
-        if (expectedDate.isBefore(LocalDate.now().minusDays(2))) {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+
+        LocalDate mostRecent = activeDates.get(0);
+        if (!mostRecent.equals(today) && !mostRecent.equals(yesterday)) {
             return 0;
         }
 
-        for (DailyProgress progress : sortedHistory) {
-            if (progress.getDate().equals(expectedDate)) {
+        int streak = 0;
+        LocalDate expectedDate = mostRecent;
+
+        for (LocalDate date : activeDates) {
+            if (date.equals(expectedDate)) {
                 streak++;
-                expectedDate = expectedDate.minusDays(1); // Expect the next submission to be the day before
+                expectedDate = expectedDate.minusDays(1);
             } else {
-                break; // The streak is broken
+                break;
             }
         }
         return streak;

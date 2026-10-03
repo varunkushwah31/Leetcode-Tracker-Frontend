@@ -2,6 +2,7 @@ package com.tracker.leetcode.tracker.Service;
 
 import com.tracker.leetcode.tracker.Exception.LearningPathNotFoundException;
 import com.tracker.leetcode.tracker.Models.LearningPath;
+import com.tracker.leetcode.tracker.Models.Platform;
 import com.tracker.leetcode.tracker.Repository.LearningPathRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,15 +56,17 @@ public class LearningPathService {
                 // Calculate the exact deadline (86400 seconds = 1 day)
                 long endTimestamp = currentTimestamp + (question.getDaysToComplete() * 86400L);
 
-                // Reusing your existing logic to add the question to the classroom
-                // Note: Make sure the method name matches what you have in ClassroomService!
+                // Reusing classroom logic to add the question with platform support
+                Platform platform = question.getPlatform() != null ? question.getPlatform() : Platform.LEETCODE;
                 classroomService.assignQuestion(
                         classroomId,
+                        platform,
+                        question.getTitle(),
                         question.getTitleSlug(),
                         currentTimestamp,
                         endTimestamp
                 );
-                log.debug("Successfully assigned question '{}' from path '{}'", question.getTitleSlug(), path.getTitle());
+                log.debug("Successfully assigned question '{}' ({}) from path '{}'", question.getTitleSlug(), platform, path.getTitle());
             } catch (Exception e) {
                 log.error("Failed to assign question '{}' from path '{}': {}",
                         question.getTitleSlug(), path.getTitle(), e.getMessage());

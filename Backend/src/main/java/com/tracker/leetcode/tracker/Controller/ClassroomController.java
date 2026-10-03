@@ -161,4 +161,40 @@ public class ClassroomController {
         classroomService.deleteAssignment(classroomId, assignmentId, mentorId);
         return ResponseEntity.ok("Assignment deleted successfully.");
     }
+
+    @PutMapping("/{classroomId}/assignments/{assignmentId}/deadline")
+    public ResponseEntity<Classroom> updateAssignmentDeadline(
+            @PathVariable String classroomId,
+            @PathVariable String assignmentId,
+            @RequestParam(required = false) String mentorId,
+            @RequestParam(required = false) Long newEndTimestamp,
+            @RequestBody(required = false) java.util.Map<String, Object> body) {
+
+        String effectiveMentorId = mentorId;
+        Long effectiveDeadline = newEndTimestamp;
+
+        if (body != null) {
+            if (effectiveMentorId == null && body.containsKey("mentorId")) {
+                effectiveMentorId = String.valueOf(body.get("mentorId"));
+            }
+            if (effectiveDeadline == null && (body.containsKey("newEndTimestamp") || body.containsKey("endTimestamp"))) {
+                Object rawTs = body.getOrDefault("newEndTimestamp", body.get("endTimestamp"));
+                if (rawTs instanceof Number num) {
+                    effectiveDeadline = num.longValue();
+                } else if (rawTs != null) {
+                    effectiveDeadline = Long.parseLong(String.valueOf(rawTs));
+                }
+            }
+        }
+
+        if (effectiveMentorId == null || effectiveMentorId.isBlank()) {
+            throw new ValidationFailedException("mentorId is required to update assignment deadline.");
+        }
+        if (effectiveDeadline == null || effectiveDeadline <= 0) {
+            throw new ValidationFailedException("Valid newEndTimestamp is required.");
+        }
+
+        Classroom updated = classroomService.updateAssignmentDeadline(classroomId, assignmentId, effectiveMentorId, effectiveDeadline);
+        return ResponseEntity.ok(updated);
+    }
 }

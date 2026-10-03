@@ -61,7 +61,8 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
 
     const filteredStudents = students?.filter(s =>
         s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.leetcodeUsername.toLowerCase().includes(searchQuery.toLowerCase())
+        (s.leetcodeUsername && s.leetcodeUsername.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (s.codeforcesHandle && s.codeforcesHandle.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     return (
@@ -118,7 +119,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                         </thead>
                         <tbody className="divide-y divide-zinc-800/60">
                         {filteredStudents?.map((student, index) => (
-                            <tr key={student.id} className="hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername)}>
+                            <tr key={student.id} className="hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername || student.codeforcesHandle || student.id || '')}>
                                 <td className="py-4 px-6">
                                     <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto ${getRankBadgeClass(index)}`}>
                                         {index + 1}
@@ -132,7 +133,16 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                         </Avatar>
                                         <div>
                                             <p className="font-semibold text-white group-hover:text-[#b4afff] transition-colors">{student.name}</p>
-                                            <p className="text-xs text-zinc-500 font-medium tracking-wide">@{student.leetcodeUsername}</p>
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                {student.leetcodeUsername && (
+                                                    <span className="text-xs text-zinc-500 font-medium tracking-wide">@{student.leetcodeUsername}</span>
+                                                )}
+                                                {student.codeforcesHandle && (
+                                                    <span className="text-[10px] font-semibold text-blue-400 bg-blue-500/10 px-1.5 py-0.2 rounded border border-blue-500/20">
+                                                        CF: @{student.codeforcesHandle}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -142,8 +152,22 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                         <span className={`font-bold ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-400' : 'text-zinc-600'}`}>{student.consistencyStreak || 0}</span>
                                     </div>
                                 </td>
-                                <td className="py-4 px-6 text-center"><span className="font-bold text-zinc-200 text-base">{student.totalSolved || 0}</span></td>
-                                <td className="py-4 px-6 text-center"><span className="font-bold text-zinc-400">{Math.round(student.currentContestRating || 0).toLocaleString()}</span></td>
+                                <td className="py-4 px-6 text-center">
+                                    <span className="font-bold text-zinc-200 text-base">{student.totalSolved || 0}</span>
+                                    {Boolean(student.codeforcesSolvedCount && student.codeforcesSolvedCount > 0) && (
+                                        <div className="text-[10px] text-zinc-500 font-medium">
+                                            LC: {student.leetcodeSolvedCount ?? ((student.totalSolved || 0) - (student.codeforcesSolvedCount || 0))} • CF: {student.codeforcesSolvedCount}
+                                        </div>
+                                    )}
+                                </td>
+                                <td className="py-4 px-6 text-center">
+                                    <span className="font-bold text-zinc-400">{Math.round(student.currentContestRating || 0).toLocaleString()}</span>
+                                    {student.codeforcesRating !== undefined && student.codeforcesRating > 0 && (
+                                        <div className="text-[10px] text-blue-400 font-medium">
+                                            CF: {student.codeforcesRating}
+                                        </div>
+                                    )}
+                                </td>
                                 <td className="py-4 px-6">
                                     <div className="flex flex-col items-end gap-1.5">
                                         <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.completedAssignments || 0} Done</Badge>

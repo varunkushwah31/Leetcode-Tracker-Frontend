@@ -33,7 +33,9 @@ public class LearningPath {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PathQuestion {
-        private String titleSlug; // e.g., "two-sum"
+        private Platform platform; // LEETCODE or CODEFORCES (defaults to LEETCODE if null)
+        private String title;      // Optional problem title
+        private String titleSlug;  // e.g., "two-sum" or "4A"
 
         // Instead of a hard deadline, paths use relative days.
         // e.g., "Due 3 days after I assign this path to a class"

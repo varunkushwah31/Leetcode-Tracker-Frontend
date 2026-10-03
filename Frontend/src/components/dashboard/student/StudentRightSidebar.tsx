@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import { ScrollArea } from '../../ui/scroll-area';
-import { ClockIcon, CheckCircleIcon as CheckCircle2 } from '@phosphor-icons/react';
+import { ClockIcon, CheckCircleIcon as CheckCircle2, TrophyIcon } from '@phosphor-icons/react';
 import type { StudentExtendedDTO } from '@/types';
 
 export function StudentRightSidebar({ data, totalSolved }: Readonly<{
@@ -73,7 +73,18 @@ export function StudentRightSidebar({ data, totalSolved }: Readonly<{
  <div className="bg-[#1a1b2e] p-1.5 rounded-lg group-hover:bg-[#5b4fff] transition-colors">
  <CheckCircle2 className="w-4 h-4 text-[#968fff] group-hover:text-white"/>
  </div>
+ <div className="min-w-0 flex items-center gap-2">
  <p className="text-[13.5px] font-bold text-zinc-200 tracking-tight truncate">{sub.title}</p>
+ {sub.platform && (
+ <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded shrink-0 ${
+ sub.platform === 'CODEFORCES'
+ ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+ : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+ }`}>
+ {sub.platform === 'CODEFORCES' ? 'CF' : 'LC'}
+ </span>
+ )}
+ </div>
  </div>
  <span className="text-[11px] font-bold text-zinc-500 shrink-0 uppercase tracking-wider">{formatDate(sub.timestamp)}</span>
  </a>
@@ -82,6 +93,89 @@ export function StudentRightSidebar({ data, totalSolved }: Readonly<{
  </ScrollArea>
  </CardContent>
  </Card>
+
+ {/* Codeforces Contest History */}
+ {data?.codeforcesContestHistory && data.codeforcesContestHistory.length > 0 && (
+ <Card className="relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden">
+ <CardHeader>
+ <CardTitle className="flex items-center gap-2 text-lg text-white tracking-tight">
+ <TrophyIcon className="w-5 h-5 text-cyan-400"/> CF Contest History
+ <span className="ml-auto text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+ {data.codeforcesContestHistory.length} contests
+ </span>
+ </CardTitle>
+ </CardHeader>
+ <CardContent className="p-4 pt-0">
+ <ScrollArea className="h-56 pr-4">
+ <div className="flex flex-col gap-2.5">
+ {data.codeforcesContestHistory.slice().reverse().slice(0, 10).map((contest) => {
+ const delta = contest.newRating - contest.oldRating;
+ return (
+ <div
+ key={`cf-contest-${contest.contestId}-${contest.ratingUpdateTimeSeconds}`}
+ className="flex items-center justify-between p-3 bg-[#1a1a1a]/40 border border-zinc-800/50 rounded-xl"
+ >
+ <div className="min-w-0 flex-1">
+ <p className="text-[13px] font-bold text-zinc-200 tracking-tight truncate">{contest.contestName}</p>
+ <div className="flex items-center gap-2 mt-0.5">
+ <span className="text-[11px] text-zinc-500 font-medium">Rank #{contest.rank}</span>
+ <span className="text-[11px] text-zinc-600">•</span>
+ <span className="text-[11px] text-zinc-500">{formatDate(contest.ratingUpdateTimeSeconds)}</span>
+ </div>
+ </div>
+ <div className="text-right shrink-0 ml-3">
+ <p className="text-sm font-bold text-cyan-400">{contest.newRating}</p>
+ <p className={`text-[10px] font-semibold ${delta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+ {delta >= 0 ? '+' : ''}{delta}
+ </p>
+ </div>
+ </div>
+ );
+ })}
+ </div>
+ </ScrollArea>
+ </CardContent>
+ </Card>
+ )}
+
+ {/* LeetCode Contest History */}
+ {data?.contestHistory && data.contestHistory.length > 0 && (
+ <Card className="relative bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-800/50 shadow-2xl rounded-2xl overflow-hidden">
+ <CardHeader>
+ <CardTitle className="flex items-center gap-2 text-lg text-white tracking-tight">
+ <TrophyIcon className="w-5 h-5 text-[#ffa116]"/> LC Contest History
+ <span className="ml-auto text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+ {data.contestHistory.length} contests
+ </span>
+ </CardTitle>
+ </CardHeader>
+ <CardContent className="p-4 pt-0">
+ <ScrollArea className="h-56 pr-4">
+ <div className="flex flex-col gap-2.5">
+ {data.contestHistory.slice().reverse().slice(0, 10).map((contest) => (
+ <div
+ key={`lc-contest-${contest.title}-${contest.timestamp}`}
+ className="flex items-center justify-between p-3 bg-[#1a1a1a]/40 border border-zinc-800/50 rounded-xl"
+ >
+ <div className="min-w-0 flex-1">
+ <p className="text-[13px] font-bold text-zinc-200 tracking-tight truncate">{contest.title}</p>
+ <div className="flex items-center gap-2 mt-0.5">
+ <span className="text-[11px] text-zinc-500 font-medium">Rank #{contest.ranking}</span>
+ <span className="text-[11px] text-zinc-600">•</span>
+ <span className="text-[11px] text-zinc-500">{formatDate(contest.timestamp)}</span>
+ </div>
+ </div>
+ <div className="text-right shrink-0 ml-3">
+ <p className="text-sm font-bold text-[#ffa116]">{Math.round(contest.rating)}</p>
+ <p className="text-[10px] text-zinc-500">{contest.problemsSolved}/{contest.totalProblems} solved</p>
+ </div>
+ </div>
+ ))}
+ </div>
+ </ScrollArea>
+ </CardContent>
+ </Card>
+ )}
  </div>
  );
 }

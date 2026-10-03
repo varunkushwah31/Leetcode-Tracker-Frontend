@@ -2,6 +2,7 @@ package com.tracker.leetcode.tracker.Service;
 
 import com.tracker.leetcode.tracker.Exception.StudentNotFoundException;
 import com.tracker.leetcode.tracker.Models.Student;
+import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,12 @@ class StudentServiceTest {
     @Mock
     private LeetCodeApiClient leetCodeApiClient;
 
+    @Mock
+    private CodeforcesApiClient codeforcesApiClient;
+
+    @Mock
+    private ClassroomRepository classroomRepository;
+
     @InjectMocks
     private StudentService studentService;
 
@@ -40,21 +47,14 @@ class StudentServiceTest {
 
     @Test
     void syncAllProfileData_WhenStudentExists_ShouldReturnUpdatedStudent() {
-        // Arrange: Tell the mocks what to do when called
         when(studentRepository.findByLeetcodeUsername("test_user")).thenReturn(Optional.of(mockStudent));
-
-        // We mock the API call to return a blank student just to satisfy the method signature
         when(leetCodeApiClient.fetchExtendedProfileDetails(anyString())).thenReturn(new Student());
         when(studentRepository.save(any(Student.class))).thenReturn(mockStudent);
 
-        // Act
         Student result = studentService.syncAllProfileData("test_user");
 
-        // Assert
         assertNotNull(result);
         assertEquals("test_user", result.getLeetcodeUsername());
-
-        // Verify that our API client was actually called during the sync
         verify(leetCodeApiClient, times(1)).fetchCalendarData("test_user");
         verify(leetCodeApiClient, times(1)).fetchProblemStats("test_user");
         verify(studentRepository, times(1)).save(mockStudent);
@@ -62,15 +62,38 @@ class StudentServiceTest {
 
     @Test
     void syncAllProfileData_WhenStudentDoesNotExist_ShouldThrowException() {
-        // Arrange
         when(studentRepository.findByLeetcodeUsername("unknown_user")).thenReturn(Optional.empty());
 
-        // Act & Assert
         Exception exception = assertThrows(StudentNotFoundException.class, () -> studentService.syncAllProfileData("unknown_user"));
 
         assertTrue(exception.getMessage().contains("not found in database"));
-
-        // Verify the API client was NEVER called because it failed early
         verify(leetCodeApiClient, never()).fetchCalendarData(anyString());
+    }
+
+    @Test
+    void updateStudentHandles_LinkingCodeforces_ShouldSucceed() {
+        when(studentRepository.findById("123")).thenReturn(Optional.of(mockStudent));
+        when(studentRepository.findByCodeforcesHandle("new_cf")).thenReturn(Optional.empty());
+        when(studentRepository.save(any(Student.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Student updated = studentService.updateStudentHandles("123", "test_user", "new_cf");
+
+        assertNotNull(updated);
+        assertEquals("test_user", updated.getLeetcodeUsername());
+        assertEquals("new_cf", updated.getCodeforcesHandle());
+        verify(studentRepository, times(2)).save(mockStudent);
+    }
+
+    @Test
+    void updateStudentHandles_WhenBothBlank_ShouldThrowIllegalArgumentException() {
+        when(studentRepository.findById("123")).thenReturn(Optional.of(mockStudent));
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> studentService.updateStudentHandles("123", "  ", "")
+        );
+
+        assertTrue(ex.getMessage().contains("At least one platform username"));
+        verify(studentRepository, never()).save(mockStudent);
     }
 }

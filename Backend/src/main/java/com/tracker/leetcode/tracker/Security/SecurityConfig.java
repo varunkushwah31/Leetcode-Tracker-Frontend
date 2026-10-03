@@ -26,7 +26,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final com.tracker.leetcode.tracker.Service.RateLimitingService rateLimitingService;
@@ -73,9 +72,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/students/me/**").hasRole("STUDENT")
 
                         .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2LoginSuccessHandler)
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)

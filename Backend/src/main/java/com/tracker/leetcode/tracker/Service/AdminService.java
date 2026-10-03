@@ -94,11 +94,18 @@ public class AdminService {
 
         for (Student student : allStudents) {
             try {
-                // This utilizes your existing sync logic!
-                studentService.syncAllProfileData(student.getLeetcodeUsername());
+                // Use the best available identifier — supports LC-only, CF-only, and dual-platform students
+                String identifier = student.getLeetcodeUsername();
+                if (identifier == null || identifier.isBlank()) {
+                    identifier = student.getCodeforcesHandle();
+                }
+                if (identifier == null || identifier.isBlank()) {
+                    identifier = student.getId();
+                }
+                studentService.syncAllProfileData(identifier);
                 successCount++;
             } catch (Exception e) {
-                log.error("Failed to sync student: {}", student.getLeetcodeUsername(), e);
+                log.error("Failed to sync student: {} (ID: {})", student.getName(), student.getId(), e);
             }
         }
 

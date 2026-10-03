@@ -55,16 +55,14 @@ export function StudentDashboard() {
     useEffect(() => { void fetchDashboard(); }, [fetchDashboard]);
 
     const handleSync = async () => {
-        if (!dashboardData?.leetcodeUsername) return;
-
         setSyncError(null);
         setIsSyncing(true);
 
         try {
-            const response = await StudentService.syncProfile(dashboardData.leetcodeUsername);
+            const response = await StudentService.syncProfile();
             setDashboardData(response.data);
         } catch (err: unknown) {
-            setSyncError(getErrorMessage(err, 'Failed to sync with LeetCode.'));
+            setSyncError(getErrorMessage(err, 'Failed to sync profiles.'));
         } finally {
             setIsSyncing(false);
         }
@@ -72,19 +70,20 @@ export function StudentDashboard() {
 
     const isAssignmentCompleted = (assignment: AssignmentDTO) => {
         if (dashboardData?.manuallyCompletedAssignments?.includes(assignment.id)) return true;
-        return !!dashboardData?.recentSubmissions?.some(sub =>
-            sub.titleSlug === assignment.titleSlug &&
-            sub.timestamp >= assignment.startTimestamp &&
-            sub.timestamp <= assignment.endTimestamp
-        );
+        const normTarget = assignment.titleSlug ? assignment.titleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : '';
+        return !!dashboardData?.recentSubmissions?.some(sub => {
+            const platformMatches = !assignment.platform || !sub.platform || assignment.platform === sub.platform;
+            const normSub = sub.titleSlug ? sub.titleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : '';
+            return platformMatches && normSub === normTarget;
+        });
     };
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#09090B]">
+            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
                 <div className="flex flex-col items-center space-y-4">
                     <Loader2 className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-500" />
-                    <p className="font-medium text-zinc-500 dark:text-zinc-400">Decrypting LeetCode stats...</p>
+                    <p className="font-medium text-zinc-500 dark:text-zinc-400">Loading your stats...</p>
                 </div>
             </div>
         );
@@ -107,7 +106,7 @@ export function StudentDashboard() {
     });
 
     return (
-        <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-[#09090B] transition-colors duration-200 relative">
+        <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed transition-colors duration-200 relative">
             <div className="hidden dark:block">
                 <AmbientGlow />
             </div>
@@ -145,7 +144,7 @@ export function StudentDashboard() {
                             </Avatar>
                             <div className="text-right hidden sm:block">
                                 <p className="text-sm font-bold text-zinc-900 dark:text-white">{dashboardData?.name || user?.name}</p>
-                                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">@{dashboardData?.leetcodeUsername || 'student'}</p>
+                                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">@{dashboardData?.leetcodeUsername || dashboardData?.codeforcesHandle || 'student'}</p>
                             </div>
                         </div>
                         <Button variant="ghost" size="icon" onClick={logout} className="hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 text-zinc-500 dark:text-zinc-400">
@@ -161,7 +160,7 @@ export function StudentDashboard() {
                 <ErrorBanner message={pageError} className="mb-6" />
                 <ErrorBanner message={syncError} className="mb-6" />
 
-                <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} />
+                <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} onProfileUpdated={fetchDashboard} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">

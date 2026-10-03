@@ -194,6 +194,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_GATEWAY, "Bad Gateway", ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler(CodeforcesApiException.class)
+    public ResponseEntity<ErrorResponse> handleCodeforcesApiError(CodeforcesApiException ex, HttpServletRequest request) {
+        log.warn("External Codeforces API Error on path [{}]: {}", request.getRequestURI(), ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_GATEWAY, "Bad Gateway", ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(RequestNotPermitted.class)
     public ResponseEntity<ErrorResponse> handleRequestNotPermitted(RequestNotPermitted ex, HttpServletRequest request) {
         log.warn("LeetCode upstream rate limit reached on path [{}]: {}", request.getRequestURI(), ex.getMessage());

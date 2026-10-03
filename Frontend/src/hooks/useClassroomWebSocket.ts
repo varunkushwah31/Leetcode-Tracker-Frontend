@@ -34,7 +34,6 @@ export function useClassroomWebSocket(
 
     useEffect(() => {
         if (!classroomId) return;
-
         const token = localStorage.getItem('accessToken');
         const brokerURL = getBrokerUrl();
 

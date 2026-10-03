@@ -30,11 +30,28 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const [isUploading, setIsUploading] = useState(false);
     const [uploadFailures, setUploadFailures] = useState<string[]>([]);
 
-    const [assignmentData, setAssignmentData] = useState({ titleSlug: '', deadline: '3' });
+    const getDefaultDeadline = (daysAhead: number = 3) => {
+        const d = new Date(Date.now() + daysAhead * 86400 * 1000);
+        d.setHours(23, 59, 0, 0);
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
+    const [assignmentData, setAssignmentData] = useState<{
+        platform: 'LEETCODE' | 'CODEFORCES';
+        title: string;
+        titleSlug: string;
+        deadline: string;
+    }>({
+        platform: 'LEETCODE',
+        title: '',
+        titleSlug: '',
+        deadline: getDefaultDeadline(3),
+    });
     const [selectedPathId, setSelectedPathId] = useState<string>('');
     const [newPath, setNewPath] = useState({ title: '', description: '' });
     const [pathQuestions, setPathQuestions] = useState<Array<PathQuestion & { tempId: string }>>([
-        { tempId: 'question-initial-1', titleSlug: '', daysToComplete: 3 }
+        { tempId: 'question-initial-1', platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }
     ]);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -88,15 +105,62 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
         }
     };
 
+    const parseProblemInput = (input: string, platform: 'LEETCODE' | 'CODEFORCES'): { slug: string; detectedPlatform: 'LEETCODE' | 'CODEFORCES'; problemNumber?: string } => {
+        const trimmed = input.trim();
+        const cfMatch = trimmed.match(/(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([A-Za-z0-9]+)/i);
+        if (cfMatch) {
+            const pNum = `${cfMatch[1]}${cfMatch[2].toUpperCase()}`;
+            return { slug: pNum, detectedPlatform: 'CODEFORCES', problemNumber: pNum };
+        }
+
+        const lcMatch = trimmed.match(/problems\/([a-zA-Z0-9_-]+)/i);
+        if (lcMatch) {
+            return { slug: lcMatch[1].toLowerCase(), detectedPlatform: 'LEETCODE' };
+        }
+
+        if (platform === 'CODEFORCES') {
+            const cleanCF = trimmed.replace('/', '').toUpperCase();
+            return { slug: cleanCF, detectedPlatform: 'CODEFORCES', problemNumber: cleanCF };
+        }
+
+        return { slug: trimmed.toLowerCase(), detectedPlatform: 'LEETCODE' };
+    };
+
     const handleAssignQuestion = async () => {
         setAssignQuestionError(null);
+        if (!assignmentData.titleSlug.trim()) {
+            setAssignQuestionError('Please enter a problem URL or problem slug/ID.');
+            return;
+        }
+
+        const parsed = parseProblemInput(assignmentData.titleSlug, assignmentData.platform);
+        const effectivePlatform = parsed.detectedPlatform || assignmentData.platform;
+
         const start = Math.floor(Date.now() / 1000);
-        const end = start + (Number.parseInt(assignmentData.deadline) * 86400);
+        const deadlineDate = new Date(assignmentData.deadline);
+        const end = Math.floor(deadlineDate.getTime() / 1000);
+
+        if (isNaN(end) || end <= start) {
+            setAssignQuestionError('Please select a valid future deadline date and time.');
+            return;
+        }
 
         try {
-            await ClassroomService.assignQuestion(selectedClassroom.classroomId, assignmentData.titleSlug, start, end);
+            await ClassroomService.assignQuestion(selectedClassroom.classroomId, {
+                platform: effectivePlatform,
+                title: assignmentData.title.trim() || undefined,
+                titleSlug: parsed.slug,
+                questionLink: assignmentData.titleSlug.trim().startsWith('http') ? assignmentData.titleSlug.trim() : undefined,
+                start,
+                end,
+            });
             setAssignQuestionOpen(false);
-            setAssignmentData({ titleSlug: '', deadline: '3' });
+            setAssignmentData({
+                platform: 'LEETCODE',
+                title: '',
+                titleSlug: '',
+                deadline: getDefaultDeadline(3),
+            });
             onRefresh();
         } catch (err: unknown) {
             setAssignQuestionError(getErrMsg(err, 'Failed to assign question.'));
@@ -106,11 +170,20 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     const handleCreatePath = async () => {
         setCreatePathError(null);
         try {
-            const sanitizedQuestions = pathQuestions.map(({ titleSlug, daysToComplete }) => ({ titleSlug, daysToComplete }));
+            const sanitizedQuestions = pathQuestions.map(({ platform, title, titleSlug, daysToComplete }) => {
+                const p = platform || 'LEETCODE';
+                const parsed = parseProblemInput(titleSlug, p);
+                return {
+                    platform: parsed.detectedPlatform || p,
+                    title: title?.trim() || undefined,
+                    titleSlug: parsed.slug,
+                    daysToComplete: daysToComplete || 3
+                };
+            });
             await PathService.createPath({ mentorId, title: newPath.title, description: newPath.description, questions: sanitizedQuestions });
             setCreatePathOpen(false);
             setNewPath({ title: '', description: '' });
-            setPathQuestions([{ tempId: `question-reset-${Date.now()}`, titleSlug: '', daysToComplete: 3 }]);
+            setPathQuestions([{ tempId: `question-reset-${Date.now()}`, platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }]);
             onRefresh();
         } catch (err: unknown) {
             setCreatePathError(getErrMsg(err, 'Failed to create learning path.'));
@@ -171,7 +244,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                             <div className="flex gap-2">
                                 <Input
-                                    placeholder="LeetCode Username"
+                                    placeholder="LeetCode username or Codeforces handle"
                                     value={newStudentUsername}
                                     onChange={(e) => {
                                         setNewStudentUsername(e.target.value);
@@ -194,7 +267,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />
 
-                            <p className="text-xs text-zinc-400">Upload a .csv file with LeetCode usernames.</p>
+                            <p className="text-xs text-zinc-400">Upload a .csv file with student identifiers (LeetCode usernames or Codeforces handles).</p>
                             <div className="flex gap-2">
                                 <Input type="file" accept=".csv" onChange={(e) => { setUploadFile(e.target.files ? e.target.files[0] : null); if(bulkUploadError) setBulkUploadError(null); }} className={`cursor-pointer file:bg-emerald-500/10 file:text-emerald-400 file:border-0 file:rounded-md file:px-2 file:py-1 ${inputClasses}`} />
                                 <Button onClick={handleBulkUpload} disabled={!uploadFile || isUploading} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
@@ -224,18 +297,135 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                     <ErrorBanner message={assignQuestionError} />
 
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2"><Label className="text-zinc-300">Problem Slug</Label><Input placeholder="two-sum" value={assignmentData.titleSlug} onChange={(e) => { setAssignmentData({ ...assignmentData, titleSlug: e.target.value }); if(assignQuestionError) setAssignQuestionError(null); }} className={inputClasses} /></div>
+                    <div className="space-y-4 py-3">
+                        {/* Platform Selector */}
+                        <div className="space-y-1.5">
+                            <Label className="text-zinc-300 text-xs uppercase font-semibold">Platform</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setAssignmentData({ ...assignmentData, platform: 'LEETCODE' })}
+                                    className={`py-2 px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                                        assignmentData.platform === 'LEETCODE'
+                                            ? 'bg-[#ffa116]/15 border-[#ffa116] text-[#ffa116] shadow-md shadow-[#ffa116]/10'
+                                            : 'bg-[#1a1a1a] border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800'
+                                    }`}
+                                >
+                                    <span>LeetCode</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setAssignmentData({ ...assignmentData, platform: 'CODEFORCES' })}
+                                    className={`py-2 px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                                        assignmentData.platform === 'CODEFORCES'
+                                            ? 'bg-cyan-500/15 border-cyan-400 text-cyan-400 shadow-md shadow-cyan-500/10'
+                                            : 'bg-[#1a1a1a] border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800'
+                                    }`}
+                                >
+                                    <span>Codeforces</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Problem URL or Slug/ID */}
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-zinc-300 text-xs uppercase font-semibold">
+                                    Problem URL
+                                </Label>
+                                <span className="text-[11px] text-zinc-500">Paste whole URL or ID</span>
+                            </div>
+                            <Input
+                                placeholder={
+                                    assignmentData.platform === 'CODEFORCES'
+                                        ? 'https://codeforces.com/problemset/problem/4/A or 4A'
+                                        : 'https://leetcode.com/problems/two-sum/ or two-sum'
+                                }
+                                value={assignmentData.titleSlug}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    let newPlatform = assignmentData.platform;
+
+                                    // Auto-detect platform from URL
+                                    if (val.toLowerCase().includes('codeforces.com')) {
+                                        newPlatform = 'CODEFORCES';
+                                    } else if (val.toLowerCase().includes('leetcode.com') || val.toLowerCase().includes('leetcode.cn')) {
+                                        newPlatform = 'LEETCODE';
+                                    }
+
+                                    setAssignmentData({
+                                        ...assignmentData,
+                                        titleSlug: val,
+                                        platform: newPlatform,
+                                    });
+                                    if (assignQuestionError) setAssignQuestionError(null);
+                                }}
+                                className={inputClasses}
+                            />
+                            {/* Extracted preview badge */}
+                            {assignmentData.titleSlug.trim().length > 0 && (() => {
+                                const parsed = parseProblemInput(assignmentData.titleSlug, assignmentData.platform);
+                                return (
+                                    <div className="flex items-center gap-2 pt-1 text-xs text-zinc-400">
+                                        <span className="font-semibold text-zinc-500">Extracted:</span>
+                                        <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-md font-mono text-[11px]">
+                                            {parsed.detectedPlatform === 'CODEFORCES'
+                                                ? `CF Problem #${parsed.problemNumber || parsed.slug}`
+                                                : `LeetCode: ${parsed.slug}`}
+                                        </span>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+
+                        {/* Problem Title (Optional) */}
+                        <div className="space-y-1.5">
+                            <Label className="text-zinc-300 text-xs uppercase font-semibold">
+                                Problem Title <span className="text-zinc-500 font-normal lowercase">(optional - auto-fetched from platform)</span>
+                            </Label>
+                            <Input
+                                placeholder={assignmentData.platform === 'CODEFORCES' ? 'Watermelon (or leave empty to auto-fetch)' : 'Two Sum (or leave empty to auto-fetch)'}
+                                value={assignmentData.title}
+                                onChange={(e) => setAssignmentData({ ...assignmentData, title: e.target.value })}
+                                className={inputClasses}
+                            />
+                        </div>
+
+                        {/* Deadline Selector */}
                         <div className="space-y-2">
-                            <Label className="text-zinc-300">Deadline</Label>
-                            <Select value={assignmentData.deadline} onValueChange={(v) => setAssignmentData({ ...assignmentData, deadline: v })}>
-                                <SelectTrigger className={inputClasses}><SelectValue placeholder="Select deadline" /></SelectTrigger>
-                                <SelectContent className="bg-[#1a1b2e] border-zinc-800 text-white rounded-xl">
-                                    <SelectItem value="1" className="focus:bg-[#5b4fff]/20 focus:text-white">1 Day</SelectItem>
-                                    <SelectItem value="3" className="focus:bg-[#5b4fff]/20 focus:text-white">3 Days</SelectItem>
-                                    <SelectItem value="7" className="focus:bg-[#5b4fff]/20 focus:text-white">1 Week</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className="flex items-center justify-between">
+                                <Label className="text-zinc-300 text-xs uppercase font-semibold">Assignment Deadline</Label>
+                                <span className="text-[11px] text-zinc-500">Pick any custom date & time</span>
+                            </div>
+                            <Input
+                                type="datetime-local"
+                                value={assignmentData.deadline}
+                                min={getDefaultDeadline(0)}
+                                onChange={(e) => setAssignmentData({ ...assignmentData, deadline: e.target.value })}
+                                className={`${inputClasses} [color-scheme:dark]`}
+                            />
+                            {/* Quick Presets */}
+                            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                <span className="text-[11px] text-zinc-500 font-medium mr-1">Quick presets:</span>
+                                {[
+                                    { label: '+1 Day', days: 1 },
+                                    { label: '+2 Days', days: 2 },
+                                    { label: '+3 Days', days: 3 },
+                                    { label: '+5 Days', days: 5 },
+                                    { label: '+1 Week', days: 7 },
+                                    { label: '+2 Weeks', days: 14 },
+                                    { label: '+1 Month', days: 30 },
+                                ].map((preset) => (
+                                    <button
+                                        key={preset.label}
+                                        type="button"
+                                        onClick={() => setAssignmentData({ ...assignmentData, deadline: getDefaultDeadline(preset.days) })}
+                                        className="text-[11px] bg-zinc-800/80 hover:bg-[#5b4fff]/20 text-zinc-300 hover:text-[#b4afff] px-2 py-0.5 rounded-md border border-zinc-700/60 transition-colors"
+                                    >
+                                        {preset.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>
@@ -310,48 +500,96 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                     variant="outline"
                                     size="sm"
                                     className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 rounded-lg h-8"
-                                    onClick={() => setPathQuestions(prev => [...prev, { tempId: `question-new-${Date.now()}-${prev.length}`, titleSlug: '', daysToComplete: 3 }])}
+                                    onClick={() => setPathQuestions(prev => [...prev, { tempId: `question-new-${Date.now()}-${prev.length}`, platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }])}
                                 >
                                     <PlusIcon className="w-3 h-3 mr-1" /> Add
                                 </Button>
                             </div>
                             <div className="space-y-3">
                                 {pathQuestions.map((q, idx) => (
-                                    <div key={q.tempId} className="flex items-center gap-3 bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-800/60">
-                                        <div className="flex-1">
-                                            <Label className="text-xs text-zinc-400">Slug</Label>
+                                    <div key={q.tempId} className="bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-800/60 space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            {/* Platform Selector */}
+                                            <div className="flex rounded-lg overflow-hidden border border-zinc-800 text-xs">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newQs = [...pathQuestions];
+                                                        newQs[idx].platform = 'LEETCODE';
+                                                        setPathQuestions(newQs);
+                                                    }}
+                                                    className={`px-2.5 py-1.5 transition-all text-xs font-semibold cursor-pointer ${
+                                                        (q.platform ?? 'LEETCODE') === 'LEETCODE'
+                                                            ? 'bg-[#ffa116]/20 text-[#ffa116]'
+                                                            : 'bg-[#141522] text-zinc-500 hover:text-zinc-300'
+                                                    }`}
+                                                >
+                                                    LC
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newQs = [...pathQuestions];
+                                                        newQs[idx].platform = 'CODEFORCES';
+                                                        setPathQuestions(newQs);
+                                                    }}
+                                                    className={`px-2.5 py-1.5 transition-all text-xs font-semibold cursor-pointer ${
+                                                        q.platform === 'CODEFORCES'
+                                                            ? 'bg-cyan-500/20 text-cyan-400'
+                                                            : 'bg-[#141522] text-zinc-500 hover:text-zinc-300'
+                                                    }`}
+                                                >
+                                                    CF
+                                                </button>
+                                            </div>
+                                            <div className="flex-1">
+                                                <Input
+                                                    placeholder={q.platform === 'CODEFORCES' ? 'Problem ID (e.g. 4A or CF link)' : 'Slug (e.g. two-sum or LC link)'}
+                                                    className={inputClasses}
+                                                    value={q.titleSlug}
+                                                    onChange={e => {
+                                                        const newQs = [...pathQuestions];
+                                                        newQs[idx].titleSlug = e.target.value;
+                                                        setPathQuestions(newQs);
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="w-24">
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    placeholder="Days"
+                                                    className={inputClasses}
+                                                    value={q.daysToComplete}
+                                                    onChange={e => {
+                                                        const newQs = [...pathQuestions];
+                                                        newQs[idx].daysToComplete = Number.parseInt(e.target.value) || 1;
+                                                        setPathQuestions(newQs);
+                                                    }}
+                                                />
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+                                                onClick={() => setPathQuestions(prev => prev.filter(item => item.tempId !== q.tempId))}
+                                                disabled={pathQuestions.length === 1}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                        <div className="pl-1">
                                             <Input
-                                                className={`mt-1 ${inputClasses}`}
-                                                value={q.titleSlug}
+                                                placeholder="Optional Title (e.g. Watermelon or Two Sum)"
+                                                className={`h-8 text-xs ${inputClasses}`}
+                                                value={q.title ?? ''}
                                                 onChange={e => {
                                                     const newQs = [...pathQuestions];
-                                                    newQs[idx].titleSlug = e.target.value;
+                                                    newQs[idx].title = e.target.value;
                                                     setPathQuestions(newQs);
                                                 }}
                                             />
                                         </div>
-                                        <div className="w-32">
-                                            <Label className="text-xs text-zinc-400">Days</Label>
-                                            <Input
-                                                type="number"
-                                                className={`mt-1 ${inputClasses}`}
-                                                value={q.daysToComplete}
-                                                onChange={e => {
-                                                    const newQs = [...pathQuestions];
-                                                    newQs[idx].daysToComplete = Number.parseInt(e.target.value) || 1;
-                                                    setPathQuestions(newQs);
-                                                }}
-                                            />
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="mt-6 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
-                                            onClick={() => setPathQuestions(prev => prev.filter(item => item.tempId !== q.tempId))}
-                                            disabled={pathQuestions.length === 1}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
                                     </div>
                                 ))}
                             </div>

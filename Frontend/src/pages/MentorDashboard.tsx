@@ -36,11 +36,14 @@ import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 
-async function syncStudentsInBatches(students: { leetcodeUsername: string }[], batchSize = 3): Promise<void> {
+async function syncStudentsInBatches(students: { id?: string; leetcodeUsername?: string; codeforcesHandle?: string }[], batchSize = 3): Promise<void> {
     for (let i = 0; i < students.length; i += batchSize) {
         const batch = students.slice(i, i + batchSize);
         await Promise.allSettled(
-            batch.map(student => StudentService.syncProfile(student.leetcodeUsername))
+            batch.map(student => {
+                const target = student.id || student.leetcodeUsername || student.codeforcesHandle;
+                return target ? StudentService.syncProfile(target) : Promise.resolve();
+            })
         );
         if (i + batchSize < students.length) {
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -372,6 +375,7 @@ export function MentorDashboard() {
                             key={c.classroomId}
                             onClick={() => {
                                 setSelectedClassroom(c);
+                                setViewingStudentUsername(null);
                                 setShowAdminOverview(false);
                                 setError(null);
                                 if (isMobile) setMobileSidebarOpen(false);
@@ -462,9 +466,7 @@ export function MentorDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-auto relative bg-[#0a0a0a] flex flex-col">
-                <div className="inset-0 bg-[radial-gradient(#333_1px,transparent_1px)] bg-size-[24px_24px] opacity-40 pointer-events-none fixed"></div>
-                
+            <main className="flex-1 overflow-y-auto relative bg-[#0a0a0a] bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
                 {/* Luminous Multi-Layer Ambient Glow */}
                 <AmbientGlow />
 
@@ -488,12 +490,37 @@ export function MentorDashboard() {
                                 <span>Home</span>
                             </Link>
                             <span className="text-zinc-600 hidden sm:inline">/</span>
-                            <span className="text-zinc-400 font-medium">Classrooms</span>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setViewingStudentUsername(null);
+                                    setShowAdminOverview(false);
+                                }}
+                                className="text-zinc-400 hover:text-white transition-colors font-medium cursor-pointer"
+                            >
+                                Classrooms
+                            </button>
                             {selectedClassroom && !showAdminOverview && (
                                 <>
                                     <span className="text-zinc-600">/</span>
-                                    <span className="text-white font-semibold tracking-tight truncate max-w-40 sm:max-w-xs">
+                                    <button
+                                        type="button"
+                                        onClick={() => setViewingStudentUsername(null)}
+                                        className={`font-semibold tracking-tight truncate max-w-40 sm:max-w-xs transition-colors cursor-pointer ${
+                                            viewingStudentUsername
+                                                ? 'text-zinc-400 hover:text-white'
+                                                : 'text-white'
+                                        }`}
+                                    >
                                         {selectedClassroom.className}
+                                    </button>
+                                </>
+                            )}
+                            {viewingStudentUsername && (
+                                <>
+                                    <span className="text-zinc-600">/</span>
+                                    <span className="text-[#968fff] font-semibold tracking-tight truncate max-w-40 sm:max-w-xs">
+                                        {viewingStudentUsername}
                                     </span>
                                 </>
                             )}
@@ -517,6 +544,7 @@ export function MentorDashboard() {
                                         const target = classrooms.find(c => c.classroomId === e.target.value);
                                         if (target) {
                                             setSelectedClassroom(target);
+                                            setViewingStudentUsername(null);
                                             setShowAdminOverview(false);
                                             setError(null);
                                         }
@@ -568,10 +596,21 @@ export function MentorDashboard() {
                                     classrooms={classrooms}
                                     onSelectClassroom={(c) => {
                                         setSelectedClassroom(c);
+                                        setViewingStudentUsername(null);
                                         setError(null);
                                     }}
                                     onCreateClass={() => setCreateClassOpen(true)}
                                     onOpenSidebar={() => setMobileSidebarOpen(true)}
+                                />
+                            );
+                        }
+
+                        if (viewingStudentUsername) {
+                            return (
+                                <StudentDetailsView
+                                    username={viewingStudentUsername}
+                                    classroomName={selectedClassroom.className}
+                                    onBack={() => setViewingStudentUsername(null)}
                                 />
                             );
                         }
@@ -634,10 +673,6 @@ export function MentorDashboard() {
                                     mentorId={user!.id!}
                                     onRefresh={fetchDashboardData}
                                 />
-
-                                {viewingStudentUsername && (
-                                    <StudentDetailsView username={viewingStudentUsername} onBack={() => setViewingStudentUsername(null)} />
-                                )}
                             </div>
                         );
                     })()}

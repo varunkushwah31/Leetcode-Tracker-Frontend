@@ -1,30 +1,40 @@
 package com.tracker.leetcode.tracker.Models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class RecentSubmission {
     private String title;
     private String titleSlug;
     private long timestamp;
-
-    // NEW: The auto-generated clickable URL
     private String questionLink;
+    private Platform platform = Platform.LEETCODE;
 
-    // Custom constructor: We use this in the LeetCodeApiClient!
+    // Backward-compatible constructor for LeetCode
     public RecentSubmission(String title, String titleSlug, long timestamp) {
         this.title = title;
         this.titleSlug = titleSlug;
         this.timestamp = timestamp;
-        // Automatically build the URL the moment the object is created
+        this.platform = Platform.LEETCODE;
         this.questionLink = "https://leetcode.com/problems/" + titleSlug + "/";
     }
 
-    // Custom setter: Just in case Spring Data MongoDB or Jackson tries to set it manually
+    public RecentSubmission(String title, String titleSlug, long timestamp, Platform platform, String questionLink) {
+        this.title = title;
+        this.titleSlug = titleSlug;
+        this.timestamp = timestamp;
+        this.platform = platform != null ? platform : Platform.LEETCODE;
+        this.questionLink = questionLink;
+    }
+
     public void setTitleSlug(String titleSlug) {
         this.titleSlug = titleSlug;
-        this.questionLink = "https://leetcode.com/problems/" + titleSlug + "/";
+        if (this.questionLink == null && this.platform == Platform.LEETCODE) {
+            this.questionLink = "https://leetcode.com/problems/" + titleSlug + "/";
+        }
     }
 }
