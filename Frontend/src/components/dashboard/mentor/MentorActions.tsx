@@ -4,7 +4,7 @@ import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { UserPlusIcon, ClipboardTextIcon as ClipboardList, MapTrifoldIcon as Map, PlusIcon, TrashIcon as Trash2, CloudArrowUpIcon as UploadCloud, SpinnerIcon as Loader2, WarningIcon as AlertTriangle } from '@phosphor-icons/react';
+import { UserPlusIcon, ClipboardTextIcon as ClipboardList, MapTrifoldIcon as Map, PlusIcon, TrashIcon as Trash2, CloudArrowUpIcon as UploadCloud, SpinnerIcon as Loader2, WarningIcon as AlertTriangle, ClockIcon } from '@phosphor-icons/react';
 import { ClassroomService, PathService } from '@/services/endpoints.ts';
 import type { ClassroomDashboardDTO, LearningPath, PathQuestion } from '@/types';
 import {ErrorBanner} from "@/components/ui/ErrorBanner.tsx";// <-- 1. Import the Banner
@@ -221,8 +221,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
         }
     };
 
-    const inputClasses = "bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10";
-    const dialogContentClasses = "bg-white dark:bg-[#111111] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white sm:rounded-2xl";
+    const inputClasses = "bg-zinc-100/90 dark:bg-[#1a1b2e]/60 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10";
+    const dialogContentClasses = "bg-white dark:bg-[#111111] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white sm:rounded-2xl shadow-2xl";
 
     return (
         <div className="flex flex-wrap gap-3">
@@ -233,16 +233,28 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         <UserPlusIcon className="w-4 h-4 mr-2" />Add Student
                     </Button>
                 </DialogTrigger>
-                <DialogContent className={dialogContentClasses}>
-                    <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Add Students</DialogTitle></DialogHeader>
-                    <div className="space-y-6 py-4">
+                <DialogContent className={`sm:max-w-lg ${dialogContentClasses}`}>
+                    <DialogHeader>
+                        <DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold flex items-center gap-2.5">
+                            <UserPlusIcon className="w-5 h-5 text-[#5b4fff]" />
+                            Add Students
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
 
-                        <div className="space-y-2 p-4 bg-zinc-50 dark:bg-[#1a1b2e]/40 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                            <Label className="text-[#5b4fff] dark:text-[#968fff] font-bold">1. Add Single Student</Label>
+                        {/* 1. Add Single Student */}
+                        <div className="p-4 bg-zinc-50/80 dark:bg-[#161726]/50 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-2.5">
+                            <Label className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                                <span className="w-5 h-5 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-black flex items-center justify-center">1</span>
+                                Add Single Student
+                            </Label>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                Enter a student's LeetCode username or Codeforces handle.
+                            </p>
 
                             <ErrorBanner message={addStudentError} className="mb-2" />
 
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 pt-1">
                                 <Input
                                     placeholder="LeetCode username or Codeforces handle"
                                     value={newStudentUsername}
@@ -255,29 +267,75 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 <Button
                                     onClick={handleAddStudent}
                                     disabled={!newStudentUsername || isAdding}
-                                    className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl w-20"
+                                    className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl px-5 font-semibold shrink-0 shadow-sm"
                                 >
                                     {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="space-y-3 p-4 bg-zinc-50 dark:bg-[#1a1b2e]/40 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                            <Label className="text-emerald-600 dark:text-emerald-400 font-bold">2. Bulk Import (CSV)</Label>
+                        {/* Divider */}
+                        <div className="relative py-1">
+                            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-zinc-200 dark:border-zinc-800" /></div>
+                            <div className="relative flex justify-center text-xs uppercase"><span className="bg-white dark:bg-[#111111] px-3 text-zinc-400 font-semibold tracking-wider">OR</span></div>
+                        </div>
+
+                        {/* 2. Bulk Import via CSV */}
+                        <div className="p-4 bg-zinc-50/80 dark:bg-[#161726]/50 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                                    <span className="w-5 h-5 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-black flex items-center justify-center">2</span>
+                                    Bulk Import (CSV)
+                                </Label>
+                                <span className="text-[11px] font-medium text-zinc-500">.csv format</span>
+                            </div>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                Upload a CSV file containing LeetCode usernames or Codeforces handles in a single column.
+                            </p>
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />
 
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400">Upload a .csv file with student identifiers (LeetCode usernames or Codeforces handles).</p>
-                            <div className="flex gap-2">
-                                <Input type="file" accept=".csv" onChange={(e) => { setUploadFile(e.target.files ? e.target.files[0] : null); if(bulkUploadError) setBulkUploadError(null); }} className={`cursor-pointer file:bg-emerald-500/10 file:text-emerald-600 dark:file:text-emerald-400 file:border-0 file:rounded-md file:px-2 file:py-1 ${inputClasses}`} />
-                                <Button onClick={handleBulkUpload} disabled={!uploadFile || isUploading} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
-                                    {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />} Import
+                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-[#5b4fff]/50 dark:hover:border-[#5b4fff]/50 rounded-xl p-4 cursor-pointer bg-white/60 dark:bg-[#12131e]/50 hover:bg-[#5b4fff]/5 transition-all group">
+                                <UploadCloud className="w-7 h-7 text-zinc-400 group-hover:text-[#5b4fff] transition-colors mb-1.5" />
+                                {uploadFile ? (
+                                    <div className="text-center">
+                                        <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate max-w-xs">{uploadFile.name}</p>
+                                        <p className="text-xs text-zinc-500 mt-0.5">{(uploadFile.size / 1024).toFixed(1)} KB • Click to choose a different file</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-center">
+                                        <p className="text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                            <span className="text-[#5b4fff] dark:text-[#968fff] font-bold">Choose CSV file</span> or drag & drop
+                                        </p>
+                                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">Student handles list (.csv)</p>
+                                    </div>
+                                )}
+                                <input
+                                    type="file"
+                                    accept=".csv"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        setUploadFile(e.target.files ? e.target.files[0] : null);
+                                        if (bulkUploadError) setBulkUploadError(null);
+                                    }}
+                                />
+                            </label>
+
+                            {uploadFile && (
+                                <Button
+                                    onClick={handleBulkUpload}
+                                    disabled={isUploading}
+                                    className="w-full bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl h-10 font-semibold shadow-sm"
+                                >
+                                    {isUploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UploadCloud className="w-4 h-4 mr-2" />}
+                                    Import {uploadFile.name}
                                 </Button>
-                            </div>
+                            )}
+
                             {uploadFailures.length > 0 && (
-                                <div className="mt-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-sm text-rose-600 dark:text-rose-400">
-                                    <span className="font-bold">Failed to add:</span>
-                                    <ul className="list-disc pl-5 mt-1">{uploadFailures.map((f) => <li key={`fail-${f}`}>{f}</li>)}</ul>
+                                <div className="mt-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-600 dark:text-rose-400">
+                                    <span className="font-bold">Failed to add ({uploadFailures.length}):</span>
+                                    <ul className="list-disc pl-5 mt-1 max-h-24 overflow-y-auto custom-scrollbar">{uploadFailures.map((f) => <li key={`fail-${f}`}>{f}</li>)}</ul>
                                 </div>
                             )}
                         </div>
@@ -292,7 +350,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         <ClipboardList className="w-4 h-4 mr-2 text-[#5b4fff] dark:text-[#968fff]" />Assign Question
                     </Button>
                 </DialogTrigger>
-                <DialogContent className={dialogContentClasses}>
+                <DialogContent className={`sm:max-w-xl ${dialogContentClasses}`}>
                     <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Assign Question</DialogTitle></DialogHeader>
 
                     <ErrorBanner message={assignQuestionError} />
@@ -438,7 +496,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             {/* 3. ASSIGN PATH DIALOG */}
             <Dialog open={assignPathOpen} onOpenChange={(open) => { setAssignPathOpen(open); if(!open) setAssignPathError(null); }}>
                 <DialogTrigger asChild><Button className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white border border-transparent rounded-xl shadow-lg shadow-[#5b4fff]/20 transition-all hover:-translate-y-0.5"><Map className="w-4 h-4 mr-2" /> Assign Path</Button></DialogTrigger>
-                <DialogContent className={dialogContentClasses}>
+                <DialogContent className={`sm:max-w-lg ${dialogContentClasses}`}>
                     <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Assign Learning Path</DialogTitle></DialogHeader>
 
                     <ErrorBanner message={assignPathError} />
@@ -482,35 +540,69 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
             {/* 4. CREATE PATH DIALOG */}
             <Dialog open={createPathOpen} onOpenChange={(open) => { setCreatePathOpen(open); if(!open) setCreatePathError(null); }}>
-                <DialogContent className={`max-w-2xl ${dialogContentClasses}`}>
-                    <DialogHeader><DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold">Build a Learning Path</DialogTitle></DialogHeader>
+                <DialogContent className={`sm:max-w-3xl ${dialogContentClasses}`}>
+                    <DialogHeader>
+                        <DialogTitle className="text-zinc-900 dark:text-white text-xl font-bold flex items-center gap-2.5">
+                            <Map className="w-5 h-5 text-[#5b4fff]" /> Build a Learning Path
+                        </DialogTitle>
+                    </DialogHeader>
 
                     <ErrorBanner message={createPathError} />
 
-                    <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2"><Label className="text-zinc-700 dark:text-zinc-300">Title</Label><Input className={inputClasses} value={newPath.title} onChange={e => { setNewPath({...newPath, title: e.target.value}); if(createPathError) setCreatePathError(null); }} /></div>
-                            <div className="space-y-2"><Label className="text-zinc-700 dark:text-zinc-300">Description</Label><Input className={inputClasses} value={newPath.description} onChange={e => setNewPath({...newPath, description: e.target.value})} /></div>
+                    <div className="space-y-5 py-2 max-h-[65vh] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold uppercase text-zinc-600 dark:text-zinc-400">Path Title</Label>
+                                <Input
+                                    placeholder="e.g. Dynamic Programming Roadmap"
+                                    className={inputClasses}
+                                    value={newPath.title}
+                                    onChange={e => { setNewPath({...newPath, title: e.target.value}); if(createPathError) setCreatePathError(null); }}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold uppercase text-zinc-600 dark:text-zinc-400">Description</Label>
+                                <Input
+                                    placeholder="e.g. Master classic DP patterns from 1D to trees"
+                                    className={inputClasses}
+                                    value={newPath.description}
+                                    onChange={e => setNewPath({...newPath, description: e.target.value})}
+                                />
+                            </div>
                         </div>
-                        <div className="mt-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <Label className="text-zinc-700 dark:text-zinc-300">Questions</Label>
+
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/80 pb-2.5">
+                                <div>
+                                    <Label className="text-sm font-bold text-zinc-900 dark:text-white">
+                                        Questions in this Path ({pathQuestions.length})
+                                    </Label>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                        Add problem slugs or IDs and specify days allocated per problem
+                                    </p>
+                                </div>
                                 <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
-                                    className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg h-8"
+                                    className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-xl h-8.5 font-medium px-3"
                                     onClick={() => setPathQuestions(prev => [...prev, { tempId: `question-new-${Date.now()}-${prev.length}`, platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }])}
                                 >
-                                    <PlusIcon className="w-3 h-3 mr-1" /> Add
+                                    <PlusIcon className="w-3.5 h-3.5 mr-1 text-[#5b4fff]" weight="bold" /> Add Question
                                 </Button>
                             </div>
+
                             <div className="space-y-3">
                                 {pathQuestions.map((q, idx) => (
-                                    <div key={q.tempId} className="bg-zinc-50 dark:bg-[#1a1b2e]/40 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800/60 space-y-2">
-                                        <div className="flex items-center gap-2">
+                                    <div key={q.tempId} className="bg-zinc-50/80 dark:bg-[#161726]/60 p-4 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-3 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
+                                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
+                                            {/* Question Badge */}
+                                            <span className="text-xs font-bold px-2 py-1 rounded-lg bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 shrink-0">
+                                                Q{idx + 1}
+                                            </span>
+
                                             {/* Platform Selector */}
-                                            <div className="flex rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 text-xs">
+                                            <div className="flex rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 text-xs shrink-0">
                                                 <button
                                                     type="button"
                                                     onClick={() => {
@@ -518,10 +610,10 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                         newQs[idx].platform = 'LEETCODE';
                                                         setPathQuestions(newQs);
                                                     }}
-                                                    className={`px-2.5 py-1.5 transition-all text-xs font-semibold cursor-pointer ${
+                                                    className={`px-3 py-2 transition-all text-xs font-bold cursor-pointer ${
                                                         (q.platform ?? 'LEETCODE') === 'LEETCODE'
                                                             ? 'bg-amber-500/20 text-amber-600 dark:text-[#ffa116]'
-                                                            : 'bg-zinc-100 dark:bg-[#141522] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+                                                            : 'bg-zinc-100 dark:bg-[#1c1d2d] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                                                     }`}
                                                 >
                                                     LC
@@ -533,16 +625,18 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                         newQs[idx].platform = 'CODEFORCES';
                                                         setPathQuestions(newQs);
                                                     }}
-                                                    className={`px-2.5 py-1.5 transition-all text-xs font-semibold cursor-pointer ${
+                                                    className={`px-3 py-2 transition-all text-xs font-bold cursor-pointer ${
                                                         q.platform === 'CODEFORCES'
                                                             ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400'
-                                                            : 'bg-zinc-100 dark:bg-[#141522] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+                                                            : 'bg-zinc-100 dark:bg-[#1c1d2d] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                                                     }`}
                                                 >
                                                     CF
                                                 </button>
                                             </div>
-                                            <div className="flex-1">
+
+                                            {/* Identifier Input */}
+                                            <div className="flex-1 min-w-[180px]">
                                                 <Input
                                                     placeholder={q.platform === 'CODEFORCES' ? 'Problem ID (e.g. 4A or CF link)' : 'Slug (e.g. two-sum or LC link)'}
                                                     className={inputClasses}
@@ -554,12 +648,14 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                     }}
                                                 />
                                             </div>
-                                            <div className="w-24">
-                                                <Input
+
+                                            {/* Days with clear badge */}
+                                            <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#1c1d2d] px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 h-10 shrink-0">
+                                                <ClockIcon className="w-3.5 h-3.5 text-zinc-400" />
+                                                <input
                                                     type="number"
                                                     min="1"
-                                                    placeholder="Days"
-                                                    className={inputClasses}
+                                                    className="w-10 bg-transparent text-sm font-semibold text-center text-zinc-900 dark:text-white focus:outline-none"
                                                     value={q.daysToComplete}
                                                     onChange={e => {
                                                         const newQs = [...pathQuestions];
@@ -567,21 +663,27 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                         setPathQuestions(newQs);
                                                     }}
                                                 />
+                                                <span className="text-xs text-zinc-500 font-medium">days</span>
                                             </div>
+
+                                            {/* Trash button */}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300"
+                                                className="text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300 shrink-0 rounded-xl"
                                                 onClick={() => setPathQuestions(prev => prev.filter(item => item.tempId !== q.tempId))}
                                                 disabled={pathQuestions.length === 1}
+                                                title="Remove question"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
-                                        <div className="pl-1">
+
+                                        {/* Optional Title Input */}
+                                        <div>
                                             <Input
                                                 placeholder="Optional Title (e.g. Watermelon or Two Sum)"
-                                                className={`h-8 text-xs ${inputClasses}`}
+                                                className={`h-9 text-xs ${inputClasses}`}
                                                 value={q.title ?? ''}
                                                 onChange={e => {
                                                     const newQs = [...pathQuestions];
@@ -595,7 +697,23 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             </div>
                         </div>
                     </div>
-                    <DialogFooter><Button onClick={handleCreatePath} disabled={!newPath.title || !pathQuestions[0].titleSlug} className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white disabled:opacity-50 rounded-xl">Save Path</Button></DialogFooter>
+
+                    <DialogFooter className="gap-2 sm:gap-0 pt-2">
+                        <Button
+                            variant="outline"
+                            className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl"
+                            onClick={() => setCreatePathOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleCreatePath}
+                            disabled={!newPath.title || !pathQuestions[0].titleSlug}
+                            className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white disabled:opacity-50 rounded-xl font-semibold shadow-md shadow-[#5b4fff]/20"
+                        >
+                            Save Learning Path
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
 
