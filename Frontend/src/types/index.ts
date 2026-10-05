@@ -134,6 +134,12 @@ export interface StudentRegisterRequest extends MentorRegisterRequest {
     codeforcesHandle?: string;
 }
 
+export interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword?: string;
+}
+
 export interface PathQuestion {
     platform?: 'LEETCODE' | 'CODEFORCES';
     title?: string;

@@ -150,4 +150,17 @@ public class AuthenticationController {
                 .role(authResponse.role())
                 .build());
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<java.util.Map<String, String>> changePassword(
+            @Valid @RequestBody com.tracker.leetcode.tracker.DTO.ChangePasswordRequest request,
+            org.springframework.security.core.Authentication authentication) {
+
+        if (authentication == null || authentication.getName() == null || authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+            throw new com.tracker.leetcode.tracker.Exception.UserAuthenticationException("You must be logged in to change your password.");
+        }
+
+        authenticationService.changePassword(authentication.getName(), request);
+        return ResponseEntity.ok(java.util.Map.of("message", "Password changed successfully."));
+    }
 }

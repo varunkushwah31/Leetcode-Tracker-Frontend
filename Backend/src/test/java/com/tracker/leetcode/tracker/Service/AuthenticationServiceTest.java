@@ -1,9 +1,13 @@
 package com.tracker.leetcode.tracker.Service;
 
 import com.tracker.leetcode.tracker.DTO.AuthenticationResponse;
+import com.tracker.leetcode.tracker.DTO.ChangePasswordRequest;
 import com.tracker.leetcode.tracker.DTO.StudentRegisterRequest;
 import com.tracker.leetcode.tracker.Exception.DuplicateStudentException;
+import com.tracker.leetcode.tracker.Exception.UserAuthenticationException;
+import com.tracker.leetcode.tracker.Exception.ValidationFailedException;
 import com.tracker.leetcode.tracker.Models.AuthProvider;
+import com.tracker.leetcode.tracker.Models.Mentor;
 import com.tracker.leetcode.tracker.Models.Role;
 import com.tracker.leetcode.tracker.Models.Student;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
@@ -190,5 +194,104 @@ class AuthenticationServiceTest {
 
         assertTrue(ex.getMessage().contains("already in use"));
         verify(studentRepository, never()).save(any());
+    }
+
+    @Test
+    void changePassword_ForStudent_WithValidCredentials_ShouldSucceed() {
+        Student student = new Student();
+        student.setEmail("student@example.com");
+        student.setPassword("encodedOldPassword");
+
+        when(studentRepository.findByEmail("student@example.com")).thenReturn(Optional.of(student));
+        when(passwordEncoder.matches("oldPass123", "encodedOldPassword")).thenReturn(true);
+        when(passwordEncoder.matches("newPass456", "encodedOldPassword")).thenReturn(false);
+        when(passwordEncoder.encode("newPass456")).thenReturn("encodedNewPassword");
+
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass123", "newPass456", "newPass456");
+        authenticationService.changePassword("student@example.com", request);
+
+        assertEquals("encodedNewPassword", student.getPassword());
+        verify(studentRepository).save(student);
+    }
+
+    @Test
+    void changePassword_ForMentor_WithValidCredentials_ShouldSucceed() {
+        Mentor mentor = new Mentor();
+        mentor.setEmail("mentor@example.com");
+        mentor.setPassword("encodedOldPassword");
+
+        when(studentRepository.findByEmail("mentor@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmail("mentor@example.com")).thenReturn(Optional.of(mentor));
+        when(passwordEncoder.matches("oldPass123", "encodedOldPassword")).thenReturn(true);
+        when(passwordEncoder.matches("newPass456", "encodedOldPassword")).thenReturn(false);
+        when(passwordEncoder.encode("newPass456")).thenReturn("encodedNewPassword");
+
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass123", "newPass456", "newPass456");
+        authenticationService.changePassword("mentor@example.com", request);
+
+        assertEquals("encodedNewPassword", mentor.getPassword());
+        verify(mentorRepository).save(mentor);
+    }
+
+    @Test
+    void changePassword_WithIncorrectCurrentPassword_ShouldThrowValidationFailedException() {
+        Student student = new Student();
+        student.setEmail("student@example.com");
+        student.setPassword("encodedOldPassword");
+
+        when(studentRepository.findByEmail("student@example.com")).thenReturn(Optional.of(student));
+        when(passwordEncoder.matches("wrongPass", "encodedOldPassword")).thenReturn(false);
+
+        ChangePasswordRequest request = new ChangePasswordRequest("wrongPass", "newPass456", "newPass456");
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.changePassword("student@example.com", request)
+        );
+
+        assertEquals("Current password is incorrect.", ex.getMessage());
+        verify(studentRepository, never()).save(any());
+    }
+
+    @Test
+    void changePassword_WithSameNewPassword_ShouldThrowValidationFailedException() {
+        Student student = new Student();
+        student.setEmail("student@example.com");
+        student.setPassword("encodedOldPassword");
+
+        when(studentRepository.findByEmail("student@example.com")).thenReturn(Optional.of(student));
+        when(passwordEncoder.matches("samePassword", "encodedOldPassword")).thenReturn(true);
+
+        ChangePasswordRequest request = new ChangePasswordRequest("samePassword", "samePassword", "samePassword");
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.changePassword("student@example.com", request)
+        );
+
+        assertEquals("New password cannot be the same as your current password.", ex.getMessage());
+        verify(studentRepository, never()).save(any());
+    }
+
+    @Test
+    void changePassword_WithMismatchedConfirmPassword_ShouldThrowValidationFailedException() {
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass123", "newPass456", "differentPass");
+
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.changePassword("student@example.com", request)
+        );
+
+        assertEquals("New password and confirmation password do not match.", ex.getMessage());
+    }
+
+    @Test
+    void changePassword_WithShortPassword_ShouldThrowValidationFailedException() {
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPass123", "short", "short");
+
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.changePassword("student@example.com", request)
+        );
+
+        assertEquals("New password must be at least 6 characters long.", ex.getMessage());
     }
 }

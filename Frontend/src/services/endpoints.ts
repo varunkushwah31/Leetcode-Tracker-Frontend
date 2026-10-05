@@ -5,6 +5,7 @@ import type {
     LoginRequest, 
     StudentRegisterRequest, 
     MentorRegisterRequest, 
+    ChangePasswordRequest,
     LearningPath,
     BulkImportResponseDTO
 } from '@/types';
@@ -24,7 +25,10 @@ export const AuthService = {
 
     // FIXED: Changed axiosInstance to api, and updated the path to match the others!
     verifyEmail: (email: string, otp: string) =>
-        api.post<AuthResponse>('/v1/auth/verify-email', { email, otp })
+        api.post<AuthResponse>('/v1/auth/verify-email', { email, otp }),
+
+    changePassword: (data: ChangePasswordRequest) =>
+        api.post<{ message: string }>('/v1/auth/change-password', data)
 };
 
 export const StudentService = {

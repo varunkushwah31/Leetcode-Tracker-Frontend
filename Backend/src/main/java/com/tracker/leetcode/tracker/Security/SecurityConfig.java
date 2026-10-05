@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/health").permitAll()
 
                         // Auth endpoints
+                        .requestMatchers("/api/v1/auth/change-password").authenticated()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN")
 

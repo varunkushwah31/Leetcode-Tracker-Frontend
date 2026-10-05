@@ -2,11 +2,13 @@ package com.tracker.leetcode.tracker.Service;
 
 import com.tracker.leetcode.tracker.DTO.AuthenticationRequest;
 import com.tracker.leetcode.tracker.DTO.AuthenticationResponse;
+import com.tracker.leetcode.tracker.DTO.ChangePasswordRequest;
 import com.tracker.leetcode.tracker.DTO.RegisterRequest;
 import com.tracker.leetcode.tracker.DTO.StudentRegisterRequest;
 import com.tracker.leetcode.tracker.Exception.DuplicateMentorException;
 import com.tracker.leetcode.tracker.Exception.DuplicateStudentException;
 import com.tracker.leetcode.tracker.Exception.UserAuthenticationException;
+import com.tracker.leetcode.tracker.Exception.ValidationFailedException;
 import com.tracker.leetcode.tracker.Models.*;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
@@ -192,6 +194,66 @@ public class AuthenticationService {
                     throw new com.tracker.leetcode.tracker.Exception.RefreshTokenException("User associated with refresh token no longer exists.");
                 })
                 .orElseThrow(() -> new com.tracker.leetcode.tracker.Exception.RefreshTokenException("Invalid or expired refresh token."));
+    }
+
+    // 3. CHANGE PASSWORD LOGIC
+    public void changePassword(String userEmail, ChangePasswordRequest request) {
+        if (userEmail == null || userEmail.isBlank()) {
+            throw new UserAuthenticationException("User is not authenticated.");
+        }
+
+        if (request.currentPassword() == null || request.currentPassword().isBlank()) {
+            throw new ValidationFailedException("Current password is required.");
+        }
+
+        if (request.newPassword() == null || request.newPassword().isBlank()) {
+            throw new ValidationFailedException("New password is required.");
+        }
+
+        if (request.newPassword().length() < 6) {
+            throw new ValidationFailedException("New password must be at least 6 characters long.");
+        }
+
+        if (request.confirmPassword() != null && !request.confirmPassword().isBlank()) {
+            if (!request.newPassword().equals(request.confirmPassword())) {
+                throw new ValidationFailedException("New password and confirmation password do not match.");
+            }
+        }
+
+        // 1. Check if user is a Student
+        var studentOpt = studentRepository.findByEmail(userEmail)
+                .or(() -> studentRepository.findByEmailIgnoreCase(userEmail));
+        if (studentOpt.isPresent()) {
+            Student student = studentOpt.get();
+            if (!passwordEncoder.matches(request.currentPassword(), student.getPassword())) {
+                throw new ValidationFailedException("Current password is incorrect.");
+            }
+            if (passwordEncoder.matches(request.newPassword(), student.getPassword())) {
+                throw new ValidationFailedException("New password cannot be the same as your current password.");
+            }
+            student.setPassword(passwordEncoder.encode(request.newPassword()));
+            studentRepository.save(student);
+            log.info("Password changed successfully for student: {}", userEmail);
+            return;
+        }
+
+        // 2. Check if user is a Mentor or Admin
+        var mentorOpt = mentorRepository.findByEmail(userEmail);
+        if (mentorOpt.isPresent()) {
+            Mentor mentor = mentorOpt.get();
+            if (!passwordEncoder.matches(request.currentPassword(), mentor.getPassword())) {
+                throw new ValidationFailedException("Current password is incorrect.");
+            }
+            if (passwordEncoder.matches(request.newPassword(), mentor.getPassword())) {
+                throw new ValidationFailedException("New password cannot be the same as your current password.");
+            }
+            mentor.setPassword(passwordEncoder.encode(request.newPassword()));
+            mentorRepository.save(mentor);
+            log.info("Password changed successfully for mentor/admin: {}", userEmail);
+            return;
+        }
+
+        throw new UserAuthenticationException("User account not found.");
     }
 
     // 4. DRY HELPER METHODS

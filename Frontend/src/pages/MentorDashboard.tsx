@@ -15,6 +15,7 @@ import {
     LifebuoyIcon,
     HouseIcon,
     UsersIcon,
+    KeyIcon,
 } from '@phosphor-icons/react';
 import { Badge } from '../components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '../components/ui/dialog';
@@ -23,6 +24,7 @@ import { Label } from '../components/ui/label';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { useAuth } from '../hooks/useAuth';
 import { BrandLogo } from '../components/common/BrandLogo';
+import { ChangePasswordModal } from '../components/common/ChangePasswordModal';
 import { MentorService, ClassroomService, PathService, StudentService } from '../services/endpoints';
 import type { ClassroomDashboardDTO, LearningPath, ClassroomAnalyticsDTO } from '@/types';
 
@@ -432,6 +434,18 @@ export function MentorDashboard() {
                     </button>
                 )}
 
+                <ChangePasswordModal
+                    trigger={
+                        <button
+                            type="button"
+                            className="w-full flex items-center px-3 py-2 text-xs rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white transition-colors border border-transparent cursor-pointer"
+                            onClick={() => { if (isMobile) setMobileSidebarOpen(false); }}
+                        >
+                            <KeyIcon className="w-4 h-4 mr-2 text-zinc-500" /> Change Password
+                        </button>
+                    }
+                />
+
                 <button onClick={logout} aria-label="Sign out" className="w-full flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-red-500/10 transition-colors text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 border border-transparent hover:border-red-500/20">
                     <LogOut className="w-4 h-4 mr-2" /> Sign Out
                 </button>
@@ -573,6 +587,19 @@ export function MentorDashboard() {
                         <ThemeToggle />
 
                         <div className="flex items-center gap-2 pl-2 border-l border-zinc-200 dark:border-zinc-800">
+                            <ChangePasswordModal
+                                trigger={
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-8 h-8 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                                        title="Change Password"
+                                        aria-label="Change Password"
+                                    >
+                                        <KeyIcon className="w-4 h-4" />
+                                    </Button>
+                                }
+                            />
                             <Avatar className="w-8 h-8 border border-zinc-200 dark:border-zinc-800">
                                 <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] text-xs font-bold">
                                     {user?.name?.substring(0, 2).toUpperCase() || 'ME'}

@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { SpinnerIcon as Loader2, SignOutIcon as LogOut, PulseIcon as Activity, DownloadSimpleIcon as Download } from '@phosphor-icons/react';
+import { SpinnerIcon as Loader2, SignOutIcon as LogOut, PulseIcon as Activity, DownloadSimpleIcon as Download, KeyIcon } from '@phosphor-icons/react';
 import { BrandLogo } from '../components/common/BrandLogo';
+import { ChangePasswordModal } from '../components/common/ChangePasswordModal';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../hooks/useAuth';
@@ -171,7 +172,20 @@ export function StudentDashboard() {
                                 <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">@{dashboardData?.leetcodeUsername || dashboardData?.codeforcesHandle || 'student'}</p>
                             </div>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={logout} className="hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 text-zinc-500 dark:text-zinc-400">
+                        <ChangePasswordModal
+                            trigger={
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                                    title="Change Password"
+                                    aria-label="Change Password"
+                                >
+                                    <KeyIcon className="w-4 h-4" />
+                                </Button>
+                            }
+                        />
+                        <Button variant="ghost" size="icon" onClick={logout} className="hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 text-zinc-500 dark:text-zinc-400" title="Sign Out" aria-label="Sign Out">
                             <LogOut className="w-4 h-4" />
                         </Button>
                     </div>
