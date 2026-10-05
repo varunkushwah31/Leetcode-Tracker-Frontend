@@ -11,6 +11,11 @@ type RetryableRequest = InternalAxiosRequestConfig & { _retry?: boolean };
 
 export type ApiFormattedError = Error & { status?: number };
 
+export function isAuthEndpoint(url?: string): boolean {
+    if (!url) return false;
+    return url.includes('/v1/auth/');
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const api = axios.create({
@@ -63,7 +68,7 @@ function extractRefreshErrorMessage(refreshError: unknown): { message: string; s
     return { message: "Session expired. Please log in again." };
 }
 
-function extractErrorMessage(error: AxiosError<{ message?: string; validationErrors?: Record<string, string> } | string>): string {
+function extractErrorMessage(error: AxiosError<{ message?: string; validationErrors?: Record<string, string>; error?: string } | string>): string {
     if (!error.response) {
         if (error.request) {
             return "The backend server is not responding. Please ensure it is running.";
@@ -93,6 +98,9 @@ function extractErrorMessage(error: AxiosError<{ message?: string; validationErr
         if (data.message) {
             return data.message;
         }
+        if ('error' in data && typeof data.error === 'string' && data.error) {
+            return data.error;
+        }
     }
 
     if (typeof data === 'string' && data !== '') {
@@ -119,16 +127,27 @@ async function handle401Refresh(originalRequest: RetryableRequest) {
     } catch (refreshError: unknown) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        
+        if (typeof window !== 'undefined' && 
+            window.location.pathname !== '/login' && 
+            window.location.pathname !== '/register') {
+            window.location.href = '/login';
+        }
 
         const { message, status } = extractRefreshErrorMessage(refreshError);
         throw toFormattedError(message, status ?? 401);
     }
 }
 
-// 1. REQUEST INTERCEPTOR (Attaches the Access Token to every request)
+// 1. REQUEST INTERCEPTOR (Attaches the Access Token to every request, except auth endpoints)
 api.interceptors.request.use(
     (config) => {
+        // Skip attaching Authorization header to unauthenticated auth endpoints
+        // so invalid or stale tokens won't cause 401s on login or signup
+        if (isAuthEndpoint(config.url)) {
+            return config;
+        }
+
         // Grab the short-lived access token from local storage
         const token = localStorage.getItem('accessToken');
 
@@ -148,11 +167,13 @@ api.interceptors.response.use(
         // If the request succeeds, just return the response
         return response;
     },
-    async (error: AxiosError<{ message?: string } | string>) => {
+    async (error: AxiosError<{ message?: string; validationErrors?: Record<string, string>; error?: string } | string>) => {
         const originalRequest = error.config as RetryableRequest | undefined;
+        const isAuthRequest = isAuthEndpoint(originalRequest?.url);
 
         // --- PART A: Token Rotation Logic (single-flight) ---
-        if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+        // Never attempt token refresh on auth endpoints (e.g. invalid login/signup credentials)
+        if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isAuthRequest) {
             return await handle401Refresh(originalRequest);
         }
 

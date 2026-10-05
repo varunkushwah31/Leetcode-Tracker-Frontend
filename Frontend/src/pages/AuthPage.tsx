@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -19,12 +19,25 @@ import {
 
 export function AuthPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [isLogin, setIsLogin] = useState(true);
+  const isRegisterRoute = location.pathname === '/register';
+  const [isLogin, setIsLogin] = useState(!isRegisterRoute);
   const [role, setRole] = useState<'student' | 'mentor'>('student');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Keep isLogin aligned if route changes via browser history or navigation
+  useEffect(() => {
+    setIsLogin(location.pathname !== '/register');
+  }, [location.pathname]);
+
+  const toggleAuthMode = (newIsLogin: boolean) => {
+    setIsLogin(newIsLogin);
+    setError(null);
+    navigate(newIsLogin ? '/login' : '/register');
+  };
 
   const { login, registerMentor, registerStudent } = useAuth();
 
@@ -108,7 +121,7 @@ export function AuthPage() {
     }
   };
 
-  const handleAuth = async (e: React.SubmitEvent) => {
+  const handleAuth = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
@@ -404,7 +417,7 @@ export function AuthPage() {
                       required
                       autoComplete={isLogin ? "current-password" : "new-password"}
                       placeholder="••••••••"
-                      minLength={6}
+                      minLength={8}
                       value={formData.password}
                       onChange={(e) => { setFormData({...formData, password: e.target.value}); clearError(); }}
                       className="bg-zinc-50 dark:bg-[#18181b] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-10 rounded-xl w-full tracking-widest font-mono transition-all px-3.5 pr-10 text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
@@ -423,7 +436,7 @@ export function AuthPage() {
                   </button>
                 </div>
                 {!isLogin && (
-                    <p className="text-[11px] text-zinc-500">Minimum 6 characters required.</p>
+                    <p className="text-[11px] text-zinc-500">Minimum 8 characters required.</p>
                 )}
               </div>
               <Button
@@ -442,7 +455,7 @@ export function AuthPage() {
               </p>
               <button
                   type="button"
-                  onClick={() => { setIsLogin(!isLogin); setError(null); }}
+                  onClick={() => toggleAuthMode(!isLogin)}
                   className="border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white rounded-lg px-3 py-1 text-xs sm:text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer interactive-press"
               >
                 {isLogin ? 'Sign up' : 'Sign in'}
