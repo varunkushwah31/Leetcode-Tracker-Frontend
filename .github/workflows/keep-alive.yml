@@ -2,8 +2,8 @@ name: Keep Render Instance Alive
 
 on:
   schedule:
-    # Runs every 14 minutes to prevent Render free instance from sleeping (spins down after 15m inactivity)
-    - cron: '*/14 * * * *'
+    # Runs every 10 minutes (provides a 5-minute safety buffer against GitHub queue delays; Render sleeps at 15 min)
+    - cron: '*/10 * * * *'
   workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
 
 jobs:
@@ -16,10 +16,13 @@ jobs:
           SERVICE_URL: ${{ secrets.BACKEND_HEALTH_URL || 'https://leettracker-backend-nq7r.onrender.com/health' }}
         run: |
           echo "Sending keep-alive ping to: $SERVICE_URL"
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 "$SERVICE_URL" || true)
-          echo "Received HTTP status code: $HTTP_STATUS"
-          if [ "$HTTP_STATUS" -eq 200 ]; then
-            echo "Success: Render service is active and responding."
-          else
-            echo "Notice: Service responded with HTTP $HTTP_STATUS (ping sent to wake up instance)."
-          fi
+          for i in 1 2 3; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 "$SERVICE_URL" || true)
+            echo "Attempt $i: HTTP status code: $HTTP_STATUS"
+            if [ "$HTTP_STATUS" -eq 200 ]; then
+              echo "Success: Render service is active and responding."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Ping completed."
