@@ -193,28 +193,28 @@ export function AuthPage() {
               Track, assign, and validate your students' LeetCode & Codeforces progress through an automated, data-rich dashboard.
             </p>
             <div className="grid grid-cols-2 gap-3 xl:gap-4">
-              <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors shadow-xs">
+              <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
                 <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                   <Activity className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Live Tracking</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Real-time sync with LeetCode & Codeforces</p>
               </div>
-              <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors shadow-xs">
+              <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
                 <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                   <AlertCircle className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Smart Assignments</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Automated validation & scoring</p>
               </div>
-              <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors shadow-xs">
+              <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
                 <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                   <UsersIcon className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Leaderboards</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Gamified cohort rankings</p>
               </div>
-              <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors shadow-xs">
+              <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
                 <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                   <LayoutDashboard className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
@@ -232,7 +232,7 @@ export function AuthPage() {
             <AmbientGlow variant="center" />
           </div>
 
-          <div className="w-full max-w-lg relative z-10 bg-white/95 dark:bg-[#111111]/90 backdrop-blur-2xl p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xl my-auto mt-14 sm:my-auto">
+          <div className="w-full max-w-lg relative z-10 bg-white dark:bg-[#111116] p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto mt-14 sm:my-auto">
             {/* Mobile Header with Logo */}
             <div className="flex items-center mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800/60 lg:hidden">
               <BrandLogo size="sm" theme="auto" />

@@ -218,7 +218,7 @@ export function LandingPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:auto-rows-[minmax(300px,auto)]">
-                        <div className="md:col-span-2 bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c]">
+                        <div className="md:col-span-2 bg-white dark:bg-[#0c0c11] p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#101016]">
                             <div className="absolute top-0 right-0 p-8 sm:p-10">
                                 <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
                                     <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
@@ -234,7 +234,7 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c]">
+                        <div className="bg-white dark:bg-[#0c0c11] p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#101016]">
                             {/* Ambient Purple Glow */}
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
 
@@ -266,7 +266,7 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c]">
+                        <div className="bg-white dark:bg-[#0c0c11] p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#101016]">
                             {/* Ambient Purple Glow */}
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
 
@@ -298,7 +298,7 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="md:col-span-2 bg-white/95 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end gap-6 relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#0c0c0c]">
+                        <div className="md:col-span-2 bg-white dark:bg-[#0c0c11] p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end gap-6 relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#101016]">
                             <div className="flex items-end gap-2 sm:gap-3 relative z-10 w-full h-28 sm:h-32 shrink-0 overflow-visible pt-5 opacity-70 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
                                 <div className="h-[40%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 group-hover:scale-y-105 origin-bottom"></div>
                                 <div className="h-[60%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-75 group-hover:scale-y-110 origin-bottom"></div>

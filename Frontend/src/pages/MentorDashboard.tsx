@@ -392,11 +392,11 @@ export function MentorDashboard() {
                             className={`w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 flex justify-between items-center group ${
                                 selectedClassroom?.classroomId === c.classroomId && !showAdminOverview
                                     ? 'bg-zinc-100 dark:bg-[#1a1b2e] border border-[#5b4fff]/40 text-[#5b4fff] dark:text-white font-medium shadow-sm ring-1 ring-[#5b4fff]/30'
-                                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 hover:text-zinc-900 dark:hover:text-white border border-transparent'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white border border-transparent'
                             }`}
                         >
                             <span className="truncate group-hover:translate-x-0.5 transition-transform">{c.className}</span>
-                            <Badge className={`border-transparent transition-colors ${selectedClassroom?.classroomId === c.classroomId && !showAdminOverview ? 'bg-[#5b4fff] text-white' : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-200'}`}>
+                            <Badge className={`border-transparent transition-colors ${selectedClassroom?.classroomId === c.classroomId && !showAdminOverview ? 'bg-[#5b4fff] text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-200'}`}>
                                 {c.enrolledStudents?.length || 0}
                             </Badge>
                         </button>
@@ -409,7 +409,7 @@ export function MentorDashboard() {
                 </div>
             </ScrollArea>
 
-            <div className="p-4 border-t border-zinc-200 dark:border-zinc-900 space-y-2 bg-white/80 dark:bg-[#09090e]/80 backdrop-blur-md">
+            <div className="p-4 border-t border-zinc-200 dark:border-zinc-900 space-y-2 bg-white dark:bg-[#09090e]">
                 <div className="flex items-center gap-3 px-3 py-2 mb-2">
                     <Avatar className="border border-zinc-200 dark:border-zinc-800 w-9 h-9">
                         <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] font-bold">{(user?.name || 'ME').substring(0, 2).toUpperCase()}</AvatarFallback>

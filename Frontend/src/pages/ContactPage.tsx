@@ -66,7 +66,7 @@ export function ContactPage() {
                     </p>
 
                     <div className="grid gap-4">
-                        <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors flex items-center gap-4 shadow-xs">
+                        <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
                             <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
                                 <Mail className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
@@ -75,7 +75,7 @@ export function ContactPage() {
                                 <p className="text-[13px] text-zinc-500 leading-snug">hello@mentorsync.in</p>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors flex items-center gap-4 shadow-xs">
+                        <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
                             <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
                                 <PhoneIcon className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
@@ -84,7 +84,7 @@ export function ContactPage() {
                                 <p className="text-[13px] text-zinc-500 leading-snug">+91 98765 43210</p>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-transparent border border-zinc-200 dark:border-zinc-800/80 p-4 xl:p-5 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors flex items-center gap-4 shadow-xs">
+                        <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
                             <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
                                 <MapPinIcon className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
@@ -104,7 +104,7 @@ export function ContactPage() {
                     <AmbientGlow variant="center" />
                 </div>
 
-                <div className="w-full max-w-120 relative z-10 bg-white/95 dark:bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xl my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="w-full max-w-120 relative z-10 bg-white dark:bg-[#111116] p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
 
                     <div className="lg:hidden flex items-center justify-between mb-8">
                         <BrandLogo size="md" theme="auto" />
