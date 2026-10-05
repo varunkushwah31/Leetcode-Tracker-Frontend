@@ -63,16 +63,23 @@ export const ClassroomService = {
     // NOTE: mentorId is currently passed from the client, but it must move
     // server-side (derive the mentor from the authenticated principal/JWT) so
     // clients cannot spoof another mentor's identity.
-    createClassroom: (mentorId: string, className: string) => api.post('/classrooms', null, { params: { mentorId, className } }),
-    getDashboard: (classroomId: string, sortBy: string = 'solved') => api.get(`/classrooms/${classroomId}/dashboard`, { params: { sortBy } }),
-    addStudent: (classroomId: string, identifier: string, mentorId?: string) =>
-        api.post(`/classrooms/${classroomId}/students`, null, {
-            params: {
-                identifier,
-                leetcodeUsername: identifier,
-                ...(mentorId ? { mentorId } : {})
-            }
+    createClassroom: (mentorId: string, className: string) =>
+        api.post('/classrooms', { mentorId, className }, {
+            params: { mentorId, className },
+            headers: { 'Content-Type': 'application/json' }
         }),
+    getDashboard: (classroomId: string, sortBy: string = 'solved') => api.get(`/classrooms/${classroomId}/dashboard`, { params: { sortBy } }),
+    addStudent: (classroomId: string, identifier: string, mentorId?: string) => {
+        const payload = {
+            identifier,
+            leetcodeUsername: identifier,
+            ...(mentorId ? { mentorId } : {})
+        };
+        return api.post(`/classrooms/${classroomId}/students`, payload, {
+            params: payload,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    },
     removeStudent: (classroomId: string, studentIdentifier: string, mentorId?: string) =>
         api.delete(`/classrooms/${classroomId}/students/${encodeURIComponent(studentIdentifier)}`, {
             params: mentorId ? { mentorId } : undefined
@@ -100,16 +107,26 @@ export const ClassroomService = {
     deleteAssignment: (classroomId: string, assignmentId: string, mentorId: string) =>
         api.delete(`/classrooms/${classroomId}/assignments/${assignmentId}`, { params: { mentorId } }),
 
-    updateAssignmentDeadline: (classroomId: string, assignmentId: string, mentorId: string, newEndTimestamp: number) =>
-        api.put(`/classrooms/${classroomId}/assignments/${assignmentId}/deadline`, null, {
-            params: { mentorId, newEndTimestamp }
-        }),
+    updateAssignmentDeadline: (classroomId: string, assignmentId: string, mentorId: string, newEndTimestamp: number) => {
+        const payload = {
+            mentorId,
+            newEndTimestamp,
+            endTimestamp: newEndTimestamp
+        };
+        return api.put(`/classrooms/${classroomId}/assignments/${assignmentId}/deadline`, payload, {
+            params: payload,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    },
 
     validateStudentSubmission: (classroomId: string, username: string, assignmentId: string, url: string) =>
         api.post(`/classrooms/${classroomId}/students/${username}/assignments/${assignmentId}/validate`, { url }),
 
     nudgeStudent: (classroomId: string, studentId: string, assignmentName: string) =>
-        api.post(`/classrooms/${classroomId}/students/${studentId}/nudge`, null, { params: { assignmentName } }),
+        api.post(`/classrooms/${classroomId}/students/${studentId}/nudge`, { assignmentName }, {
+            params: { assignmentName },
+            headers: { 'Content-Type': 'application/json' }
+        }),
     
     // Upload CSV (let axios set the multipart boundary automatically)
     bulkAddStudents: (classroomId: string, file: File) => {

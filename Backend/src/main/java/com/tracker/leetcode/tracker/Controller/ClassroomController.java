@@ -17,6 +17,7 @@ import com.tracker.leetcode.tracker.Exception.ValidationFailedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -34,15 +35,48 @@ public class ClassroomController {
     private final StudentRepository studentRepository;
     private final EmailService emailService;
 
-    // 1. Create a Classroom
-    // URL Example: POST /api/classrooms?mentorId=65f1a2b...&className=Data%20Structures
-    @PostMapping
-    public ResponseEntity<Classroom> createClassroom(
-            @RequestParam String mentorId,
-            @RequestParam String className) {
-        return ResponseEntity.ok(classroomService.createClassroom(mentorId, className));
+    @SuppressWarnings("unchecked")
+    private java.util.Map<String, Object> parseJsonBody(jakarta.servlet.http.HttpServletRequest request) {
+        if (request == null) return null;
+        String contentType = request.getContentType();
+        if (contentType == null || !contentType.toLowerCase().contains("application/json")) {
+            return null;
+        }
+        try {
+            tools.jackson.databind.ObjectMapper mapper = new tools.jackson.databind.ObjectMapper();
+            return mapper.readValue(request.getInputStream(), java.util.Map.class);
+        } catch (Exception e) {
+            log.debug("Could not parse request body as JSON: {}", e.getMessage());
+            return null;
+        }
     }
 
+    // 1. Create a Classroom (supports JSON body, form urlencoded, and query params)
+    @PostMapping
+    public ResponseEntity<Classroom> createClassroom(
+            @RequestParam(required = false) String mentorId,
+            @RequestParam(required = false) String className,
+            jakarta.servlet.http.HttpServletRequest request) {
+
+        String effectiveMentorId = mentorId;
+        String effectiveClassName = className;
+
+        java.util.Map<String, Object> body = parseJsonBody(request);
+        if (body != null) {
+            if (effectiveMentorId == null && body.containsKey("mentorId")) effectiveMentorId = String.valueOf(body.get("mentorId"));
+            if (effectiveClassName == null && body.containsKey("className")) effectiveClassName = String.valueOf(body.get("className"));
+        }
+
+        if (effectiveMentorId == null || effectiveMentorId.isBlank()) {
+            throw new ValidationFailedException("mentorId is required to create classroom.");
+        }
+        if (effectiveClassName == null || effectiveClassName.isBlank()) {
+            throw new ValidationFailedException("className is required to create classroom.");
+        }
+        return ResponseEntity.ok(classroomService.createClassroom(effectiveMentorId, effectiveClassName));
+    }
+
+    // 2. Add Student to Classroom (supports JSON body, form urlencoded, and query params)
     @PostMapping("/{classroomId}/students")
     public ResponseEntity<Classroom> addStudentToClassroom(
             @PathVariable String classroomId,
@@ -50,7 +84,7 @@ public class ClassroomController {
             @RequestParam(required = false) String identifier,
             @RequestParam(required = false) String studentId,
             @RequestParam(required = false) String mentorId,
-            @RequestBody(required = false) java.util.Map<String, Object> body) {
+            jakarta.servlet.http.HttpServletRequest request) {
 
         String effectiveIdentifier = identifier != null ? identifier
                 : leetcodeUsername != null ? leetcodeUsername
@@ -58,6 +92,7 @@ public class ClassroomController {
 
         String effectiveMentorId = mentorId;
 
+        java.util.Map<String, Object> body = parseJsonBody(request);
         if (body != null) {
             if (effectiveIdentifier == null || effectiveIdentifier.isBlank()) {
                 if (body.containsKey("identifier")) effectiveIdentifier = String.valueOf(body.get("identifier"));
@@ -241,11 +276,12 @@ public class ClassroomController {
             @PathVariable String assignmentId,
             @RequestParam(required = false) String mentorId,
             @RequestParam(required = false) Long newEndTimestamp,
-            @RequestBody(required = false) java.util.Map<String, Object> body) {
+            jakarta.servlet.http.HttpServletRequest request) {
 
         String effectiveMentorId = mentorId;
         Long effectiveDeadline = newEndTimestamp;
 
+        java.util.Map<String, Object> body = parseJsonBody(request);
         if (body != null) {
             if (effectiveMentorId == null && body.containsKey("mentorId")) {
                 effectiveMentorId = String.valueOf(body.get("mentorId"));
