@@ -121,7 +121,7 @@ export function ClassroomAnalytics({
         const deadlineDate = new Date(assignmentDeadline);
         const end = Math.floor(deadlineDate.getTime() / 1000);
 
-        if (isNaN(end) || end <= start) {
+        if (Number.isNaN(end) || end <= start) {
             setAssignError('Please select a valid future deadline date and time.');
             return;
         }
@@ -207,7 +207,7 @@ export function ClassroomAnalytics({
 
     if (isLoading) {
         return (
-            <Card className="shadow-xs dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#121217] rounded-2xl">
+            <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
                 <CardContent className="flex flex-col items-center justify-center py-20">
                     <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff] mb-4" />
                     <p className="text-zinc-900 dark:text-white text-base font-bold tracking-tight mb-1">
@@ -223,7 +223,7 @@ export function ClassroomAnalytics({
 
     if (!data || data.totalStudents === 0) {
         return (
-            <Card className="shadow-xs dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#121217] rounded-2xl">
+            <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
                 <CardContent className="flex flex-col items-center justify-center py-16">
                     <div className="w-16 h-16 bg-zinc-100 dark:bg-[#1a1b2e] rounded-2xl flex items-center justify-center mb-6 shadow-xs">
                         <Activity className="w-8 h-8 text-[#5b4fff] dark:text-[#968fff]" />
@@ -235,7 +235,7 @@ export function ClassroomAnalytics({
         );
     }
 
-    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-xs dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#121217] rounded-2xl";
+    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
 
     const atRiskCount = data.atRiskStudentsCount ?? (data.atRiskStudents ? data.atRiskStudents.length : 0);
     const criticalWeaknessTopics = normalizedWeaknessTopics;
@@ -370,14 +370,14 @@ export function ClassroomAnalytics({
             </div>
 
             {/* Sub-Navigation Tabs */}
-            <div className="p-1.5 bg-zinc-100/90 dark:bg-[#121216] border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl flex flex-wrap gap-1.5 shadow-xs">
+            <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs flex-wrap gap-1 w-max max-w-full">
                 <button
                     type="button"
                     onClick={() => setActiveTab('overview')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
                         activeTab === 'overview'
-                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
+                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
                     <Activity className="w-4 h-4 text-[#5b4fff]" />
@@ -387,10 +387,10 @@ export function ClassroomAnalytics({
                 <button
                     type="button"
                     onClick={() => setActiveTab('weaknesses')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
                         activeTab === 'weaknesses'
-                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
+                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
                     <AlertTriangle className="w-4 h-4 text-rose-500" />
@@ -398,7 +398,7 @@ export function ClassroomAnalytics({
                     {criticalWeaknessTopics.length > 0 && (
                         <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
                             activeTab === 'weaknesses'
-                                ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                                 : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
                         }`}>
                             {criticalWeaknessTopics.length}
@@ -409,10 +409,10 @@ export function ClassroomAnalytics({
                 <button
                     type="button"
                     onClick={() => setActiveTab('matrix')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
                         activeTab === 'matrix'
-                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
+                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
                     <TrendingUp className="w-4 h-4 text-emerald-500" />
@@ -422,10 +422,10 @@ export function ClassroomAnalytics({
                 <button
                     type="button"
                     onClick={() => setActiveTab('watchlist')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
                         activeTab === 'watchlist'
-                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
+                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
                     <ShieldWarningIcon className="w-4 h-4 text-amber-500" />
@@ -433,7 +433,7 @@ export function ClassroomAnalytics({
                     {atRiskCount > 0 && (
                         <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
                             activeTab === 'watchlist'
-                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                                 : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                         }`}>
                             {atRiskCount}
@@ -444,10 +444,10 @@ export function ClassroomAnalytics({
                 <button
                     type="button"
                     onClick={() => setActiveTab('assignments')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
                         activeTab === 'assignments'
-                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
+                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
                     <BookOpenIcon className="w-4 h-4 text-blue-500" />
@@ -455,7 +455,7 @@ export function ClassroomAnalytics({
                     {data.assignmentCompletionRate !== undefined && (
                         <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
                             activeTab === 'assignments'
-                                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30'
+                                ? 'bg-blue-500/20 text-blue-300 border-blue-500/40'
                                 : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
                         }`}>
                             {Math.round(data.assignmentCompletionRate)}%
@@ -469,21 +469,21 @@ export function ClassroomAnalytics({
                 <div className="space-y-6">
                     {/* Action Items Bar */}
                     {data.recommendedActionItems && data.recommendedActionItems.length > 0 && (
-                        <Card className="border border-indigo-200 dark:border-indigo-900/60 bg-linear-to-r from-indigo-50/70 via-white to-purple-50/50 dark:from-[#151329] dark:via-[#121217] dark:to-[#1a1329] rounded-2xl shadow-xs">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base font-bold flex items-center gap-2 text-indigo-950 dark:text-indigo-200">
+                        <Card className={`${cardClasses} overflow-hidden`}>
+                            <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60">
+                                <CardTitle className="text-base font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
                                     <LightningIcon className="w-5 h-5 text-[#5b4fff]" weight="fill" />
                                     Automated Mentorship Action Items
                                 </CardTitle>
-                                <CardDescription className="text-zinc-600 dark:text-zinc-400 text-xs">
+                                <CardDescription className="text-zinc-500 dark:text-zinc-400 text-xs">
                                     Synthesized algorithmic insights based on cohort solve velocity, difficulty distribution, and inactivity flags
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="pt-0 space-y-2">
+                            <CardContent className="pt-4 space-y-2">
                                 {data.recommendedActionItems.map((item, idx) => {
                                     if (typeof item === 'string') {
                                         return (
-                                            <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-[#16161c] p-2.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
+                                            <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-[#16161f] p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
                                                 <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <span className="leading-relaxed">{item}</span>
                                             </div>
@@ -491,7 +491,7 @@ export function ClassroomAnalytics({
                                     }
                                     const prob = item as CuratedProblemDTO;
                                     return (
-                                        <div key={prob.slug || prob.titleSlug || idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-[#16161c] p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
+                                        <div key={prob.slug || prob.titleSlug || idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-[#16161f] p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
                                             <div className="flex items-start gap-2.5 min-w-0">
                                                 <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <div className="min-w-0">
@@ -500,7 +500,7 @@ export function ClassroomAnalytics({
                                                             Assign target practice: {prob.title}
                                                         </span>
                                                         {prob.difficulty && (
-                                                            <Badge className="text-[9px] px-1.5 py-0 font-bold uppercase bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20">
+                                                            <Badge className="text-[9px] px-1.5 py-0 font-bold uppercase bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                                                 {prob.difficulty}
                                                             </Badge>
                                                         )}
@@ -516,9 +516,9 @@ export function ClassroomAnalytics({
                                             <Button
                                                 size="sm"
                                                 onClick={() => handleOpenAssignModal(prob)}
-                                                className="shrink-0 h-7 px-2.5 text-xs bg-zinc-900 dark:bg-zinc-800 hover:bg-[#5b4fff] dark:hover:bg-[#5b4fff] text-white rounded-lg font-medium transition-colors cursor-pointer"
+                                                className="shrink-0 h-8 px-3 text-xs bg-zinc-900 dark:bg-[#222] hover:bg-[#5b4fff] dark:hover:bg-[#5b4fff] text-white rounded-xl font-semibold border border-zinc-700/60 dark:border-zinc-700/60 transition-colors cursor-pointer"
                                             >
-                                                <LightningIcon className="w-3 h-3 mr-1" />
+                                                <LightningIcon className="w-3.5 h-3.5 mr-1" />
                                                 Assign Now
                                             </Button>
                                         </div>
@@ -582,43 +582,43 @@ export function ClassroomAnalytics({
                             </CardHeader>
                             <CardContent className="space-y-5 pt-6">
                                 <div className="grid grid-cols-3 gap-3 text-center">
-                                    <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-1">Dual Platform</p>
-                                        <h4 className="text-2xl font-black text-purple-700 dark:text-purple-300">{data.dualPlatformStudents ?? 0}</h4>
-                                        <p className="text-[10px] text-zinc-500 mt-0.5">LC + CF Active</p>
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-[#968fff] mb-1">Dual Platform</p>
+                                        <h4 className="text-2xl font-black text-zinc-900 dark:text-white">{data.dualPlatformStudents ?? 0}</h4>
+                                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC + CF Active</p>
                                     </div>
-                                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80">
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">LeetCode Only</p>
-                                        <h4 className="text-2xl font-black text-amber-700 dark:text-amber-300">{data.leetcodeOnlyStudents ?? data.totalStudents}</h4>
-                                        <p className="text-[10px] text-zinc-500 mt-0.5">Profiles</p>
+                                        <h4 className="text-2xl font-black text-zinc-900 dark:text-white">{data.leetcodeOnlyStudents ?? data.totalStudents}</h4>
+                                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Profiles</p>
                                     </div>
-                                    <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80">
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1">Codeforces Only</p>
-                                        <h4 className="text-2xl font-black text-blue-700 dark:text-blue-300">{data.codeforcesOnlyStudents ?? 0}</h4>
-                                        <p className="text-[10px] text-zinc-500 mt-0.5">Profiles</p>
+                                        <h4 className="text-2xl font-black text-zinc-900 dark:text-white">{data.codeforcesOnlyStudents ?? 0}</h4>
+                                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Profiles</p>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3 pt-2">
-                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                                        <p className="text-[11px] font-semibold text-zinc-500 mb-1">Avg LC Contest Rating</p>
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/60 dark:border-zinc-800/60">
+                                        <p className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Avg LC Contest Rating</p>
                                         <h4 className="text-xl font-bold text-zinc-900 dark:text-white">
                                             {data.averageLeetcodeRating ? Math.round(data.averageLeetcodeRating) : '—'}
                                         </h4>
                                     </div>
-                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                                        <p className="text-[11px] font-semibold text-zinc-500 mb-1">Avg CF Contest Rating</p>
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/60 dark:border-zinc-800/60">
+                                        <p className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Avg CF Contest Rating</p>
                                         <h4 className="text-xl font-bold text-zinc-900 dark:text-white">
                                             {data.averageCodeforcesRating ? Math.round(data.averageCodeforcesRating) : '—'}
                                         </h4>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-[#5b4fff]/10 border border-[#5b4fff]/20 text-xs">
+                                <div className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
                                     <span className="font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
                                         <FlameIcon className="w-4 h-4 text-amber-500" /> Cohort Streak Average
                                     </span>
-                                    <span className="font-black text-[#5b4fff] dark:text-[#968fff]">
+                                    <span className="font-black text-zinc-900 dark:text-white">
                                         {data.averageStreak ? data.averageStreak.toFixed(1) : '0.0'} days
                                     </span>
                                 </div>
@@ -634,21 +634,21 @@ export function ClassroomAnalytics({
                                 <CardTitle className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-2">
                                     <CheckCircleIcon className="w-4 h-4" /> Cohort Strongholds
                                 </CardTitle>
-                                <CardDescription className="text-xs text-zinc-500">Topics with the highest solve volume and mastery</CardDescription>
+                                <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Topics with the highest solve volume and mastery</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-4">
                                 <div className="flex flex-wrap gap-2">
                                     {data.topStrengths && data.topStrengths.length > 0 ? (
                                         data.topStrengths.map((skill, i) => (
-                                            <div key={i} className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
-                                                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{formatTagName(skill.tagName)}</span>
-                                                <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded-md">
+                                            <div key={i} className="px-3 py-1.5 bg-zinc-50 dark:bg-[#16161f] border border-emerald-500/30 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
+                                                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{formatTagName(skill.tagName)}</span>
+                                                <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-md">
                                                     {skill.problemsSolved}
                                                 </span>
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-xs text-zinc-500 italic">No strength data recorded yet.</p>
+                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 italic">No strength data recorded yet.</p>
                                     )}
                                 </div>
                             </CardContent>
@@ -670,21 +670,21 @@ export function ClassroomAnalytics({
                                         View Interventions <ArrowUpRightIcon className="w-3.5 h-3.5 ml-1" />
                                     </Button>
                                 </div>
-                                <CardDescription className="text-xs text-zinc-500">Core algorithmic topics with low cohort solve counts</CardDescription>
+                                <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Core algorithmic topics with low cohort solve counts</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-4">
                                 <div className="flex flex-wrap gap-2">
                                     {criticalWeaknessTopics.length > 0 ? (
                                         criticalWeaknessTopics.map((skill: any, i) => (
-                                            <div key={i} className="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
-                                                <span className="text-xs font-semibold text-rose-700 dark:text-rose-300">{formatTagName(skill.tagName)}</span>
-                                                <span className="text-[11px] font-black text-rose-600 dark:text-rose-400 bg-rose-500/20 px-1.5 py-0.5 rounded-md">
+                                            <div key={i} className="px-3 py-1.5 bg-zinc-50 dark:bg-[#16161f] border border-rose-500/30 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
+                                                <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">{formatTagName(skill.tagName)}</span>
+                                                <span className="text-[11px] font-black text-rose-600 dark:text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded-md">
                                                     {skill.problemsSolved ?? skill.cohortTotalSolved ?? 0}
                                                 </span>
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-xs text-zinc-500 italic">No critical gaps identified.</p>
+                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 italic">No critical gaps identified.</p>
                                     )}
                                 </div>
                             </CardContent>
@@ -697,23 +697,23 @@ export function ClassroomAnalytics({
             {activeTab === 'weaknesses' && (
                 <div className="space-y-6">
                     {/* Header Banner */}
-                    <div className="bg-linear-to-r from-rose-500/10 via-amber-500/5 to-transparent border border-rose-500/20 p-5 rounded-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className={`${cardClasses} p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4`}>
                         <div className="max-w-3xl">
                             <h3 className="text-base font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <AlertTriangle className="w-5 h-5 text-rose-500" />
                                 High-Yield Algorithmic Weaknesses & Intervention Catalog
                             </h3>
-                            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                                 Our diagnostic engine detects high-priority topics where cohort participation is critically low.
                                 Directly target these blind spots by assigning curated high-yield interview problems with one click.
                             </p>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                            <div className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#16161c] border border-zinc-200/80 dark:border-zinc-800 text-center shadow-xs">
+                            <div className="px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-center shadow-xs">
                                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Gap Topics</p>
                                 <p className="text-lg font-black text-rose-600 dark:text-rose-400">{normalizedWeaknessTopics.length}</p>
                             </div>
-                            <div className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#16161c] border border-zinc-200/80 dark:border-zinc-800 text-center shadow-xs">
+                            <div className="px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-center shadow-xs">
                                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Curated Problems</p>
                                 <p className="text-lg font-black text-[#5b4fff] dark:text-[#968fff]">
                                     {normalizedWeaknessTopics.reduce((acc, t) => acc + (t.suggestedProblems?.length || 0), 0)}
@@ -725,12 +725,12 @@ export function ClassroomAnalytics({
                     {/* Filter and Search Bar for Weaknesses */}
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                         <div className="relative flex-1 max-w-md">
-                            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                             <Input
                                 placeholder="Search weaknesses (e.g. Dynamic Programming, Graph, Greedy)..."
                                 value={searchWeakness}
                                 onChange={(e) => setSearchWeakness(e.target.value)}
-                                className="pl-9 h-9 text-xs rounded-xl bg-white dark:bg-[#121217] border-zinc-200 dark:border-zinc-800"
+                                className="pl-10 h-10 text-[14px] rounded-xl bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#5b4fff]"
                             />
                         </div>
 
@@ -738,39 +738,41 @@ export function ClassroomAnalytics({
                             <span className="text-xs text-zinc-500 font-medium mr-1 flex items-center gap-1">
                                 <FunnelIcon className="w-3.5 h-3.5" /> Filter:
                             </span>
-                            <button
-                                type="button"
-                                onClick={() => setWeaknessFilter('ALL')}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                                    weaknessFilter === 'ALL'
-                                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
-                                        : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                }`}
-                            >
-                                All ({normalizedWeaknessTopics.length})
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setWeaknessFilter('CRITICAL')}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                                    weaknessFilter === 'CRITICAL'
-                                        ? 'bg-rose-600 text-white shadow-xs'
-                                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20'
-                                }`}
-                            >
-                                Critical Only
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setWeaknessFilter('WITH_PROBLEMS')}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                                    weaknessFilter === 'WITH_PROBLEMS'
-                                        ? 'bg-[#5b4fff] text-white shadow-xs'
-                                        : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20'
-                                }`}
-                            >
-                                Ready to Assign
-                            </button>
+                            <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setWeaknessFilter('ALL')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                                        weaknessFilter === 'ALL'
+                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    All ({normalizedWeaknessTopics.length})
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setWeaknessFilter('CRITICAL')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                                        weaknessFilter === 'CRITICAL'
+                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    Critical Only
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setWeaknessFilter('WITH_PROBLEMS')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                                        weaknessFilter === 'WITH_PROBLEMS'
+                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    Ready to Assign
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -797,12 +799,12 @@ export function ClassroomAnalytics({
                                 const avgSolved = topic.averageSolvedPerStudent ?? topic.averageSolved ?? (totalSolved / Math.max(data.totalStudents || 1, 1));
                                 const formattedTitle = formatTagName(topic.tagName);
                                 return (
-                                <Card key={topic.tagName} className={`${cardClasses} border border-zinc-200/90 dark:border-zinc-800/80 hover:border-rose-500/40 transition-all flex flex-col justify-between overflow-hidden shadow-xs`}>
+                                <Card key={topic.tagName} className={`${cardClasses} hover:border-rose-500/40 transition-all flex flex-col justify-between overflow-hidden shadow-xs`}>
                                     <div>
-                                        <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60 bg-rose-500/5">
+                                        <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60 bg-transparent">
                                             <div className="flex items-start justify-between gap-3">
                                                 <div className="flex items-center gap-3 min-w-0">
-                                                    <div className="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-bold shrink-0">
+                                                    <div className="p-2 rounded-xl bg-zinc-100 dark:bg-[#1a1b2e] text-rose-600 dark:text-rose-400 border border-zinc-200 dark:border-zinc-800 font-bold shrink-0">
                                                         <TargetIcon className="w-5 h-5" />
                                                     </div>
                                                     <div className="min-w-0">
@@ -828,7 +830,7 @@ export function ClassroomAnalytics({
 
                                         <CardContent className="pt-4 space-y-4">
                                             {/* Diagnostic Recommendation */}
-                                            <div className="p-3 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2.5">
+                                            <div className="p-3 bg-zinc-50 dark:bg-[#16161f] rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2.5">
                                                 <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <div className="min-w-0">
                                                     <span className="font-bold text-zinc-900 dark:text-white mr-1.5">Diagnostic Recommendation:</span>
@@ -849,7 +851,7 @@ export function ClassroomAnalytics({
                                                             return (
                                                             <div
                                                                 key={probKey}
-                                                                className="p-3 rounded-xl bg-white dark:bg-[#16161c] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/50 transition-all flex flex-col justify-between group shadow-2xs"
+                                                                className="p-3 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/50 transition-all flex flex-col justify-between group shadow-2xs"
                                                             >
                                                                 <div className="flex items-start justify-between gap-2 mb-2">
                                                                     <div className="min-w-0">
@@ -892,7 +894,7 @@ export function ClassroomAnalytics({
                                                                 <Button
                                                                     size="sm"
                                                                     onClick={() => handleOpenAssignModal(prob)}
-                                                                    className="w-full mt-2 h-7 text-xs bg-zinc-900 dark:bg-zinc-800 hover:bg-[#5b4fff] dark:hover:bg-[#5b4fff] text-white rounded-lg font-medium transition-colors cursor-pointer"
+                                                                    className="w-full mt-2 h-8 text-xs bg-zinc-900 dark:bg-[#222] hover:bg-[#5b4fff] dark:hover:bg-[#5b4fff] text-white rounded-lg font-semibold border border-zinc-700/60 dark:border-zinc-700/60 transition-colors cursor-pointer"
                                                                 >
                                                                     <LightningIcon className="w-3.5 h-3.5 mr-1" />
                                                                     Assign to Cohort
@@ -919,12 +921,12 @@ export function ClassroomAnalytics({
                     {/* Filter and Search Bar */}
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                         <div className="relative flex-1 max-w-md">
-                            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                             <Input
                                 placeholder="Search topic (e.g., Tree, Dynamic Programming, Graph)..."
                                 value={searchTopic}
                                 onChange={(e) => setSearchTopic(e.target.value)}
-                                className="pl-9 h-9 text-xs rounded-xl bg-white dark:bg-[#121217] border-zinc-200 dark:border-zinc-800"
+                                className="pl-10 h-10 text-[14px] rounded-xl bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#5b4fff]"
                             />
                         </div>
 
@@ -932,46 +934,48 @@ export function ClassroomAnalytics({
                             <span className="text-xs text-zinc-500 font-medium mr-1 flex items-center gap-1">
                                 <FunnelIcon className="w-3.5 h-3.5" /> Filter:
                             </span>
-                            <button
-                                onClick={() => setSelectedMasteryFilter('ALL')}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                                    selectedMasteryFilter === 'ALL'
-                                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900'
-                                        : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                }`}
-                            >
-                                All ({data.topicProficiencies?.length || 0})
-                            </button>
-                            <button
-                                onClick={() => setSelectedMasteryFilter('CRITICAL_WEAKNESS')}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                                    selectedMasteryFilter === 'CRITICAL_WEAKNESS'
-                                        ? 'bg-rose-600 text-white'
-                                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20'
-                                }`}
-                            >
-                                Weakness
-                            </button>
-                            <button
-                                onClick={() => setSelectedMasteryFilter('DEVELOPING')}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                                    selectedMasteryFilter === 'DEVELOPING'
-                                        ? 'bg-amber-600 text-white'
-                                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20'
-                                }`}
-                            >
-                                Developing
-                            </button>
-                            <button
-                                onClick={() => setSelectedMasteryFilter('STRONG')}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                                    selectedMasteryFilter === 'STRONG'
-                                        ? 'bg-emerald-600 text-white'
-                                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20'
-                                }`}
-                            >
-                                Strong
-                            </button>
+                            <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
+                                <button
+                                    onClick={() => setSelectedMasteryFilter('ALL')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                                        selectedMasteryFilter === 'ALL'
+                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    All ({data.topicProficiencies?.length || 0})
+                                </button>
+                                <button
+                                    onClick={() => setSelectedMasteryFilter('CRITICAL_WEAKNESS')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                                        selectedMasteryFilter === 'CRITICAL_WEAKNESS'
+                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    Weakness
+                                </button>
+                                <button
+                                    onClick={() => setSelectedMasteryFilter('DEVELOPING')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                                        selectedMasteryFilter === 'DEVELOPING'
+                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    Developing
+                                </button>
+                                <button
+                                    onClick={() => setSelectedMasteryFilter('STRONG')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
+                                        selectedMasteryFilter === 'STRONG'
+                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    Strong
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -999,13 +1003,13 @@ export function ClassroomAnalytics({
                                             {topic.masteryLevel === 'STRONG' ? 'STRONG' : topic.masteryLevel === 'DEVELOPING' ? 'DEVELOPING' : 'WEAKNESS'}
                                         </Badge>
                                     </div>
-                                    <CardDescription className="text-xs text-zinc-500">
+                                    <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">
                                         {totalSolved} solved total ({avgSolved.toFixed(1)} avg/student)
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-4 space-y-3 flex-1 flex flex-col justify-between">
                                     <div className="space-y-1.5">
-                                        <div className="flex justify-between text-[11px] font-semibold text-zinc-500">
+                                        <div className="flex justify-between text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
                                             <span>Proficiency Index</span>
                                             <span>{profIndex}%</span>
                                         </div>
@@ -1027,14 +1031,14 @@ export function ClassroomAnalytics({
                                             <div className="pt-2 border-t border-zinc-200/50 dark:border-zinc-800/50 space-y-1.5">
                                                 <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Target Problem:</p>
                                                 <div className="flex items-center justify-between text-xs">
-                                                    <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate max-w-[160px]" title={targetProblem.title}>
+                                                    <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate max-w-40" title={targetProblem.title}>
                                                         {targetProblem.title}
                                                     </span>
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"
                                                         onClick={() => handleOpenAssignModal(targetProblem)}
-                                                        className="h-6 px-2 text-[11px] text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/10"
+                                                        className="h-6 px-2 text-[11px] text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/10 rounded-lg font-semibold"
                                                     >
                                                         Assign <LightningIcon className="w-3 h-3 ml-0.5" />
                                                     </Button>
@@ -1058,13 +1062,13 @@ export function ClassroomAnalytics({
             {/* TAB 4: AT-RISK WATCHLIST */}
             {activeTab === 'watchlist' && (
                 <div className="space-y-6">
-                    <div className="bg-linear-to-r from-amber-500/10 via-rose-500/5 to-transparent border border-amber-500/20 p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className={`${cardClasses} p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
                         <div>
                             <h3 className="text-base font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <ShieldWarningIcon className="w-5 h-5 text-amber-500" />
                                 Early Warning & Inactivity Watchlist
                             </h3>
-                            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed">
                                 Students are flagged as at-risk if they have had zero submissions in the last 7+ days or are lagging by over 50% below the cohort average.
                                 Timely intervention helps prevent churn and interview unpreparedness.
                             </p>
@@ -1129,17 +1133,17 @@ export function ClassroomAnalytics({
 
                                     <CardContent className="pt-3 space-y-3">
                                         {/* Risk Reason Banner */}
-                                        <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-700 dark:text-zinc-300">
+                                        <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-700 dark:text-zinc-300">
                                             <p className="font-semibold text-zinc-900 dark:text-white mb-0.5">Alert Trigger:</p>
                                             <p className="leading-snug text-zinc-600 dark:text-zinc-400">{reason}</p>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-2 text-xs">
-                                            <div className="p-2 rounded-lg bg-zinc-100/60 dark:bg-zinc-900/40">
+                                            <div className="p-2 rounded-lg bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/50 dark:border-zinc-800/50">
                                                 <p className="text-[10px] text-zinc-500 font-semibold">Total Solved</p>
                                                 <p className="text-sm font-extrabold text-zinc-900 dark:text-white">{student.totalSolved ?? 0}</p>
                                             </div>
-                                            <div className="p-2 rounded-lg bg-zinc-100/60 dark:bg-zinc-900/40">
+                                            <div className="p-2 rounded-lg bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/50 dark:border-zinc-800/50">
                                                 <p className="text-[10px] text-zinc-500 font-semibold">Activity Status</p>
                                                 <p className={`text-sm font-extrabold ${student.activeThisWeek ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                                     {student.daysInactive !== undefined ? `${student.daysInactive}d Inactive` : student.activeThisWeek ? 'Active this wk' : 'Inactive'}
@@ -1159,7 +1163,7 @@ export function ClassroomAnalytics({
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={() => onStudentClick(student.name || student.email || student.leetcodeUsername || '')}
-                                                className="w-full mt-2 h-8 text-xs rounded-xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                                className="w-full mt-2 h-8 text-xs rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 font-semibold cursor-pointer"
                                             >
                                                 <UserCircleIcon className="w-3.5 h-3.5 mr-1.5" />
                                                 Open Student Profile

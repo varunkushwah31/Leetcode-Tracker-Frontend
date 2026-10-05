@@ -252,8 +252,8 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
         const q = mentorSearch.toLowerCase().trim();
         if (!q) return overviewData.allMentors;
         return overviewData.allMentors.filter(m =>
-            (m.name && m.name.toLowerCase().includes(q)) ||
-            (m.email && m.email.toLowerCase().includes(q))
+            (m.name?.toLowerCase().includes(q)) ||
+            (m.email?.toLowerCase().includes(q))
         );
     }, [overviewData?.allMentors, mentorSearch]);
 
@@ -262,8 +262,8 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
         const q = classroomSearch.toLowerCase().trim();
         if (!q) return overviewData.allClassrooms;
         return overviewData.allClassrooms.filter(c =>
-            (c.className && c.className.toLowerCase().includes(q)) ||
-            (c.mentorName && c.mentorName.toLowerCase().includes(q))
+            (c.className?.toLowerCase().includes(q)) ||
+            (c.mentorName?.toLowerCase().includes(q))
         );
     }, [overviewData?.allClassrooms, classroomSearch]);
 
@@ -271,10 +271,10 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
         const q = studentSearch.toLowerCase().trim();
         if (!q) return students || [];
         return (students || []).filter(s =>
-            (s.name && s.name.toLowerCase().includes(q)) ||
-            (s.email && s.email.toLowerCase().includes(q)) ||
-            (s.leetcodeUsername && s.leetcodeUsername.toLowerCase().includes(q)) ||
-            (s.codeforcesHandle && s.codeforcesHandle.toLowerCase().includes(q))
+            (s.name?.toLowerCase().includes(q)) ||
+            (s.email?.toLowerCase().includes(q)) ||
+            (s.leetcodeUsername?.toLowerCase().includes(q)) ||
+            (s.codeforcesHandle?.toLowerCase().includes(q))
         );
     }, [students, studentSearch]);
 
@@ -302,7 +302,9 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
         );
     }
 
-    const dialogCardClasses = "bg-white dark:bg-[#111116] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl rounded-2xl";
+    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
+    const tableHeaderClasses = "bg-zinc-50/80 dark:bg-[#1a1b2e]/50 border-b border-zinc-200/80 dark:border-zinc-800/60 text-[11px] font-bold text-zinc-500 uppercase tracking-wider px-4 py-3";
+    const dialogCardClasses = "bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl rounded-2xl";
 
     return (
         <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300 space-y-8">
@@ -341,7 +343,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     <Button
                         variant="outline"
                         onClick={() => fetchAllData()}
-                        className="border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-xs font-semibold h-10 px-3.5 rounded-xl text-zinc-700 dark:text-zinc-300"
+                        className="border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-3.5 rounded-xl cursor-pointer"
                     >
                         <RefreshCw className="w-4 h-4 mr-1.5 text-zinc-500" />
                         Refresh
@@ -350,7 +352,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     <Button
                         variant="outline"
                         onClick={() => setClearAllCacheOpen(true)}
-                        className="border-amber-200/80 dark:border-amber-500/25 bg-amber-50/50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-semibold h-10 px-3.5 rounded-xl transition-colors"
+                        className="border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-3.5 rounded-xl transition-colors cursor-pointer"
                     >
                         <DatabaseIcon className="w-4 h-4 mr-1.5 text-amber-600 dark:text-amber-400" />
                         Flush Caches
@@ -359,7 +361,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     <Button
                         onClick={handleForceSync}
                         disabled={isSyncingAll}
-                        className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md shadow-[#5b4fff]/20 transition-all cursor-pointer"
+                        className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-sm transition-all cursor-pointer"
                     >
                         {isSyncingAll ? (
                             <>
@@ -381,7 +383,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
 
             {/* Key Metric Overview Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-white/90 dark:bg-[#111116]/90 border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl relative overflow-hidden backdrop-blur-md">
+                <Card className={cardClasses}>
                     <CardContent className="p-5 flex items-center justify-between">
                         <div>
                             <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
@@ -394,13 +396,13 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{overviewData.dualPlatformStudents || 0}</span> dual-platform
                             </div>
                         </div>
-                        <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20">
+                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20">
                             <UsersIcon className="w-6 h-6" />
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-white/90 dark:bg-[#111116]/90 border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl relative overflow-hidden backdrop-blur-md">
+                <Card className={cardClasses}>
                     <CardContent className="p-5 flex items-center justify-between">
                         <div>
                             <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
@@ -413,13 +415,13 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 Across all active faculties
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
                             <UserCheckIcon className="w-6 h-6" />
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-white/90 dark:bg-[#111116]/90 border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl relative overflow-hidden backdrop-blur-md">
+                <Card className={cardClasses}>
                     <CardContent className="p-5 flex items-center justify-between">
                         <div>
                             <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
@@ -432,13 +434,13 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">{overviewData.totalAssignments || 0}</span> total assignments
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20">
+                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20">
                             <BookOpenIcon className="w-6 h-6" />
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-white/90 dark:bg-[#111116]/90 border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl relative overflow-hidden backdrop-blur-md">
+                <Card className={cardClasses}>
                     <CardContent className="p-5 flex items-center justify-between">
                         <div>
                             <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
@@ -452,7 +454,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 Mem: <span className="font-semibold text-zinc-800 dark:text-zinc-200">{cacheStats?.usedMemoryHuman || 'Active'}</span>
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/20">
+                        <div className="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/20">
                             <HardDrivesIcon className="w-6 h-6" />
                         </div>
                     </CardContent>
@@ -461,39 +463,39 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
 
             {/* Navigation Tabs */}
             <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as typeof activeTab)} className="w-full">
-                <TabsList className="bg-zinc-100 dark:bg-[#14141b] p-1 rounded-2xl border border-zinc-200 dark:border-zinc-800 max-w-full overflow-x-auto flex flex-nowrap">
+                <TabsList className="h-auto flex items-center gap-1.5 p-1.5 bg-white dark:bg-[#121217] rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs max-w-full overflow-x-auto justify-start">
                     <TabsTrigger
                         value="overview"
                         onClick={() => setActiveTab('overview')}
-                        className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#1e1e28] data-[state=active]:text-[#5b4fff] dark:data-[state=active]:text-[#968fff] data-[state=active]:shadow-xs transition-all cursor-pointer"
+                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
                     >
                         Telemetry & Platform
                     </TabsTrigger>
                     <TabsTrigger
                         value="mentors"
                         onClick={() => setActiveTab('mentors')}
-                        className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#1e1e28] data-[state=active]:text-[#5b4fff] dark:data-[state=active]:text-[#968fff] data-[state=active]:shadow-xs transition-all cursor-pointer"
+                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
                     >
                         Mentors & Faculty ({overviewData.allMentors?.length || 0})
                     </TabsTrigger>
                     <TabsTrigger
                         value="classrooms"
                         onClick={() => setActiveTab('classrooms')}
-                        className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#1e1e28] data-[state=active]:text-[#5b4fff] dark:data-[state=active]:text-[#968fff] data-[state=active]:shadow-xs transition-all cursor-pointer"
+                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
                     >
                         Classrooms ({overviewData.allClassrooms?.length || 0})
                     </TabsTrigger>
                     <TabsTrigger
                         value="students"
                         onClick={() => setActiveTab('students')}
-                        className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#1e1e28] data-[state=active]:text-[#5b4fff] dark:data-[state=active]:text-[#968fff] data-[state=active]:shadow-xs transition-all cursor-pointer"
+                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
                     >
                         Students Directory ({students.length})
                     </TabsTrigger>
                     <TabsTrigger
                         value="cache"
                         onClick={() => setActiveTab('cache')}
-                        className="rounded-xl text-xs font-semibold px-4 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#1e1e28] data-[state=active]:text-[#5b4fff] dark:data-[state=active]:text-[#968fff] data-[state=active]:shadow-xs transition-all cursor-pointer"
+                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
                     >
                         Redis Diagnostics
                     </TabsTrigger>
@@ -503,8 +505,8 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                 <TabsContent value="overview" className="mt-6 space-y-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Platform Distribution Card */}
-                        <Card className="bg-white dark:bg-[#111116] border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm">
-                            <CardHeader>
+                        <Card className={cardClasses}>
+                            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-3">
                                 <CardTitle className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                     <CodeIcon className="w-5 h-5 text-[#5b4fff]" /> Platform Adoption Breakdown
                                 </CardTitle>
@@ -512,7 +514,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                     Multi-platform distribution across student base
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4">
+                            <CardContent className="space-y-4 pt-4">
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-xs font-semibold">
                                         <span className="text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
@@ -522,7 +524,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                             {overviewData.dualPlatformStudents || 0} students
                                         </span>
                                     </div>
-                                    <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-2.5 overflow-hidden">
+                                    <div className="w-full bg-zinc-100 dark:bg-[#16161f] rounded-full h-2.5 overflow-hidden">
                                         <div
                                             className="bg-indigo-500 h-2.5 rounded-full"
                                             style={{
@@ -541,7 +543,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                             {overviewData.leetcodeOnlyStudents || 0} students
                                         </span>
                                     </div>
-                                    <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-2.5 overflow-hidden">
+                                    <div className="w-full bg-zinc-100 dark:bg-[#16161f] rounded-full h-2.5 overflow-hidden">
                                         <div
                                             className="bg-amber-500 h-2.5 rounded-full"
                                             style={{
@@ -560,7 +562,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                             {overviewData.codeforcesOnlyStudents || 0} students
                                         </span>
                                     </div>
-                                    <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-2.5 overflow-hidden">
+                                    <div className="w-full bg-zinc-100 dark:bg-[#16161f] rounded-full h-2.5 overflow-hidden">
                                         <div
                                             className="bg-blue-500 h-2.5 rounded-full"
                                             style={{
@@ -573,8 +575,8 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                         </Card>
 
                         {/* System Health Summary */}
-                        <Card className="bg-white dark:bg-[#111116] border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm">
-                            <CardHeader>
+                        <Card className={cardClasses}>
+                            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-3">
                                 <CardTitle className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                     <CpuIcon className="w-5 h-5 text-emerald-500" /> Cluster & Cache Telemetry
                                 </CardTitle>
@@ -582,27 +584,27 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                     Real-time runtime state and active memory allocation
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-3">
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-[#181820] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
+                            <CardContent className="space-y-3 pt-4">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
                                     <span className="text-zinc-600 dark:text-zinc-400">Redis Connection</span>
                                     <Badge className={`${cacheStats?.redisStatus === 'CONNECTED' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'}`}>
                                         {cacheStats?.redisStatus || 'N/A'}
                                     </Badge>
                                 </div>
 
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-[#181820] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
                                     <span className="text-zinc-600 dark:text-zinc-400">Redis Server Version</span>
                                     <span className="font-semibold text-zinc-900 dark:text-white">{cacheStats?.redisVersion || '7.x'}</span>
                                 </div>
 
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-[#181820] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
                                     <span className="text-zinc-600 dark:text-zinc-400">Memory Utilization</span>
                                     <span className="font-semibold text-zinc-900 dark:text-white">
                                         {cacheStats?.usedMemoryHuman || 'N/A'} (Peak: {cacheStats?.usedMemoryPeakHuman || 'N/A'})
                                     </span>
                                 </div>
 
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-[#181820] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
                                     <span className="text-zinc-600 dark:text-zinc-400">Configured Cache Regions</span>
                                     <span className="font-semibold text-[#5b4fff] dark:text-[#968fff]">
                                         {cacheStats?.configuredCaches?.length || 0} caches active
@@ -622,26 +624,27 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 placeholder="Search mentors by name or email..."
                                 value={mentorSearch}
                                 onChange={(e) => setMentorSearch(e.target.value)}
-                                className="pl-9 bg-white dark:bg-[#14141b] border-zinc-200 dark:border-zinc-800 rounded-xl text-xs h-10"
+                                className="pl-9 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent rounded-xl text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 h-10 focus:outline-none focus:ring-1 focus:ring-[#5b4fff]"
                             />
                         </div>
                         <Button
                             onClick={() => setAddMentorOpen(true)}
-                            className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-sm"
+                            className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-sm cursor-pointer"
                         >
                             <UserPlusIcon className="w-4 h-4 mr-1.5" weight="bold" />
                             Add New Mentor
                         </Button>
                     </div>
 
-                    <Card className="bg-white dark:bg-[#111116] border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
-                        <ScrollArea className="h-[460px]">
-                            <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    <Card className={`${cardClasses} overflow-hidden`}>
+                        <div className={tableHeaderClasses}>Faculty Members & Privileges</div>
+                        <ScrollArea className="h-115">
+                            <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
                                 {filteredMentors.map((mentor) => (
-                                    <div key={mentor.id} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-[#181820] transition-colors group">
+                                    <div key={mentor.id} className="p-4 flex items-center justify-between hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
                                         <div className="flex items-center gap-3.5">
-                                            <Avatar className="h-10 w-10 border border-zinc-200 dark:border-zinc-700">
-                                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold text-xs">
+                                            <Avatar className="h-10 w-10 border border-zinc-200/80 dark:border-zinc-800/80">
+                                                <AvatarFallback className="bg-zinc-100 dark:bg-[#16161f] text-zinc-700 dark:text-zinc-200 font-bold text-xs">
                                                     {(mentor.name || mentor.email || 'Mentor').substring(0, 2).toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
@@ -653,7 +656,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                             SUPER ADMIN
                                                         </Badge>
                                                     ) : (
-                                                        <Badge variant="outline" className="text-zinc-500 border-zinc-300 dark:border-zinc-700 text-[10px] py-0">
+                                                        <Badge variant="outline" className="bg-zinc-100 dark:bg-[#16161f] text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800/80 text-[10px] py-0">
                                                             MENTOR
                                                         </Badge>
                                                     )}
@@ -663,14 +666,14 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                         </div>
 
                                         <div className="flex items-center gap-3">
-                                            <Badge variant="outline" className="bg-zinc-50 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 text-xs">
+                                            <Badge variant="outline" className="bg-zinc-100 dark:bg-[#16161f] text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800/80 text-xs rounded-lg">
                                                 {mentor.classroomIds?.length || 0} Classrooms
                                             </Badge>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => setDeletingMentor(mentor)}
-                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl"
+                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl cursor-pointer"
                                                 title="Delete Mentor"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -697,15 +700,16 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                             placeholder="Search classrooms by title or mentor..."
                             value={classroomSearch}
                             onChange={(e) => setClassroomSearch(e.target.value)}
-                            className="pl-9 bg-white dark:bg-[#14141b] border-zinc-200 dark:border-zinc-800 rounded-xl text-xs h-10"
+                            className="pl-9 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent rounded-xl text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 h-10 focus:outline-none focus:ring-1 focus:ring-[#5b4fff]"
                         />
                     </div>
 
-                    <Card className="bg-white dark:bg-[#111116] border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
-                        <ScrollArea className="h-[460px]">
-                            <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    <Card className={`${cardClasses} overflow-hidden`}>
+                        <div className={tableHeaderClasses}>Active Cohorts & Enrolled Students</div>
+                        <ScrollArea className="h-115">
+                            <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
                                 {filteredClassrooms.map((cls) => (
-                                    <div key={cls.classroomId} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-[#181820] transition-colors group">
+                                    <div key={cls.classroomId} className="p-4 flex items-center justify-between hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
                                         <div>
                                             <p className="font-bold text-sm text-zinc-900 dark:text-white">{cls.className || 'Unnamed Class'}</p>
                                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
@@ -714,17 +718,17 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                         </div>
 
                                         <div className="flex items-center gap-3">
-                                            <Badge variant="outline" className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20 text-xs">
+                                            <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 text-xs rounded-lg">
                                                 {cls.enrolledStudents?.length || 0} Students
                                             </Badge>
-                                            <Badge variant="outline" className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 text-xs">
+                                            <Badge variant="outline" className="bg-zinc-100 dark:bg-[#16161f] text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800/80 text-xs rounded-lg">
                                                 {cls.assignments?.length || 0} Assignments
                                             </Badge>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => setDeletingClassroom(cls)}
-                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl"
+                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl cursor-pointer"
                                                 title="Force Delete Classroom"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -751,13 +755,14 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                             placeholder="Search students by name, email, LeetCode or Codeforces..."
                             value={studentSearch}
                             onChange={(e) => setStudentSearch(e.target.value)}
-                            className="pl-9 bg-white dark:bg-[#14141b] border-zinc-200 dark:border-zinc-800 rounded-xl text-xs h-10"
+                            className="pl-9 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent rounded-xl text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 h-10 focus:outline-none focus:ring-1 focus:ring-[#5b4fff]"
                         />
                     </div>
 
-                    <Card className="bg-white dark:bg-[#111116] border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
-                        <ScrollArea className="h-[460px]">
-                            <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    <Card className={`${cardClasses} overflow-hidden`}>
+                        <div className={tableHeaderClasses}>Enrolled Student Accounts & Handles</div>
+                        <ScrollArea className="h-115">
+                            <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
                                 {filteredStudents.map((student, idx) => {
                                     const studentFallback = (student.name || student.email || student.leetcodeUsername || student.codeforcesHandle || 'Student')
                                         .substring(0, 2)
@@ -765,11 +770,11 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                     const studentDisplayName = student.name || student.email || student.leetcodeUsername || student.codeforcesHandle || 'Unnamed Student';
 
                                     return (
-                                        <div key={student.id || student.leetcodeUsername || student.email || `st-${idx}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-[#181820] transition-colors group">
+                                        <div key={student.id || student.leetcodeUsername || student.email || `st-${idx}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
                                             <div className="flex items-center gap-3.5">
-                                                <Avatar className="h-10 w-10 border border-zinc-200 dark:border-zinc-700">
+                                                <Avatar className="h-10 w-10 border border-zinc-200/80 dark:border-zinc-800/80">
                                                     <AvatarImage src={student.avatarUrl} />
-                                                    <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold text-xs">
+                                                    <AvatarFallback className="bg-zinc-100 dark:bg-[#16161f] text-zinc-700 dark:text-zinc-200 font-bold text-xs">
                                                         {studentFallback}
                                                     </AvatarFallback>
                                                 </Avatar>
@@ -780,12 +785,12 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                     </div>
                                                 <div className="flex flex-wrap items-center gap-2 mt-1">
                                                     {student.leetcodeUsername && (
-                                                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                                                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                                                             LC: @{student.leetcodeUsername} ({student.leetcodeSolvedCount || 0} solved)
                                                         </span>
                                                     )}
                                                     {student.codeforcesHandle && (
-                                                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
+                                                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
                                                             CF: @{student.codeforcesHandle} ({student.codeforcesRating || 'Unrated'})
                                                         </span>
                                                     )}
@@ -803,7 +808,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                 size="sm"
                                                 onClick={() => handleSyncStudent(student)}
                                                 disabled={syncingStudentId === student.id}
-                                                className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-8 px-3"
+                                                className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-8 px-3 cursor-pointer"
                                                 title="Sync student LeetCode & Codeforces data"
                                             >
                                                 {syncingStudentId === student.id ? (
@@ -818,7 +823,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => setDeletingStudent(student)}
-                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl h-8 w-8"
+                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl h-8 w-8 cursor-pointer"
                                                 title="Delete Student"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -840,7 +845,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
 
                 {/* TAB 5: REDIS DIAGNOSTICS & CACHE */}
                 <TabsContent value="cache" className="mt-6 space-y-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white dark:bg-[#111116] border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 ${cardClasses}`}>
                         <div>
                             <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <DatabaseIcon className="w-5 h-5 text-indigo-500" /> Redis Cache Management
@@ -859,14 +864,10 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     </div>
 
                     {/* Cache Namespaces Table */}
-                    <Card className="bg-white dark:bg-[#111116] border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-bold text-zinc-900 dark:text-white">
-                                Cache Namespaces & Key Volume
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    <Card className={`${cardClasses} overflow-hidden`}>
+                        <div className={tableHeaderClasses}>Cache Namespaces & Key Volume</div>
+                        <ScrollArea className="h-115">
+                            <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
                                 {(cacheStats?.configuredCaches || [
                                     'classroom-dashboard',
                                     'classroom-analytics',
@@ -880,14 +881,14 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                     const count = cacheStats?.namespaceKeyCounts?.[`${cName}*`] ??
                                         cacheStats?.namespaceKeyCounts?.[cName] ?? 0;
                                     return (
-                                        <div key={cName} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-[#181820] transition-colors">
+                                        <div key={cName} className="p-4 flex items-center justify-between hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors">
                                             <div>
                                                 <p className="font-mono text-xs font-semibold text-zinc-900 dark:text-white">{cName}</p>
                                                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Spring Cache Region</p>
                                             </div>
 
                                             <div className="flex items-center gap-3">
-                                                <Badge variant="outline" className="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 text-xs">
+                                                <Badge variant="outline" className="bg-zinc-100 dark:bg-[#16161f] text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800/80 text-xs rounded-lg">
                                                     {count >= 0 ? `${count} estimated keys` : 'Active'}
                                                 </Badge>
                                                 <Button
@@ -895,7 +896,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                     size="sm"
                                                     disabled={clearingCache === cName}
                                                     onClick={() => handleClearCache(cName)}
-                                                    className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-8 px-3 hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:text-amber-700 dark:hover:text-amber-400"
+                                                    className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-8 px-3 cursor-pointer"
                                                 >
                                                     {clearingCache === cName ? (
                                                         <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />
@@ -909,7 +910,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                     );
                                 })}
                             </div>
-                        </CardContent>
+                        </ScrollArea>
                     </Card>
                 </TabsContent>
             </Tabs>
@@ -940,7 +941,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 onChange={(e) => setNewMentorName(e.target.value)}
                                 placeholder="Dr. Alan Turing"
                                 required
-                                className="bg-zinc-50 dark:bg-[#181820] border-zinc-200 dark:border-zinc-800 rounded-xl text-sm"
+                                className="bg-zinc-50 dark:bg-[#16161f] border-zinc-200 dark:border-zinc-800 rounded-xl text-sm"
                             />
                         </div>
 
@@ -955,7 +956,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 onChange={(e) => setNewMentorEmail(e.target.value)}
                                 placeholder="turing@university.edu"
                                 required
-                                className="bg-zinc-50 dark:bg-[#181820] border-zinc-200 dark:border-zinc-800 rounded-xl text-sm"
+                                className="bg-zinc-50 dark:bg-[#16161f] border-zinc-200 dark:border-zinc-800 rounded-xl text-sm"
                             />
                         </div>
 
@@ -970,7 +971,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 onChange={(e) => setNewMentorPassword(e.target.value)}
                                 placeholder="Min 6 characters"
                                 required
-                                className="bg-zinc-50 dark:bg-[#181820] border-zinc-200 dark:border-zinc-800 rounded-xl text-sm"
+                                className="bg-zinc-50 dark:bg-[#16161f] border-zinc-200 dark:border-zinc-800 rounded-xl text-sm"
                             />
                         </div>
 
@@ -979,14 +980,14 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 type="button"
                                 variant="outline"
                                 onClick={() => setAddMentorOpen(false)}
-                                className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-10 px-4"
+                                className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-4 cursor-pointer"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={isCreatingMentor}
-                                className="rounded-xl bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-5"
+                                className="rounded-xl bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-5 cursor-pointer"
                             >
                                 {isCreatingMentor ? (
                                     <>
@@ -1023,10 +1024,10 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     </div>
 
                     <DialogFooter className="gap-2">
-                        <Button variant="outline" className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-10 px-4" onClick={() => setDeletingMentor(null)}>
+                        <Button variant="outline" className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-4 cursor-pointer" onClick={() => setDeletingMentor(null)}>
                             Cancel
                         </Button>
-                        <Button onClick={handleDeleteMentor} className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-10 px-5">
+                        <Button onClick={handleDeleteMentor} className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-10 px-5 cursor-pointer">
                             Delete Mentor & Classes
                         </Button>
                     </DialogFooter>
@@ -1054,10 +1055,10 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     </div>
 
                     <DialogFooter className="gap-2">
-                        <Button variant="outline" className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-10 px-4" onClick={() => setDeletingClassroom(null)}>
+                        <Button variant="outline" className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-4 cursor-pointer" onClick={() => setDeletingClassroom(null)}>
                             Cancel
                         </Button>
-                        <Button onClick={handleDeleteClassroom} className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-10 px-5">
+                        <Button onClick={handleDeleteClassroom} className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-10 px-5 cursor-pointer">
                             Delete Classroom
                         </Button>
                     </DialogFooter>
@@ -1085,10 +1086,10 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     </div>
 
                     <DialogFooter className="gap-2">
-                        <Button variant="outline" className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-10 px-4" onClick={() => setDeletingStudent(null)}>
+                        <Button variant="outline" className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-4 cursor-pointer" onClick={() => setDeletingStudent(null)}>
                             Cancel
                         </Button>
-                        <Button onClick={handleDeleteStudent} className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-10 px-5">
+                        <Button onClick={handleDeleteStudent} className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold h-10 px-5 cursor-pointer">
                             Delete Student
                         </Button>
                     </DialogFooter>
@@ -1111,10 +1112,10 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     </div>
 
                     <DialogFooter className="gap-2">
-                        <Button variant="outline" className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-10 px-4" onClick={() => setClearAllCacheOpen(false)}>
+                        <Button variant="outline" className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-4 cursor-pointer" onClick={() => setClearAllCacheOpen(false)}>
                             Cancel
                         </Button>
-                        <Button onClick={() => handleClearCache()} className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold h-10 px-5">
+                        <Button onClick={() => handleClearCache()} className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold h-10 px-5 cursor-pointer">
                             Confirm Purge
                         </Button>
                     </DialogFooter>
