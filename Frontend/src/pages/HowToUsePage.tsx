@@ -81,7 +81,7 @@ https://codeforces.com/profile/petr`;
         <div className="min-h-screen bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
 
             {/* Background Base matching Landing Page */}
-            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] bg-[radial-gradient(rgba(100,116,139,0.12)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed transition-colors duration-200 pointer-events-none">
+            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed transition-colors duration-200 pointer-events-none">
                 <div className="hidden dark:block">
                     <AmbientGlow />
                 </div>

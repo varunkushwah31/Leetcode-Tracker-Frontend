@@ -99,7 +99,7 @@ export function ContactPage() {
 
             {/* Right Panel - Form */}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#f8fafc] dark:bg-[#0a0a0a] overflow-hidden transition-colors duration-200">
-                <div className="absolute inset-0 bg-[radial-gradient(rgba(100,116,139,0.12)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none"></div>
                 <div className="hidden dark:block">
                     <AmbientGlow variant="center" />
                 </div>
