@@ -726,7 +726,7 @@ https://codeforces.com/profile/petr`;
                 </div>
 
                 <div className="absolute bottom-5 sm:bottom-7.5 left-1/2 -translate-x-1/2 w-[200%] sm:w-[120%] text-center whitespace-nowrap pointer-events-none">
-                    <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-zinc-900 dark:text-white opacity-[0.015] dark:opacity-[0.02] select-none uppercase leading-none">
+                    <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-zinc-900 dark:text-white opacity-[0.06] dark:opacity-[0.02] select-none uppercase leading-none">
                         MENTORSYNC
                     </h1>
                 </div>
