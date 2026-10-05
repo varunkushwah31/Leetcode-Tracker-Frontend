@@ -16,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.tracker.leetcode.tracker.DTO.BulkImportResponseDTO;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -146,5 +148,133 @@ class ClassroomServiceTest {
         assertNotNull(matrix);
         assertTrue(matrix.contains("Alice"));
         assertTrue(matrix.contains("COMPLETED"));
+    }
+
+    @Test
+    void extractLeetcodeUsername_ShouldExtractHandleCorrectly() {
+        assertEquals("varunkushwah31", ClassroomService.extractLeetcodeUsername("https://leetcode.com/u/varunkushwah31/"));
+        assertEquals("varunkushwah31", ClassroomService.extractLeetcodeUsername("https://leetcode.com/varunkushwah31"));
+        assertEquals("varunkushwah31", ClassroomService.extractLeetcodeUsername("https://leetcode.cn/u/varunkushwah31/?ref=test#overview"));
+        assertEquals("varunkushwah31", ClassroomService.extractLeetcodeUsername("leetcode.com/u/varunkushwah31"));
+        assertEquals("tourist", ClassroomService.extractLeetcodeUsername("@tourist"));
+        assertEquals("tourist", ClassroomService.extractLeetcodeUsername("tourist"));
+        assertEquals("", ClassroomService.extractLeetcodeUsername("https://leetcode.com/problems/two-sum/"));
+        assertEquals("", ClassroomService.extractLeetcodeUsername(""));
+        assertEquals("", ClassroomService.extractLeetcodeUsername(null));
+    }
+
+    @Test
+    void extractCodeforcesHandle_ShouldExtractHandleCorrectly() {
+        assertEquals("tourist", ClassroomService.extractCodeforcesHandle("https://codeforces.com/profile/tourist/"));
+        assertEquals("tourist", ClassroomService.extractCodeforcesHandle("https://codeforces.net/profile/tourist?mobile=true#history"));
+        assertEquals("tourist", ClassroomService.extractCodeforcesHandle("codeforces.com/profile/tourist"));
+        assertEquals("tourist", ClassroomService.extractCodeforcesHandle("@tourist"));
+        assertEquals("tourist", ClassroomService.extractCodeforcesHandle("tourist"));
+        assertEquals("", ClassroomService.extractCodeforcesHandle("https://codeforces.com/problemset/problem/1/A"));
+        assertEquals("", ClassroomService.extractCodeforcesHandle(""));
+        assertEquals("", ClassroomService.extractCodeforcesHandle(null));
+    }
+
+    @Test
+    void isUrlMethods_ShouldIdentifyPlatformUrls() {
+        assertTrue(ClassroomService.isLeetCodeUrl("https://leetcode.com/u/test/"));
+        assertTrue(ClassroomService.isLeetCodeUrl("leetcode.cn/u/test"));
+        assertFalse(ClassroomService.isLeetCodeUrl("https://codeforces.com/profile/test"));
+        assertFalse(ClassroomService.isLeetCodeUrl("test_user"));
+
+        assertTrue(ClassroomService.isCodeforcesUrl("https://codeforces.com/profile/test/"));
+        assertTrue(ClassroomService.isCodeforcesUrl("codeforces.net/profile/test"));
+        assertFalse(ClassroomService.isCodeforcesUrl("https://leetcode.com/u/test"));
+        assertFalse(ClassroomService.isCodeforcesUrl("test_user"));
+    }
+
+    @Test
+    void addStudentToClassroom_WhenLeetCodeUrlProvided_ShouldExtractUsernameAndProvision() {
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+        when(studentRepository.findByLeetcodeUsername("john_doe")).thenReturn(Optional.empty());
+        when(studentRepository.findById("john_doe")).thenReturn(Optional.empty());
+        when(studentRepository.save(any(Student.class))).thenAnswer(invocation -> {
+            Student s = invocation.getArgument(0);
+            s.setId("std-new-1");
+            return s;
+        });
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(mockClassroom);
+
+        Classroom updated = classroomService.addStudentToClassroom("class-1", "https://leetcode.com/u/john_doe/?ref=123");
+
+        assertNotNull(updated);
+        assertTrue(mockClassroom.getStudentIds().contains("std-new-1"));
+        verify(studentRepository).save(argThat(s ->
+            "john_doe".equals(s.getLeetcodeUsername()) && "john_doe".equals(s.getName())
+        ));
+    }
+
+    @Test
+    void addStudentToClassroom_WhenCodeforcesUrlProvided_ShouldExtractHandleAndProvision() {
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+        when(studentRepository.findByCodeforcesHandle("tourist")).thenReturn(Optional.empty());
+        when(studentRepository.findById("tourist")).thenReturn(Optional.empty());
+        when(studentRepository.save(any(Student.class))).thenAnswer(invocation -> {
+            Student s = invocation.getArgument(0);
+            s.setId("std-new-2");
+            return s;
+        });
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(mockClassroom);
+
+        Classroom updated = classroomService.addStudentToClassroom("class-1", "https://codeforces.com/profile/tourist");
+
+        assertNotNull(updated);
+        assertTrue(mockClassroom.getStudentIds().contains("std-new-2"));
+        verify(studentRepository).save(argThat(s ->
+            "tourist".equals(s.getCodeforcesHandle()) && "tourist".equals(s.getName())
+        ));
+    }
+
+    @Test
+    void bulkAddStudents_WithUrlsAndSwappedColumns_ShouldAutoExtractAndRoute() {
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(mockClassroom);
+
+        String csvContent = "Name,Email,LeetCode Username,Codeforces Handle\n" +
+                "Alice,alice@test.com,https://leetcode.com/u/alice_lc/?ref=1,https://codeforces.com/profile/alice_cf\n" +
+                "Bob,bob@test.com,https://codeforces.com/profile/bob_cf,https://leetcode.com/u/bob_lc\n";
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "students.csv",
+                "text/csv",
+                csvContent.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+        );
+
+        when(studentRepository.findByEmail("alice@test.com")).thenReturn(Optional.empty());
+        when(studentRepository.findByLeetcodeUsername("alice_lc")).thenReturn(Optional.empty());
+        when(studentRepository.findByCodeforcesHandle("alice_cf")).thenReturn(Optional.empty());
+
+        when(studentRepository.findByEmail("bob@test.com")).thenReturn(Optional.empty());
+        when(studentRepository.findByLeetcodeUsername("bob_lc")).thenReturn(Optional.empty());
+        when(studentRepository.findByCodeforcesHandle("bob_cf")).thenReturn(Optional.empty());
+
+        when(studentRepository.save(any(Student.class))).thenAnswer(invocation -> {
+            Student s = invocation.getArgument(0);
+            if (s.getId() == null) s.setId("id-" + s.getName());
+            return s;
+        });
+
+        BulkImportResponseDTO res = classroomService.bulkAddStudents("class-1", file);
+
+        assertEquals(2, res.getAddedCount());
+        assertEquals(0, res.getFailedCount());
+
+        verify(studentRepository).save(argThat(s ->
+            "Alice".equals(s.getName()) &&
+            "alice_lc".equals(s.getLeetcodeUsername()) &&
+            "alice_cf".equals(s.getCodeforcesHandle())
+        ));
+
+        verify(studentRepository).save(argThat(s ->
+            "Bob".equals(s.getName()) &&
+            "bob_lc".equals(s.getLeetcodeUsername()) &&
+            "bob_cf".equals(s.getCodeforcesHandle())
+        ));
     }
 }

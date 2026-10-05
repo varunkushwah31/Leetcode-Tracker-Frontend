@@ -72,11 +72,12 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
     // Handlers
     const handleAddStudent = async () => {
         setAddStudentError(null);
-        if (!newStudentUsername) return;
+        const trimmed = newStudentUsername.trim();
+        if (!trimmed) return;
 
         setIsAdding(true);
         try {
-            await ClassroomService.addStudent(selectedClassroom.classroomId, newStudentUsername);
+            await ClassroomService.addStudent(selectedClassroom.classroomId, trimmed);
             setNewStudentUsername('');
             setAddStudentOpen(false);
             onRefresh();
@@ -272,14 +273,14 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 Add Single Student
                             </Label>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                Enter a student's LeetCode username or Codeforces handle.
+                                Enter a student's LeetCode / Codeforces username or profile URL (e.g. <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">leetcode.com/u/user</code>).
                             </p>
 
                             <ErrorBanner message={addStudentError} className="mb-2" />
 
                             <div className="flex gap-2 pt-1">
                                 <Input
-                                    placeholder="LeetCode username or Codeforces handle"
+                                    placeholder="Username, handle, or profile URL"
                                     value={newStudentUsername}
                                     onChange={(e) => {
                                         setNewStudentUsername(e.target.value);
@@ -323,7 +324,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 </Button>
                             </div>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                Upload a CSV file containing students. Supports columns: <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">Name, Email, LeetCode Username, Codeforces Handle</code> or a single column of handles.
+                                Upload a CSV file containing students. Automatically extracts usernames from LeetCode & Codeforces profile URLs. Supports columns: <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">Name, Email, LeetCode Username, Codeforces Handle</code> or a single column of handles/URLs.
                             </p>
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />

@@ -87,21 +87,79 @@ public class ClassroomService {
             throw new ValidationFailedException("Student identifier cannot be blank.");
         }
 
-        Student student = studentRepository.findById(trimmed)
-                .or(() -> studentRepository.findByEmail(trimmed))
-                .or(() -> studentRepository.findByLeetcodeUsername(trimmed))
-                .or(() -> studentRepository.findByCodeforcesHandle(trimmed))
-                .orElse(null);
+        String lcUsername = "";
+        String cfHandle = "";
+        String email = "";
+        String lookupKey = trimmed;
 
-        if (student == null) {
-            student = new Student();
-            student.setName(trimmed);
-            if (trimmed.contains("@")) {
-                student.setEmail(trimmed);
-            } else {
-                student.setLeetcodeUsername(trimmed);
-                student.setEmail(trimmed.toLowerCase().replaceAll("[^a-z0-9]", "") + "_" + UUID.randomUUID().toString().substring(0, 6) + "@student.mentorsync.local");
+        if (isCodeforcesUrl(trimmed)) {
+            cfHandle = extractCodeforcesHandle(trimmed);
+            lookupKey = cfHandle;
+        } else if (isLeetCodeUrl(trimmed)) {
+            lcUsername = extractLeetcodeUsername(trimmed);
+            lookupKey = lcUsername;
+        } else if (trimmed.contains("@") && !trimmed.startsWith("@")) {
+            email = trimmed;
+        } else {
+            if (trimmed.startsWith("@")) {
+                lookupKey = trimmed.substring(1).trim();
             }
+            lcUsername = lookupKey;
+        }
+
+        if (lookupKey.isEmpty() && lcUsername.isEmpty() && cfHandle.isEmpty() && email.isEmpty()) {
+            throw new ValidationFailedException("Invalid student identifier or URL provided.");
+        }
+
+        Student student = null;
+        if (!email.isEmpty()) {
+            student = studentRepository.findByEmail(email).orElse(null);
+        }
+        if (student == null && !lcUsername.isEmpty()) {
+            student = studentRepository.findByLeetcodeUsername(lcUsername).orElse(null);
+        }
+        if (student == null && !cfHandle.isEmpty()) {
+            student = studentRepository.findByCodeforcesHandle(cfHandle).orElse(null);
+        }
+        final String finalKey = lookupKey;
+        if (student == null && !finalKey.isEmpty()) {
+            student = studentRepository.findById(finalKey)
+                    .or(() -> studentRepository.findByEmail(finalKey))
+                    .or(() -> studentRepository.findByLeetcodeUsername(finalKey))
+                    .or(() -> studentRepository.findByCodeforcesHandle(finalKey))
+                    .orElse(null);
+        }
+
+        if (student != null) {
+            boolean studentModified = false;
+            if (!lcUsername.isEmpty() && (student.getLeetcodeUsername() == null || student.getLeetcodeUsername().isBlank())) {
+                student.setLeetcodeUsername(lcUsername);
+                studentModified = true;
+            }
+            if (!cfHandle.isEmpty() && (student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank())) {
+                student.setCodeforcesHandle(cfHandle);
+                studentModified = true;
+            }
+            if (studentModified) {
+                student = studentRepository.save(student);
+            }
+        } else {
+            student = new Student();
+            String effectiveName = !lcUsername.isEmpty() ? lcUsername
+                    : !cfHandle.isEmpty() ? cfHandle
+                    : !lookupKey.isEmpty() ? lookupKey
+                    : email;
+            student.setName(effectiveName);
+
+            if (!email.isEmpty()) {
+                student.setEmail(email);
+            } else {
+                String handleSeed = !lcUsername.isEmpty() ? lcUsername : !cfHandle.isEmpty() ? cfHandle : "user";
+                student.setEmail(handleSeed.toLowerCase().replaceAll("[^a-z0-9]", "") + "_" + UUID.randomUUID().toString().substring(0, 6) + "@student.mentorsync.local");
+            }
+
+            if (!lcUsername.isEmpty()) student.setLeetcodeUsername(lcUsername);
+            if (!cfHandle.isEmpty()) student.setCodeforcesHandle(cfHandle);
             student.setRole(Role.STUDENT);
             student.setAuthProvider(AuthProvider.LOCAL);
             student.setEnabled(true);
@@ -329,10 +387,16 @@ public class ClassroomService {
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found in this classroom."));
 
         String trimmed = studentIdentifier != null ? studentIdentifier.trim() : "";
-        Student student = studentRepository.findById(trimmed)
-                .or(() -> studentRepository.findByEmail(trimmed))
-                .or(() -> studentRepository.findByLeetcodeUsername(trimmed))
-                .or(() -> studentRepository.findByCodeforcesHandle(trimmed))
+        String lcExtracted = isLeetCodeUrl(trimmed) ? extractLeetcodeUsername(trimmed) : "";
+        String cfExtracted = isCodeforcesUrl(trimmed) ? extractCodeforcesHandle(trimmed) : "";
+        final String lookup = trimmed.startsWith("@") ? trimmed.substring(1).trim() : trimmed;
+
+        Student student = studentRepository.findById(lookup)
+                .or(() -> studentRepository.findByEmail(lookup))
+                .or(() -> studentRepository.findByLeetcodeUsername(lookup))
+                .or(() -> studentRepository.findByCodeforcesHandle(lookup))
+                .or(() -> !lcExtracted.isBlank() ? studentRepository.findByLeetcodeUsername(lcExtracted) : Optional.empty())
+                .or(() -> !cfExtracted.isBlank() ? studentRepository.findByCodeforcesHandle(cfExtracted) : Optional.empty())
                 .orElseThrow(() -> new StudentNotFoundException("Student not found."));
 
         // If they already validated it, skip the network call and return
@@ -660,25 +724,47 @@ public class ClassroomService {
                     }
                 }
 
-                // If generic identifier provided, resolve type
-                if (lcUsername.isBlank() && cfHandle.isBlank() && !genericId.isBlank()) {
-                    if (genericId.contains("@")) {
-                        email = genericId;
-                    } else if (genericId.toLowerCase().contains("codeforces.com")) {
-                        cfHandle = extractHandleFromUrl(genericId);
-                    } else if (genericId.toLowerCase().contains("leetcode.com")) {
-                        lcUsername = extractHandleFromUrl(genericId);
-                    } else {
-                        lcUsername = genericId;
+                // Cross-platform URL detection and correction
+                boolean lcHasCf = isCodeforcesUrl(lcUsername);
+                boolean cfHasLc = isLeetCodeUrl(cfHandle);
+
+                if (lcHasCf && cfHasLc) {
+                    // Both columns were swapped
+                    String temp = lcUsername;
+                    lcUsername = cfHandle;
+                    cfHandle = temp;
+                } else if (lcHasCf && (cfHandle.isBlank() || isCodeforcesUrl(cfHandle))) {
+                    if (cfHandle.isBlank()) {
+                        cfHandle = lcUsername;
+                        lcUsername = "";
+                    }
+                } else if (cfHasLc && (lcUsername.isBlank() || isLeetCodeUrl(lcUsername))) {
+                    if (lcUsername.isBlank()) {
+                        lcUsername = cfHandle;
+                        cfHandle = "";
                     }
                 }
 
-                // Clean handles
-                if (lcUsername.toLowerCase().contains("leetcode.com")) {
-                    lcUsername = extractHandleFromUrl(lcUsername);
+                // If generic identifier provided, resolve type
+                if (lcUsername.isBlank() && cfHandle.isBlank() && !genericId.isBlank()) {
+                    if (isCodeforcesUrl(genericId)) {
+                        cfHandle = extractCodeforcesHandle(genericId);
+                    } else if (isLeetCodeUrl(genericId)) {
+                        lcUsername = extractLeetcodeUsername(genericId);
+                    } else if (genericId.contains("@") && !genericId.startsWith("@")) {
+                        email = genericId;
+                    } else {
+                        String cleaned = genericId.startsWith("@") ? genericId.substring(1).trim() : genericId.trim();
+                        lcUsername = cleaned;
+                    }
                 }
-                if (cfHandle.toLowerCase().contains("codeforces.com")) {
-                    cfHandle = extractHandleFromUrl(cfHandle);
+
+                // Clean handles and auto-extract usernames/handles from profile URLs
+                if (!lcUsername.isBlank()) {
+                    lcUsername = extractLeetcodeUsername(lcUsername);
+                }
+                if (!cfHandle.isBlank()) {
+                    cfHandle = extractCodeforcesHandle(cfHandle);
                 }
 
                 if (name.isBlank() && email.isBlank() && lcUsername.isBlank() && cfHandle.isBlank()) {
@@ -901,9 +987,134 @@ public class ClassroomService {
     // 2c. Sample CSV Template for Mentors
     public String generateStudentTemplateCsv() {
         return "Name,Email,LeetCode Username,Codeforces Handle\n" +
-                "Alex Turner,alex@example.com,alex_turner,alex_cf\n" +
-                "Sarah Connor,sarah@example.com,sarah_c,\n" +
+                "Alex Turner,alex@example.com,https://leetcode.com/u/alex_turner,https://codeforces.com/profile/alex_cf\n" +
+                "Sarah Connor,sarah@example.com,https://leetcode.com/sarah_c,\n" +
                 "David Miller,david@example.com,,david_cf\n";
+    }
+
+    public static boolean isLeetCodeUrl(String input) {
+        if (input == null || input.isBlank()) return false;
+        String lower = input.toLowerCase().trim();
+        return lower.contains("leetcode.com") || lower.contains("leetcode.cn");
+    }
+
+    public static boolean isCodeforcesUrl(String input) {
+        if (input == null || input.isBlank()) return false;
+        String lower = input.toLowerCase().trim();
+        return lower.contains("codeforces.com") || lower.contains("codeforces.net") || lower.contains("codeforces.org");
+    }
+
+    public static String extractLeetcodeUsername(String input) {
+        if (input == null || input.isBlank()) return "";
+        String s = input.trim();
+
+        if (isLeetCodeUrl(s)) {
+            int qIdx = s.indexOf('?');
+            if (qIdx >= 0) s = s.substring(0, qIdx);
+            int hIdx = s.indexOf('#');
+            if (hIdx >= 0) s = s.substring(0, hIdx);
+            s = s.trim();
+
+            String lower = s.toLowerCase();
+            if (lower.contains("/problems/") || lower.contains("/contest/") || lower.contains("/discuss/") || lower.contains("/tag/")) {
+                return "";
+            }
+
+            Pattern lcPattern = Pattern.compile("(?:leetcode\\.(?:com|cn))/(?:u/)?([a-zA-Z0-9_-]+)/?", Pattern.CASE_INSENSITIVE);
+            Matcher m = lcPattern.matcher(s);
+            if (m.find()) {
+                String candidate = m.group(1);
+                if (!candidate.equalsIgnoreCase("u") && !candidate.equalsIgnoreCase("problems") && !candidate.equalsIgnoreCase("contest")) {
+                    return candidate;
+                }
+            }
+
+            while (s.endsWith("/")) {
+                s = s.substring(0, s.length() - 1);
+            }
+            int lastSlash = s.lastIndexOf('/');
+            if (lastSlash >= 0) {
+                String candidate = s.substring(lastSlash + 1);
+                if (!candidate.equalsIgnoreCase("u")) {
+                    return candidate.replaceAll("[^a-zA-Z0-9_-]", "");
+                }
+            }
+        }
+
+        if (s.startsWith("@")) {
+            s = s.substring(1).trim();
+        }
+
+        while (s.endsWith("/")) {
+            s = s.substring(0, s.length() - 1).trim();
+        }
+
+        int qIdx = s.indexOf('?');
+        if (qIdx >= 0) s = s.substring(0, qIdx);
+        int hIdx = s.indexOf('#');
+        if (hIdx >= 0) s = s.substring(0, hIdx);
+
+        return s.trim();
+    }
+
+    public static String extractCodeforcesHandle(String input) {
+        if (input == null || input.isBlank()) return "";
+        String s = input.trim();
+
+        if (isCodeforcesUrl(s)) {
+            int qIdx = s.indexOf('?');
+            if (qIdx >= 0) s = s.substring(0, qIdx);
+            int hIdx = s.indexOf('#');
+            if (hIdx >= 0) s = s.substring(0, hIdx);
+            s = s.trim();
+
+            String lower = s.toLowerCase();
+            if (lower.contains("/problemset/") || lower.contains("/contest/") || lower.contains("/gym/") || lower.contains("/blog/")) {
+                return "";
+            }
+
+            Pattern cfPattern = Pattern.compile("(?:codeforces\\.(?:com|net|org))/(?:profile/)?([a-zA-Z0-9_.-]+)/?", Pattern.CASE_INSENSITIVE);
+            Matcher m = cfPattern.matcher(s);
+            if (m.find()) {
+                String candidate = m.group(1);
+                if (!candidate.equalsIgnoreCase("profile") && !candidate.equalsIgnoreCase("problemset") && !candidate.equalsIgnoreCase("contest")) {
+                    return candidate;
+                }
+            }
+
+            while (s.endsWith("/")) {
+                s = s.substring(0, s.length() - 1);
+            }
+            int lastSlash = s.lastIndexOf('/');
+            if (lastSlash >= 0) {
+                String candidate = s.substring(lastSlash + 1);
+                if (!candidate.equalsIgnoreCase("profile")) {
+                    return candidate.replaceAll("[^a-zA-Z0-9_.-]", "");
+                }
+            }
+        }
+
+        if (s.startsWith("@")) {
+            s = s.substring(1).trim();
+        }
+
+        while (s.endsWith("/")) {
+            s = s.substring(0, s.length() - 1).trim();
+        }
+
+        int qIdx = s.indexOf('?');
+        if (qIdx >= 0) s = s.substring(0, qIdx);
+        int hIdx = s.indexOf('#');
+        if (hIdx >= 0) s = s.substring(0, hIdx);
+
+        return s.trim();
+    }
+
+    public String extractHandleFromUrl(String url) {
+        if (isCodeforcesUrl(url)) {
+            return extractCodeforcesHandle(url);
+        }
+        return extractLeetcodeUsername(url);
     }
 
     private char detectDelimiter(String line) {
@@ -915,16 +1126,6 @@ public class ClassroomService {
 
     private String cleanHeader(String col) {
         return col != null ? col.trim().toLowerCase().replaceAll("[^a-z0-9]", "") : "";
-    }
-
-    private String extractHandleFromUrl(String url) {
-        if (url == null || url.isBlank()) return "";
-        String trimmed = url.trim();
-        while (trimmed.endsWith("/")) {
-            trimmed = trimmed.substring(0, trimmed.length() - 1);
-        }
-        int lastSlash = trimmed.lastIndexOf('/');
-        return lastSlash >= 0 ? trimmed.substring(lastSlash + 1) : trimmed;
     }
 
     private List<String> parseCsvLine(String line, char delimiter) {

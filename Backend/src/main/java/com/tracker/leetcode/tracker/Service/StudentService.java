@@ -48,10 +48,16 @@ public class StudentService {
             throw new StudentNotFoundException("Student identifier cannot be blank.");
         }
         String trimmed = identifier.trim();
-        return studentRepository.findById(trimmed)
-                .or(() -> studentRepository.findByEmail(trimmed))
-                .or(() -> studentRepository.findByLeetcodeUsername(trimmed))
-                .or(() -> studentRepository.findByCodeforcesHandle(trimmed))
+        String lcHandle = ClassroomService.isLeetCodeUrl(trimmed) ? ClassroomService.extractLeetcodeUsername(trimmed) : "";
+        String cfHandle = ClassroomService.isCodeforcesUrl(trimmed) ? ClassroomService.extractCodeforcesHandle(trimmed) : "";
+        final String lookup = trimmed.startsWith("@") ? trimmed.substring(1).trim() : trimmed;
+
+        return studentRepository.findById(lookup)
+                .or(() -> studentRepository.findByEmail(lookup))
+                .or(() -> studentRepository.findByLeetcodeUsername(lookup))
+                .or(() -> studentRepository.findByCodeforcesHandle(lookup))
+                .or(() -> !lcHandle.isBlank() ? studentRepository.findByLeetcodeUsername(lcHandle) : Optional.empty())
+                .or(() -> !cfHandle.isBlank() ? studentRepository.findByCodeforcesHandle(cfHandle) : Optional.empty())
                 .orElseThrow(() -> new StudentNotFoundException("Student '" + trimmed + "' not found in database. Please add them first!"));
     }
 
@@ -490,8 +496,14 @@ public class StudentService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Student not found with ID: " + studentId));
 
-        String newLc = (leetcodeUsername != null && !leetcodeUsername.trim().isEmpty()) ? leetcodeUsername.trim() : null;
-        String newCf = (codeforcesHandle != null && !codeforcesHandle.trim().isEmpty()) ? codeforcesHandle.trim() : null;
+        String rawLc = (leetcodeUsername != null && !leetcodeUsername.trim().isEmpty()) ? leetcodeUsername.trim() : null;
+        String rawCf = (codeforcesHandle != null && !codeforcesHandle.trim().isEmpty()) ? codeforcesHandle.trim() : null;
+
+        String newLc = rawLc != null ? ClassroomService.extractLeetcodeUsername(rawLc) : null;
+        if (newLc != null && newLc.isBlank()) newLc = null;
+
+        String newCf = rawCf != null ? ClassroomService.extractCodeforcesHandle(rawCf) : null;
+        if (newCf != null && newCf.isBlank()) newCf = null;
 
         if (newLc == null && newCf == null) {
             throw new IllegalArgumentException("At least one platform username (LeetCode or Codeforces) must remain linked.");

@@ -382,10 +382,10 @@ https://codeforces.com/profile/petr`;
 
                                 <div className="p-5 bg-cyan-500/5 dark:bg-cyan-500/10 border border-cyan-500/20 rounded-2xl">
                                     <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-bold text-sm mb-2">
-                                        <CheckCircle className="w-4 h-4" /> URL Sanitization
+                                        <CheckCircle className="w-4 h-4" /> Auto URL & Handle Extraction
                                     </div>
                                     <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                        Paste raw handles (e.g. <code className="font-mono text-cyan-600 dark:text-cyan-300">tourist</code>) or full URLs (e.g. <code className="font-mono text-cyan-600 dark:text-cyan-300">https://leetcode.com/u/tourist</code>). Handles are extracted automatically.
+                                        Paste raw handles (e.g. <code className="font-mono text-cyan-600 dark:text-cyan-300">tourist</code>) or full URLs (e.g. <code className="font-mono text-cyan-600 dark:text-cyan-300">https://leetcode.com/u/user</code> or <code className="font-mono text-cyan-600 dark:text-cyan-300">https://codeforces.com/profile/handle</code>). Queries, hashes, and slashes are cleaned automatically with cross-platform column detection.
                                     </p>
                                 </div>
                             </div>
