@@ -31,6 +31,7 @@ public class MentorService {
                 .id(mentor.getId())
                 .name(mentor.getName())
                 .email(mentor.getEmail())
+                .role(mentor.getRole())
                 .classroomIds(mentor.getClassroomIds() != null ? mentor.getClassroomIds() : new java.util.ArrayList<>())
                 .build();
     }

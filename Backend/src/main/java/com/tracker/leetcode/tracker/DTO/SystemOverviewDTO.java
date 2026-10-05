@@ -15,6 +15,10 @@ public class SystemOverviewDTO {
     private long totalStudents;
     private long totalMentors;
     private long totalClassrooms;
+    private long totalAssignments;
+    private long dualPlatformStudents;
+    private long leetcodeOnlyStudents;
+    private long codeforcesOnlyStudents;
     private List<MentorDTO> allMentors;
     private List<ClassroomDashboardDTO> allClassrooms;
 }

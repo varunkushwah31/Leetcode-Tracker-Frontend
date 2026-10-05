@@ -7,7 +7,11 @@ import type {
     MentorRegisterRequest, 
     ChangePasswordRequest,
     LearningPath,
-    BulkImportResponseDTO
+    BulkImportResponseDTO,
+    SystemOverviewDTO,
+    StudentSummaryDTO,
+    MentorDTO,
+    CacheStatsResponse
 } from '@/types';
 
 export const AuthService = {
@@ -160,10 +164,16 @@ export const PathService = {
 
 
 export const AdminService = {
-    getOverview: () => api.get('/admin/overview'),
-    deleteMentor: (id: string) => api.delete(`/admin/mentors/${id}`),
-    deleteClassroom: (id: string) => api.delete(`/admin/classrooms/${id}`),
-    forceSyncAll: () => api.post('/admin/sync-all')
+    getOverview: () => api.get<SystemOverviewDTO>('/admin/overview'),
+    getAllStudents: () => api.get<StudentSummaryDTO[]>('/admin/students'),
+    deleteStudent: (id: string) => api.delete<{ message: string }>(`/admin/students/${id}`),
+    syncStudent: (id: string) => api.post<{ message: string }>(`/admin/students/${id}/sync`),
+    createMentor: (data: MentorRegisterRequest) => api.post<MentorDTO>('/admin/mentors', data),
+    deleteMentor: (id: string) => api.delete<{ message: string }>(`/admin/mentors/${id}`),
+    deleteClassroom: (id: string) => api.delete<{ message: string }>(`/admin/classrooms/${id}`),
+    forceSyncAll: () => api.post<{ message: string }>('/admin/sync-all'),
+    getCacheStats: () => api.get<CacheStatsResponse>('/admin/cache/stats'),
+    clearCache: (cacheName?: string) => api.post<{ message?: string; error?: string }>('/admin/cache/clear', null, { params: cacheName ? { cacheName } : {} })
 };
 
 

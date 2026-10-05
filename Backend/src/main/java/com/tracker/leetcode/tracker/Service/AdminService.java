@@ -2,15 +2,20 @@ package com.tracker.leetcode.tracker.Service;
 
 import com.tracker.leetcode.tracker.DTO.ClassroomDashboardDTO;
 import com.tracker.leetcode.tracker.DTO.MentorDTO;
+import com.tracker.leetcode.tracker.DTO.RegisterRequest;
+import com.tracker.leetcode.tracker.DTO.StudentSummaryDTO;
 import com.tracker.leetcode.tracker.DTO.SystemOverviewDTO;
 import com.tracker.leetcode.tracker.Models.Classroom;
 import com.tracker.leetcode.tracker.Models.Mentor;
+import com.tracker.leetcode.tracker.Models.Role;
 import com.tracker.leetcode.tracker.Models.Student;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import com.tracker.leetcode.tracker.Exception.ClassroomNotFoundException;
 import com.tracker.leetcode.tracker.Exception.MentorNotFoundException;
+import com.tracker.leetcode.tracker.Exception.StudentNotFoundException;
+import com.tracker.leetcode.tracker.Mapper.StudentMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -36,6 +41,7 @@ public class AdminService {
     private final MentorService mentorService;
     private final ClassroomService classroomService;
     private final StudentService studentService;
+    private final StudentMapper studentMapper;
     private final CacheManager cacheManager;
     private final StringRedisTemplate stringRedisTemplate;
     private final RedisConnectionFactory redisConnectionFactory;
@@ -44,12 +50,34 @@ public class AdminService {
         log.info("Super Admin requested the master system overview.");
 
         try {
-            long totalStudents = studentRepository.count();
+            List<Student> allStudents = studentRepository.findAll();
+            long totalStudents = allStudents.size();
             long totalMentors = mentorRepository.count();
-            long totalClassrooms = classroomRepository.count();
+
+            List<Classroom> classrooms = classroomRepository.findAll();
+            long totalClassrooms = classrooms.size();
+
+            long totalAssignments = classrooms.stream()
+                    .mapToLong(c -> c.getAssignments() != null ? c.getAssignments().size() : 0)
+                    .sum();
+
+            long dual = allStudents.stream()
+                    .filter(s -> s.getLeetcodeUsername() != null && !s.getLeetcodeUsername().isBlank() &&
+                            s.getCodeforcesHandle() != null && !s.getCodeforcesHandle().isBlank())
+                    .count();
+
+            long lcOnly = allStudents.stream()
+                    .filter(s -> (s.getLeetcodeUsername() != null && !s.getLeetcodeUsername().isBlank()) &&
+                            (s.getCodeforcesHandle() == null || s.getCodeforcesHandle().isBlank()))
+                    .count();
+
+            long cfOnly = allStudents.stream()
+                    .filter(s -> (s.getCodeforcesHandle() != null && !s.getCodeforcesHandle().isBlank()) &&
+                            (s.getLeetcodeUsername() == null || s.getLeetcodeUsername().isBlank()))
+                    .count();
 
             List<MentorDTO> mentorDTOS = mentorService.getAllMentors();
-            List<ClassroomDashboardDTO> classroomDashboardDTOS = classroomRepository.findAll()
+            List<ClassroomDashboardDTO> classroomDashboardDTOS = classrooms
                     .stream()
                     .map(classroom -> classroomService.getClassroomDashboard(classroom.getId(), "name"))
                     .toList();
@@ -59,6 +87,10 @@ public class AdminService {
                     .totalStudents(totalStudents)
                     .totalMentors(totalMentors)
                     .totalClassrooms(totalClassrooms)
+                    .totalAssignments(totalAssignments)
+                    .dualPlatformStudents(dual)
+                    .leetcodeOnlyStudents(lcOnly)
+                    .codeforcesOnlyStudents(cfOnly)
                     .allMentors(mentorDTOS)
                     .allClassrooms(classroomDashboardDTOS)
                     .build();
@@ -66,6 +98,56 @@ public class AdminService {
             log.error("Failed to generate system overview: {}", e.getMessage());
             throw new RuntimeException("Failed to generate system overview. Please try again later.");
         }
+    }
+
+    public List<StudentSummaryDTO> getAllStudents() {
+        return studentRepository.findAll().stream()
+                .map(studentMapper::toSummaryDTO)
+                .toList();
+    }
+
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics", "student-stats", "student-progress", "student-recent"}, allEntries = true)
+    public void deleteStudent(String studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new StudentNotFoundException("Student not found with ID: " + studentId));
+
+        // Remove student reference from any enrolled classrooms
+        List<Classroom> classrooms = classroomRepository.findAll();
+        for (Classroom classroom : classrooms) {
+            if (classroom.getStudentIds() != null && classroom.getStudentIds().remove(student.getId())) {
+                classroomRepository.save(classroom);
+            }
+        }
+
+        studentRepository.delete(student);
+        log.info("SUPER ADMIN ACTION: Deleted student {} (ID: {})", student.getEmail(), student.getId());
+    }
+
+    public Map<String, String> syncStudent(String studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new StudentNotFoundException("Student not found with ID: " + studentId));
+
+        String identifier = student.getLeetcodeUsername();
+        if (identifier == null || identifier.isBlank()) {
+            identifier = student.getCodeforcesHandle();
+        }
+        if (identifier == null || identifier.isBlank()) {
+            identifier = student.getId();
+        }
+
+        studentService.syncAllProfileData(identifier);
+        log.info("SUPER ADMIN ACTION: Synced profile for student: {} ({})", student.getName(), identifier);
+        return Map.of("message", "Profile synced successfully for " + student.getName() + ".");
+    }
+
+    public MentorDTO createMentor(RegisterRequest request) {
+        Mentor mentor = Mentor.builder()
+                .name(request.name())
+                .email(request.email())
+                .password(request.password())
+                .role(Role.MENTOR)
+                .build();
+        return mentorService.createMentor(mentor);
     }
 
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics", "mentors-all", "mentor"}, allEntries = true)

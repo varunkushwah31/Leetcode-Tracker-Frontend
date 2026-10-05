@@ -178,6 +178,7 @@ export interface MentorDTO {
     id: string;
     name: string;
     email: string;
+    role?: Role;
     classroomIds: string[];
 }
 
@@ -185,8 +186,22 @@ export interface SystemOverviewDTO {
     totalStudents: number;
     totalMentors: number;
     totalClassrooms: number;
+    totalAssignments?: number;
+    dualPlatformStudents?: number;
+    leetcodeOnlyStudents?: number;
+    codeforcesOnlyStudents?: number;
     allMentors: MentorDTO[];
     allClassrooms: ClassroomDashboardDTO[];
+}
+
+export interface CacheStatsResponse {
+    redisStatus: string;
+    usedMemoryHuman?: string;
+    usedMemoryPeakHuman?: string;
+    redisVersion?: string;
+    uptimeInSeconds?: string;
+    configuredCaches?: string[];
+    namespaceKeyCounts?: Record<string, number>;
 }
 
 export interface ClassroomDashboardDTO {
