@@ -65,7 +65,18 @@ export const ClassroomService = {
     // clients cannot spoof another mentor's identity.
     createClassroom: (mentorId: string, className: string) => api.post('/classrooms', null, { params: { mentorId, className } }),
     getDashboard: (classroomId: string, sortBy: string = 'solved') => api.get(`/classrooms/${classroomId}/dashboard`, { params: { sortBy } }),
-    addStudent: (classroomId: string, leetcodeUsername: string) => api.post(`/classrooms/${classroomId}/students`, null, { params: { leetcodeUsername } }),
+    addStudent: (classroomId: string, identifier: string, mentorId?: string) =>
+        api.post(`/classrooms/${classroomId}/students`, null, {
+            params: {
+                identifier,
+                leetcodeUsername: identifier,
+                ...(mentorId ? { mentorId } : {})
+            }
+        }),
+    removeStudent: (classroomId: string, studentIdentifier: string, mentorId?: string) =>
+        api.delete(`/classrooms/${classroomId}/students/${encodeURIComponent(studentIdentifier)}`, {
+            params: mentorId ? { mentorId } : undefined
+        }),
     assignQuestion: (classroomId: string, titleSlugOrData: string | { platform?: 'LEETCODE' | 'CODEFORCES'; title?: string; titleSlug: string; questionLink?: string; start: number; end: number }, start?: number, end?: number) => {
         if (typeof titleSlugOrData === 'object') {
             return api.post(`/classrooms/${classroomId}/assignments`, {

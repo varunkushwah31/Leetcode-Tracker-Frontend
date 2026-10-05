@@ -277,4 +277,67 @@ class ClassroomServiceTest {
             "bob_cf".equals(s.getCodeforcesHandle())
         ));
     }
+
+    @Test
+    void removeStudentFromClassroom_WhenAuthorized_ShouldRemoveStudentAndBroadcast() {
+        mockClassroom.setStudentIds(new ArrayList<>(List.of("std-1", "std-2")));
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(mockClassroom);
+
+        Student student = new Student();
+        student.setId("std-1");
+        student.setName("Alice");
+        when(studentRepository.findById("std-1")).thenReturn(Optional.of(student));
+
+        Classroom result = classroomService.removeStudentFromClassroom("class-1", "std-1", "mentor-123");
+
+        assertNotNull(result);
+        assertFalse(mockClassroom.getStudentIds().contains("std-1"));
+        assertTrue(mockClassroom.getStudentIds().contains("std-2"));
+        verify(redisLeaderboardService).removeStudentFromClassroom("class-1", "std-1");
+        verify(webSocketBridge).broadcastClassroomUpdate(eq("class-1"), eq("UPDATE"), contains("Alice"));
+        verify(messagingTemplate).convertAndSend(eq("/topic/classrooms/class-1"), (Object) any());
+    }
+
+    @Test
+    void removeStudentFromClassroom_WhenNotMentor_ShouldThrowAccessDenied() {
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+
+        assertThrows(AccessDeniedException.class, () ->
+            classroomService.removeStudentFromClassroom("class-1", "std-1", "other-mentor")
+        );
+        verify(classroomRepository, never()).save(any());
+    }
+
+    @Test
+    void removeStudentFromClassroom_WhenStudentNotEnrolled_ShouldThrowValidationFailed() {
+        mockClassroom.setStudentIds(new ArrayList<>(List.of("std-2")));
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+        when(studentRepository.findById("std-unknown")).thenReturn(Optional.empty());
+
+        assertThrows(com.tracker.leetcode.tracker.Exception.ValidationFailedException.class, () ->
+            classroomService.removeStudentFromClassroom("class-1", "std-unknown", "mentor-123")
+        );
+        verify(classroomRepository, never()).save(any());
+    }
+
+    @Test
+    void removeStudentFromClassroom_WhenIdentifierIsProfileUrl_ShouldResolveAndRemove() {
+        mockClassroom.setStudentIds(new ArrayList<>(List.of("std-1")));
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(mockClassroom);
+
+        Student student = new Student();
+        student.setId("std-1");
+        student.setName("Alice");
+        student.setLeetcodeUsername("alice_lc");
+
+        when(studentRepository.findByLeetcodeUsername("alice_lc")).thenReturn(Optional.of(student));
+
+        Classroom result = classroomService.removeStudentFromClassroom("class-1", "https://leetcode.com/u/alice_lc/", "mentor-123");
+
+        assertNotNull(result);
+        assertFalse(mockClassroom.getStudentIds().contains("std-1"));
+        verify(redisLeaderboardService).removeStudentFromClassroom("class-1", "std-1");
+    }
 }

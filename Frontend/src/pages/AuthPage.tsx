@@ -9,6 +9,13 @@ import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
+import {
+  extractLeetcodeUsername,
+  extractCodeforcesHandle,
+  isLeetCodeUrl,
+  isCodeforcesUrl,
+  sanitizePlatformHandles
+} from '../lib/handleExtractor';
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -25,6 +32,82 @@ export function AuthPage() {
     name: '', email: '', password: '', leetcodeUsername: '', codeforcesHandle: '',
   });
 
+  const handleLeetcodeChange = (val: string) => {
+    clearError();
+    if (isCodeforcesUrl(val)) {
+      const extractedCf = extractCodeforcesHandle(val);
+      setFormData(prev => ({
+        ...prev,
+        codeforcesHandle: extractedCf,
+        leetcodeUsername: isCodeforcesUrl(prev.leetcodeUsername) ? '' : prev.leetcodeUsername
+      }));
+      return;
+    }
+    setFormData(prev => ({ ...prev, leetcodeUsername: val }));
+  };
+
+  const handleLeetcodeBlur = () => {
+    if (formData.leetcodeUsername && isLeetCodeUrl(formData.leetcodeUsername)) {
+      setFormData(prev => ({
+        ...prev,
+        leetcodeUsername: extractLeetcodeUsername(prev.leetcodeUsername)
+      }));
+    }
+  };
+
+  const handleLeetcodePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData('text');
+    if (isCodeforcesUrl(text)) {
+      e.preventDefault();
+      clearError();
+      const extractedCf = extractCodeforcesHandle(text);
+      setFormData(prev => ({ ...prev, codeforcesHandle: extractedCf }));
+    } else if (isLeetCodeUrl(text)) {
+      e.preventDefault();
+      clearError();
+      const extractedLc = extractLeetcodeUsername(text);
+      setFormData(prev => ({ ...prev, leetcodeUsername: extractedLc }));
+    }
+  };
+
+  const handleCodeforcesChange = (val: string) => {
+    clearError();
+    if (isLeetCodeUrl(val)) {
+      const extractedLc = extractLeetcodeUsername(val);
+      setFormData(prev => ({
+        ...prev,
+        leetcodeUsername: extractedLc,
+        codeforcesHandle: isLeetCodeUrl(prev.codeforcesHandle) ? '' : prev.codeforcesHandle
+      }));
+      return;
+    }
+    setFormData(prev => ({ ...prev, codeforcesHandle: val }));
+  };
+
+  const handleCodeforcesBlur = () => {
+    if (formData.codeforcesHandle && isCodeforcesUrl(formData.codeforcesHandle)) {
+      setFormData(prev => ({
+        ...prev,
+        codeforcesHandle: extractCodeforcesHandle(prev.codeforcesHandle)
+      }));
+    }
+  };
+
+  const handleCodeforcesPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData('text');
+    if (isLeetCodeUrl(text)) {
+      e.preventDefault();
+      clearError();
+      const extractedLc = extractLeetcodeUsername(text);
+      setFormData(prev => ({ ...prev, leetcodeUsername: extractedLc }));
+    } else if (isCodeforcesUrl(text)) {
+      e.preventDefault();
+      clearError();
+      const extractedCf = extractCodeforcesHandle(text);
+      setFormData(prev => ({ ...prev, codeforcesHandle: extractedCf }));
+    }
+  };
+
   const handleAuth = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setError(null);
@@ -33,17 +116,19 @@ export function AuthPage() {
       if (isLogin) {
         await login({ email: formData.email, password: formData.password });
       } else if (role === 'student') {
-        const lcTrim = formData.leetcodeUsername?.trim();
-        const cfTrim = formData.codeforcesHandle?.trim();
-        if (!lcTrim && !cfTrim) {
+        const { leetcodeUsername: cleanLc, codeforcesHandle: cleanCf } = sanitizePlatformHandles(
+          formData.leetcodeUsername,
+          formData.codeforcesHandle
+        );
+        if (!cleanLc && !cleanCf) {
           setError("Please provide at least one platform username (LeetCode or Codeforces).");
           setIsLoading(false);
           return;
         }
         await registerStudent({
           ...formData,
-          leetcodeUsername: lcTrim || undefined,
-          codeforcesHandle: cfTrim || undefined,
+          leetcodeUsername: cleanLc || undefined,
+          codeforcesHandle: cleanCf || undefined,
         });
       } else {
         await registerMentor({
@@ -243,12 +328,22 @@ export function AuthPage() {
                           <GlobeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                           <Input
                               autoComplete="username"
-                              placeholder="username"
+                              placeholder="username or profile URL"
                               value={formData.leetcodeUsername}
-                              onChange={(e) => { setFormData({...formData, leetcodeUsername: e.target.value}); clearError(); }}
+                              onChange={(e) => handleLeetcodeChange(e.target.value)}
+                              onBlur={handleLeetcodeBlur}
+                              onPaste={handleLeetcodePaste}
                               className="bg-white dark:bg-[#141416] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-9 h-10 rounded-xl w-full transition-all text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
                           />
                         </div>
+                        {isLeetCodeUrl(formData.leetcodeUsername) && (
+                          <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 pt-0.5">
+                            <span className="font-semibold text-zinc-500">Auto-extracted:</span>
+                            <span className="font-mono bg-zinc-200/80 dark:bg-zinc-800 text-[#ffa116] px-1.5 py-0.5 rounded text-[10px] border border-zinc-300 dark:border-zinc-700/60 font-bold">
+                              @{extractLeetcodeUsername(formData.leetcodeUsername)}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="space-y-1.5">
@@ -263,17 +358,27 @@ export function AuthPage() {
                           <TerminalIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                           <Input
                               autoComplete="username"
-                              placeholder="handle"
+                              placeholder="handle or profile URL"
                               value={formData.codeforcesHandle}
-                              onChange={(e) => { setFormData({...formData, codeforcesHandle: e.target.value}); clearError(); }}
+                              onChange={(e) => handleCodeforcesChange(e.target.value)}
+                              onBlur={handleCodeforcesBlur}
+                              onPaste={handleCodeforcesPaste}
                               className="bg-white dark:bg-[#141416] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-9 h-10 rounded-xl w-full transition-all text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
                           />
                         </div>
+                        {isCodeforcesUrl(formData.codeforcesHandle) && (
+                          <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 pt-0.5">
+                            <span className="font-semibold text-zinc-500">Auto-extracted:</span>
+                            <span className="font-mono bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded text-[10px] border border-cyan-200 dark:border-cyan-800/60 font-bold">
+                              @{extractCodeforcesHandle(formData.codeforcesHandle)}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     <p className="text-[11px] text-zinc-500 leading-relaxed">
-                      Provide your handle for either platform to initialize tracking. You can connect the remaining platform at any time from your dashboard.
+                      Provide your username, handle, or paste your profile URL for either platform. URLs are automatically converted.
                     </p>
                   </div>
               )}

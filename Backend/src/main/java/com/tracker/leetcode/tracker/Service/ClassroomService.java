@@ -185,7 +185,112 @@ public class ClassroomService {
         classroom.getStudentIds().add(student.getId());
         Classroom saved = classroomRepository.save(classroom);
         webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Student added: " + student.getName());
+        messagingTemplate.convertAndSend(
+                "/topic/classrooms/" + classroomId,
+                (Object) Map.of("action", "UPDATE", "message", "Student added: " + student.getName())
+        );
         return saved;
+    }
+
+    // 2. Add Student with mentor check
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
+    public Classroom addStudentToClassroom(String classroomId, String identifier, String mentorId) {
+        if (mentorId != null && !mentorId.isBlank()) {
+            Classroom classroom = classroomRepository.findById(classroomId)
+                    .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+            if (!classroom.getMentorId().equals(mentorId)) {
+                log.warn("Security Alert: Mentor {} attempted to add student to classroom {} which they do not own.", mentorId, classroomId);
+                throw new AccessDeniedException("You are not authorized to modify this classroom.");
+            }
+        }
+        return addStudentToClassroom(classroomId, identifier);
+    }
+
+    // 2b. Remove Student from Classroom
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
+    public Classroom removeStudentFromClassroom(String classroomId, String studentIdentifier, String mentorId) {
+        log.info("Removing student '{}' from classroom ID: {} by mentor {}", studentIdentifier, classroomId, mentorId);
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+
+        if (mentorId != null && !mentorId.isBlank() && !classroom.getMentorId().equals(mentorId)) {
+            log.warn("Security Alert: Mentor {} attempted to remove student from classroom {} which they do not own.", mentorId, classroomId);
+            throw new AccessDeniedException("You are not authorized to modify this classroom.");
+        }
+
+        String trimmed = studentIdentifier != null ? studentIdentifier.trim() : "";
+        if (trimmed.isEmpty()) {
+            throw new ValidationFailedException("Student identifier cannot be blank.");
+        }
+
+        if (classroom.getStudentIds() == null || classroom.getStudentIds().isEmpty()) {
+            throw new ValidationFailedException("No students are enrolled in this classroom.");
+        }
+
+        // 1. Resolve student ID
+        String targetStudentId = null;
+        String studentName = null;
+
+        if (classroom.getStudentIds().contains(trimmed)) {
+            targetStudentId = trimmed;
+            Student s = studentRepository.findById(trimmed).orElse(null);
+            if (s != null) studentName = s.getName();
+        } else {
+            String lcExtracted = isLeetCodeUrl(trimmed) ? extractLeetcodeUsername(trimmed) : "";
+            String cfExtracted = isCodeforcesUrl(trimmed) ? extractCodeforcesHandle(trimmed) : "";
+
+            Student student = null;
+            if (!lcExtracted.isBlank()) {
+                student = studentRepository.findByLeetcodeUsername(lcExtracted).orElse(null);
+            } else if (!cfExtracted.isBlank()) {
+                student = studentRepository.findByCodeforcesHandle(cfExtracted).orElse(null);
+            }
+
+            if (student == null) {
+                final String lookup = trimmed.startsWith("@") ? trimmed.substring(1).trim() : trimmed;
+                student = studentRepository.findById(lookup)
+                        .or(() -> studentRepository.findByEmail(lookup))
+                        .or(() -> studentRepository.findByLeetcodeUsername(lookup))
+                        .or(() -> studentRepository.findByCodeforcesHandle(lookup))
+                        .orElse(null);
+            }
+
+            if (student != null && classroom.getStudentIds().contains(student.getId())) {
+                targetStudentId = student.getId();
+                studentName = student.getName();
+            }
+        }
+
+        if (targetStudentId == null) {
+            throw new ValidationFailedException("Student '" + trimmed + "' is not enrolled in this classroom.");
+        }
+
+        // 2. Remove student from classroom list
+        classroom.getStudentIds().remove(targetStudentId);
+        Classroom saved = classroomRepository.save(classroom);
+
+        // 3. Remove from Redis Leaderboard metric ZSets
+        try {
+            if (redisLeaderboardService != null) {
+                redisLeaderboardService.removeStudentFromClassroom(classroomId, targetStudentId);
+            }
+        } catch (Exception ex) {
+            log.warn("Failed removing student {} from Redis leaderboards: {}", targetStudentId, ex.getMessage());
+        }
+
+        // 4. Broadcast WebSocket & STOMP updates
+        String displayName = studentName != null ? studentName : targetStudentId;
+        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Student removed: " + displayName);
+        messagingTemplate.convertAndSend(
+                "/topic/classrooms/" + classroomId,
+                (Object) Map.of("action", "UPDATE", "message", "Student removed: " + displayName)
+        );
+
+        return saved;
+    }
+
+    public Classroom removeStudentFromClassroom(String classroomId, String studentIdentifier) {
+        return removeStudentFromClassroom(classroomId, studentIdentifier, null);
     }
 
     // 3. Get Dashboard (with Sorting & Fetching restored!)

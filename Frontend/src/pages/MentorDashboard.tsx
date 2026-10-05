@@ -84,6 +84,9 @@ function ClassroomTabContent({
                 onExportCSV={onExportCSV}
                 onStudentClick={onStudentClick}
                 classroomId={selectedClassroom.classroomId}
+                mentorId={mentorId}
+                classroomName={selectedClassroom.className}
+                onRefresh={onRefresh}
             />
         );
     }
@@ -610,7 +613,13 @@ export function MentorDashboard() {
                                 <StudentDetailsView
                                     username={viewingStudentUsername}
                                     classroomName={selectedClassroom.className}
+                                    classroomId={selectedClassroom.classroomId}
+                                    mentorId={user?.id}
                                     onBack={() => setViewingStudentUsername(null)}
+                                    onStudentRemoved={() => {
+                                        setViewingStudentUsername(null);
+                                        void fetchDashboardData();
+                                    }}
                                 />
                             );
                         }

@@ -56,12 +56,24 @@ public class AuthenticationService {
             throw new DuplicateStudentException("Student email already in use.");
         }
 
-        String lcUsername = request.leetcodeUsername() != null ? request.leetcodeUsername().trim() : null;
+        String rawLc = request.leetcodeUsername() != null ? request.leetcodeUsername().trim() : null;
+        String rawCf = request.codeforcesHandle() != null ? request.codeforcesHandle().trim() : null;
+
+        // Cross-platform detection and correction
+        if (rawLc != null && ClassroomService.isCodeforcesUrl(rawLc) && (rawCf == null || rawCf.isBlank())) {
+            rawCf = rawLc;
+            rawLc = null;
+        } else if (rawCf != null && ClassroomService.isLeetCodeUrl(rawCf) && (rawLc == null || rawLc.isBlank())) {
+            rawLc = rawCf;
+            rawCf = null;
+        }
+
+        String lcUsername = (rawLc != null && !rawLc.isBlank()) ? ClassroomService.extractLeetcodeUsername(rawLc) : null;
         if (lcUsername != null && lcUsername.isEmpty()) {
             lcUsername = null;
         }
 
-        String cfHandle = request.codeforcesHandle() != null ? request.codeforcesHandle().trim() : null;
+        String cfHandle = (rawCf != null && !rawCf.isBlank()) ? ClassroomService.extractCodeforcesHandle(rawCf) : null;
         if (cfHandle != null && cfHandle.isEmpty()) {
             cfHandle = null;
         }

@@ -3,7 +3,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
-import { FlameIcon, DownloadSimpleIcon as Download, MagnifyingGlassIcon as Search, BellIcon, SpinnerIcon as Loader2, TableIcon as Table } from '@phosphor-icons/react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
+import { FlameIcon, DownloadSimpleIcon as Download, MagnifyingGlassIcon as Search, BellIcon, SpinnerIcon as Loader2, TableIcon as Table, TrashIcon as Trash2 } from '@phosphor-icons/react';
 import type { StudentSummaryDTO } from '@/types';
 import { ClassroomService, StudentService } from '@/services/endpoints';
 import { useState } from 'react';
@@ -15,6 +16,9 @@ interface LeaderboardTableProps {
     onExportCSV: () => void;
     onStudentClick: (username: string) => void;
     classroomId?: string;
+    mentorId?: string;
+    classroomName?: string;
+    onRefresh?: () => void;
 }
 
 function getRankBadgeClass(index: number): string {
@@ -40,12 +44,36 @@ function getNudgeButtonLabel(isCurrentlyNudging: boolean, isNudged: boolean): st
     return 'Nudge';
 }
 
-export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, onStudentClick, classroomId }: Readonly<LeaderboardTableProps>) {
+export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, onStudentClick, classroomId, mentorId, classroomName, onRefresh }: Readonly<LeaderboardTableProps>) {
     const [searchQuery, setSearchQuery] = useState("");
     const [nudgingStudentId, setNudgingStudentId] = useState<string | null>(null);
     const [nudgedStudents, setNudgedStudents] = useState<Record<string, boolean>>({});
     const [isExportingMatrix, setIsExportingMatrix] = useState(false);
     const [exportingReportStudent, setExportingReportStudent] = useState<string | null>(null);
+    const [studentToRemove, setStudentToRemove] = useState<StudentSummaryDTO | null>(null);
+    const [isRemoving, setIsRemoving] = useState(false);
+    const [removeError, setRemoveError] = useState<string | null>(null);
+
+    const handleConfirmRemove = async () => {
+        if (!classroomId || !studentToRemove) return;
+        setIsRemoving(true);
+        setRemoveError(null);
+        try {
+            const studentIdentifier = studentToRemove.id || studentToRemove.leetcodeUsername || studentToRemove.codeforcesHandle;
+            if (!studentIdentifier) {
+                throw new Error("Unable to identify student.");
+            }
+            await ClassroomService.removeStudent(classroomId, studentIdentifier, mentorId);
+            setStudentToRemove(null);
+            if (onRefresh) {
+                onRefresh();
+            }
+        } catch (err: unknown) {
+            setRemoveError(err instanceof Error && err.message ? err.message : 'Failed to remove student from classroom');
+        } finally {
+            setIsRemoving(false);
+        }
+    };
 
     const handleExportAssignmentMatrix = async () => {
         if (!classroomId) return;
@@ -267,6 +295,21 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                     {getNudgeButtonLabel(nudgingStudentId === student.id, Boolean(nudgedStudents[student.id]))}
                                                 </button>
                                             )}
+                                            {classroomId && (
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setStudentToRemove(student);
+                                                        setRemoveError(null);
+                                                    }}
+                                                    title="Remove student from classroom"
+                                                    className="group/remove inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-900/50 hover:border-rose-300 dark:hover:border-rose-800 text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 bg-rose-50/50 dark:bg-rose-950/20 hover:bg-rose-100/60 dark:hover:bg-rose-900/30 transition-all cursor-pointer interactive-press"
+                                                >
+                                                    <Trash2 className="w-2.5 h-2.5 text-rose-500 group-hover/remove:text-rose-600 dark:group-hover/remove:text-rose-400" />
+                                                    <span>Remove</span>
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </td>
@@ -279,6 +322,60 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                     </table>
                 </div>
             </CardContent>
+
+            {/* Student Removal Confirmation Dialog */}
+            <Dialog open={!!studentToRemove} onOpenChange={(open) => { if (!open) { setStudentToRemove(null); setRemoveError(null); } }}>
+                <DialogContent className="sm:max-w-md bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-2xl">
+                    <DialogHeader>
+                        <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 mb-2">
+                            <Trash2 className="w-5 h-5" />
+                        </div>
+                        <DialogTitle className="text-lg font-bold text-zinc-900 dark:text-white">
+                            Remove Student from Classroom
+                        </DialogTitle>
+                        <DialogDescription className="text-zinc-600 dark:text-zinc-400 text-sm mt-1.5 leading-relaxed">
+                            Are you sure you want to remove <span className="font-semibold text-zinc-900 dark:text-white">{studentToRemove?.name}</span>
+                            {studentToRemove?.leetcodeUsername ? ` (@${studentToRemove.leetcodeUsername})` : (studentToRemove?.codeforcesHandle ? ` (@${studentToRemove.codeforcesHandle})` : '')} from {classroomName ? <span className="font-semibold text-zinc-900 dark:text-white">"{classroomName}"</span> : 'this classroom'}?
+                            <br /><br />
+                            The student will be un-enrolled from this classroom and removed from its leaderboard. Their account and personal progress on external platforms remain intact.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {removeError && (
+                        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-600 dark:text-rose-400 font-medium">
+                            {removeError}
+                        </div>
+                    )}
+
+                    <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => { setStudentToRemove(null); setRemoveError(null); }}
+                            disabled={isRemoving}
+                            className="rounded-xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleConfirmRemove}
+                            disabled={isRemoving}
+                            className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-semibold shadow-sm cursor-pointer"
+                        >
+                            {isRemoving ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                                    Removing...
+                                </>
+                            ) : (
+                                <>
+                                    <Trash2 className="w-4 h-4 mr-1.5" />
+                                    Remove Student
+                                </>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 }

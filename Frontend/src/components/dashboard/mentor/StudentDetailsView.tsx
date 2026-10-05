@@ -5,9 +5,10 @@ import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import {
-    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, PulseIcon as Activity, DownloadSimpleIcon as Download
+    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, PulseIcon as Activity, DownloadSimpleIcon as Download, TrashIcon as Trash2
 } from '@phosphor-icons/react';
-import { StudentService } from '@/services/endpoints';
+import { StudentService, ClassroomService } from '@/services/endpoints';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
 import type { StudentExtendedDTO } from '@/types';
 import { ActivityHeatmap } from '../student/ActivityHeatmap';
 import { ContestRatingsSection } from '../student/ContestRatingsSection';
@@ -17,14 +18,40 @@ import { ErrorBanner } from "@/components/ui/ErrorBanner.tsx";
 interface StudentDetailsViewProps {
     username: string;
     classroomName?: string;
+    classroomId?: string;
+    mentorId?: string;
     onBack: () => void;
+    onStudentRemoved?: () => void;
 }
 
-export function StudentDetailsView({ username, classroomName, onBack }: Readonly<StudentDetailsViewProps>) {
+export function StudentDetailsView({ username, classroomName, classroomId, mentorId, onBack, onStudentRemoved }: Readonly<StudentDetailsViewProps>) {
     const [data, setData] = useState<StudentExtendedDTO | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null); // <-- 2. Add Error State
     const [isExporting, setIsExporting] = useState(false);
+    const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
+    const [isRemoving, setIsRemoving] = useState(false);
+    const [removeError, setRemoveError] = useState<string | null>(null);
+
+    const handleRemoveFromClass = async () => {
+        if (!classroomId) return;
+        setIsRemoving(true);
+        setRemoveError(null);
+        try {
+            const studentIdentifier = data?.id || username;
+            await ClassroomService.removeStudent(classroomId, studentIdentifier, mentorId);
+            setConfirmRemoveOpen(false);
+            if (onStudentRemoved) {
+                onStudentRemoved();
+            } else {
+                onBack();
+            }
+        } catch (err: unknown) {
+            setRemoveError(err instanceof Error && err.message ? err.message : 'Failed to remove student from classroom');
+        } finally {
+            setIsRemoving(false);
+        }
+    };
 
     const handleExportReport = async () => {
         setIsExporting(true);
@@ -140,6 +167,17 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
                         {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Download className="w-3.5 h-3.5 text-[#5b4fff] dark:text-[#968fff] mr-1" />}
                         Export Report (CSV)
                     </Button>
+                    {classroomId && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setConfirmRemoveOpen(true); setRemoveError(null); }}
+                            className="bg-white dark:bg-[#1a1b2e] border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl text-xs font-semibold h-9 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5"
+                        >
+                            <Trash2 className="w-3.5 h-3.5 mr-1" />
+                            Remove from Class
+                        </Button>
+                    )}
                     <span className="text-xs text-zinc-500 font-medium hidden sm:inline-flex items-center gap-1.5">
                         Press <kbd className="bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-300 font-mono text-xs border border-zinc-200 dark:border-zinc-700">Esc</kbd> to return
                     </span>
@@ -323,6 +361,60 @@ export function StudentDetailsView({ username, classroomName, onBack }: Readonly
                         )}
                     </div>
                 </div>
+
+            {/* Student Removal Confirmation Dialog */}
+            <Dialog open={confirmRemoveOpen} onOpenChange={(open) => { if (!open) { setConfirmRemoveOpen(false); setRemoveError(null); } }}>
+                <DialogContent className="sm:max-w-md bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-2xl">
+                    <DialogHeader>
+                        <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 mb-2">
+                            <Trash2 className="w-5 h-5" />
+                        </div>
+                        <DialogTitle className="text-lg font-bold text-zinc-900 dark:text-white">
+                            Remove Student from Classroom
+                        </DialogTitle>
+                        <DialogDescription className="text-zinc-600 dark:text-zinc-400 text-sm mt-1.5 leading-relaxed">
+                            Are you sure you want to remove <span className="font-semibold text-zinc-900 dark:text-white">{data?.name || username}</span>
+                            {data?.leetcodeUsername ? ` (@${data.leetcodeUsername})` : (data?.codeforcesHandle ? ` (@${data.codeforcesHandle})` : '')} from {classroomName ? <span className="font-semibold text-zinc-900 dark:text-white">"{classroomName}"</span> : 'this classroom'}?
+                            <br /><br />
+                            The student will be un-enrolled from this classroom and its leaderboard. Their user account and external problem stats will remain unaffected.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {removeError && (
+                        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-600 dark:text-rose-400 font-medium">
+                            {removeError}
+                        </div>
+                    )}
+
+                    <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => { setConfirmRemoveOpen(false); setRemoveError(null); }}
+                            disabled={isRemoving}
+                            className="rounded-xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleRemoveFromClass}
+                            disabled={isRemoving}
+                            className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-semibold shadow-sm cursor-pointer"
+                        >
+                            {isRemoving ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                                    Removing...
+                                </>
+                            ) : (
+                                <>
+                                    <Trash2 className="w-4 h-4 mr-1.5" />
+                                    Remove Student
+                                </>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

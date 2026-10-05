@@ -278,13 +278,13 @@ https://codeforces.com/profile/petr`;
                                         <div className="p-4 bg-white dark:bg-[#14141c]/90 rounded-xl border border-zinc-200 dark:border-white/5 shadow-xs">
                                             <p className="font-semibold text-xs text-zinc-900 dark:text-white mb-1">Option A: Single Student</p>
                                             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-normal">
-                                                Enter their LeetCode username or Codeforces handle. The system automatically initializes their profile, pulls stats asynchronously, and enrolls them into your class.
+                                                Enter their LeetCode username, Codeforces handle, or full profile URL (e.g. <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">leetcode.com/u/alice</code>). The platform auto-extracts the canonical handle, initializes their profile, pulls stats asynchronously, and enrolls them into your class.
                                             </p>
                                         </div>
                                         <div className="p-4 bg-white dark:bg-[#14141c]/90 rounded-xl border border-zinc-200 dark:border-white/5 shadow-xs">
                                             <p className="font-semibold text-xs text-zinc-900 dark:text-white mb-1">Option B: Bulk CSV Import</p>
                                             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-normal">
-                                                Upload a CSV with names, emails, and handles. Auto-provisions accounts for non-existent users and gives real-time line-by-line feedback. <em>(See Section 3 for detailed formatting guidelines.)</em>
+                                                Upload a CSV with names, emails, handles, or profile URLs. Auto-extracts handles, auto-provisions accounts for non-existent users, and gives real-time line-by-line feedback. <em>(See Section 3 for detailed formatting guidelines.)</em>
                                             </p>
                                         </div>
                                     </div>
@@ -328,6 +328,7 @@ https://codeforces.com/profile/petr`;
                                     <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 pl-8.5 leading-relaxed">
                                         - Sort the leaderboard by <em>Total Solved</em>, <em>Daily Streak</em>, <em>Most Pending</em>, or <em>Contest Rating</em>.<br />
                                         - Click <strong className="text-zinc-900 dark:text-white"><BellIcon className="inline w-3.5 h-3.5 text-amber-500" /> Nudge</strong> on any student with pending assignments to send an automated email reminder.<br />
+                                        - Click <strong className="text-zinc-900 dark:text-white">Remove</strong> on any student row or student profile to un-enroll them from the class (with confirmation prompt). Their account and problem solving history remain safe.<br />
                                         - Click any student row to view their deep dive: topic mastery, contest performance, submission timeline, and export their individual report.<br />
                                         - Switch to the <strong className="text-zinc-900 dark:text-white">Weakness & Analytics</strong> tab to see overall cohort strengths, completion bottlenecks, and problem solve distributions.
                                     </p>
@@ -523,7 +524,7 @@ https://codeforces.com/profile/petr`;
                                         <h3 className="font-bold text-zinc-900 dark:text-white text-base">Connect Your Coding Handles</h3>
                                     </div>
                                     <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed pl-8.5">
-                                        In your Student Dashboard, click your profile card to link your LeetCode username and Codeforces handle. Make sure your profiles are public so statistics can be scraped.
+                                        During signup or in your Student Dashboard, enter your LeetCode username and Codeforces handle, or paste your profile URLs directly (e.g. <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">leetcode.com/u/alice</code>). MentorSync automatically cleans URLs and extracts handles. Make sure your profiles are public so statistics can be scraped.
                                     </p>
                                 </div>
 

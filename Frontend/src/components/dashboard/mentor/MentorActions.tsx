@@ -8,6 +8,7 @@ import { UserPlusIcon, ClipboardTextIcon as ClipboardList, MapTrifoldIcon as Map
 import { ClassroomService, PathService } from '@/services/endpoints.ts';
 import type { ClassroomDashboardDTO, LearningPath, PathQuestion, BulkImportResponseDTO } from '@/types';
 import {ErrorBanner} from "@/components/ui/ErrorBanner.tsx";// <-- 1. Import the Banner
+import { extractLeetcodeUsername, extractCodeforcesHandle, isLeetCodeUrl, isCodeforcesUrl } from '@/lib/handleExtractor';
 
 interface MentorActionsProps {
     mentorId: string;
@@ -77,7 +78,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
         setIsAdding(true);
         try {
-            await ClassroomService.addStudent(selectedClassroom.classroomId, trimmed);
+            await ClassroomService.addStudent(selectedClassroom.classroomId, trimmed, mentorId);
             setNewStudentUsername('');
             setAddStudentOpen(false);
             onRefresh();
@@ -291,11 +292,26 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 <Button
                                     onClick={handleAddStudent}
                                     disabled={!newStudentUsername || isAdding}
-                                    className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl px-5 font-semibold shrink-0 shadow-sm"
+                                    className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl px-5 font-semibold shrink-0 shadow-sm cursor-pointer"
                                 >
                                     {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
                                 </Button>
                             </div>
+
+                            {/* Extracted preview badge for URL inputs */}
+                            {newStudentUsername.trim().length > 0 && (isLeetCodeUrl(newStudentUsername) || isCodeforcesUrl(newStudentUsername)) && (() => {
+                                const isLC = isLeetCodeUrl(newStudentUsername);
+                                const isCF = isCodeforcesUrl(newStudentUsername);
+                                const extracted = isLC ? extractLeetcodeUsername(newStudentUsername) : (isCF ? extractCodeforcesHandle(newStudentUsername) : newStudentUsername.trim());
+                                return (
+                                    <div className="flex items-center gap-2 pt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                        <span className="font-semibold text-zinc-500">Auto-extracted:</span>
+                                        <span className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] px-2 py-0.5 rounded-md font-mono text-[11px] border border-zinc-200 dark:border-zinc-700 font-semibold">
+                                            {isLC ? `LeetCode: @${extracted}` : (isCF ? `Codeforces: @${extracted}` : `@${extracted}`)}
+                                        </span>
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Divider */}

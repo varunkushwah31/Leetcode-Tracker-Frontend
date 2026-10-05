@@ -43,11 +43,63 @@ public class ClassroomController {
         return ResponseEntity.ok(classroomService.createClassroom(mentorId, className));
     }
 
-    @PostMapping("/{classroomId}/students") // Removed the variable from path
+    @PostMapping("/{classroomId}/students")
     public ResponseEntity<Classroom> addStudentToClassroom(
             @PathVariable String classroomId,
-            @RequestParam String leetcodeUsername) { // Changed to @RequestParam
-        return ResponseEntity.ok(classroomService.addStudentToClassroom(classroomId, leetcodeUsername));
+            @RequestParam(required = false) String leetcodeUsername,
+            @RequestParam(required = false) String identifier,
+            @RequestParam(required = false) String studentId,
+            @RequestParam(required = false) String mentorId,
+            @RequestBody(required = false) java.util.Map<String, Object> body) {
+
+        String effectiveIdentifier = identifier != null ? identifier
+                : leetcodeUsername != null ? leetcodeUsername
+                : studentId;
+
+        String effectiveMentorId = mentorId;
+
+        if (body != null) {
+            if (effectiveIdentifier == null || effectiveIdentifier.isBlank()) {
+                if (body.containsKey("identifier")) effectiveIdentifier = String.valueOf(body.get("identifier"));
+                else if (body.containsKey("leetcodeUsername")) effectiveIdentifier = String.valueOf(body.get("leetcodeUsername"));
+                else if (body.containsKey("studentId")) effectiveIdentifier = String.valueOf(body.get("studentId"));
+                else if (body.containsKey("username")) effectiveIdentifier = String.valueOf(body.get("username"));
+            }
+            if (effectiveMentorId == null && body.containsKey("mentorId")) {
+                effectiveMentorId = String.valueOf(body.get("mentorId"));
+            }
+        }
+
+        if (effectiveIdentifier == null || effectiveIdentifier.isBlank()) {
+            throw new ValidationFailedException("Student identifier, username, or profile URL is required.");
+        }
+
+        return ResponseEntity.ok(classroomService.addStudentToClassroom(classroomId, effectiveIdentifier, effectiveMentorId));
+    }
+
+    // 2b. Remove Student from Classroom
+    @DeleteMapping("/{classroomId}/students/{studentId}")
+    public ResponseEntity<Classroom> removeStudentFromClassroom(
+            @PathVariable String classroomId,
+            @PathVariable String studentId,
+            @RequestParam(required = false) String mentorId) {
+
+        return ResponseEntity.ok(classroomService.removeStudentFromClassroom(classroomId, studentId, mentorId));
+    }
+
+    @DeleteMapping("/{classroomId}/students")
+    public ResponseEntity<Classroom> removeStudentFromClassroomQuery(
+            @PathVariable String classroomId,
+            @RequestParam(required = false) String studentId,
+            @RequestParam(required = false) String identifier,
+            @RequestParam(required = false) String leetcodeUsername,
+            @RequestParam(required = false) String mentorId) {
+
+        String effectiveId = studentId != null ? studentId : identifier != null ? identifier : leetcodeUsername;
+        if (effectiveId == null || effectiveId.isBlank()) {
+            throw new ValidationFailedException("Student identifier is required to remove student.");
+        }
+        return ResponseEntity.ok(classroomService.removeStudentFromClassroom(classroomId, effectiveId, mentorId));
     }
 
     // 3. Get the Classroom Dashboard (With Sorting)
