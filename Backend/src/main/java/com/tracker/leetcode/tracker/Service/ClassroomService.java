@@ -75,6 +75,63 @@ public class ClassroomService {
         return savedClassroom;
     }
 
+    /**
+     * Checks if a student account was genuinely created on MentorSync through signup.
+     * Genuine signed-up students have:
+     * 1. A non-blank password (encoded during signup).
+     * 2. A non-blank email that is not an auto-generated temporary placeholder (.local).
+     */
+    public static boolean isRegisteredStudent(Student student) {
+        if (student == null) {
+            return false;
+        }
+        boolean hasPassword = student.getPassword() != null && !student.getPassword().isBlank();
+        boolean hasValidEmail = student.getEmail() != null
+                && !student.getEmail().isBlank()
+                && !student.getEmail().toLowerCase().endsWith("@student.mentorsync.local");
+        return hasPassword && hasValidEmail;
+    }
+
+    /**
+     * Looks up an existing, registered MentorSync student by email, LeetCode username,
+     * Codeforces handle, or identifier (ID / username / handle).
+     */
+    public Optional<Student> findRegisteredStudent(String email, String lcUsername, String cfHandle, String genericId) {
+        Student student = null;
+
+        if (email != null && !email.isBlank()) {
+            student = studentRepository.findByEmail(email.trim())
+                    .or(() -> studentRepository.findByEmailIgnoreCase(email.trim()))
+                    .orElse(null);
+        }
+        if (student == null && lcUsername != null && !lcUsername.isBlank()) {
+            student = studentRepository.findByLeetcodeUsername(lcUsername.trim())
+                    .or(() -> studentRepository.findByLeetcodeUsernameIgnoreCase(lcUsername.trim()))
+                    .orElse(null);
+        }
+        if (student == null && cfHandle != null && !cfHandle.isBlank()) {
+            student = studentRepository.findByCodeforcesHandle(cfHandle.trim())
+                    .or(() -> studentRepository.findByCodeforcesHandleIgnoreCase(cfHandle.trim()))
+                    .orElse(null);
+        }
+        if (student == null && genericId != null && !genericId.isBlank()) {
+            String trimmedKey = genericId.trim();
+            student = studentRepository.findById(trimmedKey)
+                    .or(() -> studentRepository.findByEmail(trimmedKey))
+                    .or(() -> studentRepository.findByEmailIgnoreCase(trimmedKey))
+                    .or(() -> studentRepository.findByLeetcodeUsername(trimmedKey))
+                    .or(() -> studentRepository.findByLeetcodeUsernameIgnoreCase(trimmedKey))
+                    .or(() -> studentRepository.findByCodeforcesHandle(trimmedKey))
+                    .or(() -> studentRepository.findByCodeforcesHandleIgnoreCase(trimmedKey))
+                    .orElse(null);
+        }
+
+        if (student != null && isRegisteredStudent(student)) {
+            return Optional.of(student);
+        }
+        return Optional.empty();
+    }
+
     // 2. Add Student
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
     public Classroom addStudentToClassroom(String classroomId, String identifier) {
@@ -111,69 +168,26 @@ public class ClassroomService {
             throw new ValidationFailedException("Invalid student identifier or URL provided.");
         }
 
-        Student student = null;
-        if (!email.isEmpty()) {
-            student = studentRepository.findByEmail(email).orElse(null);
-        }
-        if (student == null && !lcUsername.isEmpty()) {
-            student = studentRepository.findByLeetcodeUsername(lcUsername).orElse(null);
-        }
-        if (student == null && !cfHandle.isEmpty()) {
-            student = studentRepository.findByCodeforcesHandle(cfHandle).orElse(null);
-        }
-        final String finalKey = lookupKey;
-        if (student == null && !finalKey.isEmpty()) {
-            student = studentRepository.findById(finalKey)
-                    .or(() -> studentRepository.findByEmail(finalKey))
-                    .or(() -> studentRepository.findByLeetcodeUsername(finalKey))
-                    .or(() -> studentRepository.findByCodeforcesHandle(finalKey))
-                    .orElse(null);
+        Student student = findRegisteredStudent(email, lcUsername, cfHandle, lookupKey).orElse(null);
+
+        // Verification: Ensure that student has already created an account on MentorSync through signup
+        if (student == null) {
+            throw new StudentNotFoundException("Student '" + trimmed + "' has not created an account on MentorSync yet. Students must sign up on MentorSync before they can be added to a classroom.");
         }
 
-        if (student != null) {
-            boolean studentModified = false;
-            if (!lcUsername.isEmpty() && (student.getLeetcodeUsername() == null || student.getLeetcodeUsername().isBlank())) {
-                student.setLeetcodeUsername(lcUsername);
-                studentModified = true;
-            }
-            if (!cfHandle.isEmpty() && (student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank())) {
-                student.setCodeforcesHandle(cfHandle);
-                studentModified = true;
-            }
-            if (studentModified) {
-                student = studentRepository.save(student);
-            }
-        } else {
-            student = new Student();
-            String effectiveName = !lcUsername.isEmpty() ? lcUsername
-                    : !cfHandle.isEmpty() ? cfHandle
-                    : !lookupKey.isEmpty() ? lookupKey
-                    : email;
-            student.setName(effectiveName);
-
-            if (!email.isEmpty()) {
-                student.setEmail(email);
-            } else {
-                String handleSeed = !lcUsername.isEmpty() ? lcUsername : !cfHandle.isEmpty() ? cfHandle : "user";
-                student.setEmail(handleSeed.toLowerCase().replaceAll("[^a-z0-9]", "") + "_" + UUID.randomUUID().toString().substring(0, 6) + "@student.mentorsync.local");
-            }
-
-            if (!lcUsername.isEmpty()) student.setLeetcodeUsername(lcUsername);
-            if (!cfHandle.isEmpty()) student.setCodeforcesHandle(cfHandle);
-            student.setRole(Role.STUDENT);
-            student.setAuthProvider(AuthProvider.LOCAL);
-            student.setEnabled(true);
-            student = studentRepository.save(student);
-
-            final Student created = student;
-            if (studentService != null) {
-                java.util.concurrent.CompletableFuture.runAsync(() -> {
-                    try {
-                        studentService.syncAllProfileData(created);
-                    } catch (Exception e) {
-                        log.warn("Background profile sync failed for newly provisioned student [{}]: {}", created.getName(), e.getMessage());
-                    }
-                }, virtualThreadExecutor != null ? virtualThreadExecutor : java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor());
+        boolean studentModified = false;
+        if (!lcUsername.isEmpty() && (student.getLeetcodeUsername() == null || student.getLeetcodeUsername().isBlank())) {
+            student.setLeetcodeUsername(lcUsername);
+            studentModified = true;
+        }
+        if (!cfHandle.isEmpty() && (student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank())) {
+            student.setCodeforcesHandle(cfHandle);
+            studentModified = true;
+        }
+        if (studentModified) {
+            Student savedStudent = studentRepository.save(student);
+            if (savedStudent != null) {
+                student = savedStudent;
             }
         }
 
@@ -189,6 +203,18 @@ public class ClassroomService {
                 "/topic/classrooms/" + classroomId,
                 (Object) Map.of("action", "UPDATE", "message", "Student added: " + student.getName())
         );
+
+        final Student studentToSync = student;
+        if (studentService != null) {
+            java.util.concurrent.CompletableFuture.runAsync(() -> {
+                try {
+                    studentService.syncAllProfileData(studentToSync);
+                } catch (Exception e) {
+                    log.warn("Background profile sync failed for student [{}]: {}", studentToSync.getName(), e.getMessage());
+                }
+            }, virtualThreadExecutor != null ? virtualThreadExecutor : java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor());
+        }
+
         return saved;
     }
 
@@ -879,19 +905,11 @@ public class ClassroomService {
                 }
 
                 try {
-                    // 1. Look up existing student
-                    Student student = null;
-                    if (!email.isBlank()) {
-                        student = studentRepository.findByEmail(email).orElse(null);
-                    }
-                    if (student == null && !lcUsername.isBlank()) {
-                        student = studentRepository.findByLeetcodeUsername(lcUsername).orElse(null);
-                    }
-                    if (student == null && !cfHandle.isBlank()) {
-                        student = studentRepository.findByCodeforcesHandle(cfHandle).orElse(null);
-                    }
+                    // Look up existing registered student in MentorSync database
+                    Optional<Student> registeredOpt = findRegisteredStudent(email, lcUsername, cfHandle, genericId);
 
-                    if (student != null) {
+                    if (registeredOpt.isPresent()) {
+                        Student student = registeredOpt.get();
                         boolean studentModified = false;
                         if ((student.getName() == null || student.getName().isBlank()) && !name.isBlank()) {
                             student.setName(name);
@@ -906,7 +924,10 @@ public class ClassroomService {
                             studentModified = true;
                         }
                         if (studentModified) {
-                            student = studentRepository.save(student);
+                            Student savedStudent = studentRepository.save(student);
+                            if (savedStudent != null) {
+                                student = savedStudent;
+                            }
                         }
 
                         // Check enrollment
@@ -918,35 +939,19 @@ public class ClassroomService {
                             classroomUpdated = true;
                             result.setAddedCount(result.getAddedCount() + 1);
                             result.getAddedStudents().add(student.getName() != null ? student.getName() : student.getId());
+                            studentsToSync.add(student);
                         }
                     } else {
-                        // Provision new student
-                        Student newStudent = new Student();
-                        String effectiveName = !name.isBlank() ? name
+                        // The student has not created an account on MentorSync through signup!
+                        // Do NOT provision a dummy account.
+                        result.setFailedCount(result.getFailedCount() + 1);
+                        String idDisplay = !name.isBlank() ? name
                                 : !lcUsername.isBlank() ? lcUsername
                                 : !cfHandle.isBlank() ? cfHandle
-                                : email;
-                        newStudent.setName(effectiveName);
-
-                        if (!email.isBlank()) {
-                            newStudent.setEmail(email);
-                        } else {
-                            String handleSeed = !lcUsername.isBlank() ? lcUsername : !cfHandle.isBlank() ? cfHandle : "user";
-                            newStudent.setEmail(handleSeed.toLowerCase().replaceAll("[^a-z0-9]", "") + "_" + UUID.randomUUID().toString().substring(0, 6) + "@student.mentorsync.local");
-                        }
-
-                        if (!lcUsername.isBlank()) newStudent.setLeetcodeUsername(lcUsername);
-                        if (!cfHandle.isBlank()) newStudent.setCodeforcesHandle(cfHandle);
-                        newStudent.setRole(Role.STUDENT);
-                        newStudent.setAuthProvider(AuthProvider.LOCAL);
-                        newStudent.setEnabled(true);
-
-                        Student saved = studentRepository.save(newStudent);
-                        classroom.getStudentIds().add(saved.getId());
-                        classroomUpdated = true;
-                        result.setAddedCount(result.getAddedCount() + 1);
-                        result.getAddedStudents().add(saved.getName());
-                        studentsToSync.add(saved);
+                                : !email.isBlank() ? email
+                                : !genericId.isBlank() ? genericId
+                                : "Row " + (lineNum + 1);
+                        result.getFailures().add(idDisplay + ": Student has not created an account on MentorSync yet. Students must sign up on MentorSync before they can be added to a classroom.");
                     }
                 } catch (Exception ex) {
                     log.warn("Error importing row {}: {}", lineNum + 1, ex.getMessage());

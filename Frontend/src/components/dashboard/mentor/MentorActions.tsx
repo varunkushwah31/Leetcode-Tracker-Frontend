@@ -274,14 +274,14 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 Add Single Student
                             </Label>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                Enter a student's LeetCode / Codeforces username or profile URL (e.g. <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">leetcode.com/u/user</code>).
+                                Enter a student's LeetCode / Codeforces username, email, or profile URL. <span className="font-semibold text-zinc-700 dark:text-zinc-300">The student must already have created an account on MentorSync through signup.</span>
                             </p>
 
                             <ErrorBanner message={addStudentError} className="mb-2" />
 
                             <div className="flex gap-2 pt-1">
                                 <Input
-                                    placeholder="Username, handle, or profile URL"
+                                    placeholder="Username, handle, email, or profile URL"
                                     value={newStudentUsername}
                                     onChange={(e) => {
                                         setNewStudentUsername(e.target.value);
@@ -340,7 +340,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 </Button>
                             </div>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                Upload a CSV file containing students. Automatically extracts usernames from LeetCode & Codeforces profile URLs. Supports columns: <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">Name, Email, LeetCode Username, Codeforces Handle</code> or a single column of handles/URLs.
+                                Upload a CSV file containing students. <span className="font-semibold text-zinc-700 dark:text-zinc-300">Only students who have already created an account on MentorSync through signup will be added.</span> Supports columns: <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">Name, Email, LeetCode Username, Codeforces Handle</code> or handles/URLs.
                             </p>
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />
@@ -415,7 +415,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                                     {bulkResult.failedCount > 0 && (
                                         <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-600 dark:text-rose-400">
-                                            <span className="font-bold">Failed rows ({bulkResult.failedCount}):</span>
+                                            <span className="font-bold">Not enrolled / Unregistered students ({bulkResult.failedCount}):</span>
                                             <ul className="list-disc pl-5 mt-1 max-h-24 overflow-y-auto custom-scrollbar space-y-0.5">
                                                 {bulkResult.failures.map((f, i) => <li key={`fail-${i}-${f}`}>{f}</li>)}
                                             </ul>

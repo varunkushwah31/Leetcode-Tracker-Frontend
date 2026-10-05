@@ -9,6 +9,9 @@ public interface StudentRepository extends MongoRepository<Student, String> {
     Optional<Student> findByLeetcodeUsername(String leetcodeUsername);
     Optional<Student> findByCodeforcesHandle(String codeforcesHandle);
     Optional<Student> findByEmail(String email);
+    Optional<Student> findByLeetcodeUsernameIgnoreCase(String leetcodeUsername);
+    Optional<Student> findByCodeforcesHandleIgnoreCase(String codeforcesHandle);
+    Optional<Student> findByEmailIgnoreCase(String email);
     boolean existsByLeetcodeUsername(String leetcodeUsername);
     boolean existsByCodeforcesHandle(String codeforcesHandle);
 }

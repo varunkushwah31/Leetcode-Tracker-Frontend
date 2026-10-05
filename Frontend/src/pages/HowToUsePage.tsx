@@ -278,13 +278,13 @@ https://codeforces.com/profile/petr`;
                                         <div className="p-4 bg-white dark:bg-[#14141c]/90 rounded-xl border border-zinc-200 dark:border-white/5 shadow-xs">
                                             <p className="font-semibold text-xs text-zinc-900 dark:text-white mb-1">Option A: Single Student</p>
                                             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-normal">
-                                                Enter their LeetCode username, Codeforces handle, or full profile URL (e.g. <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">leetcode.com/u/alice</code>). The platform auto-extracts the canonical handle, initializes their profile, pulls stats asynchronously, and enrolls them into your class.
+                                                Enter their LeetCode username, Codeforces handle, email, or profile URL. The student must already have created an account on MentorSync through signup. The platform verifies their account and enrolls them into your class.
                                             </p>
                                         </div>
                                         <div className="p-4 bg-white dark:bg-[#14141c]/90 rounded-xl border border-zinc-200 dark:border-white/5 shadow-xs">
                                             <p className="font-semibold text-xs text-zinc-900 dark:text-white mb-1">Option B: Bulk CSV Import</p>
                                             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-normal">
-                                                Upload a CSV with names, emails, handles, or profile URLs. Auto-extracts handles, auto-provisions accounts for non-existent users, and gives real-time line-by-line feedback. <em>(See Section 3 for detailed formatting guidelines.)</em>
+                                                Upload a CSV with names, emails, handles, or profile URLs. Only students who have registered on MentorSync will be added; unregistered students are reported with actionable feedback. <em>(See Section 3 for detailed formatting guidelines.)</em>
                                             </p>
                                         </div>
                                     </div>
@@ -631,8 +631,8 @@ https://codeforces.com/profile/petr`;
                                         a: "LeetCode and Codeforces have caching layers and rate limits. Clicking 'Sync Profile' in the student dashboard or 'Sync Class Data' in the mentor dashboard directly queries the external platform APIs and refreshes database metrics in real time."
                                     },
                                     {
-                                        q: "What happens if a student does not have an email in the CSV during bulk import?",
-                                        a: "MentorSync automatically provisions the student with a unique surrogate email address (<username>_<uuid>@student.mentorsync.local) to guarantee database integrity. The student can log in and update their email later."
+                                        q: "Can I add students who have not yet signed up on MentorSync?",
+                                        a: "No. For security, data integrity, and privacy, students must first create their account on MentorSync through signup. Once registered, mentors can add them individually or via bulk CSV import by their email, LeetCode username, or Codeforces handle."
                                     },
                                     {
                                         q: "Can I import a mix of LeetCode profile URLs and Codeforces profile URLs in the same CSV?",
