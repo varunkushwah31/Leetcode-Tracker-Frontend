@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ScrollArea } from '../../ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import {
-    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, PulseIcon as Activity, DownloadSimpleIcon as Download, TrashIcon as Trash2
+    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, PulseIcon as Activity, DownloadSimpleIcon as Download, TrashIcon as Trash2, WarningIcon as AlertTriangle
 } from '@phosphor-icons/react';
 import { StudentService, ClassroomService } from '@/services/endpoints';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
@@ -110,6 +110,23 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
         if (!ts) return 'Unknown Date';
         return typeof ts === 'number' ? new Date(ts * 1000).toLocaleDateString() : new Date(ts).toLocaleDateString();
     };
+
+    const skillGaps = useMemo(() => {
+        if (!data?.skills) return [];
+        const coreTopics = [
+            'Dynamic Programming', 'Graph', 'Tree', 'Binary Search', 'Sliding Window',
+            'Two Pointers', 'Stack', 'Heap', 'Backtracking', 'Linked List'
+        ];
+        const skillMap = new Map<string, number>();
+        data.skills.forEach((s) => {
+            skillMap.set(s.tagName.toLowerCase(), s.problemsSolved);
+        });
+
+        return coreTopics.map((topic) => {
+            const count = skillMap.get(topic.toLowerCase()) || 0;
+            return { name: topic, count };
+        }).filter((item) => item.count < 3);
+    }, [data?.skills]);
 
     if (loading) {
         return (
@@ -259,22 +276,47 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                         </Card>
 
                         <Card className={cardClasses}>
-                            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4"><CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center"><BrainCircuit className="w-5 h-5 mr-2 text-[#5b4fff]" /> Top Skills</CardTitle></CardHeader>
+                            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4"><CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center"><BrainCircuit className="w-5 h-5 mr-2 text-[#5b4fff]" /> Top Skills & Mastered Topics</CardTitle></CardHeader>
                             <CardContent className="pt-6">
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-wrap gap-2.5">
                                     {data.skills && data.skills.length > 0 ? (
                                         data.skills.toSorted((a, b) => b.problemsSolved - a.problemsSolved).slice(0, 15).map((skill) => (
-                                            <div key={skill.tagName} className="flex items-center bg-zinc-100/70 dark:bg-[#1a1b2e]/30 rounded-xl px-3 py-2 border border-zinc-200 dark:border-zinc-800/60 shadow-sm">
-                                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mr-3">{skill.tagName}</span>
+                                            <div key={skill.tagName} className="flex items-center bg-zinc-100/70 dark:bg-[#1a1b2e]/30 rounded-xl px-3 py-1.5 border border-zinc-200 dark:border-zinc-800/60 shadow-xs">
+                                                <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mr-2.5">{skill.tagName}</span>
                                                 <span className="text-[11px] font-bold bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#b4afff] px-2 py-0.5 rounded-md">{skill.problemsSolved}</span>
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-sm text-zinc-500 py-4 italic">No topic data available.</p>
+                                        <p className="text-xs text-zinc-500 py-2 italic">No topic data available.</p>
                                     )}
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {skillGaps.length > 0 && (
+                            <Card className={cardClasses}>
+                                <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
+                                    <CardTitle className="text-lg font-bold text-rose-600 dark:text-rose-400 tracking-tight flex items-center">
+                                        <AlertTriangle className="w-5 h-5 mr-2 text-rose-500" /> Focus Areas & Identified Skill Gaps
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-6 space-y-3">
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                        Core technical interview topics with low/zero problem solutions by this student:
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {skillGaps.map((gap) => (
+                                            <div key={gap.name} className="flex items-center bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-1.5 shadow-xs">
+                                                <span className="text-xs font-semibold text-rose-700 dark:text-rose-300 mr-2">{gap.name}</span>
+                                                <span className="text-[10px] font-extrabold bg-rose-500/20 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded-md">
+                                                    {gap.count} solves
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
 
                         <ContestRatingsSection
                             contestHistory={data.contestHistory}

@@ -160,6 +160,51 @@ export interface SkillStat {
     problemsSolved: number;
 }
 
+export interface CuratedProblemDTO {
+    title: string;
+    slug: string;
+    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+    platform: 'LEETCODE' | 'CODEFORCES';
+    topic: string;
+    link: string;
+}
+
+export interface TopicProficiencyDTO {
+    tagName: string;
+    cohortTotalSolved: number;
+    averageSolvedPerStudent: number;
+    masteryLevel: 'STRONG' | 'DEVELOPING' | 'CRITICAL_WEAKNESS';
+    severity: 'HIGH' | 'MEDIUM' | 'LOW';
+    recommendation: string;
+    suggestedProblems: CuratedProblemDTO[];
+}
+
+export interface AtRiskStudentDTO {
+    studentId: string;
+    name: string;
+    email: string;
+    leetcodeUsername?: string;
+    codeforcesHandle?: string;
+    currentStreak: number;
+    totalSolved: number;
+    lastSubmissionDate?: string;
+    daysInactive: number;
+    riskLevel: 'CRITICAL' | 'WARNING' | 'MODERATE';
+    primaryRiskReason: string;
+}
+
+export interface AssignmentAnalyticsDTO {
+    assignmentId: string;
+    title: string;
+    platform: string;
+    problemSlug: string;
+    dueDate?: string;
+    isExpired: boolean;
+    completedCount: number;
+    totalStudents: number;
+    completionRate: number;
+}
+
 export interface ClassroomAnalyticsDTO {
     classroomId: string;
     className: string;
@@ -172,6 +217,27 @@ export interface ClassroomAnalyticsDTO {
     classEngagementScore: number;
     topStrengths: SkillStat[];
     criticalWeaknesses: SkillStat[];
+    // Upgraded comprehensive fields
+    topicProficiencies?: TopicProficiencyDTO[];
+    recommendedActionItems?: string[];
+    atRiskStudentsCount?: number;
+    atRiskStudents?: AtRiskStudentDTO[];
+    averageStreak?: number;
+    streakChampion?: string;
+    streakChampionStreak?: number;
+    totalAssignments?: number;
+    assignmentCompletionRate?: number;
+    assignmentsBreakdown?: AssignmentAnalyticsDTO[];
+    easyPercentage?: number;
+    mediumPercentage?: number;
+    hardPercentage?: number;
+    interviewReadinessScore?: number;
+    readinessAssessment?: string;
+    dualPlatformStudents?: number;
+    leetcodeOnlyStudents?: number;
+    codeforcesOnlyStudents?: number;
+    averageLeetcodeRating?: number;
+    averageCodeforcesRating?: number;
 }
 
 export interface MentorDTO {

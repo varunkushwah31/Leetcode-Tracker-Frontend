@@ -93,7 +93,15 @@ function ClassroomTabContent({
         );
     }
     if (activeTab === 'analytics') {
-        return <ClassroomAnalytics data={analyticsData} />;
+        return (
+            <ClassroomAnalytics
+                data={analyticsData}
+                classroomId={selectedClassroom.classroomId}
+                mentorId={mentorId}
+                onRefresh={onRefresh}
+                onStudentClick={onStudentClick}
+            />
+        );
     }
     return (
         <ManageAssignments

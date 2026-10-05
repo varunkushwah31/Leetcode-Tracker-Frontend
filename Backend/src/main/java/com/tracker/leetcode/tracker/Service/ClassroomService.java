@@ -1,9 +1,13 @@
 package com.tracker.leetcode.tracker.Service;
 
+import com.tracker.leetcode.tracker.DTO.AssignmentAnalyticsDTO;
+import com.tracker.leetcode.tracker.DTO.AtRiskStudentDTO;
 import com.tracker.leetcode.tracker.DTO.BulkImportResponseDTO;
 import com.tracker.leetcode.tracker.DTO.ClassroomAnalyticsDTO;
 import com.tracker.leetcode.tracker.DTO.ClassroomDashboardDTO;
+import com.tracker.leetcode.tracker.DTO.CuratedProblemDTO;
 import com.tracker.leetcode.tracker.DTO.StudentSummaryDTO;
+import com.tracker.leetcode.tracker.DTO.TopicProficiencyDTO;
 import com.tracker.leetcode.tracker.Exception.*;
 import com.tracker.leetcode.tracker.Mapper.StudentMapper;
 import com.tracker.leetcode.tracker.Models.*;
@@ -43,6 +47,10 @@ public class ClassroomService {
     private final SimpMessagingTemplate messagingTemplate;
     private final RedisLeaderboardService redisLeaderboardService;
     private final RedisWebSocketBridge webSocketBridge;
+
+    @Lazy
+    @Autowired
+    private CuratedTopicCatalog curatedTopicCatalog;
 
     @Lazy
     @Autowired
@@ -1290,15 +1298,17 @@ public class ClassroomService {
         log.info("Successfully assigned {} to classroom {}", titleSlug, classroom.getClassName());
     }
 
-    // NEW: Get Classroom Analytics
+    // NEW & ENHANCED: Get Classroom Analytics with Smart Weakness Engine & Risk Watchlist
     @Cacheable(value = "classroom-analytics", key = "#classroomId")
     public ClassroomAnalyticsDTO getClassroomAnalytics(String classroomId) {
-        log.info("Generating Analytics for Classroom ID: {}", classroomId);
+        log.info("Generating Enhanced Analytics for Classroom ID: {}", classroomId);
 
         Classroom classroom = classroomRepository.findById(classroomId)
                 .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
 
-        List<Student> students = studentRepository.findAllById(classroom.getStudentIds());
+        List<Student> students = (classroom.getStudentIds() != null && !classroom.getStudentIds().isEmpty())
+                ? studentRepository.findAllById(classroom.getStudentIds())
+                : Collections.emptyList();
         int totalStudents = students.size();
 
         if (totalStudents == 0) {
@@ -1314,72 +1324,351 @@ public class ClassroomService {
                     .classEngagementScore(0.0)
                     .topStrengths(new ArrayList<>())
                     .criticalWeaknesses(new ArrayList<>())
+                    .topicProficiencies(new ArrayList<>())
+                    .recommendedActionItems(new ArrayList<>())
+                    .atRiskStudentsCount(0)
+                    .atRiskStudents(new ArrayList<>())
+                    .averageStreak(0.0)
+                    .streakChampion("N/A")
+                    .streakChampionStreak(0)
+                    .totalAssignments(0)
+                    .assignmentCompletionRate(0.0)
+                    .assignmentsBreakdown(new ArrayList<>())
+                    .easyPercentage(0.0)
+                    .mediumPercentage(0.0)
+                    .hardPercentage(0.0)
+                    .interviewReadinessScore(0)
+                    .readinessAssessment("No students currently enrolled in this classroom.")
+                    .dualPlatformStudents(0)
+                    .leetcodeOnlyStudents(0)
+                    .codeforcesOnlyStudents(0)
+                    .averageLeetcodeRating(0.0)
+                    .averageCodeforcesRating(0.0)
                     .build();
         }
 
         int totalSolved = 0, totalEasy = 0, totalMed = 0, totalHard = 0, activeCount = 0;
-        java.util.Map<String, Integer> aggregatedSkills = new java.util.HashMap<>();
+        int dualPlatformCount = 0, lcOnlyCount = 0, cfOnlyCount = 0;
+        double totalLcRating = 0.0, totalCfRating = 0.0;
+        int lcRatedCount = 0, cfRatedCount = 0;
+        int totalStreak = 0, maxStreak = 0;
+        String streakChampion = "N/A";
+
+        Map<String, Integer> studentTotalSolvedMap = new HashMap<>();
+        Map<String, Boolean> studentActiveMap = new HashMap<>();
+        Map<String, Integer> aggregatedSkills = new HashMap<>();
 
         long oneWeekAgo = System.currentTimeMillis() / 1000 - (7 * 86400);
 
         for (Student s : students) {
             // 1. Calculate Difficulties and Total Solved across platforms
             int studentLcSolved = 0;
+            int sEasy = 0, sMed = 0, sHard = 0;
             if (s.getProblemStats() != null) {
                 for (var stat : s.getProblemStats()) {
+                    if (stat.getDifficulty() == null) continue;
                     switch (stat.getDifficulty().toLowerCase()) {
                         case "all" -> studentLcSolved += stat.getCount();
-                        case "easy" -> totalEasy += stat.getCount();
-                        case "medium" -> totalMed += stat.getCount();
-                        case "hard" -> totalHard += stat.getCount();
+                        case "easy" -> sEasy += stat.getCount();
+                        case "medium" -> sMed += stat.getCount();
+                        case "hard" -> sHard += stat.getCount();
                     }
                 }
             }
             int studentCfSolved = s.getCodeforcesSolvedCount() != null ? s.getCodeforcesSolvedCount() : 0;
-            totalSolved += (studentLcSolved + studentCfSolved);
+            int studentTotal = studentLcSolved + studentCfSolved;
+
+            studentTotalSolvedMap.put(s.getId(), studentTotal);
+            totalSolved += studentTotal;
+            totalEasy += sEasy;
+            totalMed += sMed;
+            totalHard += sHard;
 
             // 2. Check Engagement (Active in last 7 days)
             boolean isActive = s.getRecentSubmissions() != null && s.getRecentSubmissions().stream()
                     .anyMatch(sub -> sub.getTimestamp() >= oneWeekAgo);
+            studentActiveMap.put(s.getId(), isActive);
             if (isActive) activeCount++;
 
-            // 3. Aggregate Skills
+            // 3. Platform Distribution
+            boolean hasLc = s.getLeetcodeUsername() != null && !s.getLeetcodeUsername().isBlank();
+            boolean hasCf = s.getCodeforcesHandle() != null && !s.getCodeforcesHandle().isBlank();
+            if (hasLc && hasCf) dualPlatformCount++;
+            else if (hasLc) lcOnlyCount++;
+            else if (hasCf) cfOnlyCount++;
+
+            // 4. Contest Ratings
+            if (s.getCurrentContestRating() > 0) {
+                totalLcRating += s.getCurrentContestRating();
+                lcRatedCount++;
+            }
+            if (s.getCodeforcesRating() != null && s.getCodeforcesRating() > 0) {
+                totalCfRating += s.getCodeforcesRating();
+                cfRatedCount++;
+            }
+
+            // 5. Consistency Streak
+            int sStreak = studentMapper.calculateStreak(s.getProgressHistory());
+            totalStreak += sStreak;
+            if (sStreak > maxStreak) {
+                maxStreak = sStreak;
+                streakChampion = (s.getName() != null && !s.getName().isBlank()) ? s.getName() : s.getLeetcodeUsername();
+            }
+
+            // 6. Aggregate Skills
             if (s.getSkills() != null) {
                 for (var skill : s.getSkills()) {
-                    aggregatedSkills.merge(skill.getTagName(), skill.getProblemsSolved(), Integer::sum);
+                    if (skill.getTagName() != null && !skill.getTagName().isBlank()) {
+                        aggregatedSkills.merge(skill.getTagName(), skill.getProblemsSolved(), Integer::sum);
+                    }
                 }
             }
         }
 
-        // Sort skills by total solved across the class
-        List<SkillStat> sortedSkills = aggregatedSkills.entrySet().stream()
+        int avgSolved = totalSolved / totalStudents;
+        int avgEasy = totalEasy / totalStudents;
+        int avgMed = totalMed / totalStudents;
+        int avgHard = totalHard / totalStudents;
+        double avgStreak = (double) totalStreak / totalStudents;
+        double avgLcRating = lcRatedCount > 0 ? (totalLcRating / lcRatedCount) : 0.0;
+        double avgCfRating = cfRatedCount > 0 ? (totalCfRating / cfRatedCount) : 0.0;
+
+        double easyPct = totalSolved > 0 ? (totalEasy * 100.0) / totalSolved : 0.0;
+        double medPct = totalSolved > 0 ? (totalMed * 100.0) / totalSolved : 0.0;
+        double hardPct = totalSolved > 0 ? (totalHard * 100.0) / totalSolved : 0.0;
+
+        // 7. At-Risk Students Watchlist
+        List<AtRiskStudentDTO> atRiskList = new ArrayList<>();
+        for (Student s : students) {
+            boolean isActive = studentActiveMap.getOrDefault(s.getId(), false);
+            int sSolved = studentTotalSolvedMap.getOrDefault(s.getId(), 0);
+            int sStreak = studentMapper.calculateStreak(s.getProgressHistory());
+
+            String riskLevel = null;
+            String riskReason = null;
+
+            if (!isActive) {
+                if (sSolved < (avgSolved * 0.5)) {
+                    riskLevel = "HIGH";
+                    riskReason = "Inactive in the last 7 days and solve count is below 50% of class average.";
+                } else {
+                    riskLevel = "MEDIUM";
+                    riskReason = "No submissions recorded in the last 7 days.";
+                }
+            } else if (totalStudents > 1 && sSolved < (avgSolved * 0.35)) {
+                riskLevel = "MEDIUM";
+                riskReason = "Total problems solved is significantly below cohort pace.";
+            }
+
+            if (riskLevel != null) {
+                atRiskList.add(AtRiskStudentDTO.builder()
+                        .studentId(s.getId())
+                        .name(s.getName() != null && !s.getName().isBlank() ? s.getName() : "Student")
+                        .email(s.getEmail())
+                        .leetcodeUsername(s.getLeetcodeUsername())
+                        .codeforcesHandle(s.getCodeforcesHandle())
+                        .totalSolved(sSolved)
+                        .streak(sStreak)
+                        .activeThisWeek(isActive)
+                        .riskLevel(riskLevel)
+                        .riskReason(riskReason)
+                        .build());
+            }
+        }
+        atRiskList.sort((a, b) -> {
+            if ("HIGH".equals(a.getRiskLevel()) && !"HIGH".equals(b.getRiskLevel())) return -1;
+            if (!"HIGH".equals(a.getRiskLevel()) && "HIGH".equals(b.getRiskLevel())) return 1;
+            return Integer.compare(a.getTotalSolved(), b.getTotalSolved());
+        });
+
+        // 8. Assignments Completion Analytics
+        List<Assignment> assignments = classroom.getAssignments() != null ? classroom.getAssignments() : Collections.emptyList();
+        List<AssignmentAnalyticsDTO> assignmentsBreakdown = new ArrayList<>();
+        double totalCompletionPercentSum = 0.0;
+
+        for (Assignment a : assignments) {
+            int completedCount = 0;
+            for (Student s : students) {
+                boolean isManually = s.getManuallyCompletedAssignments() != null &&
+                        s.getManuallyCompletedAssignments().contains(a.getId());
+                boolean isCaught = false;
+                if (!isManually && s.getRecentSubmissions() != null) {
+                    isCaught = s.getRecentSubmissions().stream()
+                            .anyMatch(sub -> StudentMapper.isProblemSlugMatch(sub.getTitleSlug(), a.getTitleSlug()));
+                }
+                if (isManually || isCaught) {
+                    completedCount++;
+                }
+            }
+
+            double compPct = (completedCount * 100.0) / totalStudents;
+            totalCompletionPercentSum += compPct;
+            boolean isExpired = a.getEndTimestamp() > 0 && a.getEndTimestamp() < (System.currentTimeMillis() / 1000);
+
+            assignmentsBreakdown.add(AssignmentAnalyticsDTO.builder()
+                    .assignmentId(a.getId())
+                    .title(a.getTitle() != null && !a.getTitle().isBlank() ? a.getTitle() : a.getTitleSlug())
+                    .titleSlug(a.getTitleSlug())
+                    .platform(a.getPlatform() != null ? a.getPlatform().name() : "LEETCODE")
+                    .questionLink(a.getQuestionLink())
+                    .completedStudentsCount(completedCount)
+                    .totalStudentsCount(totalStudents)
+                    .completionPercentage(compPct)
+                    .startTimestamp(a.getStartTimestamp())
+                    .endTimestamp(a.getEndTimestamp())
+                    .expired(isExpired)
+                    .build());
+        }
+
+        double classAssignmentCompRate = assignments.isEmpty() ? 100.0 : (totalCompletionPercentSum / assignments.size());
+
+        // 9. Topic Analysis & Smart Weakness Engine
+        List<String> coreCurriculumTopics = List.of(
+                "Dynamic Programming", "Tree", "Graph", "Binary Search",
+                "Two Pointers", "Sliding Window", "Stack", "Heap (Priority Queue)",
+                "Backtracking", "Linked List", "Greedy", "Hash Table"
+        );
+        for (String coreTopic : coreCurriculumTopics) {
+            aggregatedSkills.putIfAbsent(coreTopic, 0);
+        }
+
+        List<TopicProficiencyDTO> topicProficiencies = new ArrayList<>();
+        List<CuratedProblemDTO> recommendedActionItems = new ArrayList<>();
+
+        for (Map.Entry<String, Integer> entry : aggregatedSkills.entrySet()) {
+            String tagName = entry.getKey();
+            int count = entry.getValue();
+            double avgSolvedForTopic = (double) count / totalStudents;
+            boolean isCore = curatedTopicCatalog != null && curatedTopicCatalog.isCoreInterviewTopic(tagName);
+
+            String level;
+            String severity;
+            String recommendation;
+
+            if (avgSolvedForTopic >= 12.0) {
+                level = "STRONG";
+                severity = "LOW";
+                recommendation = "Cohort demonstrates high proficiency. Ready for hard-tier problem variants.";
+            } else if (avgSolvedForTopic >= 4.0) {
+                level = "DEVELOPING";
+                severity = isCore ? "MEDIUM" : "LOW";
+                recommendation = "Solid foundation developing. Reinforce with intermediate pattern practice.";
+            } else {
+                level = "CRITICAL_WEAKNESS";
+                severity = isCore ? "HIGH" : "MEDIUM";
+                recommendation = isCore
+                        ? "High-priority interview topic with low practice! Schedule dedicated cohort assignment."
+                        : "Low solve volume across students. Encourage practice to build breadth.";
+            }
+
+            List<CuratedProblemDTO> suggested = curatedTopicCatalog != null
+                    ? curatedTopicCatalog.getCuratedProblemsForTopic(tagName)
+                    : Collections.emptyList();
+
+            topicProficiencies.add(TopicProficiencyDTO.builder()
+                    .tagName(tagName)
+                    .problemsSolved(count)
+                    .averageSolved(avgSolvedForTopic)
+                    .masteryLevel(level)
+                    .severity(severity)
+                    .recommendation(recommendation)
+                    .suggestedProblems(suggested)
+                    .build());
+        }
+
+        // Sort topic proficiencies: HIGH severity first, then by solve count
+        topicProficiencies.sort((a, b) -> {
+            int severityCompare = getSeverityOrder(a.getSeverity()) - getSeverityOrder(b.getSeverity());
+            if (severityCompare != 0) return severityCompare;
+            return Integer.compare(a.getProblemsSolved(), b.getProblemsSolved());
+        });
+
+        // Collect top action items (suggested problems from the most critical weaknesses)
+        for (TopicProficiencyDTO tp : topicProficiencies) {
+            if ("HIGH".equals(tp.getSeverity()) && tp.getSuggestedProblems() != null) {
+                for (CuratedProblemDTO p : tp.getSuggestedProblems()) {
+                    if (recommendedActionItems.size() < 4 && !recommendedActionItems.contains(p)) {
+                        recommendedActionItems.add(p);
+                    }
+                }
+            }
+        }
+
+        // Legacy topStrengths & criticalWeaknesses for backwards compatibility
+        List<SkillStat> sortedSkillsDesc = aggregatedSkills.entrySet().stream()
+                .filter(e -> e.getValue() > 0)
                 .map(e -> new SkillStat(e.getKey(), e.getValue()))
                 .sorted((a, b) -> Integer.compare(b.getProblemsSolved(), a.getProblemsSolved()))
                 .toList();
 
-        // Top 5 Strengths
-        List<SkillStat> topStrengths = sortedSkills.stream().limit(5).toList();
+        List<SkillStat> topStrengths = sortedSkillsDesc.stream().limit(5).toList();
 
-        // Top 5 Weaknesses (Topics they have barely touched, but at least 1 person tried)
-        List<SkillStat> criticalWeaknesses = sortedSkills.stream()
-                .filter(s -> s.getProblemsSolved() > 0) // Ignore completely untouched
-                .skip(Math.max(0, sortedSkills.size() - 5)) // Get the bottom 5
-                .sorted(Comparator.comparingInt(SkillStat::getProblemsSolved)) // Sort ascending for weaknesses
+        List<SkillStat> criticalWeaknesses = topicProficiencies.stream()
+                .filter(tp -> "CRITICAL_WEAKNESS".equals(tp.getMasteryLevel()))
+                .limit(5)
+                .map(tp -> new SkillStat(tp.getTagName(), tp.getProblemsSolved()))
                 .toList();
+
+        // 10. Interview Readiness Score (0-100)
+        double difficultyScore = Math.min(35.0, ((medPct * 0.7 + hardPct * 1.5) / 50.0) * 35.0);
+        double engagementScore = ((double) activeCount / totalStudents) * 30.0;
+        long coreMastered = topicProficiencies.stream()
+                .filter(tp -> ("STRONG".equals(tp.getMasteryLevel()) || "DEVELOPING".equals(tp.getMasteryLevel()))
+                        && curatedTopicCatalog != null && curatedTopicCatalog.isCoreInterviewTopic(tp.getTagName()))
+                .count();
+        double breadthScore = Math.min(20.0, (coreMastered / 8.0) * 20.0);
+        double assignmentScore = (classAssignmentCompRate / 100.0) * 15.0;
+
+        int readinessScore = (int) Math.round(Math.min(100.0, Math.max(0.0, difficultyScore + engagementScore + breadthScore + assignmentScore)));
+
+        String readinessAssessment;
+        if (readinessScore >= 75) {
+            readinessAssessment = "Interview Ready — High algorithmic depth, balanced difficulty, and strong cohort consistency.";
+        } else if (readinessScore >= 50) {
+            readinessAssessment = "Solid Foundation — Good problem-solving momentum; assign more Medium & Hard problems to build interview depth.";
+        } else {
+            readinessAssessment = "Foundational Phase — Focus on regular weekly consistency, assignment completion, and core DSA topics.";
+        }
 
         return ClassroomAnalyticsDTO.builder()
                 .classroomId(classroomId)
                 .className(classroom.getClassName())
                 .totalStudents(totalStudents)
-                .averageTotalSolved(totalSolved / totalStudents)
-                .averageEasy(totalEasy / totalStudents)
-                .averageMedium(totalMed / totalStudents)
-                .averageHard(totalHard / totalStudents)
+                .averageTotalSolved(avgSolved)
+                .averageEasy(avgEasy)
+                .averageMedium(avgMed)
+                .averageHard(avgHard)
                 .activeStudentsThisWeek(activeCount)
                 .classEngagementScore((activeCount * 100.0) / totalStudents)
                 .topStrengths(topStrengths)
                 .criticalWeaknesses(criticalWeaknesses)
+                .topicProficiencies(topicProficiencies)
+                .recommendedActionItems(recommendedActionItems)
+                .atRiskStudentsCount(atRiskList.size())
+                .atRiskStudents(atRiskList)
+                .averageStreak(Math.round(avgStreak * 10.0) / 10.0)
+                .streakChampion(streakChampion)
+                .streakChampionStreak(maxStreak)
+                .totalAssignments(assignments.size())
+                .assignmentCompletionRate(Math.round(classAssignmentCompRate * 10.0) / 10.0)
+                .assignmentsBreakdown(assignmentsBreakdown)
+                .easyPercentage(Math.round(easyPct * 10.0) / 10.0)
+                .mediumPercentage(Math.round(medPct * 10.0) / 10.0)
+                .hardPercentage(Math.round(hardPct * 10.0) / 10.0)
+                .interviewReadinessScore(readinessScore)
+                .readinessAssessment(readinessAssessment)
+                .dualPlatformStudents(dualPlatformCount)
+                .leetcodeOnlyStudents(lcOnlyCount)
+                .codeforcesOnlyStudents(cfOnlyCount)
+                .averageLeetcodeRating(Math.round(avgLcRating * 10.0) / 10.0)
+                .averageCodeforcesRating(Math.round(avgCfRating * 10.0) / 10.0)
                 .build();
+    }
+
+    private int getSeverityOrder(String severity) {
+        if ("HIGH".equalsIgnoreCase(severity)) return 1;
+        if ("MEDIUM".equalsIgnoreCase(severity)) return 2;
+        return 3;
     }
 
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics", "mentors-all", "mentor"}, allEntries = true)
