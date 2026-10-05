@@ -204,13 +204,14 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
     const handleSyncStudent = async (student: StudentSummaryDTO) => {
         const studentId = student.id;
         if (!studentId) return;
+        const studentDisplayName = student.name || student.email || student.leetcodeUsername || 'student';
         setSyncingStudentId(studentId);
         try {
             const res = await AdminService.syncStudent(studentId);
-            showToast(res.data?.message || `Synced ${student.name}'s statistics.`, 'success');
+            showToast(res.data?.message || `Synced ${studentDisplayName}'s statistics.`, 'success');
             await fetchAllData();
         } catch (err: unknown) {
-            showToast(getErrMsg(err, `Failed to sync student ${student.name}.`), 'error');
+            showToast(getErrMsg(err, `Failed to sync student ${studentDisplayName}.`), 'error');
         } finally {
             setSyncingStudentId(null);
         }
@@ -218,10 +219,11 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
 
     const handleDeleteStudent = async () => {
         if (!deletingStudent?.id) return;
+        const studentDisplayName = deletingStudent.name || deletingStudent.email || deletingStudent.leetcodeUsername || 'student';
         setDeleteStudentError(null);
         try {
             await AdminService.deleteStudent(deletingStudent.id);
-            showToast(`Deleted student "${deletingStudent.name}".`, 'success');
+            showToast(`Deleted student "${studentDisplayName}".`, 'success');
             setDeletingStudent(null);
             await fetchAllData();
         } catch (err: unknown) {
@@ -250,7 +252,8 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
         const q = mentorSearch.toLowerCase().trim();
         if (!q) return overviewData.allMentors;
         return overviewData.allMentors.filter(m =>
-            m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)
+            (m.name && m.name.toLowerCase().includes(q)) ||
+            (m.email && m.email.toLowerCase().includes(q))
         );
     }, [overviewData?.allMentors, mentorSearch]);
 
@@ -259,15 +262,16 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
         const q = classroomSearch.toLowerCase().trim();
         if (!q) return overviewData.allClassrooms;
         return overviewData.allClassrooms.filter(c =>
-            c.className.toLowerCase().includes(q) || (c.mentorName && c.mentorName.toLowerCase().includes(q))
+            (c.className && c.className.toLowerCase().includes(q)) ||
+            (c.mentorName && c.mentorName.toLowerCase().includes(q))
         );
     }, [overviewData?.allClassrooms, classroomSearch]);
 
     const filteredStudents = useMemo(() => {
         const q = studentSearch.toLowerCase().trim();
-        if (!q) return students;
-        return students.filter(s =>
-            s.name.toLowerCase().includes(q) ||
+        if (!q) return students || [];
+        return (students || []).filter(s =>
+            (s.name && s.name.toLowerCase().includes(q)) ||
             (s.email && s.email.toLowerCase().includes(q)) ||
             (s.leetcodeUsername && s.leetcodeUsername.toLowerCase().includes(q)) ||
             (s.codeforcesHandle && s.codeforcesHandle.toLowerCase().includes(q))
@@ -638,12 +642,12 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                         <div className="flex items-center gap-3.5">
                                             <Avatar className="h-10 w-10 border border-zinc-200 dark:border-zinc-700">
                                                 <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold text-xs">
-                                                    {mentor.name.substring(0, 2).toUpperCase()}
+                                                    {(mentor.name || mentor.email || 'Mentor').substring(0, 2).toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div>
                                                 <div className="flex items-center gap-2">
-                                                    <p className="font-bold text-sm text-zinc-900 dark:text-white">{mentor.name}</p>
+                                                    <p className="font-bold text-sm text-zinc-900 dark:text-white">{mentor.name || mentor.email || 'Unnamed Mentor'}</p>
                                                     {mentor.role === 'SUPER_ADMIN' ? (
                                                         <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 text-[10px] py-0">
                                                             SUPER ADMIN
@@ -654,7 +658,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                         </Badge>
                                                     )}
                                                 </div>
-                                                <p className="text-xs text-zinc-500 dark:text-zinc-400">{mentor.email}</p>
+                                                {mentor.email && <p className="text-xs text-zinc-500 dark:text-zinc-400">{mentor.email}</p>}
                                             </div>
                                         </div>
 
@@ -703,7 +707,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                 {filteredClassrooms.map((cls) => (
                                     <div key={cls.classroomId} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-[#181820] transition-colors group">
                                         <div>
-                                            <p className="font-bold text-sm text-zinc-900 dark:text-white">{cls.className}</p>
+                                            <p className="font-bold text-sm text-zinc-900 dark:text-white">{cls.className || 'Unnamed Class'}</p>
                                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                                                 Instructor: <span className="font-medium text-zinc-700 dark:text-zinc-300">{cls.mentorName || 'Unassigned'}</span>
                                             </p>
@@ -754,20 +758,26 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     <Card className="bg-white dark:bg-[#111116] border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
                         <ScrollArea className="h-[460px]">
                             <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
-                                {filteredStudents.map((student) => (
-                                    <div key={student.id || student.leetcodeUsername || student.email} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-[#181820] transition-colors group">
-                                        <div className="flex items-center gap-3.5">
-                                            <Avatar className="h-10 w-10 border border-zinc-200 dark:border-zinc-700">
-                                                <AvatarImage src={student.avatarUrl} />
-                                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold text-xs">
-                                                    {student.name.substring(0, 2).toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <p className="font-bold text-sm text-zinc-900 dark:text-white">{student.name}</p>
-                                                    <span className="text-xs text-zinc-400">({student.email})</span>
-                                                </div>
+                                {filteredStudents.map((student, idx) => {
+                                    const studentFallback = (student.name || student.email || student.leetcodeUsername || student.codeforcesHandle || 'Student')
+                                        .substring(0, 2)
+                                        .toUpperCase();
+                                    const studentDisplayName = student.name || student.email || student.leetcodeUsername || student.codeforcesHandle || 'Unnamed Student';
+
+                                    return (
+                                        <div key={student.id || student.leetcodeUsername || student.email || `st-${idx}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-[#181820] transition-colors group">
+                                            <div className="flex items-center gap-3.5">
+                                                <Avatar className="h-10 w-10 border border-zinc-200 dark:border-zinc-700">
+                                                    <AvatarImage src={student.avatarUrl} />
+                                                    <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold text-xs">
+                                                        {studentFallback}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="font-bold text-sm text-zinc-900 dark:text-white">{studentDisplayName}</p>
+                                                        {student.email && <span className="text-xs text-zinc-400">({student.email})</span>}
+                                                    </div>
                                                 <div className="flex flex-wrap items-center gap-2 mt-1">
                                                     {student.leetcodeUsername && (
                                                         <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
@@ -815,7 +825,8 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                             </Button>
                                         </div>
                                     </div>
-                                ))}
+                                );
+                            })}
 
                                 {filteredStudents.length === 0 && (
                                     <div className="p-8 text-center text-xs text-zinc-500">
@@ -1004,7 +1015,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
 
                     <div className="py-2 text-sm text-zinc-600 dark:text-zinc-300 space-y-2">
                         <p>
-                            Are you sure you want to permanently delete mentor <strong>{deletingMentor?.name}</strong> ({deletingMentor?.email})?
+                            Are you sure you want to permanently delete mentor <strong>{deletingMentor?.name || deletingMentor?.email || 'this mentor'}</strong>{deletingMentor?.email && deletingMentor?.name ? ` (${deletingMentor.email})` : ''}?
                         </p>
                         <p className="text-xs font-bold text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 p-2.5 rounded-xl border border-rose-200 dark:border-rose-500/20">
                             Warning: This will cascade-delete their {deletingMentor?.classroomIds?.length || 0} associated classroom(s) and cannot be undone.
@@ -1066,7 +1077,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
 
                     <div className="py-2 text-sm text-zinc-600 dark:text-zinc-300 space-y-2">
                         <p>
-                            Are you sure you want to permanently remove student <strong>{deletingStudent?.name}</strong> ({deletingStudent?.email})?
+                            Are you sure you want to permanently remove student <strong>{deletingStudent?.name || deletingStudent?.email || deletingStudent?.leetcodeUsername || 'this student'}</strong>{deletingStudent?.email && deletingStudent?.name ? ` (${deletingStudent.email})` : ''}?
                         </p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
                             This student will be removed from all enrolled classrooms and their platform tracking history deleted.

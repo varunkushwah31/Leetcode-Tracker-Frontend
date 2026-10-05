@@ -155,4 +155,51 @@ describe('AdminOverview Component', () => {
             expect(AdminService.forceSyncAll).toHaveBeenCalled();
         });
     });
+
+    it('renders and filters safely when students and mentors have null or missing fields', async () => {
+        const corruptedStudents = [
+            ...mockStudents,
+            {
+                id: 'corrupt-1',
+                name: null as unknown as string,
+                email: null as unknown as string,
+                role: 'STUDENT',
+                leetcodeUsername: null as unknown as string,
+                codeforcesHandle: null as unknown as string,
+                leetcodeSolvedCount: 0,
+                codeforcesSolvedCount: 0,
+                totalSolved: 0,
+                consistencyStreak: 0,
+                rank: 'Unranked',
+                currentContestRating: 0,
+                completedAssignments: 0,
+                pendingAssignments: 0,
+            },
+        ];
+
+        vi.mocked(AdminService.getAllStudents).mockResolvedValue({ data: corruptedStudents } as never);
+
+        render(<AdminOverview onBack={mockBack} />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Super Admin Center')).toBeDefined();
+        });
+
+        const studentsTab = screen.getByRole('tab', { name: /Students Directory/i });
+        fireEvent.click(studentsTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Grace Hopper')).toBeDefined();
+            expect(screen.getByText('Unnamed Student')).toBeDefined();
+        });
+
+        // Search input should filter without crashing on null properties
+        const searchInput = screen.getByPlaceholderText(/Search students by name/i);
+        fireEvent.change(searchInput, { target: { value: 'Grace' } });
+
+        await waitFor(() => {
+            expect(screen.getByText('Grace Hopper')).toBeDefined();
+            expect(screen.queryByText('Unnamed Student')).toBeNull();
+        });
+    });
 });

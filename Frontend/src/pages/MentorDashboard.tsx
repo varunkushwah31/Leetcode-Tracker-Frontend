@@ -404,7 +404,7 @@ export function MentorDashboard() {
             <div className="p-4 border-t border-zinc-200 dark:border-zinc-900 space-y-2 bg-white/80 dark:bg-[#09090e]/80 backdrop-blur-md">
                 <div className="flex items-center gap-3 px-3 py-2 mb-2">
                     <Avatar className="border border-zinc-200 dark:border-zinc-800 w-9 h-9">
-                        <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] font-bold">{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] font-bold">{(user?.name || 'ME').substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">{user?.name}</p>
@@ -602,7 +602,7 @@ export function MentorDashboard() {
                             />
                             <Avatar className="w-8 h-8 border border-zinc-200 dark:border-zinc-800">
                                 <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] text-xs font-bold">
-                                    {user?.name?.substring(0, 2).toUpperCase() || 'ME'}
+                                    {(user?.name || 'ME').substring(0, 2).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
                         </div>
