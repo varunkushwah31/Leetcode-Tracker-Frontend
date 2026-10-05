@@ -37,6 +37,7 @@ interface ClassroomAnalyticsProps {
     readonly data: ClassroomAnalyticsDTO | null;
     readonly classroomId?: string;
     readonly mentorId?: string;
+    readonly isLoading?: boolean;
     readonly onRefresh?: () => void;
     readonly onStudentClick?: (username: string) => void;
 }
@@ -47,6 +48,7 @@ export function ClassroomAnalytics({
     data,
     classroomId,
     mentorId: _mentorId,
+    isLoading = false,
     onRefresh,
     onStudentClick,
 }: ClassroomAnalyticsProps) {
@@ -76,9 +78,9 @@ export function ClassroomAnalytics({
 
     const handleOpenAssignModal = (problem: CuratedProblemDTO) => {
         setSelectedProblem(problem);
-        setAssignmentTitle(problem.title);
-        setAssignmentSlug(problem.slug);
-        setAssignmentPlatform(problem.platform || 'LEETCODE');
+        setAssignmentTitle(problem.title || '');
+        setAssignmentSlug(problem.slug || problem.titleSlug || '');
+        setAssignmentPlatform((problem.platform as 'LEETCODE' | 'CODEFORCES') || 'LEETCODE');
         setAssignmentDeadline(getDefaultDeadline(3));
         setAssignError(null);
         setAssignSuccessMsg(null);
@@ -136,12 +138,29 @@ export function ClassroomAnalytics({
     const filteredTopics = useMemo(() => {
         if (!data?.topicProficiencies) return [];
         return data.topicProficiencies.filter((tp) => {
-            const matchesSearch = tp.tagName.toLowerCase().includes(searchTopic.toLowerCase());
+            const tagName = tp.tagName || '';
+            const matchesSearch = tagName.toLowerCase().includes(searchTopic.toLowerCase());
             const matchesFilter =
                 selectedMasteryFilter === 'ALL' || tp.masteryLevel === selectedMasteryFilter;
             return matchesSearch && matchesFilter;
         });
     }, [data?.topicProficiencies, searchTopic, selectedMasteryFilter]);
+
+    if (isLoading) {
+        return (
+            <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl">
+                <CardContent className="flex flex-col items-center justify-center py-20">
+                    <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff] mb-4" />
+                    <p className="text-zinc-900 dark:text-white text-base font-bold tracking-tight mb-1">
+                        Computing Cohort Analytics & Weaknesses
+                    </p>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-xs">
+                        Synthesizing problem solve velocity, topic proficiencies, and risk indicators...
+                    </p>
+                </CardContent>
+            </Card>
+        );
+    }
 
     if (!data || data.totalStudents === 0) {
         return (
@@ -160,11 +179,11 @@ export function ClassroomAnalytics({
     const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
 
     const atRiskCount = data.atRiskStudentsCount ?? (data.atRiskStudents ? data.atRiskStudents.length : 0);
-    const criticalWeaknessTopics = data.topicProficiencies
-        ? data.topicProficiencies.filter((t) => t.masteryLevel === 'CRITICAL_WEAKNESS')
+    const criticalWeaknessTopics = (data.topicProficiencies && data.topicProficiencies.length > 0)
+        ? data.topicProficiencies.filter((t) => t.masteryLevel === 'CRITICAL_WEAKNESS' || t.severity === 'HIGH')
         : (data.criticalWeaknesses || []);
 
-    const interviewScore = data.interviewReadinessScore ?? Math.min(100, Math.round((data.averageMedium * 1.5 + data.averageHard * 3) / 1.5));
+    const interviewScore = data.interviewReadinessScore ?? Math.min(100, Math.round(((data.averageMedium || 0) * 1.5 + (data.averageHard || 0) * 3) / 1.5));
     const readinessLabel = data.readinessAssessment || (interviewScore >= 75 ? 'Interview Ready' : interviewScore >= 45 ? 'Foundations Good' : 'Needs Practice');
 
     return (
@@ -238,7 +257,7 @@ export function ClassroomAnalytics({
                                     {criticalWeaknessTopics.length}
                                 </h3>
                                 <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                                    {criticalWeaknessTopics.length > 0 ? `${(criticalWeaknessTopics[0] as any).tagName} & more` : 'No major gaps'}
+                                    {criticalWeaknessTopics.length > 0 ? `${(criticalWeaknessTopics[0] as any)?.tagName || 'Core Topics'} & more` : 'No major gaps'}
                                 </span>
                             </div>
                             <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 truncate font-medium">Click to view interventions</p>
@@ -380,12 +399,50 @@ export function ClassroomAnalytics({
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="pt-0 space-y-2">
-                                {data.recommendedActionItems.map((item, idx) => (
-                                    <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white/80 dark:bg-black/20 p-2.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
-                                        <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
-                                        <span className="leading-relaxed">{item}</span>
-                                    </div>
-                                ))}
+                                {data.recommendedActionItems.map((item, idx) => {
+                                    if (typeof item === 'string') {
+                                        return (
+                                            <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white/80 dark:bg-black/20 p-2.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
+                                                <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
+                                                <span className="leading-relaxed">{item}</span>
+                                            </div>
+                                        );
+                                    }
+                                    const prob = item as CuratedProblemDTO;
+                                    return (
+                                        <div key={prob.slug || prob.titleSlug || idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white/80 dark:bg-black/20 p-3 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
+                                            <div className="flex items-start gap-2.5 min-w-0">
+                                                <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                                        <span className="font-semibold text-zinc-900 dark:text-white truncate">
+                                                            Assign target practice: {prob.title}
+                                                        </span>
+                                                        {prob.difficulty && (
+                                                            <Badge className="text-[9px] px-1.5 py-0 font-bold uppercase bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20">
+                                                                {prob.difficulty}
+                                                            </Badge>
+                                                        )}
+                                                        {prob.topic && (
+                                                            <span className="text-[10px] text-zinc-500 font-medium">({prob.topic})</span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-[11px] text-zinc-500 mt-0.5">
+                                                        High-yield interview question to elevate cohort proficiency in flagged weak topics.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleOpenAssignModal(prob)}
+                                                className="shrink-0 h-7 px-2.5 text-xs bg-zinc-900 dark:bg-zinc-800 hover:bg-[#5b4fff] dark:hover:bg-[#5b4fff] text-white rounded-lg font-medium transition-colors cursor-pointer"
+                                            >
+                                                <LightningIcon className="w-3 h-3 mr-1" />
+                                                Assign Now
+                                            </Button>
+                                        </div>
+                                    );
+                                })}
                             </CardContent>
                         </Card>
                     )}
@@ -585,14 +642,19 @@ export function ClassroomAnalytics({
                                 ? data.topicProficiencies.filter((t) => t.masteryLevel === 'CRITICAL_WEAKNESS' || t.severity === 'HIGH')
                                 : (data.criticalWeaknesses || []).map((w) => ({
                                       tagName: w.tagName,
+                                      problemsSolved: w.problemsSolved,
                                       cohortTotalSolved: w.problemsSolved,
-                                      averageSolvedPerStudent: (w.problemsSolved / Math.max(data.totalStudents, 1)),
+                                      averageSolved: (w.problemsSolved / Math.max(data.totalStudents || 1, 1)),
+                                      averageSolvedPerStudent: (w.problemsSolved / Math.max(data.totalStudents || 1, 1)),
                                       masteryLevel: 'CRITICAL_WEAKNESS' as const,
                                       severity: 'HIGH' as const,
                                       recommendation: `Target ${w.tagName} with foundational problems to bring cohort proficiency up.`,
                                       suggestedProblems: [],
                                   }))
-                            ).map((topic: TopicProficiencyDTO) => (
+                            ).map((topic: TopicProficiencyDTO) => {
+                                const totalSolved = topic.cohortTotalSolved ?? topic.problemsSolved ?? 0;
+                                const avgSolved = topic.averageSolvedPerStudent ?? topic.averageSolved ?? (totalSolved / Math.max(data.totalStudents || 1, 1));
+                                return (
                                 <Card key={topic.tagName} className={`${cardClasses} border-l-4 border-l-rose-500 overflow-hidden`}>
                                     <CardHeader className="pb-4 border-b border-zinc-200/80 dark:border-zinc-800/60 bg-rose-500/5">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -610,7 +672,7 @@ export function ClassroomAnalytics({
                                                         </Badge>
                                                     </div>
                                                     <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                                        Cohort Solved: <span className="font-semibold text-zinc-900 dark:text-white">{topic.cohortTotalSolved}</span> total ({topic.averageSolvedPerStudent ? topic.averageSolvedPerStudent.toFixed(1) : '0'} avg per student)
+                                                        Cohort Solved: <span className="font-semibold text-zinc-900 dark:text-white">{totalSolved}</span> total ({avgSolved.toFixed(1)} avg per student)
                                                     </p>
                                                 </div>
                                             </div>
@@ -641,9 +703,12 @@ export function ClassroomAnalytics({
                                                     <CodeIcon className="w-3.5 h-3.5 text-[#5b4fff]" /> Curated Interview Problems to Bridge This Gap:
                                                 </p>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                    {topic.suggestedProblems.map((prob) => (
+                                                    {topic.suggestedProblems.map((prob, pIdx) => {
+                                                        const probKey = prob.slug || prob.titleSlug || `${topic.tagName}-${pIdx}`;
+                                                        const probLink = prob.link || (prob.titleSlug ? (prob.platform === 'CODEFORCES' ? `https://codeforces.com/problemset/problem/${prob.titleSlug}` : `https://leetcode.com/problems/${prob.titleSlug}`) : undefined);
+                                                        return (
                                                         <div
-                                                            key={prob.slug}
+                                                            key={probKey}
                                                             className="p-3 rounded-xl bg-white dark:bg-[#16161a] border border-zinc-200 dark:border-zinc-800/80 hover:border-[#5b4fff]/50 transition-all flex flex-col justify-between group shadow-xs"
                                                         >
                                                             <div className="flex items-start justify-between gap-2 mb-2">
@@ -663,7 +728,7 @@ export function ClassroomAnalytics({
                                                                                 ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                                                                                 : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                                                                         }`}>
-                                                                            {prob.difficulty}
+                                                                            {prob.difficulty || 'MEDIUM'}
                                                                         </span>
                                                                     </div>
                                                                     <p className="text-xs font-bold text-zinc-900 dark:text-white truncate" title={prob.title}>
@@ -671,9 +736,9 @@ export function ClassroomAnalytics({
                                                                     </p>
                                                                 </div>
 
-                                                                {prob.link && (
+                                                                {probLink && (
                                                                     <a
-                                                                        href={prob.link}
+                                                                        href={probLink}
                                                                         target="_blank"
                                                                         rel="noreferrer"
                                                                         className="text-zinc-400 hover:text-[#5b4fff] transition-colors p-1"
@@ -693,13 +758,13 @@ export function ClassroomAnalytics({
                                                                 Assign to Cohort
                                                             </Button>
                                                         </div>
-                                                    ))}
+                                                    );})}
                                                 </div>
                                             </div>
                                         )}
                                     </CardContent>
                                 </Card>
-                            ))}
+                            );})}
                         </div>
                     )}
                 </div>
@@ -769,7 +834,11 @@ export function ClassroomAnalytics({
 
                     {/* Matrix Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredTopics.map((topic) => (
+                        {filteredTopics.map((topic) => {
+                            const totalSolved = topic.cohortTotalSolved ?? topic.problemsSolved ?? 0;
+                            const avgSolved = topic.averageSolvedPerStudent ?? topic.averageSolved ?? (totalSolved / Math.max(data.totalStudents || 1, 1));
+                            const profIndex = Math.min(100, Math.round(avgSolved * 25));
+                            return (
                             <Card key={topic.tagName} className={`${cardClasses} hover:-translate-y-0.5 transition-all flex flex-col justify-between`}>
                                 <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60">
                                     <div className="flex items-center justify-between gap-2">
@@ -787,17 +856,17 @@ export function ClassroomAnalytics({
                                         </Badge>
                                     </div>
                                     <CardDescription className="text-xs text-zinc-500">
-                                        {topic.cohortTotalSolved} solved total ({topic.averageSolvedPerStudent.toFixed(1)} avg/student)
+                                        {totalSolved} solved total ({avgSolved.toFixed(1)} avg/student)
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-4 space-y-3 flex-1 flex flex-col justify-between">
                                     <div className="space-y-1.5">
                                         <div className="flex justify-between text-[11px] font-semibold text-zinc-500">
                                             <span>Proficiency Index</span>
-                                            <span>{Math.min(100, Math.round(topic.averageSolvedPerStudent * 25))}%</span>
+                                            <span>{profIndex}%</span>
                                         </div>
                                         <Progress
-                                            value={Math.min(100, topic.averageSolvedPerStudent * 25)}
+                                            value={profIndex}
                                             className={`h-2 ${
                                                 topic.masteryLevel === 'STRONG'
                                                     ? '[&>div]:bg-emerald-500 bg-emerald-100 dark:bg-zinc-800'
@@ -808,27 +877,30 @@ export function ClassroomAnalytics({
                                         />
                                     </div>
 
-                                    {topic.suggestedProblems && topic.suggestedProblems.length > 0 && (
-                                        <div className="pt-2 border-t border-zinc-200/50 dark:border-zinc-800/50 space-y-1.5">
-                                            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Target Problem:</p>
-                                            <div className="flex items-center justify-between text-xs">
-                                                <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate max-w-[160px]" title={topic.suggestedProblems[0].title}>
-                                                    {topic.suggestedProblems[0].title}
-                                                </span>
-                                                <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    onClick={() => handleOpenAssignModal(topic.suggestedProblems[0])}
-                                                    className="h-6 px-2 text-[11px] text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/10"
-                                                >
-                                                    Assign <LightningIcon className="w-3 h-3 ml-0.5" />
-                                                </Button>
+                                    {topic.suggestedProblems && topic.suggestedProblems.length > 0 && (() => {
+                                        const targetProblem = topic.suggestedProblems[0];
+                                        return (
+                                            <div className="pt-2 border-t border-zinc-200/50 dark:border-zinc-800/50 space-y-1.5">
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Target Problem:</p>
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate max-w-[160px]" title={targetProblem.title}>
+                                                        {targetProblem.title}
+                                                    </span>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        onClick={() => handleOpenAssignModal(targetProblem)}
+                                                        className="h-6 px-2 text-[11px] text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/10"
+                                                    >
+                                                        Assign <LightningIcon className="w-3 h-3 ml-0.5" />
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        );
+                                    })()}
                                 </CardContent>
                             </Card>
-                        ))}
+                        );})}
                     </div>
 
                     {filteredTopics.length === 0 && (
@@ -867,13 +939,20 @@ export function ClassroomAnalytics({
                         </Card>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {data.atRiskStudents.map((student) => (
+                            {data.atRiskStudents.map((student) => {
+                                const streak = student.streak ?? student.currentStreak ?? 0;
+                                const isCritical = student.riskLevel === 'CRITICAL' || student.riskLevel === 'HIGH';
+                                const isWarning = student.riskLevel === 'WARNING' || student.riskLevel === 'MEDIUM';
+                                const reason = student.riskReason || student.primaryRiskReason || 'Inactivity or solve velocity deficit';
+                                const identifier = student.leetcodeUsername || student.codeforcesHandle || student.name || student.email || 'Student';
+                                const studentKey = student.studentId || identifier;
+                                return (
                                 <Card
-                                    key={student.studentId}
+                                    key={studentKey}
                                     className={`${cardClasses} border-l-4 ${
-                                        student.riskLevel === 'CRITICAL'
+                                        isCritical
                                             ? 'border-l-rose-500'
-                                            : student.riskLevel === 'WARNING'
+                                            : isWarning
                                             ? 'border-l-amber-500'
                                             : 'border-l-blue-500'
                                     } hover:-translate-y-0.5 transition-all`}
@@ -886,20 +965,20 @@ export function ClassroomAnalytics({
                                                 </div>
                                                 <div className="min-w-0">
                                                     <h4 className="text-sm font-bold text-zinc-900 dark:text-white truncate">
-                                                        {student.name}
+                                                        {student.name || identifier}
                                                     </h4>
-                                                    <p className="text-[11px] text-zinc-500 truncate">{student.email}</p>
+                                                    <p className="text-[11px] text-zinc-500 truncate">{student.email || identifier}</p>
                                                 </div>
                                             </div>
 
                                             <Badge className={`text-[9px] font-extrabold uppercase ${
-                                                student.riskLevel === 'CRITICAL'
+                                                isCritical
                                                     ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
-                                                    : student.riskLevel === 'WARNING'
+                                                    : isWarning
                                                     ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
                                                     : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30'
                                             }`}>
-                                                {student.riskLevel}
+                                                {student.riskLevel || 'WARNING'}
                                             </Badge>
                                         </div>
                                     </CardHeader>
@@ -908,24 +987,26 @@ export function ClassroomAnalytics({
                                         {/* Risk Reason Banner */}
                                         <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-700 dark:text-zinc-300">
                                             <p className="font-semibold text-zinc-900 dark:text-white mb-0.5">Alert Trigger:</p>
-                                            <p className="leading-snug text-zinc-600 dark:text-zinc-400">{student.primaryRiskReason}</p>
+                                            <p className="leading-snug text-zinc-600 dark:text-zinc-400">{reason}</p>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-2 text-xs">
                                             <div className="p-2 rounded-lg bg-zinc-100/60 dark:bg-zinc-900/40">
                                                 <p className="text-[10px] text-zinc-500 font-semibold">Total Solved</p>
-                                                <p className="text-sm font-extrabold text-zinc-900 dark:text-white">{student.totalSolved}</p>
+                                                <p className="text-sm font-extrabold text-zinc-900 dark:text-white">{student.totalSolved ?? 0}</p>
                                             </div>
                                             <div className="p-2 rounded-lg bg-zinc-100/60 dark:bg-zinc-900/40">
-                                                <p className="text-[10px] text-zinc-500 font-semibold">Days Inactive</p>
-                                                <p className="text-sm font-extrabold text-rose-600 dark:text-rose-400">{student.daysInactive}d</p>
+                                                <p className="text-[10px] text-zinc-500 font-semibold">Activity Status</p>
+                                                <p className={`text-sm font-extrabold ${student.activeThisWeek ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                                    {student.daysInactive !== undefined ? `${student.daysInactive}d Inactive` : student.activeThisWeek ? 'Active this wk' : 'Inactive'}
+                                                </p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
                                             <span>Current Streak:</span>
                                             <span className="font-bold text-amber-500 flex items-center gap-1">
-                                                {student.currentStreak} <FlameIcon className="w-3.5 h-3.5" />
+                                                {streak} <FlameIcon className="w-3.5 h-3.5" />
                                             </span>
                                         </div>
 
@@ -942,7 +1023,7 @@ export function ClassroomAnalytics({
                                         )}
                                     </CardContent>
                                 </Card>
-                            ))}
+                            );})}
                         </div>
                     )}
                 </div>
@@ -989,7 +1070,7 @@ export function ClassroomAnalytics({
                                 <div>
                                     <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Active Cohort Velocity</p>
                                     <h3 className="text-2xl font-black text-zinc-900 dark:text-white">
-                                        {data.activeStudentsThisWeek} Active
+                                        {data.activeStudentsThisWeek ?? 0} Active
                                     </h3>
                                     <p className="text-xs text-zinc-500 mt-0.5">Contributing to submissions</p>
                                 </div>
@@ -1009,8 +1090,20 @@ export function ClassroomAnalytics({
                         </Card>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {data.assignmentsBreakdown.map((asg) => (
-                                <Card key={asg.assignmentId} className={cardClasses}>
+                            {data.assignmentsBreakdown.map((asg, idx) => {
+                                const isExpired = asg.expired ?? asg.isExpired ?? false;
+                                const completion = Math.round(asg.completionPercentage ?? asg.completionRate ?? 0);
+                                const completedCount = asg.completedStudentsCount ?? asg.completedCount ?? 0;
+                                const totalCount = asg.totalStudentsCount ?? asg.totalStudents ?? data.totalStudents;
+                                const dueDateText = asg.endTimestamp
+                                    ? new Date(asg.endTimestamp * 1000).toLocaleDateString()
+                                    : asg.dueDate
+                                    ? new Date(asg.dueDate).toLocaleDateString()
+                                    : 'No deadline';
+                                const problemTitle = asg.title || asg.titleSlug || asg.problemSlug || 'Cohort Assignment';
+
+                                return (
+                                <Card key={asg.assignmentId || idx} className={cardClasses}>
                                     <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60">
                                         <div className="flex items-start justify-between gap-2">
                                             <div>
@@ -1023,40 +1116,40 @@ export function ClassroomAnalytics({
                                                         {asg.platform === 'CODEFORCES' ? 'CF' : 'LC'}
                                                     </span>
                                                     <Badge className={`text-[9px] font-bold ${
-                                                        asg.isExpired
+                                                        isExpired
                                                             ? 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20'
                                                             : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                                     }`}>
-                                                        {asg.isExpired ? 'EXPIRED' : 'ACTIVE'}
+                                                        {isExpired ? 'EXPIRED' : 'ACTIVE'}
                                                     </Badge>
                                                 </div>
-                                                <h4 className="text-sm font-bold text-zinc-900 dark:text-white truncate" title={asg.title}>
-                                                    {asg.title || asg.problemSlug}
+                                                <h4 className="text-sm font-bold text-zinc-900 dark:text-white truncate" title={problemTitle}>
+                                                    {problemTitle}
                                                 </h4>
                                             </div>
 
                                             <div className="text-right">
                                                 <span className="text-lg font-black text-zinc-900 dark:text-white">
-                                                    {Math.round(asg.completionRate)}%
+                                                    {completion}%
                                                 </span>
                                                 <p className="text-[10px] text-zinc-500 font-medium">
-                                                    {asg.completedCount}/{asg.totalStudents} solved
+                                                    {completedCount}/{totalCount} solved
                                                 </p>
                                             </div>
                                         </div>
                                     </CardHeader>
 
                                     <CardContent className="pt-3 space-y-2">
-                                        <Progress value={asg.completionRate} className="h-2 bg-zinc-100 dark:bg-zinc-800 [&>div]:bg-emerald-500" />
+                                        <Progress value={completion} className="h-2 bg-zinc-100 dark:bg-zinc-800 [&>div]:bg-emerald-500" />
                                         <div className="flex justify-between items-center text-xs text-zinc-500 pt-1">
                                             <span>Deadline:</span>
                                             <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                                                {asg.dueDate ? new Date(asg.dueDate).toLocaleDateString() : 'No deadline'}
+                                                {dueDateText}
                                             </span>
                                         </div>
                                     </CardContent>
                                 </Card>
-                            ))}
+                            );})}
                         </div>
                     )}
                 </div>

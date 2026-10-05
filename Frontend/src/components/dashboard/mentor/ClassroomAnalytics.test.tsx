@@ -185,4 +185,94 @@ describe('ClassroomAnalytics Component', () => {
         expect(screen.getByText('80%')).toBeDefined();
         expect(screen.getByText('ACTIVE')).toBeDefined();
     });
+
+    it('renders loading state when isLoading is true', () => {
+        render(<ClassroomAnalytics data={null} isLoading={true} />);
+        expect(screen.getByText(/Computing Cohort Analytics & Weaknesses/i)).toBeDefined();
+    });
+
+    it('renders CuratedProblemDTO objects in recommendedActionItems without React child errors', () => {
+        const backendPayloadData: ClassroomAnalyticsDTO = {
+            ...mockAnalyticsData,
+            recommendedActionItems: [
+                {
+                    title: '3Sum',
+                    titleSlug: '3sum',
+                    difficulty: 'MEDIUM',
+                    platform: 'LEETCODE',
+                    topic: 'Two Pointers',
+                    link: 'https://leetcode.com/problems/3sum/',
+                },
+            ],
+            topicProficiencies: [
+                {
+                    tagName: 'Two Pointers',
+                    problemsSolved: 8,
+                    averageSolved: 0.32,
+                    masteryLevel: 'CRITICAL_WEAKNESS',
+                    severity: 'HIGH',
+                    recommendation: 'Reinforce two-pointer technique.',
+                    suggestedProblems: [
+                        {
+                            title: '3Sum',
+                            titleSlug: '3sum',
+                            difficulty: 'MEDIUM',
+                            platform: 'LEETCODE',
+                            topic: 'Two Pointers',
+                            link: 'https://leetcode.com/problems/3sum/',
+                        },
+                    ],
+                },
+            ],
+            atRiskStudents: [
+                {
+                    studentId: 'stud-2',
+                    name: 'Bob Marley',
+                    email: 'bob@example.com',
+                    streak: 0,
+                    totalSolved: 5,
+                    activeThisWeek: false,
+                    riskLevel: 'HIGH',
+                    riskReason: 'Solve count is below 50% of class average',
+                },
+            ],
+            assignmentsBreakdown: [
+                {
+                    assignmentId: 'asg-2',
+                    title: 'Trapping Rain Water',
+                    titleSlug: 'trapping-rain-water',
+                    platform: 'LEETCODE',
+                    completedStudentsCount: 15,
+                    totalStudentsCount: 25,
+                    completionPercentage: 60.0,
+                    startTimestamp: 1700000000,
+                    endTimestamp: 1700500000,
+                    expired: false,
+                },
+            ],
+        };
+
+        render(<ClassroomAnalytics data={backendPayloadData} />);
+
+        // Action Item rendered with CuratedProblemDTO
+        expect(screen.getByText(/Assign target practice: 3Sum/i)).toBeDefined();
+        expect(screen.getByText('Assign Now')).toBeDefined();
+
+        // Switch to matrix tab
+        const matrixTabBtn = screen.getByText('Topic Competency Matrix');
+        fireEvent.click(matrixTabBtn);
+        expect(screen.getByText('Two Pointers')).toBeDefined();
+
+        // Switch to watchlist tab
+        const watchlistTabBtn = screen.getByText(/At-Risk Watchlist/i);
+        fireEvent.click(watchlistTabBtn);
+        expect(screen.getByText('Bob Marley')).toBeDefined();
+        expect(screen.getByText(/Solve count is below 50% of class average/i)).toBeDefined();
+
+        // Switch to assignment tab
+        const assignmentTabBtn = screen.getByText(/Assignment Health/i);
+        fireEvent.click(assignmentTabBtn);
+        expect(screen.getByText('Trapping Rain Water')).toBeDefined();
+        expect(screen.getByText('60%')).toBeDefined();
+    });
 });

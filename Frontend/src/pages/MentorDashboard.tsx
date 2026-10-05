@@ -62,6 +62,7 @@ interface ClassroomTabContentProps {
     readonly onExportCSV: () => void;
     readonly onStudentClick: (username: string) => void;
     readonly analyticsData: ClassroomAnalyticsDTO | null;
+    readonly isAnalyticsLoading?: boolean;
     readonly mentorId: string;
     readonly onRefresh: () => void;
 }
@@ -74,6 +75,7 @@ function ClassroomTabContent({
     onExportCSV,
     onStudentClick,
     analyticsData,
+    isAnalyticsLoading,
     mentorId,
     onRefresh,
 }: Readonly<ClassroomTabContentProps>) {
@@ -98,6 +100,7 @@ function ClassroomTabContent({
                 data={analyticsData}
                 classroomId={selectedClassroom.classroomId}
                 mentorId={mentorId}
+                isLoading={isAnalyticsLoading}
                 onRefresh={onRefresh}
                 onStudentClick={onStudentClick}
             />
@@ -201,6 +204,7 @@ export function MentorDashboard() {
     const [selectedClassroom, setSelectedClassroom] = useState<ClassroomDashboardDTO | null>(null);
     const [learningPaths, setLearningPaths] = useState<LearningPath[]>([]);
     const [analyticsData, setAnalyticsData] = useState<ClassroomAnalyticsDTO | null>(null);
+    const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
 
     // UI States
     const [isLoading, setIsLoading] = useState(true);
@@ -220,6 +224,14 @@ export function MentorDashboard() {
 
     const getErrorMessage = (err: unknown, fallback: string) =>
         err instanceof Error && err.message ? err.message : fallback;
+
+    const fetchAnalytics = useCallback((classroomId: string) => {
+        setIsAnalyticsLoading(true);
+        void ClassroomService.getAnalytics(classroomId)
+            .then(res => setAnalyticsData(res.data))
+            .catch(() => { /* analytics load is best-effort */ })
+            .finally(() => setIsAnalyticsLoading(false));
+    }, []);
 
     const fetchDashboardData = useCallback(async () => {
         if (!user?.id) return;
@@ -263,11 +275,12 @@ export function MentorDashboard() {
 
     useEffect(() => {
         if (selectedClassroom?.classroomId) {
-            void ClassroomService.getAnalytics(selectedClassroom.classroomId)
-                .then(res => setAnalyticsData(res.data))
-                .catch(() => { /* analytics load is best-effort */ });
+            fetchAnalytics(selectedClassroom.classroomId);
+        } else {
+            setAnalyticsData(null);
+            setIsAnalyticsLoading(false);
         }
-    }, [selectedClassroom?.classroomId]);
+    }, [selectedClassroom?.classroomId, fetchAnalytics]);
 
     const handleCreateClass = async () => {
         if (!user?.id) return;
@@ -714,8 +727,14 @@ export function MentorDashboard() {
                                     onExportCSV={handleExportCSV}
                                     onStudentClick={(username) => setViewingStudentUsername(username)}
                                     analyticsData={analyticsData}
+                                    isAnalyticsLoading={isAnalyticsLoading}
                                     mentorId={user!.id!}
-                                    onRefresh={fetchDashboardData}
+                                    onRefresh={() => {
+                                        void fetchDashboardData();
+                                        if (selectedClassroom?.classroomId) {
+                                            fetchAnalytics(selectedClassroom.classroomId);
+                                        }
+                                    }}
                                 />
                             </div>
                         );

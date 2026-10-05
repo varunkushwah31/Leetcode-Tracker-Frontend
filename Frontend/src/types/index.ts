@@ -162,21 +162,24 @@ export interface SkillStat {
 
 export interface CuratedProblemDTO {
     title: string;
-    slug: string;
-    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-    platform: 'LEETCODE' | 'CODEFORCES';
-    topic: string;
-    link: string;
+    slug?: string;
+    titleSlug?: string;
+    difficulty?: 'EASY' | 'MEDIUM' | 'HARD' | string;
+    platform?: 'LEETCODE' | 'CODEFORCES' | string;
+    topic?: string;
+    link?: string;
 }
 
 export interface TopicProficiencyDTO {
     tagName: string;
-    cohortTotalSolved: number;
-    averageSolvedPerStudent: number;
-    masteryLevel: 'STRONG' | 'DEVELOPING' | 'CRITICAL_WEAKNESS';
-    severity: 'HIGH' | 'MEDIUM' | 'LOW';
-    recommendation: string;
-    suggestedProblems: CuratedProblemDTO[];
+    problemsSolved?: number;
+    cohortTotalSolved?: number;
+    averageSolved?: number;
+    averageSolvedPerStudent?: number;
+    masteryLevel: 'STRONG' | 'DEVELOPING' | 'CRITICAL_WEAKNESS' | string;
+    severity: 'HIGH' | 'MEDIUM' | 'LOW' | string;
+    recommendation?: string;
+    suggestedProblems?: CuratedProblemDTO[];
 }
 
 export interface AtRiskStudentDTO {
@@ -185,24 +188,35 @@ export interface AtRiskStudentDTO {
     email: string;
     leetcodeUsername?: string;
     codeforcesHandle?: string;
-    currentStreak: number;
-    totalSolved: number;
+    streak?: number;
+    currentStreak?: number;
+    totalSolved?: number;
+    activeThisWeek?: boolean;
     lastSubmissionDate?: string;
-    daysInactive: number;
-    riskLevel: 'CRITICAL' | 'WARNING' | 'MODERATE';
-    primaryRiskReason: string;
+    daysInactive?: number;
+    riskLevel?: 'CRITICAL' | 'WARNING' | 'MODERATE' | 'HIGH' | 'MEDIUM' | string;
+    primaryRiskReason?: string;
+    riskReason?: string;
 }
 
 export interface AssignmentAnalyticsDTO {
     assignmentId: string;
     title: string;
+    titleSlug?: string;
+    problemSlug?: string;
     platform: string;
-    problemSlug: string;
+    questionLink?: string;
     dueDate?: string;
-    isExpired: boolean;
-    completedCount: number;
-    totalStudents: number;
-    completionRate: number;
+    startTimestamp?: number;
+    endTimestamp?: number;
+    isExpired?: boolean;
+    expired?: boolean;
+    completedCount?: number;
+    completedStudentsCount?: number;
+    totalStudents?: number;
+    totalStudentsCount?: number;
+    completionRate?: number;
+    completionPercentage?: number;
 }
 
 export interface ClassroomAnalyticsDTO {
@@ -219,7 +233,7 @@ export interface ClassroomAnalyticsDTO {
     criticalWeaknesses: SkillStat[];
     // Upgraded comprehensive fields
     topicProficiencies?: TopicProficiencyDTO[];
-    recommendedActionItems?: string[];
+    recommendedActionItems?: (string | CuratedProblemDTO)[];
     atRiskStudentsCount?: number;
     atRiskStudents?: AtRiskStudentDTO[];
     averageStreak?: number;
