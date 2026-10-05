@@ -330,7 +330,7 @@ export function MentorDashboard() {
 
     if (isLoading && classrooms.length === 0) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#09090e] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
+            <div className="flex h-screen items-center justify-center bg-[#f8f9fc] dark:bg-[#09090e] bg-[linear-gradient(to_right,rgba(91,79,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.04)_1px,transparent_1px)] bg-size-[40px_40px] bg-fixed">
                 <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
             </div>
         );
@@ -500,7 +500,7 @@ export function MentorDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
+            <main className="flex-1 overflow-y-auto relative bg-[#f8f9fc] dark:bg-[#0a0a0a] bg-[linear-gradient(to_right,rgba(91,79,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.04)_1px,transparent_1px)] bg-size-[40px_40px] bg-fixed flex flex-col">
                 {/* Luminous Multi-Layer Ambient Glow */}
                 <div className="hidden dark:block">
                     <AmbientGlow />
@@ -698,7 +698,7 @@ export function MentorDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="flex bg-white/90 dark:bg-[#111111]/85 backdrop-blur-2xl p-1.5 rounded-xl w-max mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
+                                <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl w-max mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs">
                                     <button
                                         className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'leaderboard' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('leaderboard')}

@@ -44,6 +44,20 @@ interface ClassroomAnalyticsProps {
 
 type TabType = 'overview' | 'weaknesses' | 'matrix' | 'watchlist' | 'assignments';
 
+export const formatTagName = (tag: string | undefined | null): string => {
+    if (!tag) return '';
+    const cleaned = tag.replace(/^\*+/, '').trim();
+    if (!cleaned) return tag;
+    return cleaned
+        .split(/[\s_-]+/)
+        .map((word) => {
+            const upper = word.toUpperCase();
+            if (['DP', 'BFS', 'DFS', 'MST', 'TRIES', 'SQL', 'CF', 'LC'].includes(upper)) return upper;
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(' ');
+};
+
 export function ClassroomAnalytics({
     data,
     classroomId,
@@ -55,6 +69,8 @@ export function ClassroomAnalytics({
     const [activeTab, setActiveTab] = useState<TabType>('overview');
     const [searchTopic, setSearchTopic] = useState('');
     const [selectedMasteryFilter, setSelectedMasteryFilter] = useState<'ALL' | 'CRITICAL_WEAKNESS' | 'DEVELOPING' | 'STRONG'>('ALL');
+    const [searchWeakness, setSearchWeakness] = useState('');
+    const [weaknessFilter, setWeaknessFilter] = useState<'ALL' | 'CRITICAL' | 'WITH_PROBLEMS'>('ALL');
 
     // Quick Assign Modal State
     const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -139,16 +155,59 @@ export function ClassroomAnalytics({
         if (!data?.topicProficiencies) return [];
         return data.topicProficiencies.filter((tp) => {
             const tagName = tp.tagName || '';
-            const matchesSearch = tagName.toLowerCase().includes(searchTopic.toLowerCase());
+            const formatted = formatTagName(tagName);
+            const query = searchTopic.toLowerCase();
+            const matchesSearch = tagName.toLowerCase().includes(query) || formatted.toLowerCase().includes(query);
             const matchesFilter =
                 selectedMasteryFilter === 'ALL' || tp.masteryLevel === selectedMasteryFilter;
             return matchesSearch && matchesFilter;
         });
     }, [data?.topicProficiencies, searchTopic, selectedMasteryFilter]);
 
+    // Normalized critical weakness topics
+    const normalizedWeaknessTopics: TopicProficiencyDTO[] = useMemo(() => {
+        if (data?.topicProficiencies && data.topicProficiencies.length > 0) {
+            return data.topicProficiencies.filter((t) => t.masteryLevel === 'CRITICAL_WEAKNESS' || t.severity === 'HIGH');
+        }
+        if (data?.criticalWeaknesses && data.criticalWeaknesses.length > 0) {
+            return data.criticalWeaknesses.map((w) => ({
+                tagName: w.tagName,
+                problemsSolved: w.problemsSolved,
+                cohortTotalSolved: w.problemsSolved,
+                averageSolved: (w.problemsSolved / Math.max(data?.totalStudents || 1, 1)),
+                averageSolvedPerStudent: (w.problemsSolved / Math.max(data?.totalStudents || 1, 1)),
+                masteryLevel: 'CRITICAL_WEAKNESS' as const,
+                severity: 'HIGH' as const,
+                recommendation: `Target ${formatTagName(w.tagName)} with foundational problems to bring cohort proficiency up.`,
+                suggestedProblems: [],
+            }));
+        }
+        return [];
+    }, [data?.topicProficiencies, data?.criticalWeaknesses, data?.totalStudents]);
+
+    // Filtered weakness topics for the Weaknesses tab
+    const filteredWeaknessTopics = useMemo(() => {
+        return normalizedWeaknessTopics.filter((topic) => {
+            const rawName = (topic.tagName || '').toLowerCase();
+            const formatted = formatTagName(topic.tagName).toLowerCase();
+            const query = searchWeakness.trim().toLowerCase();
+            const matchesQuery = !query || rawName.includes(query) || formatted.includes(query);
+            if (!matchesQuery) return false;
+
+            if (weaknessFilter === 'CRITICAL') {
+                const totalSolved = topic.cohortTotalSolved ?? topic.problemsSolved ?? 0;
+                return totalSolved === 0 || topic.severity === 'HIGH';
+            }
+            if (weaknessFilter === 'WITH_PROBLEMS') {
+                return (topic.suggestedProblems?.length ?? 0) > 0;
+            }
+            return true;
+        });
+    }, [normalizedWeaknessTopics, searchWeakness, weaknessFilter]);
+
     if (isLoading) {
         return (
-            <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl">
+            <Card className="shadow-xs dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#121217] rounded-2xl">
                 <CardContent className="flex flex-col items-center justify-center py-20">
                     <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff] mb-4" />
                     <p className="text-zinc-900 dark:text-white text-base font-bold tracking-tight mb-1">
@@ -164,9 +223,9 @@ export function ClassroomAnalytics({
 
     if (!data || data.totalStudents === 0) {
         return (
-            <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl">
+            <Card className="shadow-xs dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#121217] rounded-2xl">
                 <CardContent className="flex flex-col items-center justify-center py-16">
-                    <div className="w-16 h-16 bg-zinc-100 dark:bg-[#1a1b2e] rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                    <div className="w-16 h-16 bg-zinc-100 dark:bg-[#1a1b2e] rounded-2xl flex items-center justify-center mb-6 shadow-xs">
                         <Activity className="w-8 h-8 text-[#5b4fff] dark:text-[#968fff]" />
                     </div>
                     <p className="text-zinc-900 dark:text-white text-lg font-bold tracking-tight mb-2">No data available to generate analytics.</p>
@@ -176,15 +235,21 @@ export function ClassroomAnalytics({
         );
     }
 
-    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
+    const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-xs dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#121217] rounded-2xl";
 
     const atRiskCount = data.atRiskStudentsCount ?? (data.atRiskStudents ? data.atRiskStudents.length : 0);
-    const criticalWeaknessTopics = (data.topicProficiencies && data.topicProficiencies.length > 0)
-        ? data.topicProficiencies.filter((t) => t.masteryLevel === 'CRITICAL_WEAKNESS' || t.severity === 'HIGH')
-        : (data.criticalWeaknesses || []);
+    const criticalWeaknessTopics = normalizedWeaknessTopics;
 
     const interviewScore = data.interviewReadinessScore ?? Math.min(100, Math.round(((data.averageMedium || 0) * 1.5 + (data.averageHard || 0) * 3) / 1.5));
-    const readinessLabel = data.readinessAssessment || (interviewScore >= 75 ? 'Interview Ready' : interviewScore >= 45 ? 'Foundations Good' : 'Needs Practice');
+    const readinessShortTag = (() => {
+        if (data.readinessAssessment) {
+            const splitTag = data.readinessAssessment.split(/[\u2014\-:]/)[0].trim();
+            if (splitTag && splitTag.length <= 22) {
+                return splitTag;
+            }
+        }
+        return interviewScore >= 75 ? 'Interview Ready' : interviewScore >= 45 ? 'Foundations Good' : 'Needs Practice';
+    })();
 
     return (
         <div className="space-y-6">
@@ -219,21 +284,26 @@ export function ClassroomAnalytics({
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Interview Readiness</p>
-                            <div className="flex items-baseline gap-2">
+                            <div className="flex items-center justify-between gap-1.5">
                                 <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight">
                                     {Math.round(interviewScore)}<span className="text-sm font-normal text-zinc-400">/100</span>
                                 </h3>
-                                <Badge className={`text-[10px] px-1.5 py-0 font-semibold border ${
+                                <Badge className={`text-[10px] px-2 py-0.5 font-semibold shrink-0 border ${
                                     interviewScore >= 75
                                         ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
                                         : interviewScore >= 45
                                         ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30'
                                         : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
                                 }`}>
-                                    {readinessLabel}
+                                    {readinessShortTag}
                                 </Badge>
                             </div>
                             <Progress value={interviewScore} className="h-1.5 mt-2 bg-purple-100 dark:bg-purple-950/40 [&>div]:bg-purple-500" />
+                            {data.readinessAssessment && data.readinessAssessment.trim() !== readinessShortTag && (
+                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 truncate font-medium" title={data.readinessAssessment}>
+                                    {data.readinessAssessment}
+                                </p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -257,7 +327,7 @@ export function ClassroomAnalytics({
                                     {criticalWeaknessTopics.length}
                                 </h3>
                                 <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                                    {criticalWeaknessTopics.length > 0 ? `${(criticalWeaknessTopics[0] as any)?.tagName || 'Core Topics'} & more` : 'No major gaps'}
+                                    {criticalWeaknessTopics.length > 0 ? `${formatTagName(criticalWeaknessTopics[0]?.tagName) || 'Core Topics'} & more` : 'No major gaps'}
                                 </span>
                             </div>
                             <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 truncate font-medium">Click to view interventions</p>
@@ -300,32 +370,36 @@ export function ClassroomAnalytics({
             </div>
 
             {/* Sub-Navigation Tabs */}
-            <div className="flex flex-wrap items-center gap-2 border-b border-zinc-200/80 dark:border-zinc-800/60 pb-3">
+            <div className="p-1.5 bg-zinc-100/90 dark:bg-[#121216] border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl flex flex-wrap gap-1.5 shadow-xs">
                 <button
+                    type="button"
                     onClick={() => setActiveTab('overview')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                         activeTab === 'overview'
-                            ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <Activity className="w-4 h-4" />
+                    <Activity className="w-4 h-4 text-[#5b4fff]" />
                     Overview & Benchmarks
                 </button>
 
                 <button
+                    type="button"
                     onClick={() => setActiveTab('weaknesses')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                         activeTab === 'weaknesses'
-                            ? 'bg-rose-600 text-white dark:bg-rose-500 dark:text-white shadow-sm'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <AlertTriangle className="w-4 h-4" />
+                    <AlertTriangle className="w-4 h-4 text-rose-500" />
                     Critical Weaknesses & Interventions
                     {criticalWeaknessTopics.length > 0 && (
-                        <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-extrabold ${
-                            activeTab === 'weaknesses' ? 'bg-white/20 text-white' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                        <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
+                            activeTab === 'weaknesses'
+                                ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
                         }`}>
                             {criticalWeaknessTopics.length}
                         </span>
@@ -333,30 +407,34 @@ export function ClassroomAnalytics({
                 </button>
 
                 <button
+                    type="button"
                     onClick={() => setActiveTab('matrix')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                         activeTab === 'matrix'
-                            ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <TrendingUp className="w-4 h-4" />
+                    <TrendingUp className="w-4 h-4 text-emerald-500" />
                     Topic Competency Matrix
                 </button>
 
                 <button
+                    type="button"
                     onClick={() => setActiveTab('watchlist')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                         activeTab === 'watchlist'
-                            ? 'bg-amber-600 text-white dark:bg-amber-500 dark:text-white shadow-sm'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <ShieldWarningIcon className="w-4 h-4" />
+                    <ShieldWarningIcon className="w-4 h-4 text-amber-500" />
                     At-Risk Watchlist
                     {atRiskCount > 0 && (
-                        <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-extrabold ${
-                            activeTab === 'watchlist' ? 'bg-white/20 text-white' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                        <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
+                            activeTab === 'watchlist'
+                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                         }`}>
                             {atRiskCount}
                         </span>
@@ -364,18 +442,21 @@ export function ClassroomAnalytics({
                 </button>
 
                 <button
+                    type="button"
                     onClick={() => setActiveTab('assignments')}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                         activeTab === 'assignments'
-                            ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                            ? 'bg-white dark:bg-[#1e1e24] text-zinc-900 dark:text-white shadow-xs border border-zinc-200/90 dark:border-zinc-700/70 font-bold'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <BookOpenIcon className="w-4 h-4" />
+                    <BookOpenIcon className="w-4 h-4 text-blue-500" />
                     Assignment Health
                     {data.assignmentCompletionRate !== undefined && (
-                        <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-extrabold ${
-                            activeTab === 'assignments' ? 'bg-white/20 text-white' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                        <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
+                            activeTab === 'assignments'
+                                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30'
+                                : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
                         }`}>
                             {Math.round(data.assignmentCompletionRate)}%
                         </span>
@@ -388,7 +469,7 @@ export function ClassroomAnalytics({
                 <div className="space-y-6">
                     {/* Action Items Bar */}
                     {data.recommendedActionItems && data.recommendedActionItems.length > 0 && (
-                        <Card className="border border-indigo-200 dark:border-indigo-900/60 bg-linear-to-r from-indigo-50/70 via-white to-purple-50/50 dark:from-[#151329]/80 dark:via-[#111111]/85 dark:to-[#1a1329]/70 rounded-2xl shadow-sm">
+                        <Card className="border border-indigo-200 dark:border-indigo-900/60 bg-linear-to-r from-indigo-50/70 via-white to-purple-50/50 dark:from-[#151329] dark:via-[#121217] dark:to-[#1a1329] rounded-2xl shadow-xs">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-bold flex items-center gap-2 text-indigo-950 dark:text-indigo-200">
                                     <LightningIcon className="w-5 h-5 text-[#5b4fff]" weight="fill" />
@@ -402,7 +483,7 @@ export function ClassroomAnalytics({
                                 {data.recommendedActionItems.map((item, idx) => {
                                     if (typeof item === 'string') {
                                         return (
-                                            <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white/80 dark:bg-black/20 p-2.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
+                                            <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-[#16161c] p-2.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
                                                 <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <span className="leading-relaxed">{item}</span>
                                             </div>
@@ -410,7 +491,7 @@ export function ClassroomAnalytics({
                                     }
                                     const prob = item as CuratedProblemDTO;
                                     return (
-                                        <div key={prob.slug || prob.titleSlug || idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white/80 dark:bg-black/20 p-3 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
+                                        <div key={prob.slug || prob.titleSlug || idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-700 dark:text-zinc-300 bg-white dark:bg-[#16161c] p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
                                             <div className="flex items-start gap-2.5 min-w-0">
                                                 <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <div className="min-w-0">
@@ -424,7 +505,7 @@ export function ClassroomAnalytics({
                                                             </Badge>
                                                         )}
                                                         {prob.topic && (
-                                                            <span className="text-[10px] text-zinc-500 font-medium">({prob.topic})</span>
+                                                            <span className="text-[10px] text-zinc-500 font-medium">({formatTagName(prob.topic)})</span>
                                                         )}
                                                     </div>
                                                     <p className="text-[11px] text-zinc-500 mt-0.5">
@@ -559,8 +640,8 @@ export function ClassroomAnalytics({
                                 <div className="flex flex-wrap gap-2">
                                     {data.topStrengths && data.topStrengths.length > 0 ? (
                                         data.topStrengths.map((skill, i) => (
-                                            <div key={i} className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2 shadow-sm cursor-default">
-                                                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{skill.tagName}</span>
+                                            <div key={i} className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
+                                                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{formatTagName(skill.tagName)}</span>
                                                 <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded-md">
                                                     {skill.problemsSolved}
                                                 </span>
@@ -584,7 +665,7 @@ export function ClassroomAnalytics({
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setActiveTab('weaknesses')}
-                                        className="text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 h-7 px-2"
+                                        className="text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 h-7 px-2 cursor-pointer"
                                     >
                                         View Interventions <ArrowUpRightIcon className="w-3.5 h-3.5 ml-1" />
                                     </Button>
@@ -595,8 +676,8 @@ export function ClassroomAnalytics({
                                 <div className="flex flex-wrap gap-2">
                                     {criticalWeaknessTopics.length > 0 ? (
                                         criticalWeaknessTopics.map((skill: any, i) => (
-                                            <div key={i} className="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-2 shadow-sm cursor-default">
-                                                <span className="text-xs font-semibold text-rose-700 dark:text-rose-300">{skill.tagName}</span>
+                                            <div key={i} className="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
+                                                <span className="text-xs font-semibold text-rose-700 dark:text-rose-300">{formatTagName(skill.tagName)}</span>
                                                 <span className="text-[11px] font-black text-rose-600 dark:text-rose-400 bg-rose-500/20 px-1.5 py-0.5 rounded-md">
                                                     {skill.problemsSolved ?? skill.cohortTotalSolved ?? 0}
                                                 </span>
@@ -615,20 +696,85 @@ export function ClassroomAnalytics({
             {/* TAB 2: CRITICAL WEAKNESSES & TARGETED INTERVENTIONS */}
             {activeTab === 'weaknesses' && (
                 <div className="space-y-6">
-                    <div className="bg-linear-to-r from-rose-500/10 via-amber-500/5 to-transparent border border-rose-500/20 p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div>
+                    {/* Header Banner */}
+                    <div className="bg-linear-to-r from-rose-500/10 via-amber-500/5 to-transparent border border-rose-500/20 p-5 rounded-2xl flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="max-w-3xl">
                             <h3 className="text-base font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <AlertTriangle className="w-5 h-5 text-rose-500" />
                                 High-Yield Algorithmic Weaknesses & Intervention Catalog
                             </h3>
-                            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
                                 Our diagnostic engine detects high-priority topics where cohort participation is critically low.
                                 Directly target these blind spots by assigning curated high-yield interview problems with one click.
                             </p>
                         </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                            <div className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#16161c] border border-zinc-200/80 dark:border-zinc-800 text-center shadow-xs">
+                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Gap Topics</p>
+                                <p className="text-lg font-black text-rose-600 dark:text-rose-400">{normalizedWeaknessTopics.length}</p>
+                            </div>
+                            <div className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#16161c] border border-zinc-200/80 dark:border-zinc-800 text-center shadow-xs">
+                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Curated Problems</p>
+                                <p className="text-lg font-black text-[#5b4fff] dark:text-[#968fff]">
+                                    {normalizedWeaknessTopics.reduce((acc, t) => acc + (t.suggestedProblems?.length || 0), 0)}
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    {criticalWeaknessTopics.length === 0 ? (
+                    {/* Filter and Search Bar for Weaknesses */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                        <div className="relative flex-1 max-w-md">
+                            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <Input
+                                placeholder="Search weaknesses (e.g. Dynamic Programming, Graph, Greedy)..."
+                                value={searchWeakness}
+                                onChange={(e) => setSearchWeakness(e.target.value)}
+                                className="pl-9 h-9 text-xs rounded-xl bg-white dark:bg-[#121217] border-zinc-200 dark:border-zinc-800"
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                            <span className="text-xs text-zinc-500 font-medium mr-1 flex items-center gap-1">
+                                <FunnelIcon className="w-3.5 h-3.5" /> Filter:
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => setWeaknessFilter('ALL')}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                    weaknessFilter === 'ALL'
+                                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-xs'
+                                        : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                }`}
+                            >
+                                All ({normalizedWeaknessTopics.length})
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setWeaknessFilter('CRITICAL')}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                    weaknessFilter === 'CRITICAL'
+                                        ? 'bg-rose-600 text-white shadow-xs'
+                                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20'
+                                }`}
+                            >
+                                Critical Only
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setWeaknessFilter('WITH_PROBLEMS')}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                    weaknessFilter === 'WITH_PROBLEMS'
+                                        ? 'bg-[#5b4fff] text-white shadow-xs'
+                                        : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20'
+                                }`}
+                            >
+                                Ready to Assign
+                            </button>
+                        </div>
+                    </div>
+
+                    {normalizedWeaknessTopics.length === 0 ? (
                         <Card className={cardClasses}>
                             <CardContent className="py-12 text-center">
                                 <CheckCircleIcon className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
@@ -636,133 +782,130 @@ export function ClassroomAnalytics({
                                 <p className="text-xs text-zinc-500 mt-1">No critical algorithmic weaknesses detected across core topics.</p>
                             </CardContent>
                         </Card>
+                    ) : filteredWeaknessTopics.length === 0 ? (
+                        <Card className={cardClasses}>
+                            <CardContent className="py-12 text-center">
+                                <MagnifyingGlassIcon className="w-10 h-10 text-zinc-400 mx-auto mb-3" />
+                                <h4 className="text-sm font-bold text-zinc-900 dark:text-white">No Weaknesses Match Your Search</h4>
+                                <p className="text-xs text-zinc-500 mt-1">Try searching for a different topic or reset your filter.</p>
+                            </CardContent>
+                        </Card>
                     ) : (
-                        <div className="grid grid-cols-1 gap-6">
-                            {(data.topicProficiencies && data.topicProficiencies.length > 0
-                                ? data.topicProficiencies.filter((t) => t.masteryLevel === 'CRITICAL_WEAKNESS' || t.severity === 'HIGH')
-                                : (data.criticalWeaknesses || []).map((w) => ({
-                                      tagName: w.tagName,
-                                      problemsSolved: w.problemsSolved,
-                                      cohortTotalSolved: w.problemsSolved,
-                                      averageSolved: (w.problemsSolved / Math.max(data.totalStudents || 1, 1)),
-                                      averageSolvedPerStudent: (w.problemsSolved / Math.max(data.totalStudents || 1, 1)),
-                                      masteryLevel: 'CRITICAL_WEAKNESS' as const,
-                                      severity: 'HIGH' as const,
-                                      recommendation: `Target ${w.tagName} with foundational problems to bring cohort proficiency up.`,
-                                      suggestedProblems: [],
-                                  }))
-                            ).map((topic: TopicProficiencyDTO) => {
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                            {filteredWeaknessTopics.map((topic) => {
                                 const totalSolved = topic.cohortTotalSolved ?? topic.problemsSolved ?? 0;
                                 const avgSolved = topic.averageSolvedPerStudent ?? topic.averageSolved ?? (totalSolved / Math.max(data.totalStudents || 1, 1));
+                                const formattedTitle = formatTagName(topic.tagName);
                                 return (
-                                <Card key={topic.tagName} className={`${cardClasses} border-l-4 border-l-rose-500 overflow-hidden`}>
-                                    <CardHeader className="pb-4 border-b border-zinc-200/80 dark:border-zinc-800/60 bg-rose-500/5">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-bold">
-                                                    <TargetIcon className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <h4 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-                                                            {topic.tagName}
-                                                        </h4>
-                                                        <Badge className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 text-[10px]">
-                                                            CRITICAL BLIND SPOT
-                                                        </Badge>
+                                <Card key={topic.tagName} className={`${cardClasses} border border-zinc-200/90 dark:border-zinc-800/80 hover:border-rose-500/40 transition-all flex flex-col justify-between overflow-hidden shadow-xs`}>
+                                    <div>
+                                        <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60 bg-rose-500/5">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div className="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-bold shrink-0">
+                                                        <TargetIcon className="w-5 h-5" />
                                                     </div>
-                                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                                        Cohort Solved: <span className="font-semibold text-zinc-900 dark:text-white">{totalSolved}</span> total ({avgSolved.toFixed(1)} avg per student)
-                                                    </p>
+                                                    <div className="min-w-0">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <h4 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight truncate" title={formattedTitle}>
+                                                                {formattedTitle}
+                                                            </h4>
+                                                            <Badge className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 text-[10px] shrink-0 font-bold">
+                                                                CRITICAL BLIND SPOT
+                                                            </Badge>
+                                                        </div>
+                                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                                            Cohort Solved: <span className="font-semibold text-zinc-900 dark:text-white">{totalSolved}</span> total ({avgSolved.toFixed(1)} avg/student)
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div className="flex items-center gap-2 text-xs">
-                                                <span className="text-zinc-500">Benchmark Deficit:</span>
-                                                <Badge variant="outline" className="text-rose-600 dark:text-rose-400 border-rose-500/30 font-bold">
+                                                <Badge variant="outline" className="text-rose-600 dark:text-rose-400 border-rose-500/30 font-bold text-[10px] shrink-0">
                                                     Low Solve Volume
                                                 </Badge>
                                             </div>
-                                        </div>
-                                    </CardHeader>
+                                        </CardHeader>
 
-                                    <CardContent className="pt-4 space-y-4">
-                                        {/* Diagnostic Recommendation */}
-                                        <div className="p-3 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2.5">
-                                            <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
-                                            <div>
-                                                <span className="font-bold text-zinc-900 dark:text-white mr-1.5">Diagnostic Recommendation:</span>
-                                                <span>{topic.recommendation || `Schedule focused practice sessions covering ${topic.tagName} patterns.`}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Curated Problem Recommendations */}
-                                        {topic.suggestedProblems && topic.suggestedProblems.length > 0 && (
-                                            <div>
-                                                <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                                                    <CodeIcon className="w-3.5 h-3.5 text-[#5b4fff]" /> Curated Interview Problems to Bridge This Gap:
-                                                </p>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                    {topic.suggestedProblems.map((prob, pIdx) => {
-                                                        const probKey = prob.slug || prob.titleSlug || `${topic.tagName}-${pIdx}`;
-                                                        const probLink = prob.link || (prob.titleSlug ? (prob.platform === 'CODEFORCES' ? `https://codeforces.com/problemset/problem/${prob.titleSlug}` : `https://leetcode.com/problems/${prob.titleSlug}`) : undefined);
-                                                        return (
-                                                        <div
-                                                            key={probKey}
-                                                            className="p-3 rounded-xl bg-white dark:bg-[#16161a] border border-zinc-200 dark:border-zinc-800/80 hover:border-[#5b4fff]/50 transition-all flex flex-col justify-between group shadow-xs"
-                                                        >
-                                                            <div className="flex items-start justify-between gap-2 mb-2">
-                                                                <div className="min-w-0">
-                                                                    <div className="flex items-center gap-1.5 mb-1">
-                                                                        <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
-                                                                            prob.platform === 'CODEFORCES'
-                                                                                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
-                                                                                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                                                                        }`}>
-                                                                            {prob.platform === 'CODEFORCES' ? 'CF' : 'LC'}
-                                                                        </span>
-                                                                        <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
-                                                                            prob.difficulty === 'EASY'
-                                                                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                                                                : prob.difficulty === 'MEDIUM'
-                                                                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                                                                                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                                                                        }`}>
-                                                                            {prob.difficulty || 'MEDIUM'}
-                                                                        </span>
-                                                                    </div>
-                                                                    <p className="text-xs font-bold text-zinc-900 dark:text-white truncate" title={prob.title}>
-                                                                        {prob.title}
-                                                                    </p>
-                                                                </div>
-
-                                                                {probLink && (
-                                                                    <a
-                                                                        href={probLink}
-                                                                        target="_blank"
-                                                                        rel="noreferrer"
-                                                                        className="text-zinc-400 hover:text-[#5b4fff] transition-colors p-1"
-                                                                        title="Open problem in new tab"
-                                                                    >
-                                                                        <ExternalLink className="w-3.5 h-3.5" />
-                                                                    </a>
-                                                                )}
-                                                            </div>
-
-                                                            <Button
-                                                                size="sm"
-                                                                onClick={() => handleOpenAssignModal(prob)}
-                                                                className="w-full mt-2 h-7 text-xs bg-zinc-900 dark:bg-zinc-800 hover:bg-[#5b4fff] dark:hover:bg-[#5b4fff] text-white rounded-lg font-medium transition-colors"
-                                                            >
-                                                                <LightningIcon className="w-3.5 h-3.5 mr-1" />
-                                                                Assign to Cohort
-                                                            </Button>
-                                                        </div>
-                                                    );})}
+                                        <CardContent className="pt-4 space-y-4">
+                                            {/* Diagnostic Recommendation */}
+                                            <div className="p-3 bg-zinc-50 dark:bg-zinc-900/60 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2.5">
+                                                <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
+                                                <div className="min-w-0">
+                                                    <span className="font-bold text-zinc-900 dark:text-white mr-1.5">Diagnostic Recommendation:</span>
+                                                    <span className="leading-relaxed">{topic.recommendation || `Schedule focused practice sessions covering ${formattedTitle} patterns.`}</span>
                                                 </div>
                                             </div>
-                                        )}
-                                    </CardContent>
+
+                                            {/* Curated Problem Recommendations */}
+                                            {topic.suggestedProblems && topic.suggestedProblems.length > 0 ? (
+                                                <div>
+                                                    <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                                                        <CodeIcon className="w-3.5 h-3.5 text-[#5b4fff]" /> Curated Interview Problems to Bridge This Gap:
+                                                    </p>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                                                        {topic.suggestedProblems.map((prob, pIdx) => {
+                                                            const probKey = prob.slug || prob.titleSlug || `${topic.tagName}-${pIdx}`;
+                                                            const probLink = prob.link || (prob.titleSlug ? (prob.platform === 'CODEFORCES' ? `https://codeforces.com/problemset/problem/${prob.titleSlug}` : `https://leetcode.com/problems/${prob.titleSlug}`) : undefined);
+                                                            return (
+                                                            <div
+                                                                key={probKey}
+                                                                className="p-3 rounded-xl bg-white dark:bg-[#16161c] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/50 transition-all flex flex-col justify-between group shadow-2xs"
+                                                            >
+                                                                <div className="flex items-start justify-between gap-2 mb-2">
+                                                                    <div className="min-w-0">
+                                                                        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                                                                            <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
+                                                                                prob.platform === 'CODEFORCES'
+                                                                                    ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                                                                                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                                            }`}>
+                                                                                {prob.platform === 'CODEFORCES' ? 'CF' : 'LC'}
+                                                                            </span>
+                                                                            <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
+                                                                                prob.difficulty === 'EASY'
+                                                                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                                                                    : prob.difficulty === 'MEDIUM'
+                                                                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                                                                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                                                                            }`}>
+                                                                                {prob.difficulty || 'MEDIUM'}
+                                                                            </span>
+                                                                        </div>
+                                                                        <p className="text-xs font-bold text-zinc-900 dark:text-white truncate" title={prob.title}>
+                                                                            {prob.title}
+                                                                        </p>
+                                                                    </div>
+
+                                                                    {probLink && (
+                                                                        <a
+                                                                            href={probLink}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                            className="text-zinc-400 hover:text-[#5b4fff] transition-colors p-1 shrink-0"
+                                                                            title="Open problem in new tab"
+                                                                        >
+                                                                            <ExternalLink className="w-3.5 h-3.5" />
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+
+                                                                <Button
+                                                                    size="sm"
+                                                                    onClick={() => handleOpenAssignModal(prob)}
+                                                                    className="w-full mt-2 h-7 text-xs bg-zinc-900 dark:bg-zinc-800 hover:bg-[#5b4fff] dark:hover:bg-[#5b4fff] text-white rounded-lg font-medium transition-colors cursor-pointer"
+                                                                >
+                                                                    <LightningIcon className="w-3.5 h-3.5 mr-1" />
+                                                                    Assign to Cohort
+                                                                </Button>
+                                                            </div>
+                                                        );})}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="text-xs text-zinc-400 dark:text-zinc-500 italic">No specific curated problem templates linked yet.</p>
+                                            )}
+                                        </CardContent>
+                                    </div>
                                 </Card>
                             );})}
                         </div>
@@ -781,7 +924,7 @@ export function ClassroomAnalytics({
                                 placeholder="Search topic (e.g., Tree, Dynamic Programming, Graph)..."
                                 value={searchTopic}
                                 onChange={(e) => setSearchTopic(e.target.value)}
-                                className="pl-9 h-9 text-xs rounded-xl bg-white dark:bg-[#111111] border-zinc-200 dark:border-zinc-800"
+                                className="pl-9 h-9 text-xs rounded-xl bg-white dark:bg-[#121217] border-zinc-200 dark:border-zinc-800"
                             />
                         </div>
 
@@ -838,12 +981,13 @@ export function ClassroomAnalytics({
                             const totalSolved = topic.cohortTotalSolved ?? topic.problemsSolved ?? 0;
                             const avgSolved = topic.averageSolvedPerStudent ?? topic.averageSolved ?? (totalSolved / Math.max(data.totalStudents || 1, 1));
                             const profIndex = Math.min(100, Math.round(avgSolved * 25));
+                            const formattedTitle = formatTagName(topic.tagName);
                             return (
                             <Card key={topic.tagName} className={`${cardClasses} hover:-translate-y-0.5 transition-all flex flex-col justify-between`}>
                                 <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60">
                                     <div className="flex items-center justify-between gap-2">
-                                        <CardTitle className="text-sm font-bold text-zinc-900 dark:text-white truncate" title={topic.tagName}>
-                                            {topic.tagName}
+                                        <CardTitle className="text-sm font-bold text-zinc-900 dark:text-white truncate" title={formattedTitle}>
+                                            {formattedTitle}
                                         </CardTitle>
                                         <Badge className={`text-[10px] font-bold ${
                                             topic.masteryLevel === 'STRONG'
@@ -1100,7 +1244,7 @@ export function ClassroomAnalytics({
                                     : asg.dueDate
                                     ? new Date(asg.dueDate).toLocaleDateString()
                                     : 'No deadline';
-                                const problemTitle = asg.title || asg.titleSlug || asg.problemSlug || 'Cohort Assignment';
+                                const problemTitle = asg.title || formatTagName(asg.titleSlug || asg.problemSlug) || 'Cohort Assignment';
 
                                 return (
                                 <Card key={asg.assignmentId || idx} className={cardClasses}>
