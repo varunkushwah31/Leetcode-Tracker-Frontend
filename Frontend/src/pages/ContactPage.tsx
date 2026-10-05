@@ -40,7 +40,7 @@ export function ContactPage() {
 
             {/* Left Panel - Visuals & Info */}
             <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-50 dark:bg-[#09090e] border-r border-zinc-200 dark:border-zinc-900 flex-col justify-center p-10 xl:p-16 transition-colors duration-200">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#0000000a_1px,transparent_1px),linear-gradient(to_bottom,#0000000a_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(91,79,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.04)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
 
                 <div className="relative z-10 w-full max-w-lg mx-auto">
                     <div className="flex items-center justify-between mb-12">
