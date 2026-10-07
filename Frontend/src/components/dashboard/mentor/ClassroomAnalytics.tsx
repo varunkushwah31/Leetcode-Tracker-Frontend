@@ -237,6 +237,7 @@ export function ClassroomAnalytics({
 
     const cardClasses = "border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl";
 
+
     const atRiskCount = data.atRiskStudentsCount ?? (data.atRiskStudents ? data.atRiskStudents.length : 0);
     const criticalWeaknessTopics = normalizedWeaknessTopics;
 
