@@ -420,7 +420,7 @@ export function AuthPage() {
                       minLength={8}
                       value={formData.password}
                       onChange={(e) => { setFormData({...formData, password: e.target.value}); clearError(); }}
-                      className="bg-zinc-50 dark:bg-[#18181b] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-10 rounded-xl w-full tracking-widest font-mono transition-all px-3.5 pr-10 text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
+                      className="bg-zinc-50 dark:bg-[#18181b] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-10 rounded-xl w-full transition-all px-3.5 pr-10 text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
                   />
                   <button
                       type="button"
