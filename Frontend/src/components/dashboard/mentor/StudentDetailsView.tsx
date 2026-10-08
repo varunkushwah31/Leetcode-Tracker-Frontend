@@ -5,7 +5,7 @@ import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import {
-    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, PulseIcon as Activity, DownloadSimpleIcon as Download, TrashIcon as Trash2, WarningIcon as AlertTriangle
+    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, DownloadSimpleIcon as Download, TrashIcon as Trash2, WarningIcon as AlertTriangle
 } from '@phosphor-icons/react';
 import { StudentService, ClassroomService } from '@/services/endpoints';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
@@ -268,12 +268,11 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Column */}
                     <div className="lg:col-span-2 space-y-6">
-                        <Card className={cardClasses}>
-                            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4"><CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center"><Activity className="w-5 h-5 mr-2 text-[#5b4fff]" /> 12-Week Activity</CardTitle></CardHeader>
-                            <CardContent className="pt-6">
-                                <ActivityHeatmap progressHistory={data.progressHistory} />
-                            </CardContent>
-                        </Card>
+                        <ActivityHeatmap
+                            progressHistory={data.progressHistory}
+                            consistencyStreak={data.consistencyStreak}
+                            cardClassName={cardClasses}
+                        />
 
                         <Card className={cardClasses}>
                             <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4"><CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center"><BrainCircuit className="w-5 h-5 mr-2 text-[#5b4fff]" /> Top Skills & Mastered Topics</CardTitle></CardHeader>

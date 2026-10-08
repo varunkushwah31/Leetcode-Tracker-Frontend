@@ -60,10 +60,12 @@ describe('UnifiedContestHistory', () => {
         expect(screen.getByText('1475')).toBeTruthy();
         expect(screen.getByText('+75')).toBeTruthy();
 
-        // Check LeetCode rating and solved count
+        // Check LeetCode rating and solved count and rating deltas
         expect(screen.getByText('1911')).toBeTruthy();
+        expect(screen.getByText('+61')).toBeTruthy(); // Delta between 1911 and 1850
         expect(screen.getByText('4/4 solved')).toBeTruthy();
         expect(screen.getByText('1850')).toBeTruthy();
+        expect(screen.getByText('+350')).toBeTruthy(); // Delta between 1850 and base 1500
         expect(screen.getByText('3/4 solved')).toBeTruthy();
     });
 

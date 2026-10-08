@@ -202,7 +202,10 @@ export function StudentDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        <ActivityHeatmap progressHistory={dashboardData?.progressHistory} />
+                        <ActivityHeatmap
+                            progressHistory={dashboardData?.progressHistory}
+                            consistencyStreak={dashboardData?.consistencyStreak}
+                        />
                         <PendingAssignments
                             assignments={pendingAssignments}
                             isSyncing={isSyncing}

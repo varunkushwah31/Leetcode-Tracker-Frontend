@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Card, CardContent } from '../../ui/card';
-import { TrophyIcon, CalendarBlankIcon as Calendar, TrendUpIcon as TrendingUp } from '@phosphor-icons/react';
+import { TrophyIcon, CalendarBlankIcon as Calendar, TrendUpIcon as TrendingUp, TrendDownIcon as TrendingDown } from '@phosphor-icons/react';
 import type { ContestHistory } from '@/types';
 
 interface LeetCodeRatingGraphProps {
@@ -141,6 +141,12 @@ export function LeetCodeRatingGraph({
         }
         return '—';
     }, [activePoint, globalRanking]);
+
+    const displayDelta = useMemo(() => {
+        if (!activePoint || activeIndex === null) return null;
+        const prevRating = activeIndex > 0 ? sortedContests[activeIndex - 1].rating : 1500;
+        return Math.round(activePoint.contest.rating) - Math.round(prevRating);
+    }, [activePoint, activeIndex, sortedContests]);
 
     const attendedCount = sortedContests.length;
 
@@ -421,8 +427,26 @@ export function LeetCodeRatingGraph({
                             <span>
                                 Solved: <strong className="text-amber-600 dark:text-amber-400 font-semibold">{activePoint.contest.problemsSolved}/{activePoint.contest.totalProblems}</strong>
                             </span>
+                            {displayDelta !== null && (
+                                <span className="flex items-center gap-0.5">
+                                    Delta:{' '}
+                                    <strong className={`font-semibold ${
+                                        displayDelta > 0
+                                            ? 'text-emerald-600 dark:text-emerald-400'
+                                            : displayDelta < 0
+                                            ? 'text-rose-600 dark:text-rose-400'
+                                            : 'text-zinc-500 dark:text-zinc-400'
+                                    }`}>
+                                        {displayDelta > 0 ? `+${displayDelta}` : displayDelta}
+                                    </strong>
+                                </span>
+                            )}
                             <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
-                                <TrendingUp className="w-3.5 h-3.5" />
+                                {displayDelta !== null && displayDelta >= 0 ? (
+                                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                ) : (
+                                    <TrendingDown className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                                )}
                                 {Math.round(activePoint.contest.rating).toLocaleString()}
                             </span>
                         </div>

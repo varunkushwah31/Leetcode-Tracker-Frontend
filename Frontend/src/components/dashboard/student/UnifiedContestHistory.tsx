@@ -43,16 +43,26 @@ export function UnifiedContestHistory({
     };
 
     const lcItems: UnifiedContestItem[] = useMemo(() => {
-        return (contestHistory || []).map((c, idx) => ({
-            id: `lc-${c.title}-${c.timestamp || idx}`,
-            platform: 'LEETCODE' as const,
-            title: c.title,
-            timestamp: c.timestamp,
-            rank: c.ranking,
-            rating: Math.round(c.rating),
-            problemsSolved: c.problemsSolved,
-            totalProblems: c.totalProblems,
-        }));
+        // Sort chronologically ascending to calculate deltas accurately
+        const sorted = [...(contestHistory || [])].sort((a, b) => a.timestamp - b.timestamp);
+
+        return sorted.map((c, idx) => {
+            const prevRating = idx > 0 ? sorted[idx - 1].rating : 1500;
+            const currentRating = Math.round(c.rating);
+            const delta = currentRating - Math.round(prevRating);
+
+            return {
+                id: `lc-${c.title}-${c.timestamp || idx}`,
+                platform: 'LEETCODE' as const,
+                title: c.title,
+                timestamp: c.timestamp,
+                rank: c.ranking,
+                rating: currentRating,
+                delta,
+                problemsSolved: c.problemsSolved,
+                totalProblems: c.totalProblems,
+            };
+        });
     }, [contestHistory]);
 
     const cfItems: UnifiedContestItem[] = useMemo(() => {
@@ -175,6 +185,14 @@ export function UnifiedContestHistory({
                                         </span>
                                         <span className="text-zinc-400 dark:text-zinc-600">•</span>
                                         <span className="text-zinc-500">{formatDate(contest.timestamp)}</span>
+                                        {contest.problemsSolved !== undefined && contest.totalProblems !== undefined && (
+                                            <>
+                                                <span className="text-zinc-400 dark:text-zinc-600">•</span>
+                                                <span className="text-zinc-600 dark:text-zinc-400 font-medium">
+                                                    {contest.problemsSolved}/{contest.totalProblems} solved
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="text-right shrink-0">
@@ -185,13 +203,17 @@ export function UnifiedContestHistory({
                                     >
                                         {contest.rating}
                                     </p>
-                                    {contest.platform === 'CODEFORCES' && contest.delta !== undefined ? (
+                                    {contest.delta !== undefined ? (
                                         <p
                                             className={`text-[10px] font-bold ${
-                                                contest.delta >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                                                contest.delta > 0
+                                                    ? 'text-emerald-600 dark:text-emerald-400'
+                                                    : contest.delta < 0
+                                                    ? 'text-rose-600 dark:text-rose-400'
+                                                    : 'text-zinc-500 dark:text-zinc-400'
                                             }`}
                                         >
-                                            {contest.delta >= 0 ? `+${contest.delta}` : contest.delta}
+                                            {contest.delta > 0 ? `+${contest.delta}` : contest.delta}
                                         </p>
                                     ) : (
                                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">

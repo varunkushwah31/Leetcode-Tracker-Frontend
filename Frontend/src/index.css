@@ -285,6 +285,11 @@ button:not(:disabled):active,
   width: 6px;
   height: 6px;
 }
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
