@@ -11,7 +11,9 @@ import type {
     SystemOverviewDTO,
     StudentSummaryDTO,
     MentorDTO,
-    CacheStatsResponse
+    CacheStatsResponse,
+    DailyChallengeDTO,
+    UpcomingContestDTO
 } from '@/types';
 
 export const AuthService = {
@@ -173,7 +175,19 @@ export const AdminService = {
     deleteClassroom: (id: string) => api.delete<{ message: string }>(`/admin/classrooms/${id}`),
     forceSyncAll: () => api.post<{ message: string }>('/admin/sync-all'),
     getCacheStats: () => api.get<CacheStatsResponse>('/admin/cache/stats'),
-    clearCache: (cacheName?: string) => api.post<{ message?: string; error?: string }>('/admin/cache/clear', null, { params: cacheName ? { cacheName } : {} })
+    clearCache: (cacheName?: string) => api.post<{ message?: string; error?: string }>('/admin/cache/clear', null, { params: cacheName ? { cacheName } : {} }),
+    warmCache: () => api.post<Record<string, unknown>>('/admin/cache/warm')
 };
+
+export const DailyChallengeService = {
+    getDailyChallenge: (classroomId?: string) =>
+        api.get<DailyChallengeDTO>('/challenges/daily', { params: classroomId ? { classroomId } : {} })
+};
+
+export const ContestScheduleService = {
+    getUpcomingContests: (platform?: 'ALL' | 'LEETCODE' | 'CODEFORCES') =>
+        api.get<UpcomingContestDTO[]>('/contests/upcoming', { params: platform && platform !== 'ALL' ? { platform } : {} })
+};
+
 
 

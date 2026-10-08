@@ -437,4 +437,49 @@ public class CodeforcesApiClient {
         if (input == null) return "";
         return input.trim().replace("/", "").replace("-", "").toUpperCase();
     }
+
+    public record CodeforcesDailyPick(
+            String title,
+            int contestId,
+            String index,
+            int rating,
+            String url,
+            List<String> tags
+    ) {}
+
+    public CodeforcesDailyPick fetchDailyPick() {
+        String todayKey = "codeforces:daily:challenge:" + LocalDate.now(ZoneId.of("UTC")).toString();
+        CodeforcesDailyPick cached = getFallbackDataFromCache(todayKey, CodeforcesDailyPick.class);
+        if (cached != null) {
+            return cached;
+        }
+
+        List<CodeforcesDailyPick> curatedPicks = List.of(
+                new CodeforcesDailyPick("Watermelon", 4, "A", 800, "https://codeforces.com/problemset/problem/4/A", List.of("brute force", "math")),
+                new CodeforcesDailyPick("Way Too Long Words", 71, "A", 800, "https://codeforces.com/problemset/problem/71/A", List.of("strings")),
+                new CodeforcesDailyPick("Next Round", 158, "A", 800, "https://codeforces.com/problemset/problem/158/A", List.of("special problem", "implementation")),
+                new CodeforcesDailyPick("Domino piling", 50, "A", 800, "https://codeforces.com/problemset/problem/50/A", List.of("greedy", "math")),
+                new CodeforcesDailyPick("Beautiful Matrix", 263, "A", 800, "https://codeforces.com/problemset/problem/263/A", List.of("implementation")),
+                new CodeforcesDailyPick("Theatre Square", 1, "A", 1000, "https://codeforces.com/problemset/problem/1/A", List.of("math")),
+                new CodeforcesDailyPick("Young Physicist", 69, "A", 1000, "https://codeforces.com/problemset/problem/69/A", List.of("math", "implementation")),
+                new CodeforcesDailyPick("Chat room", 58, "A", 1000, "https://codeforces.com/problemset/problem/58/A", List.of("greedy", "strings")),
+                new CodeforcesDailyPick("String Task", 118, "A", 1000, "https://codeforces.com/problemset/problem/118/A", List.of("implementation", "strings")),
+                new CodeforcesDailyPick("Interesting drink", 706, "B", 1100, "https://codeforces.com/problemset/problem/706/B", List.of("binary search", "dp")),
+                new CodeforcesDailyPick("Taxi", 158, "B", 1100, "https://codeforces.com/problemset/problem/158/B", List.of("greedy", "special problem")),
+                new CodeforcesDailyPick("Fancy Fence", 270, "A", 1100, "https://codeforces.com/problemset/problem/270/A", List.of("geometry", "math")),
+                new CodeforcesDailyPick("Vanya and Lanterns", 492, "B", 1200, "https://codeforces.com/problemset/problem/492/B", List.of("binary search", "math", "sortings")),
+                new CodeforcesDailyPick("Chewbaсca and Number", 514, "A", 1200, "https://codeforces.com/problemset/problem/514/A", List.of("greedy")),
+                new CodeforcesDailyPick("Worms", 474, "B", 1200, "https://codeforces.com/problemset/problem/474/B", List.of("binary search", "implementation")),
+                new CodeforcesDailyPick("Registration System", 4, "C", 1300, "https://codeforces.com/problemset/problem/4/C", List.of("data structures", "hashing")),
+                new CodeforcesDailyPick("Cut Ribbon", 189, "A", 1300, "https://codeforces.com/problemset/problem/189/A", List.of("dp")),
+                new CodeforcesDailyPick("T-primes", 230, "B", 1300, "https://codeforces.com/problemset/problem/230/B", List.of("binary search", "math", "number theory")),
+                new CodeforcesDailyPick("Given Length and Sum of Digits...", 489, "C", 1400, "https://codeforces.com/problemset/problem/489/C", List.of("dp", "greedy")),
+                new CodeforcesDailyPick("Two Substrings", 550, "A", 1500, "https://codeforces.com/problemset/problem/550/A", List.of("brute force", "dp", "greedy", "strings"))
+        );
+
+        int dayOfYear = LocalDate.now(ZoneId.of("UTC")).getDayOfYear();
+        CodeforcesDailyPick pick = curatedPicks.get(dayOfYear % curatedPicks.size());
+        cacheDataForFallback(todayKey, pick);
+        return pick;
+    }
 }

@@ -301,3 +301,36 @@ export interface BulkImportResponseDTO {
     alreadyEnrolledStudents: string[];
     failures: string[];
 }
+
+export interface DailyChallengeDTO {
+    date: string;
+    leetcodeFrontendId?: string;
+    leetcodeTitle?: string;
+    leetcodeTitleSlug?: string;
+    leetcodeDifficulty?: string;
+    leetcodeUrl?: string;
+    leetcodeTopicTags?: string[];
+    codeforcesTitle?: string;
+    codeforcesContestId?: number;
+    codeforcesIndex?: string;
+    codeforcesRating?: number;
+    codeforcesUrl?: string;
+    codeforcesTags?: string[];
+    classroomName?: string;
+    classroomTotalStudents: number;
+    classroomSolvedCount: number;
+    classroomSolvedPercentage: number;
+    userSolvedLeetcode: boolean;
+    userSolvedCodeforces: boolean;
+    userSolved: boolean;
+}
+
+export interface UpcomingContestDTO {
+    id: string;
+    platform: 'LEETCODE' | 'CODEFORCES';
+    title: string;
+    startTimeSeconds: number;
+    durationSeconds: number;
+    url: string;
+    phase: 'BEFORE' | 'CODING';
+}

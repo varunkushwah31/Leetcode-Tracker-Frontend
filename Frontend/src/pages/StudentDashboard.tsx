@@ -10,6 +10,8 @@ import { StudentService } from '../services/endpoints';
 import type { StudentExtendedDTO, AssignmentDTO } from '@/types';
 
 import { ProfileStats } from '../components/dashboard/student/ProfileStats';
+import { DailyChallengeCard } from '../components/dashboard/student/DailyChallengeCard';
+import { UpcomingContestsCard } from '../components/dashboard/student/UpcomingContestsCard';
 import { ActivityHeatmap } from '../components/dashboard/student/ActivityHeatmap';
 import { PendingAssignments } from '../components/dashboard/student/PendingAssignments';
 import { ClassroomList } from '../components/dashboard/student/ClassroomList';
@@ -223,6 +225,7 @@ export function StudentDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
+                        <DailyChallengeCard classroomId={selectedClassroomId} />
                         <ActivityHeatmap
                             progressHistory={dashboardData?.progressHistory}
                             consistencyStreak={dashboardData?.consistencyStreak}
@@ -250,6 +253,7 @@ export function StudentDashboard() {
 
                     <div className="space-y-8">
                         <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
+                        <UpcomingContestsCard />
                         <BadgesList badges={dashboardData?.badges} />
                     </div>
                 </div>

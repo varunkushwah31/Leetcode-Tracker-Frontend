@@ -500,4 +500,77 @@ public class LeetCodeApiClient {
         log.info("No cached skill data available, returning empty list for: {}", username);
         return new ArrayList<>();
     }
+
+    public record LeetCodeDailyQuestion(
+            String date,
+            String questionFrontendId,
+            String title,
+            String titleSlug,
+            String difficulty,
+            String url,
+            List<String> topicTags
+    ) {}
+
+    @CircuitBreaker(name = "leetcodeApi", fallbackMethod = "fetchDailyCodingChallengeFallback")
+    @RateLimiter(name = "leetcodeApi")
+    @Retry(name = "leetcodeApi")
+    public LeetCodeDailyQuestion fetchDailyCodingChallenge() {
+        String todayKey = "leetcode:daily:challenge:" + LocalDate.now(ZoneId.of("UTC")).toString();
+        LeetCodeDailyQuestion cached = getFallbackDataFromCache(todayKey, LeetCodeDailyQuestion.class);
+        if (cached != null) {
+            return cached;
+        }
+
+        String query = "{\"query\":\"query questionOfToday { activeDailyCodingChallengeQuestion { date link question { questionFrontendId title titleSlug difficulty topicTags { name slug } } } }\"}";
+        try {
+            JsonNode root = executeGraphQLQuery(query, "daily-challenge");
+            JsonNode activeQuestion = root.path("data").path("activeDailyCodingChallengeQuestion");
+
+            if (activeQuestion.isMissingNode() || activeQuestion.isNull()) {
+                throw new LeetCodeApiException("Daily coding challenge question not found in LeetCode response");
+            }
+
+            String date = activeQuestion.path("date").asText(LocalDate.now(ZoneId.of("UTC")).toString());
+            String link = activeQuestion.path("link").asText();
+            JsonNode qNode = activeQuestion.path("question");
+            String frontendId = qNode.path("questionFrontendId").asText();
+            String title = qNode.path("title").asText();
+            String titleSlug = qNode.path("titleSlug").asText();
+            String difficulty = qNode.path("difficulty").asText();
+
+            List<String> tags = new ArrayList<>();
+            JsonNode tagsNode = qNode.path("topicTags");
+            if (tagsNode.isArray()) {
+                for (JsonNode t : tagsNode) {
+                    tags.add(t.path("name").asText());
+                }
+            }
+
+            String fullUrl = link.startsWith("http") ? link : "https://leetcode.com" + link;
+            LeetCodeDailyQuestion result = new LeetCodeDailyQuestion(
+                    date, frontendId, title, titleSlug, difficulty, fullUrl, tags
+            );
+
+            cacheDataForFallback(todayKey, result);
+            return result;
+        } catch (Exception ex) {
+            return fetchDailyCodingChallengeFallback(ex);
+        }
+    }
+
+    public LeetCodeDailyQuestion fetchDailyCodingChallengeFallback(Exception ex) {
+        log.warn("Circuit breaker active or error for LeetCode daily challenge: {}. Serving deterministic daily problem.", ex.getMessage());
+        String today = LocalDate.now(ZoneId.of("UTC")).toString();
+        List<LeetCodeDailyQuestion> fallbacks = List.of(
+                new LeetCodeDailyQuestion(today, "1", "Two Sum", "two-sum", "Easy", "https://leetcode.com/problems/two-sum/", List.of("Array", "Hash Table")),
+                new LeetCodeDailyQuestion(today, "53", "Maximum Subarray", "maximum-subarray", "Medium", "https://leetcode.com/problems/maximum-subarray/", List.of("Array", "Dynamic Programming")),
+                new LeetCodeDailyQuestion(today, "121", "Best Time to Buy and Sell Stock", "best-time-to-buy-and-sell-stock", "Easy", "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", List.of("Array", "Dynamic Programming")),
+                new LeetCodeDailyQuestion(today, "200", "Number of Islands", "number-of-islands", "Medium", "https://leetcode.com/problems/number-of-islands/", List.of("Depth-First Search", "Breadth-First Search", "Union Find")),
+                new LeetCodeDailyQuestion(today, "3", "Longest Substring Without Repeating Characters", "longest-substring-without-repeating-characters", "Medium", "https://leetcode.com/problems/longest-substring-without-repeating-characters/", List.of("Hash Table", "String", "Sliding Window")),
+                new LeetCodeDailyQuestion(today, "206", "Reverse Linked List", "reverse-linked-list", "Easy", "https://leetcode.com/problems/reverse-linked-list/", List.of("Linked List", "Recursion")),
+                new LeetCodeDailyQuestion(today, "70", "Climbing Stairs", "climbing-stairs", "Easy", "https://leetcode.com/problems/climbing-stairs/", List.of("Math", "Dynamic Programming", "Memoization"))
+        );
+        int dayIndex = Math.abs(LocalDate.now(ZoneId.of("UTC")).getDayOfYear()) % fallbacks.size();
+        return fallbacks.get(dayIndex);
+    }
 }
