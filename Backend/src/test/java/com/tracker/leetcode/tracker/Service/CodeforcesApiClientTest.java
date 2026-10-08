@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,5 +76,81 @@ class CodeforcesApiClientTest {
     void fetchContestHistory_WhenHandleIsBlank_ShouldReturnEmptyList() {
         List<CodeforcesContestHistory> list = client.fetchContestHistory("");
         assertTrue(list.isEmpty());
+    }
+
+    @Test
+    void fetchSubmissions_WhenHandleIsBlank_ShouldReturnZeroSolved() {
+        CodeforcesApiClient.CodeforcesSubmissionData data = client.fetchSubmissions("");
+        assertNotNull(data);
+        assertEquals(0, data.solvedCount());
+        assertTrue(data.recentSubmissions().isEmpty());
+    }
+
+    @Test
+    void fetchSubmissions_WhenHandleIsValid_ShouldQueryWithoutCountLimitAndCountUniqueSolves() {
+        RestTemplate mockRestTemplate = mock(RestTemplate.class);
+        CodeforcesApiClient customClient = new CodeforcesApiClient(redisTemplate, mockRestTemplate);
+
+        String sampleJsonResponse = """
+            {
+              "status": "OK",
+              "result": [
+                {
+                  "id": 101,
+                  "contestId": 1,
+                  "creationTimeSeconds": 1700000000,
+                  "verdict": "OK",
+                  "problem": { "contestId": 1, "index": "A", "name": "Theatre Square", "tags": ["math"] }
+                },
+                {
+                  "id": 102,
+                  "contestId": 1,
+                  "creationTimeSeconds": 1700000010,
+                  "verdict": "OK",
+                  "problem": { "contestId": 1, "index": "A", "name": "Theatre Square", "tags": ["math"] }
+                },
+                {
+                  "id": 103,
+                  "contestId": 1,
+                  "creationTimeSeconds": 1700000020,
+                  "verdict": "WRONG_ANSWER",
+                  "problem": { "contestId": 1, "index": "B", "name": "Spreadsheets", "tags": ["implementation"] }
+                },
+                {
+                  "id": 104,
+                  "contestId": 2,
+                  "creationTimeSeconds": 1700000030,
+                  "verdict": "OK",
+                  "problem": { "contestId": 2, "index": "A", "name": "Winner", "tags": ["hashing"] }
+                },
+                {
+                  "id": 105,
+                  "creationTimeSeconds": 1700000040,
+                  "verdict": "OK",
+                  "problem": { "problemsetName": "acmsguru", "index": "100", "name": "A+B", "tags": ["math"] }
+                }
+              ]
+            }
+            """;
+
+        when(mockRestTemplate.exchange(
+                eq("https://codeforces.com/api/user.status?handle=test_cf"),
+                eq(org.springframework.http.HttpMethod.GET),
+                any(),
+                eq(String.class)
+        )).thenReturn(new org.springframework.http.ResponseEntity<>(sampleJsonResponse, org.springframework.http.HttpStatus.OK));
+
+        CodeforcesApiClient.CodeforcesSubmissionData data = customClient.fetchSubmissions("test_cf");
+
+        assertNotNull(data);
+        // Unique solved: 1A, 2A, acmsguru_100 -> exactly 3 unique problems solved
+        assertEquals(3, data.solvedCount());
+        // Verify URL called was WITHOUT &from=1&count=500 limit
+        verify(mockRestTemplate, times(1)).exchange(
+                eq("https://codeforces.com/api/user.status?handle=test_cf"),
+                eq(org.springframework.http.HttpMethod.GET),
+                any(),
+                eq(String.class)
+        );
     }
 }

@@ -196,13 +196,24 @@ public class CodeforcesApiClient {
     @CircuitBreaker(name = "codeforcesApi", fallbackMethod = "fetchSubmissionsFallback")
     @Retry(name = "codeforcesApi")
     @RateLimiter(name = "codeforcesApi")
+    public CodeforcesSubmissionData fetchSubmissions(String handle) {
+        return fetchSubmissions(handle, 0);
+    }
+
+    @CircuitBreaker(name = "codeforcesApi", fallbackMethod = "fetchSubmissionsFallback")
+    @Retry(name = "codeforcesApi")
+    @RateLimiter(name = "codeforcesApi")
     public CodeforcesSubmissionData fetchSubmissions(String handle, int count) {
         if (handle == null || handle.isBlank()) {
             return new CodeforcesSubmissionData(0, Collections.emptyList(), Collections.emptyMap(), Collections.emptyList());
         }
 
-        int fetchCount = Math.max(count, 500); // Fetch up to 500 submissions for accurate distinct solved count
-        JsonNode result = executeGetRequest("/user.status?handle=" + handle.trim() + "&from=1&count=" + fetchCount, handle);
+        // When count <= 0, query without from/count parameters so Codeforces returns the user's FULL submission history
+        String endpoint = "/user.status?handle=" + handle.trim();
+        if (count > 0) {
+            endpoint += "&from=1&count=" + count;
+        }
+        JsonNode result = executeGetRequest(endpoint, handle);
 
         Set<String> uniqueSolvedSlugs = new HashSet<>();
         List<RecentSubmission> submissions = new ArrayList<>();
@@ -219,16 +230,24 @@ public class CodeforcesApiClient {
                     String name = problem.path("name").asString("");
                     long creationTime = subNode.path("creationTimeSeconds").asLong();
 
-                    if (contestId == 0 || index.isBlank()) {
+                    String problemSlug;
+                    if (contestId > 0 && !index.isBlank()) {
+                        problemSlug = contestId + index.toUpperCase();
+                    } else if (problem.has("problemsetName") && !index.isBlank()) {
+                        problemSlug = problem.path("problemsetName").asString() + "_" + index.toUpperCase();
+                    } else if (!name.isBlank()) {
+                        problemSlug = name.trim();
+                    } else {
                         continue;
                     }
 
-                    String problemSlug = contestId + index.toUpperCase();
-                    String questionLink = "https://codeforces.com/problemset/problem/" + contestId + "/" + index.toUpperCase();
+                    String questionLink = contestId > 0 && !index.isBlank()
+                            ? "https://codeforces.com/problemset/problem/" + contestId + "/" + index.toUpperCase()
+                            : "https://codeforces.com/problemset";
 
                     // Only count accepted solutions ("OK")
                     if ("OK".equalsIgnoreCase(verdict)) {
-                        uniqueSolvedSlugs.add(problemSlug);
+                        boolean isFirstTimeSolved = uniqueSolvedSlugs.add(problemSlug);
 
                         // Heatmap daily activity
                         if (creationTime > 0) {
@@ -238,11 +257,13 @@ public class CodeforcesApiClient {
                             dailyMap.merge(date, 1, Integer::sum);
                         }
 
-                        // Collect tags/skills
-                        JsonNode tagsNode = problem.path("tags");
-                        if (tagsNode.isArray()) {
-                            for (JsonNode tag : tagsNode) {
-                                tagCounts.merge(tag.asString(), 1, Integer::sum);
+                        // Collect tags/skills per unique solved problem
+                        if (isFirstTimeSolved) {
+                            JsonNode tagsNode = problem.path("tags");
+                            if (tagsNode.isArray()) {
+                                for (JsonNode tag : tagsNode) {
+                                    tagCounts.merge(tag.asString(), 1, Integer::sum);
+                                }
                             }
                         }
 
@@ -277,6 +298,10 @@ public class CodeforcesApiClient {
 
         cacheDataForFallback("codeforces:submissions:" + handle.toLowerCase(), data);
         return data;
+    }
+
+    public CodeforcesSubmissionData fetchSubmissionsFallback(String handle, Exception ex) {
+        return fetchSubmissionsFallback(handle, 0, ex);
     }
 
     public CodeforcesSubmissionData fetchSubmissionsFallback(String handle, int count, Exception ex) {

@@ -201,7 +201,7 @@ public class StudentService {
                     log.info("Fetching Codeforces data concurrently for handle [{}]", cfHandle);
                     Student cfUser = codeforcesApiClient.fetchUserInfo(cfHandle);
                     List<CodeforcesContestHistory> cfContests = codeforcesApiClient.fetchContestHistory(cfHandle);
-                    CodeforcesApiClient.CodeforcesSubmissionData cfData = codeforcesApiClient.fetchSubmissions(cfHandle, 500);
+                    CodeforcesApiClient.CodeforcesSubmissionData cfData = codeforcesApiClient.fetchSubmissions(cfHandle);
                     return new CfSyncPayload(cfUser, cfContests, cfData);
                 } catch (Exception e) {
                     log.warn("Failed fetching Codeforces data for handle [{}]: {}", cfHandle, e.getMessage());
@@ -370,7 +370,7 @@ public class StudentService {
             student.setCodeforcesContestHistory(cfContests);
 
             // 3. Submissions (Solved count, Recent list, Daily activity heatmap, Skills)
-            CodeforcesApiClient.CodeforcesSubmissionData cfData = codeforcesApiClient.fetchSubmissions(cfHandle, 500);
+            CodeforcesApiClient.CodeforcesSubmissionData cfData = codeforcesApiClient.fetchSubmissions(cfHandle);
             student.setCodeforcesSolvedCount(cfData.solvedCount());
 
             // Merge recent submissions (LeetCode + Codeforces, sorted by timestamp descending, keep top 30)
