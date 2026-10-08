@@ -62,6 +62,10 @@ public class ClassroomService {
 
     @Lazy
     @Autowired
+    private org.springframework.cache.CacheManager cacheManager;
+
+    @Lazy
+    @Autowired
     @org.springframework.beans.factory.annotation.Qualifier("virtualThreadExecutor")
     private java.util.concurrent.Executor virtualThreadExecutor;
 
@@ -768,7 +772,11 @@ public class ClassroomService {
      * Automatically validates all pending assignments across all classrooms for a student.
      * Called whenever a student visits their dashboard, so they never need to do manual validation.
      */
-    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
+    /**
+     * Automatically validates all pending assignments across all classrooms for a student.
+     * Called whenever a student visits their dashboard.
+     * Selectively evicts only the student's enrolled classroom caches when an assignment status actually changes.
+     */
     public void autoValidatePendingAssignmentsForStudent(Student student) {
         try {
             List<Classroom> classrooms = classroomRepository.findByStudentIdsContaining(student.getId());
@@ -791,9 +799,12 @@ public class ClassroomService {
 
             if (pending.isEmpty()) return;
 
-            // Fetch fresh LeetCode submissions if there are pending LeetCode assignments
+            boolean isRecentlySynced = student.getLastSyncedAt() != null
+                    && java.time.Duration.between(student.getLastSyncedAt(), java.time.Instant.now()).toSeconds() < 60;
+
+            // Fetch fresh LeetCode submissions only if there are pending LeetCode assignments and profile hasn't been synced in the last 60s
             boolean hasLCPending = pending.stream().anyMatch(a -> a.getPlatform() == Platform.LEETCODE || a.getPlatform() == null);
-            if (hasLCPending && student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
+            if (!isRecentlySynced && hasLCPending && student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
                 try {
                     List<RecentSubmission> fresh = leetCodeApiClient.fetchRecentSubmissions(student.getLeetcodeUsername(), 20);
                     if (fresh != null && !fresh.isEmpty()) {
@@ -841,6 +852,26 @@ public class ClassroomService {
                 Student saved = studentRepository.save(student);
                 List<String> classroomIds = classrooms.stream().map(Classroom::getId).toList();
                 updateStudentInRedisLeaderboards(saved, classroomIds);
+
+                // Evict cache only for the affected classrooms
+                if (cacheManager != null) {
+                    org.springframework.cache.Cache dashCache = cacheManager.getCache("classroom-dashboard");
+                    org.springframework.cache.Cache analyticsCache = cacheManager.getCache("classroom-analytics");
+                    for (String cId : classroomIds) {
+                        if (dashCache != null) {
+                            dashCache.evict(cId + ":name");
+                            dashCache.evict(cId + ":streak");
+                            dashCache.evict(cId + ":rating");
+                            dashCache.evict(cId + ":solved");
+                            dashCache.evict(cId + ":pending");
+                            dashCache.evict(cId + ":completed");
+                            dashCache.evict(cId + ":rank");
+                        }
+                        if (analyticsCache != null) {
+                            analyticsCache.evict(cId);
+                        }
+                    }
+                }
 
                 for (Classroom classroom : classrooms) {
                     webSocketBridge.broadcastClassroomUpdate(classroom.getId(), "UPDATE", "Assignment auto-validated!");

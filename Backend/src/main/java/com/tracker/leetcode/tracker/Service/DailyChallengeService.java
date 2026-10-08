@@ -6,6 +6,9 @@ import com.tracker.leetcode.tracker.Models.RecentSubmission;
 import com.tracker.leetcode.tracker.Models.Student;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -13,6 +16,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -26,6 +30,16 @@ public class DailyChallengeService {
     private final StudentRepository studentRepository;
     private final ClassroomRepository classroomRepository;
     private final CacheManager cacheManager;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ClassroomPotdTicker implements Serializable {
+        private String classroomName;
+        private int totalStudents;
+        private int solvedCount;
+        private double solvedPercentage;
+    }
 
     /**
      * Retrieves the globally cached LeetCode Daily Challenge.
@@ -100,26 +114,62 @@ public class DailyChallengeService {
             builder.userSolved(solvedLc);
         }
 
-        // Determine classroom for ticker
+        // Determine classroom for ticker (cached in Redis to avoid heavy full-classroom document loads)
         Classroom classroom = resolveClassroom(student, classroomId);
         if (classroom != null && classroom.getStudentIds() != null && !classroom.getStudentIds().isEmpty()) {
-            List<Student> classmates = studentRepository.findAllById(classroom.getStudentIds());
-            int total = classmates.size();
-            int solvedCount = 0;
-
-            for (Student s : classmates) {
-                if (hasSolvedLeetcodeChallenge(s, globalPotd.getLeetcodeTitleSlug(), globalPotd.getLeetcodeTitle())) {
-                    solvedCount++;
-                }
+            ClassroomPotdTicker ticker = resolveClassroomTicker(classroom, globalPotd.getLeetcodeTitleSlug(), globalPotd.getLeetcodeTitle());
+            if (ticker != null) {
+                builder.classroomName(ticker.getClassroomName());
+                builder.classroomTotalStudents(ticker.getTotalStudents());
+                builder.classroomSolvedCount(ticker.getSolvedCount());
+                builder.classroomSolvedPercentage(ticker.getSolvedPercentage());
             }
-
-            builder.classroomName(classroom.getClassName());
-            builder.classroomTotalStudents(total);
-            builder.classroomSolvedCount(solvedCount);
-            builder.classroomSolvedPercentage(total > 0 ? Math.round(((double) solvedCount / total) * 1000.0) / 10.0 : 0.0);
         }
 
         return builder.build();
+    }
+
+    private ClassroomPotdTicker resolveClassroomTicker(Classroom classroom, String titleSlug, String title) {
+        String cacheKey = classroom.getId() + ":" + (titleSlug != null ? titleSlug.trim().toLowerCase() : "today");
+
+        if (cacheManager != null) {
+            Cache cache = cacheManager.getCache("classroom-potd-ticker");
+            if (cache != null) {
+                ClassroomPotdTicker cached = cache.get(cacheKey, ClassroomPotdTicker.class);
+                if (cached != null) {
+                    log.debug("Classroom POTD ticker cache HIT for classroom: {}", classroom.getId());
+                    return cached;
+                }
+            }
+        }
+
+        List<Student> classmates = studentRepository.findAllById(classroom.getStudentIds());
+        int total = classmates.size();
+        int solvedCount = 0;
+
+        for (Student s : classmates) {
+            if (hasSolvedLeetcodeChallenge(s, titleSlug, title)) {
+                solvedCount++;
+            }
+        }
+
+        double percentage = total > 0 ? Math.round(((double) solvedCount / total) * 1000.0) / 10.0 : 0.0;
+        ClassroomPotdTicker ticker = new ClassroomPotdTicker(
+                classroom.getClassName(),
+                total,
+                solvedCount,
+                percentage
+        );
+
+        if (cacheManager != null) {
+            Cache cache = cacheManager.getCache("classroom-potd-ticker");
+            if (cache != null) {
+                cache.put(cacheKey, ticker);
+                log.debug("Cached classroom POTD ticker in Redis for classroom: {}", classroom.getId());
+            }
+        }
+
+        return ticker;
     }
 
     private Student resolveStudent(String identifier) {

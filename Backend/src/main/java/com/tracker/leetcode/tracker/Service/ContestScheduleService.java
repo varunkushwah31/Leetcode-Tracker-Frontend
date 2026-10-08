@@ -1,8 +1,9 @@
 package com.tracker.leetcode.tracker.Service;
 
 import com.tracker.leetcode.tracker.DTO.UpcomingContestDTO;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,18 +21,41 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ContestScheduleService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final CacheManager cacheManager;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired(required = false)
+    @Qualifier("virtualThreadExecutor")
+    private Executor virtualThreadExecutor;
+
+    @Autowired
+    public ContestScheduleService(RedisTemplate<String, Object> redisTemplate,
+                                  CacheManager cacheManager,
+                                  @Autowired(required = false) RestTemplate restTemplate) {
+        this.redisTemplate = redisTemplate;
+        this.cacheManager = cacheManager;
+        this.restTemplate = restTemplate != null ? restTemplate : new RestTemplate();
+    }
+
+    public ContestScheduleService(RedisTemplate<String, Object> redisTemplate, CacheManager cacheManager) {
+        this(redisTemplate, cacheManager, null);
+    }
+
+    private Executor getExecutor() {
+        return virtualThreadExecutor != null ? virtualThreadExecutor : Executors.newVirtualThreadPerTaskExecutor();
+    }
 
     /**
      * Retrieves upcoming contests with global caching.
@@ -92,23 +116,42 @@ public class ContestScheduleService {
     }
 
     public List<UpcomingContestDTO> fetchAndCalculateAllContests() {
+        Executor executor = getExecutor();
+
+        CompletableFuture<List<UpcomingContestDTO>> lcFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                return calculateLeetCodeContests();
+            } catch (Exception e) {
+                log.error("Error calculating LeetCode upcoming contests: {}", e.getMessage(), e);
+                return Collections.<UpcomingContestDTO>emptyList();
+            }
+        }, executor);
+
+        CompletableFuture<List<UpcomingContestDTO>> cfFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                return fetchCodeforcesUpcomingContests();
+            } catch (Exception e) {
+                log.error("Error fetching Codeforces upcoming contests: {}", e.getMessage(), e);
+                return Collections.<UpcomingContestDTO>emptyList();
+            }
+        }, executor);
+
+        CompletableFuture.allOf(lcFuture, cfFuture).join();
+
         List<UpcomingContestDTO> results = new ArrayList<>();
-
-        // 1. Calculate upcoming LeetCode Contests
         try {
-            results.addAll(calculateLeetCodeContests());
+            results.addAll(lcFuture.join());
         } catch (Exception e) {
-            log.error("Error calculating LeetCode upcoming contests: {}", e.getMessage(), e);
+            log.error("Error retrieving LeetCode contest results: {}", e.getMessage(), e);
         }
 
-        // 2. Fetch Codeforces upcoming contests
         try {
-            results.addAll(fetchCodeforcesUpcomingContests());
+            results.addAll(cfFuture.join());
         } catch (Exception e) {
-            log.error("Error fetching Codeforces upcoming contests: {}", e.getMessage(), e);
+            log.error("Error retrieving Codeforces contest results: {}", e.getMessage(), e);
         }
 
-        // 3. Sort ascending by startTimeSeconds
+        // Sort ascending by startTimeSeconds
         results.sort(Comparator.comparingLong(UpcomingContestDTO::getStartTimeSeconds));
         return results;
     }

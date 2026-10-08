@@ -191,89 +191,135 @@ public class StudentService {
                 ? virtualThreadExecutor
                 : java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor();
 
-        // 1. Fetch LeetCode Data (concurrently on Virtual Thread if present)
-        CompletableFuture<Void> lcFuture = CompletableFuture.runAsync(() -> {
-            if (hasLc) {
-                log.info("Fetching LeetCode data concurrently for user [{}]", lcUsername);
-                try {
-                    student.setProgressHistory(leetCodeApiClient.fetchCalendarData(lcUsername));
-                } catch (Exception e) {
-                    log.warn("Failed fetching LeetCode calendar data for {}: {}", lcUsername, e.getMessage());
-                }
-
-                try {
-                    student.setProblemStats(leetCodeApiClient.fetchProblemStats(lcUsername));
-                } catch (Exception e) {
-                    log.warn("Failed fetching LeetCode problem stats for {}: {}", lcUsername, e.getMessage());
-                }
-
-                try {
-                    student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(lcUsername, 20));
-                } catch (Exception e) {
-                    log.warn("Failed fetching LeetCode recent submissions for {}: {}", lcUsername, e.getMessage());
-                }
-
-                try {
-                    student.setSkills(leetCodeApiClient.fetchSkillStats(lcUsername));
-                } catch (Exception e) {
-                    log.warn("Failed fetching LeetCode skills for {}: {}", lcUsername, e.getMessage());
-                }
-
-                try {
-                    Student extendedData = leetCodeApiClient.fetchExtendedProfileDetails(lcUsername);
-                    if (extendedData != null) {
-                        student.setAbout(extendedData.getAbout());
-                        student.setRank(extendedData.getRank());
-                        student.setCurrentContestRating(extendedData.getCurrentContestRating());
-                        student.setSocialMedia(extendedData.getSocialMedia());
-                        student.setBadges(extendedData.getBadges());
-                        student.setContestHistory(extendedData.getContestHistory());
-                        if (extendedData.getAvatarUrl() != null && !extendedData.getAvatarUrl().isBlank()) {
-                            student.setAvatarUrl(extendedData.getAvatarUrl());
-                        }
+        // 1. Fetch LeetCode Data (all 5 queries executed concurrently in parallel on Virtual Threads)
+        CompletableFuture<List<DailyProgress>> calendarFuture = hasLc
+                ? CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return leetCodeApiClient.fetchCalendarData(lcUsername);
+                    } catch (Exception e) {
+                        log.warn("Failed fetching LeetCode calendar data for {}: {}", lcUsername, e.getMessage());
+                        return null;
                     }
-                } catch (Exception e) {
-                    log.warn("Failed fetching LeetCode extended data for {}: {}", lcUsername, e.getMessage());
+                }, executor)
+                : CompletableFuture.completedFuture(null);
+
+        CompletableFuture<List<ProblemStats>> statsFuture = hasLc
+                ? CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return leetCodeApiClient.fetchProblemStats(lcUsername);
+                    } catch (Exception e) {
+                        log.warn("Failed fetching LeetCode problem stats for {}: {}", lcUsername, e.getMessage());
+                        return null;
+                    }
+                }, executor)
+                : CompletableFuture.completedFuture(null);
+
+        CompletableFuture<List<RecentSubmission>> recentFuture = hasLc
+                ? CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return leetCodeApiClient.fetchRecentSubmissions(lcUsername, 20);
+                    } catch (Exception e) {
+                        log.warn("Failed fetching LeetCode recent submissions for {}: {}", lcUsername, e.getMessage());
+                        return null;
+                    }
+                }, executor)
+                : CompletableFuture.completedFuture(null);
+
+        CompletableFuture<List<SkillStat>> skillsFuture = hasLc
+                ? CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return leetCodeApiClient.fetchSkillStats(lcUsername);
+                    } catch (Exception e) {
+                        log.warn("Failed fetching LeetCode skills for {}: {}", lcUsername, e.getMessage());
+                        return null;
+                    }
+                }, executor)
+                : CompletableFuture.completedFuture(null);
+
+        CompletableFuture<Student> extendedFuture = hasLc
+                ? CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return leetCodeApiClient.fetchExtendedProfileDetails(lcUsername);
+                    } catch (Exception e) {
+                        log.warn("Failed fetching LeetCode extended data for {}: {}", lcUsername, e.getMessage());
+                        return null;
+                    }
+                }, executor)
+                : CompletableFuture.completedFuture(null);
+
+        // 2. Fetch Codeforces Data (all 3 queries executed concurrently in parallel on Virtual Threads)
+        CompletableFuture<Student> cfUserFuture = hasCf
+                ? CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return codeforcesApiClient.fetchUserInfo(cfHandle);
+                    } catch (Exception e) {
+                        log.warn("Failed fetching Codeforces user info for handle [{}]: {}", cfHandle, e.getMessage());
+                        return null;
+                    }
+                }, executor)
+                : CompletableFuture.completedFuture(null);
+
+        CompletableFuture<List<CodeforcesContestHistory>> cfContestsFuture = hasCf
+                ? CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return codeforcesApiClient.fetchContestHistory(cfHandle);
+                    } catch (Exception e) {
+                        log.warn("Failed fetching Codeforces contest history for handle [{}]: {}", cfHandle, e.getMessage());
+                        return null;
+                    }
+                }, executor)
+                : CompletableFuture.completedFuture(null);
+
+        CompletableFuture<CodeforcesApiClient.CodeforcesSubmissionData> cfDataFuture = hasCf
+                ? CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return codeforcesApiClient.fetchSubmissions(cfHandle);
+                    } catch (Exception e) {
+                        log.warn("Failed fetching Codeforces submissions for handle [{}]: {}", cfHandle, e.getMessage());
+                        return null;
+                    }
+                }, executor)
+                : CompletableFuture.completedFuture(null);
+
+        // Await all parallel tasks across both platforms concurrently!
+        CompletableFuture.allOf(
+                calendarFuture, statsFuture, recentFuture, skillsFuture, extendedFuture,
+                cfUserFuture, cfContestsFuture, cfDataFuture
+        ).join();
+
+        // Apply LeetCode results
+        if (hasLc) {
+            List<DailyProgress> cal = calendarFuture.join();
+            if (cal != null) student.setProgressHistory(cal);
+
+            List<ProblemStats> stats = statsFuture.join();
+            if (stats != null) student.setProblemStats(stats);
+
+            List<RecentSubmission> recent = recentFuture.join();
+            if (recent != null) student.setRecentSubmissions(recent);
+
+            List<SkillStat> skills = skillsFuture.join();
+            if (skills != null) student.setSkills(skills);
+
+            Student ext = extendedFuture.join();
+            if (ext != null) {
+                student.setAbout(ext.getAbout());
+                student.setRank(ext.getRank());
+                student.setCurrentContestRating(ext.getCurrentContestRating());
+                student.setSocialMedia(ext.getSocialMedia());
+                student.setBadges(ext.getBadges());
+                student.setContestHistory(ext.getContestHistory());
+                if (ext.getAvatarUrl() != null && !ext.getAvatarUrl().isBlank()) {
+                    student.setAvatarUrl(ext.getAvatarUrl());
                 }
             }
-        }, executor);
+        }
 
-        // 2. Fetch Codeforces Data (concurrently on Virtual Thread if present)
-        CompletableFuture<CfSyncPayload> cfFuture = CompletableFuture.supplyAsync(() -> {
-            if (hasCf) {
-                log.info("Fetching Codeforces data concurrently for handle [{}]", cfHandle);
-                Student cfUser = null;
-                List<CodeforcesContestHistory> cfContests = null;
-                CodeforcesApiClient.CodeforcesSubmissionData cfData = null;
-
-                try {
-                    cfUser = codeforcesApiClient.fetchUserInfo(cfHandle);
-                } catch (Exception e) {
-                    log.warn("Failed fetching Codeforces user info for handle [{}]: {}", cfHandle, e.getMessage());
-                }
-
-                try {
-                    cfContests = codeforcesApiClient.fetchContestHistory(cfHandle);
-                } catch (Exception e) {
-                    log.warn("Failed fetching Codeforces contest history for handle [{}]: {}", cfHandle, e.getMessage());
-                }
-
-                try {
-                    cfData = codeforcesApiClient.fetchSubmissions(cfHandle);
-                } catch (Exception e) {
-                    log.warn("Failed fetching Codeforces submissions for handle [{}]: {}", cfHandle, e.getMessage());
-                }
-
-                return new CfSyncPayload(cfUser, cfContests, cfData);
-            }
-            return null;
-        }, executor);
-
-        // Wait for both concurrent platform fetches to complete
-        CompletableFuture.allOf(lcFuture, cfFuture).join();
-
-        // 3. Apply Codeforces Data & Merge metrics safely
-        CfSyncPayload cfResult = cfFuture.join();
+        // Apply Codeforces results
+        Student cfUser = cfUserFuture.join();
+        List<CodeforcesContestHistory> cfContests = cfContestsFuture.join();
+        CodeforcesApiClient.CodeforcesSubmissionData cfData = cfDataFuture.join();
+        CfSyncPayload cfResult = hasCf ? new CfSyncPayload(cfUser, cfContests, cfData) : null;
         if (cfResult != null) {
             if (cfResult.cfUser != null) {
                 student.setCodeforcesRating(cfResult.cfUser.getCodeforcesRating());

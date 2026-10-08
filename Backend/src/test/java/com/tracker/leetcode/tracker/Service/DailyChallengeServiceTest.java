@@ -133,4 +133,46 @@ class DailyChallengeServiceTest {
         assertEquals(1, result.getClassroomSolvedCount());
         assertEquals(100.0, result.getClassroomSolvedPercentage());
     }
+
+    @Test
+    @DisplayName("getDailyChallenge uses cached classroom ticker on cache hit without querying studentRepository.findAllById")
+    void getDailyChallenge_ClassroomTickerCacheHit_UsesCache() {
+        when(cacheManager.getCache("global-potd")).thenReturn(cache);
+        DailyChallengeDTO cached = DailyChallengeDTO.builder()
+                .date("2026-10-08")
+                .leetcodeTitle("Number of Islands")
+                .leetcodeTitleSlug("number-of-islands")
+                .build();
+        when(cache.get("today", DailyChallengeDTO.class)).thenReturn(cached);
+
+        Student student = new Student();
+        student.setId("s1");
+        student.setLeetcodeUsername("student1");
+
+        Classroom classroom = new Classroom();
+        classroom.setId("c1");
+        classroom.setClassName("Batch A");
+        classroom.setStudentIds(List.of("s1", "s2"));
+
+        when(studentRepository.findById("student1")).thenReturn(Optional.of(student));
+        when(classroomRepository.findById("c1")).thenReturn(Optional.of(classroom));
+
+        Cache tickerCache = mock(Cache.class);
+        when(cacheManager.getCache("classroom-potd-ticker")).thenReturn(tickerCache);
+        DailyChallengeService.ClassroomPotdTicker cachedTicker = new DailyChallengeService.ClassroomPotdTicker(
+                "Batch A", 2, 2, 100.0
+        );
+        when(tickerCache.get("c1:number-of-islands", DailyChallengeService.ClassroomPotdTicker.class)).thenReturn(cachedTicker);
+
+        DailyChallengeDTO result = dailyChallengeService.getDailyChallenge("student1", "c1");
+
+        assertNotNull(result);
+        assertEquals("Batch A", result.getClassroomName());
+        assertEquals(2, result.getClassroomTotalStudents());
+        assertEquals(2, result.getClassroomSolvedCount());
+        assertEquals(100.0, result.getClassroomSolvedPercentage());
+
+        // Verify findAllById was NEVER called because ticker was loaded directly from cache!
+        verify(studentRepository, never()).findAllById(anyList());
+    }
 }
