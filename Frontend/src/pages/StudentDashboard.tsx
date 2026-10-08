@@ -225,7 +225,10 @@ export function StudentDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        <DailyChallengeCard classroomId={selectedClassroomId} />
+                        <DailyChallengeCard
+                            classroomId={selectedClassroomId}
+                            recentSubmissions={dashboardData?.recentSubmissions}
+                        />
                         <ActivityHeatmap
                             progressHistory={dashboardData?.progressHistory}
                             consistencyStreak={dashboardData?.consistencyStreak}

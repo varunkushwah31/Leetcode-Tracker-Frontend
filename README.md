@@ -33,18 +33,19 @@ Mentors can create virtual classrooms, enroll students individually or in bulk v
 
 ### 🎯 Official LeetCode Problem of the Day (POTD)
 * **Live Daily Challenge**: Directly pulls the official daily challenge from LeetCode (`activeDailyCodingChallengeQuestion`) with topic tags, difficulty pills, problem hint, and direct solve links.
+* **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with a 24-hour TTL. Because the problem of the day is 100% identical for every user, it is stored once globally in Redis and shared across all students and mentors, eliminating redundant upstream calls.
 * **Collaborative Classroom Ticker**: Surfaces a live classroom participation banner:  
   `"14 of 24 students in your classroom have solved today's POTD!"` — motivating peer accountability and daily problem-solving consistency.
-* **Smart Redis Caching**: POTD responses are cached with a 1-hour TTL to eliminate redundant upstream calls.
 
 ### ⚔️ Live Upcoming Contests Tracker
 * **Dual-Platform Schedule**: Aggregates upcoming contest schedules from both **LeetCode** (Weekly & Biweekly) and **Codeforces** (Div 1/2/3/4).
+* **Global Redis Caching (`upcoming-contests`)**: Cached globally under `upcoming-contests` (`ALL`, `LEETCODE`, `CODEFORCES`) with a 30-minute TTL. Shared identically across all users without user-level computation.
 * **404 Prevention Filter**: Automatically restricts LeetCode contests strictly to active, published upcoming events (eliminating dead links to unannounced future weeks).
 * **Direct Registration Links**: Generates one-click registration redirects (`https://codeforces.com/contestRegistration/{id}`) for upcoming Codeforces contests.
 * **Interactive UI**: Real-time countdown clocks, duration badges, and instant platform filtering (`ALL`, `LEETCODE`, `CODEFORCES`).
 
 ### ⚡ Redis Cache Warming Worker & Distributed Lock
-* **Zero Cold-Cache Lag**: Background scheduled worker runs nightly at **03:00 AM UTC** (`@Scheduled(cron = "0 0 3 * * *")`) to pre-warm student statistics (`student-progress`, `student-stats`, `student-recent`, `student-profile`). Mentors experience instantaneous **0ms** responses during peak morning hours.
+* **Zero Cold-Cache Lag**: Background scheduled worker runs nightly at **03:00 AM UTC** (`@Scheduled(cron = "0 0 3 * * *")`) to prime global caches (`global-potd`, `upcoming-contests`) and pre-warm student statistics (`student-progress`, `student-stats`, `student-recent`, `student-profile`). Mentors experience instantaneous **0ms** responses during peak morning hours.
 * **Atomic Distributed Locking**: Acquires a Redis lock (`lock:cache:warming`, 30 min TTL) via `setIfAbsent()` to guarantee only one node warms the cache in multi-instance or Kubernetes deployments.
 * **Admin On-Demand Trigger**: Secure administrative endpoint (`POST /api/admin/cache/warm`) allows instant cache re-warming at any time.
 
@@ -258,8 +259,9 @@ Open `http://localhost:5173` in your browser.
 * `POST /api/auth/logout` — Revoke session and clear cookies.
 
 ### 🎯 Challenges & Contests
-* `GET /api/challenges/daily?classroomId={id}` — Retrieve today's official LeetCode POTD, metadata, and classroom solved progress.
-* `GET /api/contests/upcoming?platform={ALL|LEETCODE|CODEFORCES}` — Retrieve upcoming contests with countdowns and registration links.
+* `GET /api/challenges/daily?classroomId={id}` — Retrieve today's official LeetCode POTD with student solved status & classroom progress.
+* `GET /api/challenges/daily/global` — Retrieve pure globally cached LeetCode POTD (no user context, 0ms latency).
+* `GET /api/contests/upcoming?platform={ALL|LEETCODE|CODEFORCES}` — Retrieve upcoming contests with countdowns and registration links (globally cached).
 
 ### 🏫 Classrooms (`/api/classrooms`)
 * `POST /api/classrooms` — Create classroom (`mentorId`, `className`).

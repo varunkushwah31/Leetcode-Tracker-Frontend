@@ -100,6 +100,10 @@ public class RedisConfig {
         cacheConfigurations.put("mentors-all", defaultCacheConfig.entryTtl(Duration.ofHours(2)));
         cacheConfigurations.put("learning-paths-by-mentor", defaultCacheConfig.entryTtl(Duration.ofHours(3)));
 
+        // Global shared caches (identical for all users across the platform)
+        cacheConfigurations.put("global-potd", defaultCacheConfig.entryTtl(Duration.ofHours(24)));
+        cacheConfigurations.put("upcoming-contests", defaultCacheConfig.entryTtl(Duration.ofMinutes(30)));
+
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultCacheConfig)
                 .withInitialCacheConfigurations(cacheConfigurations)

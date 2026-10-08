@@ -87,6 +87,20 @@ Before running the application with Redis caching, ensure you have:
 - Cleared when: `createPath()` or `assignPathToClassroom()` is called
 - Reason: New paths affect mentor's path list, and assignments create classroom changes
 
+### Global Platform Caches (Non-User-Specific)
+
+Because the Daily Problem of the Day (POTD) and Upcoming Contests schedule are 100% identical for every student and mentor across the entire platform, they are cached **globally** in Redis rather than per-user. This eliminates redundant external API calls to LeetCode and Codeforces and guarantees 0ms response times for all users.
+
+| Cache Name | Method | TTL | Key Strategy | Use Case |
+|---|---|---|---|---|
+| `global-potd` | `getGlobalDailyChallenge()` | 24 hours | `'today'` | Caches official LeetCode Daily Challenge globally for all users |
+| `upcoming-contests` | `getUpcomingContests()` | 30 min | `'ALL'`, `'LEETCODE'`, `'CODEFORCES'` | Caches upcoming LeetCode & Codeforces contests globally |
+
+**Global Cache Mechanics**:
+- **`global-potd`**: Fetched once globally from LeetCode GraphQL. Stored under Redis key `global-potd::today`. When individual students request the daily challenge, the challenge metadata is served directly from the global cache in 0ms, and individual student solved status is overlaid in-memory or on the client without hitting LeetCode's API.
+- **`upcoming-contests`**: Fetched and calculated once globally. Stored under `upcoming-contests::ALL`, `upcoming-contests::LEETCODE`, and `upcoming-contests::CODEFORCES`. All users share the exact same scheduled contest list.
+- **Pre-warming**: The nightly Cache Warming Worker (`CacheWarmingService`) primes both `global-potd` and `upcoming-contests` at 03:00 UTC so that morning traffic encounters zero cold-cache lag.
+
 ## TTL Strategy Explained
 
 Different caches have different TTLs based on data volatility:

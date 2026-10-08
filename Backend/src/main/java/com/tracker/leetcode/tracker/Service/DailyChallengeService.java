@@ -8,6 +8,9 @@ import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,13 +25,31 @@ public class DailyChallengeService {
     private final LeetCodeApiClient leetCodeApiClient;
     private final StudentRepository studentRepository;
     private final ClassroomRepository classroomRepository;
+    private final CacheManager cacheManager;
 
-    public DailyChallengeDTO getDailyChallenge(String studentIdentifier, String classroomId) {
+    /**
+     * Retrieves the globally cached LeetCode Daily Challenge.
+     * Cached globally in Redis under "global-potd" with key "today" (TTL: 24 hours).
+     * Shared identically across all students and mentors without user-level computation.
+     */
+    @Cacheable(value = "global-potd", key = "'today'")
+    public DailyChallengeDTO getGlobalDailyChallenge() {
+        if (cacheManager != null) {
+            Cache cache = cacheManager.getCache("global-potd");
+            if (cache != null) {
+                DailyChallengeDTO cached = cache.get("today", DailyChallengeDTO.class);
+                if (cached != null) {
+                    log.debug("Global POTD cache HIT for today.");
+                    return cached;
+                }
+            }
+        }
+
+        log.info("Global POTD cache MISS. Querying upstream LeetCode API...");
         LeetCodeApiClient.LeetCodeDailyQuestion lcPotd = leetCodeApiClient.fetchDailyCodingChallenge();
-
         String today = LocalDate.now(ZoneId.of("UTC")).toString();
 
-        DailyChallengeDTO.DailyChallengeDTOBuilder builder = DailyChallengeDTO.builder()
+        DailyChallengeDTO challenge = DailyChallengeDTO.builder()
                 .date(today)
                 // Official LeetCode POTD info
                 .leetcodeFrontendId(lcPotd.questionFrontendId())
@@ -38,13 +59,43 @@ public class DailyChallengeService {
                 .leetcodeUrl(lcPotd.url())
                 .leetcodeTopicTags(lcPotd.topicTags())
                 .userSolvedLeetcode(false)
-                .userSolved(false);
+                .userSolved(false)
+                .build();
+
+        if (cacheManager != null) {
+            Cache cache = cacheManager.getCache("global-potd");
+            if (cache != null) {
+                cache.put("today", challenge);
+                log.info("Cached global POTD in Redis under 'global-potd::today'.");
+            }
+        }
+
+        return challenge;
+    }
+
+    /**
+     * Retrieves daily challenge for a student, building on top of the globally cached POTD.
+     * The upstream POTD challenge metadata is fetched 0ms from the global Redis cache.
+     */
+    public DailyChallengeDTO getDailyChallenge(String studentIdentifier, String classroomId) {
+        DailyChallengeDTO globalPotd = getGlobalDailyChallenge();
+        if (globalPotd == null) {
+            return null;
+        }
+
+        // If no user context or classroom requested, return the global cached POTD directly
+        if ((studentIdentifier == null || studentIdentifier.isBlank()) &&
+                (classroomId == null || classroomId.isBlank())) {
+            return globalPotd;
+        }
+
+        DailyChallengeDTO.DailyChallengeDTOBuilder builder = globalPotd.toBuilder();
 
         Student student = resolveStudent(studentIdentifier);
         boolean solvedLc = false;
 
         if (student != null) {
-            solvedLc = hasSolvedLeetcodeChallenge(student, lcPotd.titleSlug(), lcPotd.title());
+            solvedLc = hasSolvedLeetcodeChallenge(student, globalPotd.getLeetcodeTitleSlug(), globalPotd.getLeetcodeTitle());
             builder.userSolvedLeetcode(solvedLc);
             builder.userSolved(solvedLc);
         }
@@ -57,7 +108,7 @@ public class DailyChallengeService {
             int solvedCount = 0;
 
             for (Student s : classmates) {
-                if (hasSolvedLeetcodeChallenge(s, lcPotd.titleSlug(), lcPotd.title())) {
+                if (hasSolvedLeetcodeChallenge(s, globalPotd.getLeetcodeTitleSlug(), globalPotd.getLeetcodeTitle())) {
                     solvedCount++;
                 }
             }

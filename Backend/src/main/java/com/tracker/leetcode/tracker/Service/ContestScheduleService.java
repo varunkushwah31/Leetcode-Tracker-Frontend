@@ -3,6 +3,9 @@ package com.tracker.leetcode.tracker.Service;
 import com.tracker.leetcode.tracker.DTO.UpcomingContestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,49 +28,67 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ContestScheduleService {
 
-    private static final String UPCOMING_CONTESTS_CACHE_KEY = "cache:upcoming-contests:v2";
-    private static final long CACHE_TTL_MINUTES = 30;
-
     private final RedisTemplate<String, Object> redisTemplate;
+    private final CacheManager cacheManager;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Retrieves upcoming contests with global caching.
+     * Cached globally in Redis under "upcoming-contests" with platform keys ("ALL", "LEETCODE", "CODEFORCES").
+     * Shared across all users with a 30-minute TTL without user-level computation.
+     */
+    @Cacheable(value = "upcoming-contests", key = "#platformFilter != null && !#platformFilter.isBlank() ? #platformFilter.toUpperCase() : 'ALL'")
     public List<UpcomingContestDTO> getUpcomingContests(String platformFilter) {
-        List<UpcomingContestDTO> allContests = getCachedOrFetchContests();
+        String filterKey = (platformFilter != null && !platformFilter.isBlank())
+                ? platformFilter.trim().toUpperCase()
+                : "ALL";
 
-        if (platformFilter == null || platformFilter.isBlank() || "ALL".equalsIgnoreCase(platformFilter)) {
+        if (cacheManager != null) {
+            Cache cache = cacheManager.getCache("upcoming-contests");
+            if (cache != null) {
+                @SuppressWarnings("unchecked")
+                List<UpcomingContestDTO> cached = cache.get(filterKey, List.class);
+                if (cached != null && !cached.isEmpty()) {
+                    log.debug("Global upcoming contests cache HIT for platform: {}", filterKey);
+                    return cached;
+                }
+            }
+        }
+
+        log.info("Global upcoming contests cache MISS for platform: {}. Calculating and querying...", filterKey);
+        List<UpcomingContestDTO> allContests = fetchAndCalculateAllContests();
+
+        // Populate global caches for ALL, LEETCODE, and CODEFORCES simultaneously
+        if (cacheManager != null) {
+            Cache cache = cacheManager.getCache("upcoming-contests");
+            if (cache != null) {
+                cache.put("ALL", allContests);
+
+                List<UpcomingContestDTO> lcList = allContests.stream()
+                        .filter(c -> "LEETCODE".equalsIgnoreCase(c.getPlatform()))
+                        .collect(Collectors.toList());
+                cache.put("LEETCODE", lcList);
+
+                List<UpcomingContestDTO> cfList = allContests.stream()
+                        .filter(c -> "CODEFORCES".equalsIgnoreCase(c.getPlatform()))
+                        .collect(Collectors.toList());
+                cache.put("CODEFORCES", cfList);
+                log.info("Cached global upcoming contests in Redis under 'upcoming-contests' for ALL, LEETCODE, and CODEFORCES.");
+            }
+        }
+
+        if ("ALL".equalsIgnoreCase(filterKey)) {
             return allContests;
         }
 
-        String filterUpper = platformFilter.trim().toUpperCase();
         return allContests.stream()
-                .filter(c -> filterUpper.equalsIgnoreCase(c.getPlatform()))
+                .filter(c -> filterKey.equalsIgnoreCase(c.getPlatform()))
                 .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("unchecked")
     public List<UpcomingContestDTO> getCachedOrFetchContests() {
-        try {
-            Object cached = redisTemplate.opsForValue().get(UPCOMING_CONTESTS_CACHE_KEY);
-            if (cached instanceof List<?>) {
-                List<?> list = (List<?>) cached;
-                if (!list.isEmpty() && list.get(0) instanceof UpcomingContestDTO) {
-                    return (List<UpcomingContestDTO>) list;
-                }
-            }
-        } catch (Exception e) {
-            log.warn("Failed to retrieve upcoming contests from Redis: {}", e.getMessage());
-        }
-
-        List<UpcomingContestDTO> contests = fetchAndCalculateAllContests();
-
-        try {
-            redisTemplate.opsForValue().set(UPCOMING_CONTESTS_CACHE_KEY, contests, CACHE_TTL_MINUTES, TimeUnit.MINUTES);
-        } catch (Exception e) {
-            log.warn("Failed to cache upcoming contests in Redis: {}", e.getMessage());
-        }
-
-        return contests;
+        return getUpcomingContests("ALL");
     }
 
     public List<UpcomingContestDTO> fetchAndCalculateAllContests() {

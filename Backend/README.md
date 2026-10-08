@@ -49,18 +49,17 @@ The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade pla
 ### 1. 🎯 Official LeetCode POTD (`DailyChallengeService`)
 - Integrates directly with LeetCode GraphQL endpoint (`activeDailyCodingChallengeQuestion`).
 - Fetches problem title, difficulty (Easy, Medium, Hard), tags, description preview, hint, and problem URL.
-- Calculates collaborative classroom progress: returns total enrolled students and count of students who have completed today's challenge.
-- Cached in Redis for 1 hour to prevent redundant external API queries.
+- **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with a 24-hour TTL. Because the problem of the day is identical across all users, it is shared globally, avoiding redundant external calls.
+- Personal solve verification and collaborative classroom tickers are overlaid in-memory without re-querying LeetCode.
 
 ### 2. ⚔️ Live Upcoming Contests Tracker (`ContestScheduleService`)
-- **LeetCode**: Queries upcoming contests and extracts the strictly valid active upcoming contests (Weekly & Biweekly contests), preventing 404 links on unpublished contests.
-- **Codeforces**: Queries Codeforces API (`/contest.list?gym=false`), extracts scheduled contests, and generates direct registration links (`codeforces.com/contestRegistration/{id}`).
-- Supports platform filtering: `ALL`, `LEETCODE`, or `CODEFORCES`.
+- **LeetCode & Codeforces Aggregation**: Combines upcoming Weekly/Biweekly contests and Codeforces rounds with countdowns and direct registration URLs.
+- **Global Redis Caching (`upcoming-contests`)**: Cached globally under `upcoming-contests` (`ALL`, `LEETCODE`, `CODEFORCES`) with a 30-minute TTL. Shared identically across all users.
 
 ### 3. ⚡ Redis Cache Warming Worker (`CacheWarmingService`)
 - Automated background worker executing daily at **03:00 UTC** (`@Scheduled(cron = "0 0 3 * * *")`).
 - Uses atomic Redis distributed lock (`lock:cache:warming`, 30 min TTL) to ensure single-node execution in clustered environments.
-- Pre-warms `student-progress`, `student-stats`, `student-recent`, and `student-profile` caches for all active students.
+- Primes global caches (`global-potd`, `upcoming-contests`) and pre-warms student & classroom caches for 0ms morning response times.
 - Manual administrative trigger endpoint: `POST /api/admin/cache/warm`.
 
 ### 4. 🔄 Real-Time Clustered WebSockets (`RedisWebSocketBridge`)
@@ -105,8 +104,9 @@ The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade pla
 ### Challenges & Contests (`/api/challenges`, `/api/contests`)
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/challenges/daily` | Get today's LeetCode POTD with classroom progress |
-| `GET` | `/api/contests/upcoming` | Get upcoming LeetCode & Codeforces contests |
+| `GET` | `/api/challenges/daily` | Get today's LeetCode POTD with student solved status & classroom ticker |
+| `GET` | `/api/challenges/daily/global` | Get pure globally cached LeetCode POTD (no user context, 0ms) |
+| `GET` | `/api/contests/upcoming` | Get upcoming LeetCode & Codeforces contests (globally cached) |
 
 ### Classrooms (`/api/classrooms`)
 | Method | Endpoint | Description |

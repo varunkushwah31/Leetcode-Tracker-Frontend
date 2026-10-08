@@ -10,13 +10,14 @@ import {
     ArrowsClockwiseIcon as RefreshCw,
 } from '@phosphor-icons/react';
 import { DailyChallengeService } from '@/services/endpoints';
-import type { DailyChallengeDTO } from '@/types';
+import type { DailyChallengeDTO, RecentSubmission } from '@/types';
 
 interface DailyChallengeCardProps {
     classroomId?: string | null;
+    recentSubmissions?: RecentSubmission[];
 }
 
-export function DailyChallengeCard({ classroomId }: Readonly<DailyChallengeCardProps>) {
+export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<DailyChallengeCardProps>) {
     const [challenge, setChallenge] = useState<DailyChallengeDTO | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -78,7 +79,16 @@ export function DailyChallengeCard({ classroomId }: Readonly<DailyChallengeCardP
         return null;
     }
 
-    const isSolved = challenge.userSolvedLeetcode;
+    const isSolved = useMemo(() => {
+        if (challenge.userSolvedLeetcode) return true;
+        if (!challenge.leetcodeTitleSlug || !recentSubmissions || recentSubmissions.length === 0) return false;
+        const normTarget = challenge.leetcodeTitleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        return recentSubmissions.some((sub) => {
+            const platformMatches = !sub.platform || sub.platform === 'LEETCODE';
+            const normSub = sub.titleSlug ? sub.titleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : '';
+            return platformMatches && normSub === normTarget;
+        });
+    }, [challenge.userSolvedLeetcode, challenge.leetcodeTitleSlug, recentSubmissions]);
 
     const difficultyBadge = (diff?: string) => {
         const d = diff?.toLowerCase();

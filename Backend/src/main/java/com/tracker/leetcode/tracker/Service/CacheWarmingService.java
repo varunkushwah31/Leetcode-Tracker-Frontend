@@ -51,17 +51,19 @@ public class CacheWarmingService {
 
         log.info("Executing comprehensive Redis Cache Warming worker...");
 
-        // 1. Warm POTD & Upcoming Contests
+        // 1. Warm Global POTD & Upcoming Contests
         try {
-            dailyChallengeService.getDailyChallenge(null, null);
+            dailyChallengeService.getGlobalDailyChallenge();
+            log.info("Global POTD cache primed successfully in Redis.");
         } catch (Exception e) {
-            log.warn("Cache warming POTD failed: {}", e.getMessage());
+            log.warn("Cache warming global POTD failed: {}", e.getMessage());
         }
 
         try {
-            contestScheduleService.getCachedOrFetchContests();
+            contestScheduleService.getUpcomingContests("ALL");
+            log.info("Global upcoming contests caches primed successfully in Redis.");
         } catch (Exception e) {
-            log.warn("Cache warming Contests failed: {}", e.getMessage());
+            log.warn("Cache warming global Contests failed: {}", e.getMessage());
         }
 
         // 2. Warm Classrooms (Dashboards and Analytics)

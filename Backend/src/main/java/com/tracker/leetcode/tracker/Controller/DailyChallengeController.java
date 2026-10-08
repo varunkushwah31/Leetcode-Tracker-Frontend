@@ -33,4 +33,10 @@ public class DailyChallengeController {
         DailyChallengeDTO challenge = dailyChallengeService.getDailyChallenge(studentIdentifier, classroomId);
         return ResponseEntity.ok(challenge);
     }
+
+    @GetMapping("/daily/global")
+    public ResponseEntity<DailyChallengeDTO> getGlobalDailyChallenge() {
+        log.info("Fetching pure global LeetCode POTD (no user context).");
+        return ResponseEntity.ok(dailyChallengeService.getGlobalDailyChallenge());
+    }
 }
