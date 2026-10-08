@@ -348,27 +348,97 @@ public class ClassroomService {
 
         // 3. Apply Dynamic Sorting
         if (sortBy != null && !sortBy.isBlank()) {
-            switch (sortBy.toLowerCase()) {
+            String normalized = sortBy.toLowerCase().trim();
+            boolean isAscending = normalized.endsWith("_asc");
+            boolean isExplicitDesc = normalized.endsWith("_desc");
+            String field = normalized.replaceAll("_(asc|desc)$", "");
+
+            Comparator<StudentSummaryDTO> comparator;
+            switch (field) {
                 case "consistency":
-                    studentSummaries.sort((s1, s2) -> Integer.compare(s2.getConsistencyStreak(), s1.getConsistencyStreak()));
+                case "streak":
+                    comparator = Comparator.comparingInt(StudentSummaryDTO::getConsistencyStreak);
+                    if (!isAscending) comparator = comparator.reversed();
                     break;
+
                 case "rating":
-                    studentSummaries.sort((s1, s2) -> Double.compare(s2.getCurrentContestRating(), s1.getCurrentContestRating()));
+                    // Maximum contest rating between LeetCode and Codeforces
+                    comparator = Comparator.comparingDouble(s -> Math.max(
+                            s.getCurrentContestRating(),
+                            s.getCodeforcesRating() != null ? s.getCodeforcesRating().doubleValue() : 0.0
+                    ));
+                    if (!isAscending) comparator = comparator.reversed();
                     break;
+
+                case "lc_rating":
+                case "leetcoderating":
+                    comparator = Comparator.comparingDouble(StudentSummaryDTO::getCurrentContestRating);
+                    if (!isAscending) comparator = comparator.reversed();
+                    break;
+
+                case "cf_rating":
+                case "codeforcesrating":
+                    comparator = Comparator.comparingDouble(s -> s.getCodeforcesRating() != null ? s.getCodeforcesRating().doubleValue() : 0.0);
+                    if (!isAscending) comparator = comparator.reversed();
+                    break;
+
                 case "solved":
-                    studentSummaries.sort((s1, s2) -> Integer.compare(s2.getTotalSolved(), s1.getTotalSolved()));
+                case "totalsolved":
+                    comparator = Comparator.comparingInt(StudentSummaryDTO::getTotalSolved);
+                    if (!isAscending) comparator = comparator.reversed();
                     break;
-                case "pending": // Sort by students who are falling behind!
-                    studentSummaries.sort((s1, s2) -> Integer.compare(s2.getPendingAssignments(), s1.getPendingAssignments()));
+
+                case "lc_solved":
+                case "leetcodesolved":
+                    comparator = Comparator.comparingInt(StudentSummaryDTO::getLeetcodeSolvedCount);
+                    if (!isAscending) comparator = comparator.reversed();
                     break;
-                case "completed": // Sort by students who finished the most assignments!
-                    studentSummaries.sort((s1, s2) -> Integer.compare(s2.getCompletedAssignments(), s1.getCompletedAssignments()));
+
+                case "cf_solved":
+                case "codeforcessolved":
+                    comparator = Comparator.comparingInt(StudentSummaryDTO::getCodeforcesSolvedCount);
+                    if (!isAscending) comparator = comparator.reversed();
                     break;
+
+                case "pending": // Sort by students who are falling behind
+                    comparator = Comparator.comparingInt(StudentSummaryDTO::getPendingAssignments);
+                    if (!isAscending) comparator = comparator.reversed();
+                    break;
+
+                case "completed": // Sort by students who finished the most assignments
+                    comparator = Comparator.comparingInt(StudentSummaryDTO::getCompletedAssignments);
+                    if (!isAscending) comparator = comparator.reversed();
+                    break;
+
                 case "name":
-                    studentSummaries.sort((s1, s2) -> s1.getName().compareToIgnoreCase(s2.getName()));
+                    comparator = (s1, s2) -> {
+                        String n1 = s1.getName() != null ? s1.getName() : "";
+                        String n2 = s2.getName() != null ? s2.getName() : "";
+                        return n1.compareToIgnoreCase(n2);
+                    };
+                    if (isExplicitDesc) {
+                        comparator = comparator.reversed();
+                    }
                     break;
+
+                case "rank":
+                    comparator = (s1, s2) -> {
+                        int r1 = parseNumericalRank(s1.getRank());
+                        int r2 = parseNumericalRank(s2.getRank());
+                        return Integer.compare(r1, r2);
+                    };
+                    if (isExplicitDesc) {
+                        comparator = comparator.reversed();
+                    }
+                    break;
+
                 default:
                     log.warn("Unknown sort parameter: {}. Defaulting to unsorted.", sortBy);
+                    comparator = null;
+            }
+
+            if (comparator != null) {
+                studentSummaries.sort(comparator);
             }
         }
 
@@ -1818,6 +1888,18 @@ public class ClassroomService {
             );
         } catch (Exception ex) {
             log.warn("Failed updating student in Redis leaderboards: {}", ex.getMessage());
+        }
+    }
+
+    private int parseNumericalRank(String rankStr) {
+        if (rankStr == null || rankStr.isBlank()) {
+            return Integer.MAX_VALUE;
+        }
+        try {
+            String digits = rankStr.replaceAll("[^0-9]", "");
+            return digits.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(digits);
+        } catch (NumberFormatException e) {
+            return Integer.MAX_VALUE;
         }
     }
 }

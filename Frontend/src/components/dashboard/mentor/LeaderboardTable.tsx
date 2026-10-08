@@ -4,10 +4,49 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
-import { FlameIcon, DownloadSimpleIcon as Download, MagnifyingGlassIcon as Search, BellIcon, SpinnerIcon as Loader2, TableIcon as Table, TrashIcon as Trash2 } from '@phosphor-icons/react';
+import {
+    FlameIcon,
+    DownloadSimpleIcon as Download,
+    MagnifyingGlassIcon as Search,
+    BellIcon,
+    SpinnerIcon as Loader2,
+    TableIcon as Table,
+    TrashIcon as Trash2,
+    CaretUpIcon as CaretUp,
+    CaretDownIcon as CaretDown,
+    CaretUpDownIcon as CaretUpDown,
+    SortAscendingIcon as SortAscending,
+    SortDescendingIcon as SortDescending,
+} from '@phosphor-icons/react';
 import type { StudentSummaryDTO } from '@/types';
 import { ClassroomService, StudentService } from '@/services/endpoints';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+
+function SortIndicator({ field, activeField, direction }: Readonly<{ field: string; activeField: string; direction: 'asc' | 'desc' }>) {
+    const isActive = activeField === field;
+    if (!isActive) {
+        return (
+            <CaretUpDown
+                className="w-3.5 h-3.5 text-zinc-400/40 group-hover/th:text-zinc-600 dark:group-hover/th:text-zinc-300 transition-colors shrink-0"
+                aria-hidden="true"
+            />
+        );
+    }
+    if (direction === 'asc') {
+        return (
+            <CaretUp
+                className="w-3.5 h-3.5 text-[#5b4fff] dark:text-[#968fff] transition-transform shrink-0"
+                aria-hidden="true"
+            />
+        );
+    }
+    return (
+        <CaretDown
+            className="w-3.5 h-3.5 text-[#5b4fff] dark:text-[#968fff] transition-transform shrink-0"
+            aria-hidden="true"
+        />
+    );
+}
 
 interface LeaderboardTableProps {
     students: StudentSummaryDTO[];
@@ -53,6 +92,48 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
     const [studentToRemove, setStudentToRemove] = useState<StudentSummaryDTO | null>(null);
     const [isRemoving, setIsRemoving] = useState(false);
     const [removeError, setRemoveError] = useState<string | null>(null);
+
+    // Parse incoming sortBy prop into base field and direction
+    const parseSortProp = (prop: string): { field: string; direction: 'asc' | 'desc' } => {
+        if (!prop) return { field: 'solved', direction: 'desc' };
+        const isAsc = prop.endsWith('_asc');
+        const isExplicitDesc = prop.endsWith('_desc');
+        const field = prop.replace(/_(asc|desc)$/, '');
+        if (isAsc) return { field, direction: 'asc' };
+        if (isExplicitDesc) return { field, direction: 'desc' };
+        if (field === 'name' || field === 'rank') return { field, direction: 'asc' };
+        return { field, direction: 'desc' };
+    };
+
+    const initialParsed = parseSortProp(sortBy);
+    const [sortField, setSortField] = useState<string>(initialParsed.field);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(initialParsed.direction);
+
+    // Keep internal sort state synchronized if parent changes sortBy prop
+    useEffect(() => {
+        if (sortBy) {
+            const parsed = parseSortProp(sortBy);
+            setSortField(parsed.field);
+            setSortDirection(parsed.direction);
+        }
+    }, [sortBy]);
+
+    const handleSortChange = (newField: string, newDir?: 'asc' | 'desc') => {
+        const nextDir = newDir ?? (
+            newField === sortField
+                ? (sortDirection === 'desc' ? 'asc' : 'desc')
+                : (newField === 'name' || newField === 'rank' ? 'asc' : 'desc')
+        );
+        setSortField(newField);
+        setSortDirection(nextDir);
+        onSortChange(`${newField}_${nextDir}`);
+    };
+
+    const handleToggleDirection = () => {
+        const nextDir = sortDirection === 'desc' ? 'asc' : 'desc';
+        setSortDirection(nextDir);
+        onSortChange(`${sortField}_${nextDir}`);
+    };
 
     const handleConfirmRemove = async () => {
         if (!classroomId || !studentToRemove) return;
@@ -132,11 +213,85 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
         }
     };
 
-    const filteredStudents = students?.filter(s =>
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.leetcodeUsername && s.leetcodeUsername.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (s.codeforcesHandle && s.codeforcesHandle.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const sortedAndFilteredStudents = useMemo(() => {
+        if (!students) return [];
+
+        const q = searchQuery.trim().toLowerCase();
+        const filtered = students.filter(s =>
+            !q ||
+            (s.name && s.name.toLowerCase().includes(q)) ||
+            (s.leetcodeUsername && s.leetcodeUsername.toLowerCase().includes(q)) ||
+            (s.codeforcesHandle && s.codeforcesHandle.toLowerCase().includes(q))
+        );
+
+        return [...filtered].sort((a, b) => {
+            let diff = 0;
+            switch (sortField) {
+                case 'consistency':
+                case 'streak': {
+                    diff = (a.consistencyStreak || 0) - (b.consistencyStreak || 0);
+                    break;
+                }
+                case 'rating': {
+                    const ratingA = Math.max(a.currentContestRating || 0, a.codeforcesRating || 0);
+                    const ratingB = Math.max(b.currentContestRating || 0, b.codeforcesRating || 0);
+                    diff = ratingA - ratingB;
+                    break;
+                }
+                case 'lc_rating': {
+                    diff = (a.currentContestRating || 0) - (b.currentContestRating || 0);
+                    break;
+                }
+                case 'cf_rating': {
+                    diff = (a.codeforcesRating || 0) - (b.codeforcesRating || 0);
+                    break;
+                }
+                case 'lc_solved': {
+                    diff = (a.leetcodeSolvedCount || 0) - (b.leetcodeSolvedCount || 0);
+                    break;
+                }
+                case 'cf_solved': {
+                    diff = (a.codeforcesSolvedCount || 0) - (b.codeforcesSolvedCount || 0);
+                    break;
+                }
+                case 'pending': {
+                    diff = (a.pendingAssignments || 0) - (b.pendingAssignments || 0);
+                    break;
+                }
+                case 'completed': {
+                    diff = (a.completedAssignments || 0) - (b.completedAssignments || 0);
+                    break;
+                }
+                case 'name': {
+                    diff = (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+                    break;
+                }
+                case 'rank': {
+                    const parseRank = (r?: string) => {
+                        if (!r) return Number.MAX_SAFE_INTEGER;
+                        const num = parseInt(r.replace(/[^0-9]/g, ''), 10);
+                        return isNaN(num) ? Number.MAX_SAFE_INTEGER : num;
+                    };
+                    diff = parseRank(a.rank) - parseRank(b.rank);
+                    break;
+                }
+                case 'solved':
+                default: {
+                    diff = (a.totalSolved || 0) - (b.totalSolved || 0);
+                    break;
+                }
+            }
+
+            // Secondary tie-breakers for a deterministic sort
+            if (diff === 0 && sortField !== 'solved') {
+                const tie = (b.totalSolved || 0) - (a.totalSolved || 0);
+                if (tie !== 0) return tie;
+                return (a.name || '').localeCompare(b.name || '');
+            }
+
+            return sortDirection === 'asc' ? diff : -diff;
+        });
+    }, [students, searchQuery, sortField, sortDirection]);
 
     return (
         <Card className="mb-6 shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
@@ -176,18 +331,41 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                             </Button>
                         )}
                         <div className="flex items-center gap-2">
-                            <Select value={sortBy} onValueChange={onSortChange}>
-                                <SelectTrigger className="w-44 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white h-10 rounded-xl focus:ring-1 focus:ring-[#5b4fff]">
+                            <Select value={sortField} onValueChange={(val) => handleSortChange(val, val === 'name' || val === 'rank' ? 'asc' : 'desc')}>
+                                <SelectTrigger className="w-48 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white h-10 rounded-xl focus:ring-1 focus:ring-[#5b4fff] text-xs font-semibold">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="bg-white dark:bg-[#1a1b2e] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl shadow-xl">
-                                    <SelectItem value="solved" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white">Total Solved</SelectItem>
-                                    <SelectItem value="consistency" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white">Daily Streak</SelectItem>
-                                    <SelectItem value="pending" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white">Most Pending</SelectItem>
-                                    <SelectItem value="rating" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white">Contest Rating</SelectItem>
-                                    <SelectItem value="name" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white">Alphabetical</SelectItem>
+                                    <SelectItem value="solved" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Total Solved (Combined)</SelectItem>
+                                    <SelectItem value="lc_solved" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">LeetCode Solved</SelectItem>
+                                    <SelectItem value="cf_solved" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Codeforces Solved</SelectItem>
+                                    <SelectItem value="rating" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Highest Rating (LC/CF)</SelectItem>
+                                    <SelectItem value="lc_rating" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">LeetCode Rating</SelectItem>
+                                    <SelectItem value="cf_rating" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Codeforces Rating</SelectItem>
+                                    <SelectItem value="consistency" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Daily Streak</SelectItem>
+                                    <SelectItem value="completed" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Most Completed</SelectItem>
+                                    <SelectItem value="pending" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Most Pending</SelectItem>
+                                    <SelectItem value="name" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Alphabetical (Name)</SelectItem>
+                                    <SelectItem value="rank" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Classroom Rank</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleToggleDirection}
+                                className="h-10 px-3 bg-zinc-100 dark:bg-[#222] border-zinc-200 dark:border-zinc-700/60 hover:bg-zinc-200/70 dark:hover:bg-zinc-800 rounded-xl text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer interactive-press shrink-0"
+                                title={sortDirection === 'desc' ? 'Descending (High to Low / Z to A) - Click to sort Ascending' : 'Ascending (Low to High / A to Z) - Click to sort Descending'}
+                                aria-label="Toggle sort direction"
+                            >
+                                {sortDirection === 'desc' ? (
+                                    <SortDescending className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" />
+                                ) : (
+                                    <SortAscending className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" />
+                                )}
+                                <span className="hidden sm:inline text-xs font-semibold ml-1.5">
+                                    {sortDirection === 'desc' ? 'Desc' : 'Asc'}
+                                </span>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -195,18 +373,84 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
             <CardContent className="p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-zinc-50/80 dark:bg-[#1a1b2e]/50 border-b border-zinc-200/80 dark:border-zinc-800/60">
+                        <thead className="bg-zinc-50/80 dark:bg-[#1a1b2e]/50 border-b border-zinc-200/80 dark:border-zinc-800/60 select-none">
                         <tr>
-                            <th className="text-left py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Rank</th>
-                            <th className="text-left py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Student</th>
-                            <th className="text-center py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Streak</th>
-                            <th className="text-center py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Total Solved</th>
-                            <th className="text-center py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Rating</th>
-                            <th className="text-right py-4 px-6 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Assignments</th>
+                            <th
+                                onClick={() => handleSortChange('rank')}
+                                className="py-4 px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                title={`Sort by Rank (${sortField === 'rank' ? (sortDirection === 'asc' ? 'Ascending' : 'Descending') : 'Click to sort'})`}
+                            >
+                                <div className="flex items-center justify-center gap-1.5">
+                                    <span className={sortField === 'rank' ? 'text-[#5b4fff] dark:text-[#968fff]' : 'text-zinc-500 group-hover/th:text-zinc-900 dark:group-hover/th:text-white'}>
+                                        Rank
+                                    </span>
+                                    <SortIndicator field="rank" activeField={sortField} direction={sortDirection} />
+                                </div>
+                            </th>
+                            <th
+                                onClick={() => handleSortChange('name')}
+                                className="text-left py-4 px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                title={`Sort by Student Name (${sortField === 'name' ? (sortDirection === 'asc' ? 'A to Z' : 'Z to A') : 'Click to sort A to Z'})`}
+                            >
+                                <div className="flex items-center gap-1.5">
+                                    <span className={sortField === 'name' ? 'text-[#5b4fff] dark:text-[#968fff]' : 'text-zinc-500 group-hover/th:text-zinc-900 dark:group-hover/th:text-white'}>
+                                        Student
+                                    </span>
+                                    <SortIndicator field="name" activeField={sortField} direction={sortDirection} />
+                                </div>
+                            </th>
+                            <th
+                                onClick={() => handleSortChange('consistency')}
+                                className="text-center py-4 px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                title={`Sort by Daily Streak (${sortField === 'consistency' ? (sortDirection === 'desc' ? 'High to Low' : 'Low to High') : 'Click to sort by streak'})`}
+                            >
+                                <div className="flex items-center justify-center gap-1.5">
+                                    <span className={sortField === 'consistency' ? 'text-[#5b4fff] dark:text-[#968fff]' : 'text-zinc-500 group-hover/th:text-zinc-900 dark:group-hover/th:text-white'}>
+                                        Streak
+                                    </span>
+                                    <SortIndicator field="consistency" activeField={sortField} direction={sortDirection} />
+                                </div>
+                            </th>
+                            <th
+                                onClick={() => handleSortChange('solved')}
+                                className="text-center py-4 px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                title={`Sort by Total Solved (${sortField === 'solved' ? (sortDirection === 'desc' ? 'High to Low' : 'Low to High') : 'Click to sort by total solved'})`}
+                            >
+                                <div className="flex items-center justify-center gap-1.5">
+                                    <span className={sortField === 'solved' ? 'text-[#5b4fff] dark:text-[#968fff]' : 'text-zinc-500 group-hover/th:text-zinc-900 dark:group-hover/th:text-white'}>
+                                        Total Solved
+                                    </span>
+                                    <SortIndicator field="solved" activeField={sortField} direction={sortDirection} />
+                                </div>
+                            </th>
+                            <th
+                                onClick={() => handleSortChange('rating')}
+                                className="text-center py-4 px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                title={`Sort by Contest Rating (${sortField === 'rating' ? (sortDirection === 'desc' ? 'High to Low' : 'Low to High') : 'Click to sort by rating'})`}
+                            >
+                                <div className="flex items-center justify-center gap-1.5">
+                                    <span className={sortField === 'rating' ? 'text-[#5b4fff] dark:text-[#968fff]' : 'text-zinc-500 group-hover/th:text-zinc-900 dark:group-hover/th:text-white'}>
+                                        Rating
+                                    </span>
+                                    <SortIndicator field="rating" activeField={sortField} direction={sortDirection} />
+                                </div>
+                            </th>
+                            <th
+                                onClick={() => handleSortChange(sortField === 'completed' ? 'pending' : 'completed')}
+                                className="text-right py-4 px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                title={`Sort by Assignments (${sortField === 'completed' ? 'Currently Done, click for Pending' : 'Click to sort by completed'})`}
+                            >
+                                <div className="flex items-center justify-end gap-1.5">
+                                    <span className={sortField === 'completed' || sortField === 'pending' ? 'text-[#5b4fff] dark:text-[#968fff]' : 'text-zinc-500 group-hover/th:text-zinc-900 dark:group-hover/th:text-white'}>
+                                        Assignments {sortField === 'pending' ? '(Pending)' : ''}
+                                    </span>
+                                    <SortIndicator field={sortField === 'pending' ? 'pending' : 'completed'} activeField={sortField} direction={sortDirection} />
+                                </div>
+                            </th>
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
-                        {filteredStudents?.map((student, index) => (
+                        {sortedAndFilteredStudents?.map((student, index) => (
                             <tr key={student.id} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername || student.codeforcesHandle || student.id || '')}>
                                 <td className="py-4 px-6">
                                     <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto transition-transform duration-200 group-hover:scale-115 ${getRankBadgeClass(index)}`}>
@@ -249,11 +493,25 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                     )}
                                 </td>
                                 <td className="py-4 px-6 text-center">
-                                    <span className="font-bold text-zinc-600 dark:text-zinc-400">{Math.round(student.currentContestRating || 0).toLocaleString()}</span>
-                                    {student.codeforcesRating !== undefined && student.codeforcesRating > 0 && (
-                                        <div className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">
-                                            CF: {student.codeforcesRating}
+                                    {(student.currentContestRating ?? 0) > 0 || ((student.codeforcesRating ?? 0) > 0) ? (
+                                        <div className="flex flex-col items-center">
+                                            <span className="font-bold text-zinc-800 dark:text-zinc-200 text-sm">
+                                                {Math.round(Math.max(student.currentContestRating ?? 0, student.codeforcesRating ?? 0)).toLocaleString()}
+                                            </span>
+                                            <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-medium mt-0.5">
+                                                {(student.currentContestRating ?? 0) > 0 && (
+                                                    <span>LC: {Math.round(student.currentContestRating ?? 0)}</span>
+                                                )}
+                                                {Boolean((student.currentContestRating ?? 0) > 0 && (student.codeforcesRating ?? 0) > 0) && (
+                                                    <span>•</span>
+                                                )}
+                                                {Boolean((student.codeforcesRating ?? 0) > 0) && (
+                                                    <span className="text-blue-600 dark:text-blue-400">CF: {student.codeforcesRating}</span>
+                                                )}
+                                            </div>
                                         </div>
+                                    ) : (
+                                        <span className="text-xs text-zinc-400 dark:text-zinc-600 italic">Unrated</span>
                                     )}
                                 </td>
                                 <td className="py-4 px-6">
@@ -315,7 +573,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 </td>
                             </tr>
                         ))}
-                        {(!filteredStudents || filteredStudents.length === 0) && (
+                        {(!sortedAndFilteredStudents || sortedAndFilteredStudents.length === 0) && (
                             <tr><td colSpan={6} className="py-16 text-center text-zinc-500 text-[15px]">No students found matching your criteria.</td></tr>
                         )}
                         </tbody>

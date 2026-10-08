@@ -1,11 +1,13 @@
 package com.tracker.leetcode.tracker.Service;
 
 import com.tracker.leetcode.tracker.DTO.ClassroomDashboardDTO;
+import com.tracker.leetcode.tracker.DTO.StudentSummaryDTO;
 import com.tracker.leetcode.tracker.Exception.AssignmentNotFoundException;
 import com.tracker.leetcode.tracker.Exception.ClassroomNotFoundException;
 import com.tracker.leetcode.tracker.Mapper.StudentMapper;
 import com.tracker.leetcode.tracker.Models.Assignment;
 import com.tracker.leetcode.tracker.Models.Classroom;
+import com.tracker.leetcode.tracker.Models.Mentor;
 import com.tracker.leetcode.tracker.Models.Student;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
@@ -375,5 +377,70 @@ class ClassroomServiceTest {
         assertNotNull(result);
         assertFalse(mockClassroom.getStudentIds().contains("std-1"));
         verify(redisLeaderboardService).removeStudentFromClassroom("class-1", "std-1");
+    }
+
+    @Test
+    void getClassroomDashboard_WithDynamicSorting_ShouldSortCorrectly() {
+        mockClassroom.setStudentIds(List.of("std-1", "std-2", "std-3"));
+        when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
+
+        Mentor mockMentor = new Mentor();
+        mockMentor.setId("mentor-123");
+        mockMentor.setName("Professor Smith");
+        when(mentorRepository.findById("mentor-123")).thenReturn(Optional.of(mockMentor));
+
+        Student s1 = new Student();
+        s1.setId("std-1");
+        Student s2 = new Student();
+        s2.setId("std-2");
+        Student s3 = new Student();
+        s3.setId("std-3");
+        when(studentRepository.findAllById(mockClassroom.getStudentIds())).thenReturn(List.of(s1, s2, s3));
+
+        StudentSummaryDTO dto1 = StudentSummaryDTO.builder()
+                .id("std-1").name("Alice").totalSolved(50).currentContestRating(1600.0).codeforcesRating(1200)
+                .consistencyStreak(5).completedAssignments(3).pendingAssignments(1).build();
+
+        StudentSummaryDTO dto2 = StudentSummaryDTO.builder()
+                .id("std-2").name("Bob").totalSolved(120).currentContestRating(1400.0).codeforcesRating(1800)
+                .consistencyStreak(10).completedAssignments(5).pendingAssignments(0).build();
+
+        StudentSummaryDTO dto3 = StudentSummaryDTO.builder()
+                .id("std-3").name("Charlie").totalSolved(80).currentContestRating(1500.0).codeforcesRating(null)
+                .consistencyStreak(2).completedAssignments(2).pendingAssignments(4).build();
+
+        when(studentMapper.toSummaryDTO(eq(s1), any())).thenReturn(dto1);
+        when(studentMapper.toSummaryDTO(eq(s2), any())).thenReturn(dto2);
+        when(studentMapper.toSummaryDTO(eq(s3), any())).thenReturn(dto3);
+
+        // 1. Sort by solved (descending by default) -> std-2 (120), std-3 (80), std-1 (50)
+        var dashSolvedDesc = classroomService.getClassroomDashboard("class-1", "solved");
+        assertEquals("std-2", dashSolvedDesc.getEnrolledStudents().get(0).getId());
+        assertEquals("std-3", dashSolvedDesc.getEnrolledStudents().get(1).getId());
+        assertEquals("std-1", dashSolvedDesc.getEnrolledStudents().get(2).getId());
+
+        // 2. Sort by solved_asc -> std-1 (50), std-3 (80), std-2 (120)
+        var dashSolvedAsc = classroomService.getClassroomDashboard("class-1", "solved_asc");
+        assertEquals("std-1", dashSolvedAsc.getEnrolledStudents().get(0).getId());
+        assertEquals("std-3", dashSolvedAsc.getEnrolledStudents().get(1).getId());
+        assertEquals("std-2", dashSolvedAsc.getEnrolledStudents().get(2).getId());
+
+        // 3. Sort by rating (max of LC and CF) -> std-2 (max 1800), std-1 (max 1600), std-3 (max 1500)
+        var dashRating = classroomService.getClassroomDashboard("class-1", "rating");
+        assertEquals("std-2", dashRating.getEnrolledStudents().get(0).getId());
+        assertEquals("std-1", dashRating.getEnrolledStudents().get(1).getId());
+        assertEquals("std-3", dashRating.getEnrolledStudents().get(2).getId());
+
+        // 4. Sort by name (A-Z) -> Alice (std-1), Bob (std-2), Charlie (std-3)
+        var dashName = classroomService.getClassroomDashboard("class-1", "name");
+        assertEquals("std-1", dashName.getEnrolledStudents().get(0).getId());
+        assertEquals("std-2", dashName.getEnrolledStudents().get(1).getId());
+        assertEquals("std-3", dashName.getEnrolledStudents().get(2).getId());
+
+        // 5. Sort by name_desc (Z-A) -> Charlie (std-3), Bob (std-2), Alice (std-1)
+        var dashNameDesc = classroomService.getClassroomDashboard("class-1", "name_desc");
+        assertEquals("std-3", dashNameDesc.getEnrolledStudents().get(0).getId());
+        assertEquals("std-2", dashNameDesc.getEnrolledStudents().get(1).getId());
+        assertEquals("std-1", dashNameDesc.getEnrolledStudents().get(2).getId());
     }
 }
