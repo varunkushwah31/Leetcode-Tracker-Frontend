@@ -56,7 +56,28 @@ export function StudentDashboard() {
         void fetchDashboard();
     });
 
-    useEffect(() => { void fetchDashboard(); }, [fetchDashboard]);
+    useEffect(() => {
+        let isMounted = true;
+        const loadAndAutofetch = async () => {
+            await fetchDashboard();
+            try {
+                // Auto-fetch fresh user details in the background on sign in / mount
+                setIsSyncing(true);
+                const syncRes = await StudentService.syncProfile();
+                if (isMounted && syncRes.data) {
+                    setDashboardData(syncRes.data);
+                }
+            } catch (err: unknown) {
+                console.warn('Background profile auto-fetch notice:', err);
+            } finally {
+                if (isMounted) {
+                    setIsSyncing(false);
+                }
+            }
+        };
+        void loadAndAutofetch();
+        return () => { isMounted = false; };
+    }, [fetchDashboard]);
 
     const handleSync = async () => {
         setSyncError(null);

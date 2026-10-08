@@ -114,6 +114,23 @@ public class StudentController {
         Student freshStudentData = studentRepository.findById(currentStudent.getId())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
+        // Auto-fetch profile data if user stats/progress are uninitialized or student has never been synced
+        boolean neverSynced = freshStudentData.getLastSyncedAt() == null;
+        boolean hasEmptyStats = (freshStudentData.getProgressHistory() == null || freshStudentData.getProgressHistory().isEmpty())
+                && (freshStudentData.getProblemStats() == null || freshStudentData.getProblemStats().isEmpty())
+                && (freshStudentData.getCodeforcesSolvedCount() == null || freshStudentData.getCodeforcesSolvedCount() == 0);
+        boolean hasPlatforms = (freshStudentData.getLeetcodeUsername() != null && !freshStudentData.getLeetcodeUsername().isBlank())
+                || (freshStudentData.getCodeforcesHandle() != null && !freshStudentData.getCodeforcesHandle().isBlank());
+
+        if ((neverSynced || hasEmptyStats) && hasPlatforms) {
+            try {
+                log.info("Student {} has uninitialized profile stats on dashboard load, triggering immediate sync", freshStudentData.getId());
+                freshStudentData = studentService.syncAllProfileData(freshStudentData);
+            } catch (Exception e) {
+                log.warn("Failed immediate auto-fetch on dashboard load for student {}: {}", freshStudentData.getId(), e.getMessage());
+            }
+        }
+
         // Auto-validate all pending assignments across all enrolled classrooms
         classroomService.autoValidatePendingAssignmentsForStudent(freshStudentData);
 

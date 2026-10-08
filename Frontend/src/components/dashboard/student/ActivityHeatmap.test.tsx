@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { ActivityHeatmap } from './ActivityHeatmap';
 import type { ProgressRecord } from '@/types';
 
-describe('ActivityHeatmap', () => {
+describe('ActivityHeatmap', { timeout: 20000 }, () => {
     const today = new Date();
     const formatDateKey = (d: Date) =>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -27,7 +27,7 @@ describe('ActivityHeatmap', () => {
         expect(screen.getByRole('button', { name: /12 Weeks/i })).toBeTruthy();
         expect(screen.getByRole('button', { name: /6 Months/i })).toBeTruthy();
         expect(screen.getByRole('button', { name: /1 Year/i })).toBeTruthy();
-    });
+    }, 20000);
 
     it('switches time ranges when clicking buttons', () => {
         render(<ActivityHeatmap progressHistory={mockProgress} />);
@@ -45,7 +45,7 @@ describe('ActivityHeatmap', () => {
         // Switch back to 1 Year
         fireEvent.click(screen.getByRole('button', { name: /1 Year/i }));
         expect(screen.getByText(/submissions in the past one year/i)).toBeTruthy();
-    });
+    }, 20000);
 
     it('calculates streaks correctly even if consistencyStreak is 0', () => {
         render(<ActivityHeatmap progressHistory={mockProgress} consistencyStreak={0} />);

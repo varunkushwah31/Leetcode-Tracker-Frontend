@@ -108,14 +108,24 @@ public class LeetCodeApiClient {
                 """.formatted(username);
 
         JsonNode root = executeGraphQLQuery(query, username);
-        JsonNode calendarNode = root.path("data").path("matchedUser").path("userCalendar").path("submissionCalendar");
+        JsonNode matchedUser = root.path("data").path("matchedUser");
+        if (matchedUser.isMissingNode() || matchedUser.isNull()) {
+            throw new LeetCodeApiException("LeetCode user not found: " + username);
+        }
 
-        if (calendarNode.isMissingNode() || calendarNode.isNull()) {
-            throw new LeetCodeApiException("LeetCode returned no calendar data for user: " + username);
+        JsonNode calendarNode = matchedUser.path("userCalendar").path("submissionCalendar");
+
+        if (calendarNode.isMissingNode() || calendarNode.isNull() || calendarNode.asString("").isBlank()) {
+            log.info("LeetCode returned no calendar data for user: {}", username);
+            return new ArrayList<>();
         }
 
         try {
-            Map<String, Integer> submissionMap = objectMapper.readValue(calendarNode.asString(), new TypeReference<>() {});
+            String calendarStr = calendarNode.asString();
+            if (calendarStr == null || calendarStr.isBlank() || "{}".equals(calendarStr.trim())) {
+                return new ArrayList<>();
+            }
+            Map<String, Integer> submissionMap = objectMapper.readValue(calendarStr, new TypeReference<>() {});
             List<DailyProgress> progressList = new ArrayList<>();
 
             for (Map.Entry<String, Integer> entry : submissionMap.entrySet()) {
@@ -128,7 +138,7 @@ public class LeetCodeApiClient {
             return progressList;
         } catch (Exception e) {
             log.error("Failed to map Calendar data for {}: {}", username, e.getMessage());
-            throw new LeetCodeApiException("Error parsing LeetCode calendar data.");
+            return new ArrayList<>();
         }
     }
 

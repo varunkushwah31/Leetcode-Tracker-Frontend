@@ -64,6 +64,7 @@ class AuthenticationServiceTest {
         com.tracker.leetcode.tracker.Models.RefreshToken mockToken = new com.tracker.leetcode.tracker.Models.RefreshToken();
         mockToken.setToken("mock-refresh-token");
         lenient().when(refreshTokenService.createRefreshToken(any())).thenReturn(mockToken);
+        lenient().when(studentService.syncAllProfileData(any(Student.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
     @Test
@@ -88,6 +89,9 @@ class AuthenticationServiceTest {
         assertEquals(Role.STUDENT, response.role());
         verify(studentRepository).save(argThat(s ->
                 "alice_lc".equals(s.getLeetcodeUsername()) && s.getCodeforcesHandle() == null
+        ));
+        verify(studentService).syncAllProfileData(argThat((Student s) ->
+                "alice_lc".equals(s.getLeetcodeUsername())
         ));
     }
 

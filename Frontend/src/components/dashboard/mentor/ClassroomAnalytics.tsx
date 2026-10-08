@@ -31,6 +31,7 @@ import {
 } from '@phosphor-icons/react';
 import { ClassroomService } from '@/services/endpoints';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
+import { extractTitleFromUrlOrSlug, parseProblemInput } from '@/lib/handleExtractor';
 import type { ClassroomAnalyticsDTO, CuratedProblemDTO, TopicProficiencyDTO } from '@/types';
 
 interface ClassroomAnalyticsProps {
@@ -126,18 +127,25 @@ export function ClassroomAnalytics({
             return;
         }
 
+        // Parse slug and platform if URL was pasted
+        const parsed = parseProblemInput(assignmentSlug, assignmentPlatform);
+        const effectivePlatform = parsed.detectedPlatform || assignmentPlatform;
+        const autoTitle = assignmentTitle.trim() ||
+            extractTitleFromUrlOrSlug(assignmentSlug, effectivePlatform) ||
+            extractTitleFromUrlOrSlug(parsed.slug, effectivePlatform);
+
         setIsAssigning(true);
         setAssignError(null);
         try {
             await ClassroomService.assignQuestion(effectiveClassroomId, {
-                platform: assignmentPlatform,
-                title: assignmentTitle.trim() || undefined,
-                titleSlug: assignmentSlug.trim(),
+                platform: effectivePlatform,
+                title: autoTitle || undefined,
+                titleSlug: parsed.slug,
                 questionLink: selectedProblem?.link || (assignmentSlug.startsWith('http') ? assignmentSlug : undefined),
                 start,
                 end,
             });
-            setAssignSuccessMsg(`Successfully assigned "${assignmentTitle || assignmentSlug}" to the cohort!`);
+            setAssignSuccessMsg(`Successfully assigned "${autoTitle || parsed.slug}" to the cohort!`);
             setTimeout(() => {
                 setAssignModalOpen(false);
                 setAssignSuccessMsg(null);
@@ -1350,8 +1358,19 @@ export function ClassroomAnalytics({
                                 </span>
                                 <Input
                                     value={assignmentSlug}
-                                    onChange={(e) => setAssignmentSlug(e.target.value)}
-                                    placeholder="e.g. coin-change"
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setAssignmentSlug(val);
+                                        const parsed = parseProblemInput(val, assignmentPlatform);
+                                        if (parsed.detectedPlatform) {
+                                            setAssignmentPlatform(parsed.detectedPlatform);
+                                        }
+                                        const autoT = extractTitleFromUrlOrSlug(val, parsed.detectedPlatform);
+                                        if (autoT) {
+                                            setAssignmentTitle(autoT);
+                                        }
+                                    }}
+                                    placeholder="e.g. coin-change or problem URL"
                                     className="h-9 text-xs rounded-xl flex-1 bg-zinc-50 dark:bg-[#16161a] border-zinc-200 dark:border-zinc-800"
                                 />
                             </div>

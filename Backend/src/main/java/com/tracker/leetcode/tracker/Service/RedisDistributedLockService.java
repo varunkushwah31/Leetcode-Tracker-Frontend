@@ -59,6 +59,37 @@ public class RedisDistributedLockService {
     }
 
     /**
+     * Attempts to acquire a distributed lock with retry up to maxWait duration.
+     *
+     * @param lockKey   unique resource identifier
+     * @param lockValue unique token identifying the lock owner
+     * @param maxWait   how long to retry acquiring before giving up
+     * @param leaseTime how long the lock should be held before auto-expiring
+     * @return true if the lock was acquired, false otherwise
+     */
+    public boolean tryLockWithWait(String lockKey, String lockValue, Duration maxWait, Duration leaseTime) {
+        if (maxWait == null || maxWait.isZero() || maxWait.isNegative()) {
+            return tryLock(lockKey, lockValue, leaseTime);
+        }
+
+        long end = System.currentTimeMillis() + maxWait.toMillis();
+        do {
+            if (tryLock(lockKey, lockValue, leaseTime)) {
+                return true;
+            }
+            try {
+                long remaining = end - System.currentTimeMillis();
+                if (remaining <= 0) break;
+                Thread.sleep(Math.min(200, remaining));
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+        } while (System.currentTimeMillis() < end);
+        return false;
+    }
+
+    /**
      * Releases the lock safely using an atomic Lua script if the caller owns the lock.
      *
      * @param lockKey   resource identifier
@@ -88,7 +119,7 @@ public class RedisDistributedLockService {
     }
 
     /**
-     * Executes a task only if the distributed lock can be acquired.
+     * Executes a task only if the distributed lock can be acquired (immediate attempt).
      * If acquired, executes the task and guarantees lock release.
      *
      * @param lockKey   resource identifier
@@ -98,10 +129,25 @@ public class RedisDistributedLockService {
      * @return Optional containing the result, or Optional.empty() if lock could not be acquired
      */
     public <T> Optional<T> executeWithLock(String lockKey, Duration leaseTime, Supplier<T> task) {
+        return executeWithLock(lockKey, Duration.ZERO, leaseTime, task);
+    }
+
+    /**
+     * Executes a task attempting to acquire the distributed lock with retry up to maxWait.
+     * If acquired, executes the task and guarantees lock release.
+     *
+     * @param lockKey   resource identifier
+     * @param maxWait   maximum time to wait/retry for acquiring the lock
+     * @param leaseTime maximum duration to hold the lock
+     * @param task      task to execute
+     * @param <T>       return type
+     * @return Optional containing the result, or Optional.empty() if lock could not be acquired
+     */
+    public <T> Optional<T> executeWithLock(String lockKey, Duration maxWait, Duration leaseTime, Supplier<T> task) {
         String lockValue = UUID.randomUUID().toString();
-        boolean locked = tryLock(lockKey, lockValue, leaseTime);
+        boolean locked = tryLockWithWait(lockKey, lockValue, maxWait, leaseTime);
         if (!locked) {
-            log.info("Could not acquire distributed lock for key [{}] - skipping duplicate execution", lockKey);
+            log.info("Could not acquire distributed lock for key [{}] within wait time - skipping duplicate execution", lockKey);
             return Optional.empty();
         }
 

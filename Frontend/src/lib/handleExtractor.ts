@@ -104,3 +104,78 @@ export function sanitizePlatformHandles(
 
     return { leetcodeUsername, codeforcesHandle, swapped };
 }
+
+/**
+ * Parses problem input (URL or slug/identifier) and returns canonical slug and detected platform.
+ */
+export function parseProblemInput(
+    input: string,
+    platform: 'LEETCODE' | 'CODEFORCES' = 'LEETCODE'
+): { slug: string; detectedPlatform: 'LEETCODE' | 'CODEFORCES'; problemNumber?: string } {
+    const trimmed = (input || '').trim();
+    const cfMatch = trimmed.match(/(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([A-Za-z0-9]+)/i);
+    if (cfMatch) {
+        const pNum = `${cfMatch[1]}${cfMatch[2].toUpperCase()}`;
+        return { slug: pNum, detectedPlatform: 'CODEFORCES', problemNumber: pNum };
+    }
+
+    const lcMatch = trimmed.match(/problems\/([a-zA-Z0-9_-]+)/i);
+    if (lcMatch) {
+        return { slug: lcMatch[1].toLowerCase(), detectedPlatform: 'LEETCODE' };
+    }
+
+    if (platform === 'CODEFORCES') {
+        const cleanCF = trimmed.replace('/', '').toUpperCase();
+        return { slug: cleanCF, detectedPlatform: 'CODEFORCES', problemNumber: cleanCF };
+    }
+
+    return { slug: trimmed.toLowerCase(), detectedPlatform: 'LEETCODE' };
+}
+
+/**
+ * Extracts and humanizes a problem title automatically from a URL or problem slug/id.
+ * Allows mentors to assign questions via URL without manually typing problem titles.
+ */
+export function extractTitleFromUrlOrSlug(
+    input: string,
+    platform?: 'LEETCODE' | 'CODEFORCES'
+): string {
+    if (!input || !input.trim()) return '';
+    const trimmed = input.trim();
+
+    // 1. Codeforces URL or Problem ID
+    const cfMatch = trimmed.match(/(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([A-Za-z0-9]+)/i);
+    if (cfMatch) {
+        return `Problem ${cfMatch[1]}${cfMatch[2].toUpperCase()}`;
+    }
+    if (platform === 'CODEFORCES') {
+        const cleanCF = trimmed.replace('/', '').toUpperCase();
+        const cfIdMatch = cleanCF.match(/^(\d+)([A-Z0-9]+)$/);
+        if (cfIdMatch) {
+            return `Problem ${cfIdMatch[1]}${cfIdMatch[2]}`;
+        }
+    }
+
+    // 2. LeetCode URL or Slug
+    const lcMatch = trimmed.match(/problems\/([a-zA-Z0-9_-]+)/i);
+    const slug = lcMatch ? lcMatch[1] : (platform !== 'CODEFORCES' && !trimmed.startsWith('http') ? trimmed : '');
+
+    if (slug) {
+        const romanNumerals = new Set(['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x']);
+        const acronyms = new Set(['lru', 'lfu', 'bst', 'trie', 'sql', 'dp', 'bfs', 'dfs', 'gcd', 'lcm']);
+
+        return slug
+            .split(/[-_]+/)
+            .filter(Boolean)
+            .map(word => {
+                const lower = word.toLowerCase();
+                if (romanNumerals.has(lower)) return lower.toUpperCase();
+                if (acronyms.has(lower)) return lower.toUpperCase();
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            })
+            .join(' ');
+    }
+
+    return '';
+}
+

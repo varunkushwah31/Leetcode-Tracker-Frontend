@@ -8,7 +8,7 @@ import { UserPlusIcon, ClipboardTextIcon as ClipboardList, MapTrifoldIcon as Map
 import { ClassroomService, PathService } from '@/services/endpoints.ts';
 import type { ClassroomDashboardDTO, LearningPath, PathQuestion, BulkImportResponseDTO } from '@/types';
 import {ErrorBanner} from "@/components/ui/ErrorBanner.tsx";// <-- 1. Import the Banner
-import { extractLeetcodeUsername, extractCodeforcesHandle, isLeetCodeUrl, isCodeforcesUrl } from '@/lib/handleExtractor';
+import { extractLeetcodeUsername, extractCodeforcesHandle, isLeetCodeUrl, isCodeforcesUrl, extractTitleFromUrlOrSlug, parseProblemInput } from '@/lib/handleExtractor';
 
 interface MentorActionsProps {
     mentorId: string;
@@ -130,27 +130,6 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
         }
     };
 
-    const parseProblemInput = (input: string, platform: 'LEETCODE' | 'CODEFORCES'): { slug: string; detectedPlatform: 'LEETCODE' | 'CODEFORCES'; problemNumber?: string } => {
-        const trimmed = input.trim();
-        const cfMatch = trimmed.match(/(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([A-Za-z0-9]+)/i);
-        if (cfMatch) {
-            const pNum = `${cfMatch[1]}${cfMatch[2].toUpperCase()}`;
-            return { slug: pNum, detectedPlatform: 'CODEFORCES', problemNumber: pNum };
-        }
-
-        const lcMatch = trimmed.match(/problems\/([a-zA-Z0-9_-]+)/i);
-        if (lcMatch) {
-            return { slug: lcMatch[1].toLowerCase(), detectedPlatform: 'LEETCODE' };
-        }
-
-        if (platform === 'CODEFORCES') {
-            const cleanCF = trimmed.replace('/', '').toUpperCase();
-            return { slug: cleanCF, detectedPlatform: 'CODEFORCES', problemNumber: cleanCF };
-        }
-
-        return { slug: trimmed.toLowerCase(), detectedPlatform: 'LEETCODE' };
-    };
-
     const handleAssignQuestion = async () => {
         setAssignQuestionError(null);
         if (!assignmentData.titleSlug.trim()) {
@@ -170,10 +149,14 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             return;
         }
 
+        const autoTitle = extractTitleFromUrlOrSlug(assignmentData.titleSlug, effectivePlatform) ||
+            extractTitleFromUrlOrSlug(parsed.slug, effectivePlatform);
+        const effectiveTitle = assignmentData.title.trim() || autoTitle;
+
         try {
             await ClassroomService.assignQuestion(selectedClassroom.classroomId, {
                 platform: effectivePlatform,
-                title: assignmentData.title.trim() || undefined,
+                title: effectiveTitle || undefined,
                 titleSlug: parsed.slug,
                 questionLink: assignmentData.titleSlug.trim().startsWith('http') ? assignmentData.titleSlug.trim() : undefined,
                 start,
@@ -198,9 +181,12 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
             const sanitizedQuestions = pathQuestions.map(({ platform, title, titleSlug, daysToComplete }) => {
                 const p = platform || 'LEETCODE';
                 const parsed = parseProblemInput(titleSlug, p);
+                const effectivePlatform = parsed.detectedPlatform || p;
+                const autoTitle = extractTitleFromUrlOrSlug(titleSlug, effectivePlatform) ||
+                    extractTitleFromUrlOrSlug(parsed.slug, effectivePlatform);
                 return {
-                    platform: parsed.detectedPlatform || p,
-                    title: title?.trim() || undefined,
+                    platform: effectivePlatform,
+                    title: title?.trim() || autoTitle || undefined,
                     titleSlug: parsed.slug,
                     daysToComplete: daysToComplete || 3
                 };
@@ -496,10 +482,13 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                         newPlatform = 'LEETCODE';
                                     }
 
+                                    const autoTitle = extractTitleFromUrlOrSlug(val, newPlatform);
+
                                     setAssignmentData({
                                         ...assignmentData,
                                         titleSlug: val,
                                         platform: newPlatform,
+                                        title: autoTitle || assignmentData.title,
                                     });
                                     if (assignQuestionError) setAssignQuestionError(null);
                                 }}
@@ -508,30 +497,44 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             {/* Extracted preview badge */}
                             {assignmentData.titleSlug.trim().length > 0 && (() => {
                                 const parsed = parseProblemInput(assignmentData.titleSlug, assignmentData.platform);
+                                const derivedTitle = extractTitleFromUrlOrSlug(assignmentData.titleSlug, parsed.detectedPlatform);
                                 return (
-                                    <div className="flex items-center gap-2 pt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                    <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-zinc-500 dark:text-zinc-400">
                                         <span className="font-semibold text-zinc-500">Extracted:</span>
                                         <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300 px-2 py-0.5 rounded-md font-mono text-[11px] border border-zinc-200 dark:border-zinc-700">
                                             {parsed.detectedPlatform === 'CODEFORCES'
                                                 ? `CF Problem #${parsed.problemNumber || parsed.slug}`
                                                 : `LeetCode: ${parsed.slug}`}
                                         </span>
+                                        {derivedTitle && (
+                                            <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-md text-[11px] font-semibold border border-emerald-500/20">
+                                                Title: {derivedTitle}
+                                            </span>
+                                        )}
                                     </div>
                                 );
                             })()}
                         </div>
 
-                        {/* Problem Title (Optional) */}
+                        {/* Problem Title (Auto-assigned) */}
                         <div className="space-y-1.5">
-                            <Label className="text-zinc-700 dark:text-zinc-300 text-xs uppercase font-semibold">
-                                Problem Title <span className="text-zinc-500 font-normal lowercase">(optional - auto-fetched from platform)</span>
-                            </Label>
+                            <div className="flex items-center justify-between">
+                                <Label className="text-zinc-700 dark:text-zinc-300 text-xs uppercase font-semibold">
+                                    Problem Title
+                                </Label>
+                                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                                    Auto-assigned from URL
+                                </span>
+                            </div>
                             <Input
-                                placeholder={assignmentData.platform === 'CODEFORCES' ? 'Watermelon (or leave empty to auto-fetch)' : 'Two Sum (or leave empty to auto-fetch)'}
+                                placeholder={assignmentData.platform === 'CODEFORCES' ? 'Problem 4A (auto-assigned from URL)' : 'Two Sum (auto-assigned from URL)'}
                                 value={assignmentData.title}
                                 onChange={(e) => setAssignmentData({ ...assignmentData, title: e.target.value })}
                                 className={inputClasses}
                             />
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                The problem title is automatically assigned from the URL. No manual typing required.
+                            </p>
                         </div>
 
                         {/* Deadline Selector */}
@@ -727,8 +730,20 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                     className={inputClasses}
                                                     value={q.titleSlug}
                                                     onChange={e => {
+                                                        const val = e.target.value;
                                                         const newQs = [...pathQuestions];
-                                                        newQs[idx].titleSlug = e.target.value;
+                                                        let newPlatform = newQs[idx].platform;
+                                                        if (val.toLowerCase().includes('codeforces.com')) {
+                                                            newPlatform = 'CODEFORCES';
+                                                        } else if (val.toLowerCase().includes('leetcode.com') || val.toLowerCase().includes('leetcode.cn')) {
+                                                            newPlatform = 'LEETCODE';
+                                                        }
+                                                        const autoTitle = extractTitleFromUrlOrSlug(val, newPlatform);
+                                                        newQs[idx].titleSlug = val;
+                                                        newQs[idx].platform = newPlatform;
+                                                        if (autoTitle) {
+                                                            newQs[idx].title = autoTitle;
+                                                        }
                                                         setPathQuestions(newQs);
                                                     }}
                                                 />
@@ -767,7 +782,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                         {/* Optional Title Input */}
                                         <div>
                                             <Input
-                                                placeholder="Optional Title (e.g. Watermelon or Two Sum)"
+                                                placeholder={q.title ? q.title : "Title (auto-assigned from URL/slug)"}
                                                 className={`h-9 text-xs ${inputClasses}`}
                                                 value={q.title ?? ''}
                                                 onChange={e => {

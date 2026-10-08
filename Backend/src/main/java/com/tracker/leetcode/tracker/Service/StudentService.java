@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -143,14 +144,36 @@ public class StudentService {
      * Uses Redis Distributed Lock to prevent duplicate concurrent syncs.
      */
     public Student syncAllProfileData(Student student) {
-        String lockIdentifier = student.getId() != null ? student.getId() : student.getLeetcodeUsername();
+        String studentId = student.getId();
+        String lockIdentifier = studentId != null ? studentId : student.getLeetcodeUsername();
         String lockKey = "sync:student:" + lockIdentifier;
 
-        return lockService.executeWithLock(lockKey, Duration.ofSeconds(45), () -> doSyncAllProfileData(student))
-                .orElseGet(() -> {
-                    log.info("Concurrent sync already in progress for student [{}] - returning existing profile", lockIdentifier);
-                    return student;
-                });
+        // Skip redundant sync if already synced in the last 10 seconds
+        if (student.getLastSyncedAt() != null &&
+                Duration.between(student.getLastSyncedAt(), Instant.now()).toSeconds() < 10) {
+            log.info("Student [{}] was already synced {} seconds ago, skipping redundant sync",
+                    lockIdentifier, Duration.between(student.getLastSyncedAt(), Instant.now()).toSeconds());
+            return student;
+        }
+
+        return lockService.executeWithLock(lockKey, Duration.ofSeconds(6), Duration.ofSeconds(45), () -> {
+            Student target = student;
+            if (studentId != null) {
+                target = studentRepository.findById(studentId).orElse(student);
+                if (target.getLastSyncedAt() != null &&
+                        Duration.between(target.getLastSyncedAt(), Instant.now()).toSeconds() < 10) {
+                    log.info("Student [{}] was synced while waiting for lock, returning fresh entity", lockIdentifier);
+                    return target;
+                }
+            }
+            return doSyncAllProfileData(target);
+        }).orElseGet(() -> {
+            log.info("Concurrent sync timed out for student [{}] - reloading persisted profile", lockIdentifier);
+            if (studentId != null) {
+                return studentRepository.findById(studentId).orElse(student);
+            }
+            return student;
+        });
     }
 
     private record CfSyncPayload(Student cfUser, List<CodeforcesContestHistory> cfContests, CodeforcesApiClient.CodeforcesSubmissionData cfData) {}
@@ -171,25 +194,46 @@ public class StudentService {
         // 1. Fetch LeetCode Data (concurrently on Virtual Thread if present)
         CompletableFuture<Void> lcFuture = CompletableFuture.runAsync(() -> {
             if (hasLc) {
+                log.info("Fetching LeetCode data concurrently for user [{}]", lcUsername);
                 try {
-                    log.info("Fetching LeetCode data concurrently for user [{}]", lcUsername);
                     student.setProgressHistory(leetCodeApiClient.fetchCalendarData(lcUsername));
-                    student.setProblemStats(leetCodeApiClient.fetchProblemStats(lcUsername));
-                    student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(lcUsername, 20));
-                    student.setSkills(leetCodeApiClient.fetchSkillStats(lcUsername));
+                } catch (Exception e) {
+                    log.warn("Failed fetching LeetCode calendar data for {}: {}", lcUsername, e.getMessage());
+                }
 
+                try {
+                    student.setProblemStats(leetCodeApiClient.fetchProblemStats(lcUsername));
+                } catch (Exception e) {
+                    log.warn("Failed fetching LeetCode problem stats for {}: {}", lcUsername, e.getMessage());
+                }
+
+                try {
+                    student.setRecentSubmissions(leetCodeApiClient.fetchRecentSubmissions(lcUsername, 20));
+                } catch (Exception e) {
+                    log.warn("Failed fetching LeetCode recent submissions for {}: {}", lcUsername, e.getMessage());
+                }
+
+                try {
+                    student.setSkills(leetCodeApiClient.fetchSkillStats(lcUsername));
+                } catch (Exception e) {
+                    log.warn("Failed fetching LeetCode skills for {}: {}", lcUsername, e.getMessage());
+                }
+
+                try {
                     Student extendedData = leetCodeApiClient.fetchExtendedProfileDetails(lcUsername);
-                    student.setAbout(extendedData.getAbout());
-                    student.setRank(extendedData.getRank());
-                    student.setCurrentContestRating(extendedData.getCurrentContestRating());
-                    student.setSocialMedia(extendedData.getSocialMedia());
-                    student.setBadges(extendedData.getBadges());
-                    student.setContestHistory(extendedData.getContestHistory());
-                    if (extendedData.getAvatarUrl() != null && !extendedData.getAvatarUrl().isBlank()) {
-                        student.setAvatarUrl(extendedData.getAvatarUrl());
+                    if (extendedData != null) {
+                        student.setAbout(extendedData.getAbout());
+                        student.setRank(extendedData.getRank());
+                        student.setCurrentContestRating(extendedData.getCurrentContestRating());
+                        student.setSocialMedia(extendedData.getSocialMedia());
+                        student.setBadges(extendedData.getBadges());
+                        student.setContestHistory(extendedData.getContestHistory());
+                        if (extendedData.getAvatarUrl() != null && !extendedData.getAvatarUrl().isBlank()) {
+                            student.setAvatarUrl(extendedData.getAvatarUrl());
+                        }
                     }
                 } catch (Exception e) {
-                    log.warn("Failed fetching LeetCode data for {}: {}", lcUsername, e.getMessage());
+                    log.warn("Failed fetching LeetCode extended data for {}: {}", lcUsername, e.getMessage());
                 }
             }
         }, executor);
@@ -197,15 +241,30 @@ public class StudentService {
         // 2. Fetch Codeforces Data (concurrently on Virtual Thread if present)
         CompletableFuture<CfSyncPayload> cfFuture = CompletableFuture.supplyAsync(() -> {
             if (hasCf) {
+                log.info("Fetching Codeforces data concurrently for handle [{}]", cfHandle);
+                Student cfUser = null;
+                List<CodeforcesContestHistory> cfContests = null;
+                CodeforcesApiClient.CodeforcesSubmissionData cfData = null;
+
                 try {
-                    log.info("Fetching Codeforces data concurrently for handle [{}]", cfHandle);
-                    Student cfUser = codeforcesApiClient.fetchUserInfo(cfHandle);
-                    List<CodeforcesContestHistory> cfContests = codeforcesApiClient.fetchContestHistory(cfHandle);
-                    CodeforcesApiClient.CodeforcesSubmissionData cfData = codeforcesApiClient.fetchSubmissions(cfHandle);
-                    return new CfSyncPayload(cfUser, cfContests, cfData);
+                    cfUser = codeforcesApiClient.fetchUserInfo(cfHandle);
                 } catch (Exception e) {
-                    log.warn("Failed fetching Codeforces data for handle [{}]: {}", cfHandle, e.getMessage());
+                    log.warn("Failed fetching Codeforces user info for handle [{}]: {}", cfHandle, e.getMessage());
                 }
+
+                try {
+                    cfContests = codeforcesApiClient.fetchContestHistory(cfHandle);
+                } catch (Exception e) {
+                    log.warn("Failed fetching Codeforces contest history for handle [{}]: {}", cfHandle, e.getMessage());
+                }
+
+                try {
+                    cfData = codeforcesApiClient.fetchSubmissions(cfHandle);
+                } catch (Exception e) {
+                    log.warn("Failed fetching Codeforces submissions for handle [{}]: {}", cfHandle, e.getMessage());
+                }
+
+                return new CfSyncPayload(cfUser, cfContests, cfData);
             }
             return null;
         }, executor);
@@ -259,6 +318,8 @@ public class StudentService {
 
         // 4. Auto-validate any pending assignments
         autoValidateAssignmentsForStudent(student);
+
+        student.setLastSyncedAt(Instant.now());
 
         Student saved = studentRepository.save(student);
 

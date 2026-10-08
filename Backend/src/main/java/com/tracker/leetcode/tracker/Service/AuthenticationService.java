@@ -104,14 +104,16 @@ public class AuthenticationService {
 
         Student savedStudent = studentRepository.save(student);
 
-        java.util.concurrent.CompletableFuture.runAsync(() -> {
-            try {
-                log.info("Auto-syncing profile data in background for new student ID: {}", savedStudent.getId());
-                studentService.syncAllProfileData(savedStudent);
-            } catch (Exception e) {
-                log.warn("Failed to auto-sync profile data for student ID: {}. Error: {}", savedStudent.getId(), e.getMessage());
+        // Perform initial profile sync synchronously so newly registered student details are fully ready on first dashboard load
+        try {
+            log.info("Auto-syncing initial profile data for new student ID: {}", savedStudent.getId());
+            Student synced = studentService.syncAllProfileData(savedStudent);
+            if (synced != null) {
+                savedStudent = synced;
             }
-        });
+        } catch (Exception e) {
+            log.warn("Failed to auto-sync initial profile data for student ID: {}. Error: {}", savedStudent.getId(), e.getMessage());
+        }
 
         return generateAuthResponseForStudent(savedStudent);
     }
@@ -135,8 +137,34 @@ public class AuthenticationService {
         // 2. Are they a Student?
         var studentOpt = studentRepository.findByEmail(request.email());
         if (studentOpt.isPresent()) {
+            Student student = studentOpt.get();
             log.info("Student authenticated successfully: {}", request.email());
-            return generateAuthResponseForStudent(studentOpt.get());
+
+            // If the student has never been synced, sync synchronously so they don't see an empty profile
+            if (student.getLastSyncedAt() == null) {
+                try {
+                    log.info("Student {} has never been synced, performing sync on login", student.getId());
+                    Student synced = studentService.syncAllProfileData(student);
+                    if (synced != null) {
+                        student = synced;
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed initial sync on login for student ID: {}. Error: {}", student.getId(), e.getMessage());
+                }
+            } else {
+                // Auto-fetch fresh user details asynchronously upon sign-in
+                final Student asyncStudent = student;
+                java.util.concurrent.CompletableFuture.runAsync(() -> {
+                    try {
+                        log.info("Auto-syncing profile data on login for student ID: {}", asyncStudent.getId());
+                        studentService.syncAllProfileData(asyncStudent);
+                    } catch (Exception e) {
+                        log.warn("Failed to auto-sync profile data on login for student ID: {}. Error: {}", asyncStudent.getId(), e.getMessage());
+                    }
+                });
+            }
+
+            return generateAuthResponseForStudent(student);
         }
 
         // 3. Are they a Mentor?

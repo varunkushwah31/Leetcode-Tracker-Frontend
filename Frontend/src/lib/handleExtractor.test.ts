@@ -5,6 +5,8 @@ import {
     isLeetCodeUrl,
     isCodeforcesUrl,
     sanitizePlatformHandles,
+    parseProblemInput,
+    extractTitleFromUrlOrSlug,
 } from './handleExtractor';
 
 describe('handleExtractor', () => {
@@ -103,6 +105,68 @@ describe('handleExtractor', () => {
             expect(res.leetcodeUsername).toBe('alice');
             expect(res.codeforcesHandle).toBe('');
             expect(res.swapped).toBe(true);
+        });
+    });
+
+    describe('parseProblemInput', () => {
+        it('parses LeetCode problem URLs correctly', () => {
+            const res = parseProblemInput('https://leetcode.com/problems/two-sum/');
+            expect(res.slug).toBe('two-sum');
+            expect(res.detectedPlatform).toBe('LEETCODE');
+        });
+
+        it('parses LeetCode CN URLs correctly', () => {
+            const res = parseProblemInput('https://leetcode.cn/problems/longest-substring-without-repeating-characters');
+            expect(res.slug).toBe('longest-substring-without-repeating-characters');
+            expect(res.detectedPlatform).toBe('LEETCODE');
+        });
+
+        it('parses Codeforces problemset URLs correctly', () => {
+            const res = parseProblemInput('https://codeforces.com/problemset/problem/4/A');
+            expect(res.slug).toBe('4A');
+            expect(res.detectedPlatform).toBe('CODEFORCES');
+            expect(res.problemNumber).toBe('4A');
+        });
+
+        it('parses Codeforces contest problem URLs correctly', () => {
+            const res = parseProblemInput('https://codeforces.com/contest/1234/problem/B');
+            expect(res.slug).toBe('1234B');
+            expect(res.detectedPlatform).toBe('CODEFORCES');
+        });
+
+        it('parses direct slug or problem number', () => {
+            const lcRes = parseProblemInput('trapping-rain-water', 'LEETCODE');
+            expect(lcRes.slug).toBe('trapping-rain-water');
+            expect(lcRes.detectedPlatform).toBe('LEETCODE');
+
+            const cfRes = parseProblemInput('4A', 'CODEFORCES');
+            expect(cfRes.slug).toBe('4A');
+            expect(cfRes.detectedPlatform).toBe('CODEFORCES');
+        });
+    });
+
+    describe('extractTitleFromUrlOrSlug', () => {
+        it('auto-extracts and humanizes problem title from LeetCode URL', () => {
+            expect(extractTitleFromUrlOrSlug('https://leetcode.com/problems/two-sum/')).toBe('Two Sum');
+            expect(extractTitleFromUrlOrSlug('https://leetcode.com/problems/course-schedule-ii/')).toBe('Course Schedule II');
+            expect(extractTitleFromUrlOrSlug('https://leetcode.com/problems/lru-cache/')).toBe('LRU Cache');
+            expect(extractTitleFromUrlOrSlug('https://leetcode.com/problems/trapping-rain-water/')).toBe('Trapping Rain Water');
+        });
+
+        it('auto-extracts title from Codeforces URL', () => {
+            expect(extractTitleFromUrlOrSlug('https://codeforces.com/problemset/problem/4/A')).toBe('Problem 4A');
+            expect(extractTitleFromUrlOrSlug('https://codeforces.com/contest/1234/problem/B')).toBe('Problem 1234B');
+            expect(extractTitleFromUrlOrSlug('4A', 'CODEFORCES')).toBe('Problem 4A');
+        });
+
+        it('humanizes raw slugs with proper casing and acronyms', () => {
+            expect(extractTitleFromUrlOrSlug('median-of-two-sorted-arrays')).toBe('Median Of Two Sorted Arrays');
+            expect(extractTitleFromUrlOrSlug('lowest-common-ancestor-of-a-binary-search-tree')).toBe('Lowest Common Ancestor Of A Binary Search Tree');
+        });
+
+        it('returns empty string for empty inputs', () => {
+            expect(extractTitleFromUrlOrSlug('')).toBe('');
+            expect(extractTitleFromUrlOrSlug('   ')).toBe('');
         });
     });
 });

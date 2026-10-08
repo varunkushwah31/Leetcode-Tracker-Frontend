@@ -432,16 +432,19 @@ public class ClassroomService {
 
                 // If title is missing or default, fetch real problem title from Codeforces
                 if (assignment.getTitle() == null || assignment.getTitle().isBlank() ||
-                        assignment.getTitle().equalsIgnoreCase(assignment.getTitleSlug())) {
+                        assignment.getTitle().equalsIgnoreCase(assignment.getTitleSlug()) ||
+                        assignment.getTitle().equalsIgnoreCase("Problem " + contestId + index)) {
                     try {
                         CodeforcesApiClient.CodeforcesProblemInfo cfInfo = codeforcesApiClient.fetchProblemDetails(contestId, index);
                         if (cfInfo != null && cfInfo.title() != null && !cfInfo.title().isBlank()) {
                             assignment.setTitle(cfInfo.title());
-                        } else {
+                        } else if (assignment.getTitle() == null || assignment.getTitle().isBlank()) {
                             assignment.setTitle("Problem " + contestId + index);
                         }
                     } catch (Exception e) {
-                        assignment.setTitle("Problem " + contestId + index);
+                        if (assignment.getTitle() == null || assignment.getTitle().isBlank()) {
+                            assignment.setTitle("Problem " + contestId + index);
+                        }
                     }
                 }
             }
@@ -456,7 +459,8 @@ public class ClassroomService {
                             assignment.setProblemNumber(lcInfo.problemNumber());
                         }
                         if (assignment.getTitle() == null || assignment.getTitle().isBlank() ||
-                                assignment.getTitle().equalsIgnoreCase(slug)) {
+                                assignment.getTitle().equalsIgnoreCase(slug) ||
+                                assignment.getTitle().equalsIgnoreCase(humanizeSlug(slug))) {
                             assignment.setTitle(lcInfo.title());
                         }
                     }
@@ -475,11 +479,18 @@ public class ClassroomService {
         if (slug == null) return "";
         String[] parts = slug.replace("-", " ").replace("_", " ").split("\\s+");
         StringBuilder sb = new StringBuilder();
+        java.util.Set<String> romanNumerals = java.util.Set.of("i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x");
+        java.util.Set<String> acronyms = java.util.Set.of("lru", "lfu", "bst", "trie", "sql", "dp", "bfs", "dfs", "gcd", "lcm");
         for (String part : parts) {
             if (!part.isEmpty()) {
-                sb.append(Character.toUpperCase(part.charAt(0)))
-                  .append(part.substring(1).toLowerCase())
-                  .append(" ");
+                String lower = part.toLowerCase();
+                if (romanNumerals.contains(lower) || acronyms.contains(lower)) {
+                    sb.append(lower.toUpperCase()).append(" ");
+                } else {
+                    sb.append(Character.toUpperCase(part.charAt(0)))
+                      .append(part.substring(1).toLowerCase())
+                      .append(" ");
+                }
             }
         }
         return sb.toString().trim();

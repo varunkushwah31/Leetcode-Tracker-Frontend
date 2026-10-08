@@ -64,6 +64,12 @@ class StudentServiceTest {
                     java.util.function.Supplier<?> task = invocation.getArgument(2);
                     return Optional.ofNullable(task.get());
                 });
+
+        lenient().when(lockService.executeWithLock(anyString(), any(), any(), any()))
+                .thenAnswer(invocation -> {
+                    java.util.function.Supplier<?> task = invocation.getArgument(3);
+                    return Optional.ofNullable(task.get());
+                });
     }
 
     @Test
