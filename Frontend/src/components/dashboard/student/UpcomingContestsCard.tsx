@@ -168,9 +168,12 @@ export function UpcomingContestsCard() {
                                 const isLeetCode = contest.platform === 'LEETCODE';
 
                                 return (
-                                    <div
+                                    <a
                                         key={contest.id}
-                                        className="flex items-center justify-between p-3 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 hover:bg-zinc-100/90 dark:hover:bg-[#1a1a1a]/80 border border-zinc-200/80 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-700/60 rounded-xl transition-all group"
+                                        href={contest.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-between p-3 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 hover:bg-zinc-100/90 dark:hover:bg-[#222228] border border-zinc-200/80 dark:border-zinc-800/50 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 rounded-xl transition-all cursor-pointer group no-underline text-inherit"
                                     >
                                         <div className="min-w-0 flex-1 pr-3">
                                             <div className="flex items-center gap-1.5 mb-1 min-w-0">
@@ -184,7 +187,7 @@ export function UpcomingContestsCard() {
                                                     {isLeetCode ? 'LC' : 'CF'}
                                                 </span>
                                                 <p
-                                                    className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200 tracking-tight truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors"
+                                                    className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200 tracking-tight truncate group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors"
                                                     title={contest.title}
                                                 >
                                                     {contest.title}
@@ -193,39 +196,28 @@ export function UpcomingContestsCard() {
 
                                             <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
                                                 {countdown.isLive ? (
-                                                    <span className="font-extrabold text-rose-500 dark:text-rose-400 flex items-center gap-1">
+                                                    <span className="font-extrabold text-rose-500 dark:text-rose-400 flex items-center gap-1 shrink-0">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                                                         LIVE NOW
                                                     </span>
                                                 ) : (
-                                                    <span className="font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                                    <span className="font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1 shrink-0">
                                                         <Clock className="w-3 h-3 text-emerald-500" />
                                                         {countdown.text}
                                                     </span>
                                                 )}
-                                                <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                                                <span>{formatStartTime(contest.startTimeSeconds)}</span>
-                                                <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                                                <span>{formatDuration(contest.durationSeconds)}</span>
+                                                <span className="text-zinc-400 dark:text-zinc-600 shrink-0">•</span>
+                                                <span className="truncate">{formatStartTime(contest.startTimeSeconds)}</span>
+                                                <span className="text-zinc-400 dark:text-zinc-600 shrink-0">•</span>
+                                                <span className="shrink-0">{formatDuration(contest.durationSeconds)}</span>
                                             </div>
                                         </div>
 
-                                        <a
-                                            href={contest.url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="shrink-0"
-                                        >
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-7 px-2.5 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-[#5b4fff] dark:hover:text-[#968fff] hover:bg-[#5b4fff]/10 cursor-pointer flex items-center gap-1 transition-colors"
-                                            >
-                                                <span>Register</span>
-                                                <ExternalLink className="w-3 h-3" />
-                                            </Button>
-                                        </a>
-                                    </div>
+                                        <div className="shrink-0 flex items-center gap-1 h-7 px-2.5 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-400 group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] group-hover:bg-[#5b4fff]/10 transition-colors">
+                                            <span>Register</span>
+                                            <ExternalLink className="w-3 h-3" />
+                                        </div>
+                                    </a>
                                 );
                             })}
                         </div>

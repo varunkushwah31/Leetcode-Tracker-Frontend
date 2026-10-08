@@ -309,7 +309,7 @@ export function DailyChallengeCard({ classroomId }: Readonly<DailyChallengeCardP
                         <div className="flex items-center gap-2.5 sm:w-44 shrink-0">
                             <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-linear-to-r from-[#5b4fff] to-emerald-500 rounded-full transition-all duration-500"
+                                    className="h-full bg-[#5b4fff] rounded-full transition-all duration-500"
                                     style={{
                                         width: `${Math.min(100, Math.max(0, challenge.classroomSolvedPercentage))}%`,
                                     }}

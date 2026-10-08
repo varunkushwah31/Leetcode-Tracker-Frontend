@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ContestScheduleService {
 
-    private static final String UPCOMING_CONTESTS_CACHE_KEY = "cache:upcoming-contests";
+    private static final String UPCOMING_CONTESTS_CACHE_KEY = "cache:upcoming-contests:v2";
     private static final long CACHE_TTL_MINUTES = 30;
 
     private final RedisTemplate<String, Object> redisTemplate;
@@ -189,7 +189,11 @@ public class ContestScheduleService {
             curSat = curSat.plusWeeks(1);
         }
 
-        return list;
+        // Return strictly the 2 latest/nearest upcoming LeetCode contests
+        return list.stream()
+                .sorted(Comparator.comparingLong(UpcomingContestDTO::getStartTimeSeconds))
+                .limit(2)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -230,13 +234,18 @@ public class ContestScheduleService {
                         long duration = c.path("durationSeconds").asLong(7200);
                         long startTime = c.path("startTimeSeconds").asLong(0);
 
+                        // If upcoming (BEFORE), direct user to contest registration page
+                        String contestUrl = "BEFORE".equalsIgnoreCase(phase)
+                                ? "https://codeforces.com/contestRegistration/" + id
+                                : "https://codeforces.com/contest/" + id;
+
                         list.add(UpcomingContestDTO.builder()
                                 .id("CF-" + id)
                                 .platform("CODEFORCES")
                                 .title(name)
                                 .startTimeSeconds(startTime)
                                 .durationSeconds(duration)
-                                .url("https://codeforces.com/contest/" + id)
+                                .url(contestUrl)
                                 .phase(phase.toUpperCase())
                                 .build());
                     }
