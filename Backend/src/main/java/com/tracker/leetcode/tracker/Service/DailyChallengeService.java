@@ -8,13 +8,11 @@ import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -22,46 +20,33 @@ import java.util.Optional;
 public class DailyChallengeService {
 
     private final LeetCodeApiClient leetCodeApiClient;
-    private final CodeforcesApiClient codeforcesApiClient;
     private final StudentRepository studentRepository;
     private final ClassroomRepository classroomRepository;
 
     public DailyChallengeDTO getDailyChallenge(String studentIdentifier, String classroomId) {
         LeetCodeApiClient.LeetCodeDailyQuestion lcPotd = leetCodeApiClient.fetchDailyCodingChallenge();
-        CodeforcesApiClient.CodeforcesDailyPick cfPick = codeforcesApiClient.fetchDailyPick();
 
         String today = LocalDate.now(ZoneId.of("UTC")).toString();
 
         DailyChallengeDTO.DailyChallengeDTOBuilder builder = DailyChallengeDTO.builder()
                 .date(today)
-                // LeetCode info
+                // Official LeetCode POTD info
                 .leetcodeFrontendId(lcPotd.questionFrontendId())
                 .leetcodeTitle(lcPotd.title())
                 .leetcodeTitleSlug(lcPotd.titleSlug())
                 .leetcodeDifficulty(lcPotd.difficulty())
                 .leetcodeUrl(lcPotd.url())
                 .leetcodeTopicTags(lcPotd.topicTags())
-                // Codeforces info
-                .codeforcesTitle(cfPick.title())
-                .codeforcesContestId(cfPick.contestId())
-                .codeforcesIndex(cfPick.index())
-                .codeforcesRating(cfPick.rating())
-                .codeforcesUrl(cfPick.url())
-                .codeforcesTags(cfPick.tags())
                 .userSolvedLeetcode(false)
-                .userSolvedCodeforces(false)
                 .userSolved(false);
 
         Student student = resolveStudent(studentIdentifier);
         boolean solvedLc = false;
-        boolean solvedCf = false;
 
         if (student != null) {
             solvedLc = hasSolvedLeetcodeChallenge(student, lcPotd.titleSlug(), lcPotd.title());
-            solvedCf = hasSolvedCodeforcesChallenge(student, cfPick.contestId(), cfPick.index(), cfPick.title());
             builder.userSolvedLeetcode(solvedLc);
-            builder.userSolvedCodeforces(solvedCf);
-            builder.userSolved(solvedLc || solvedCf);
+            builder.userSolved(solvedLc);
         }
 
         // Determine classroom for ticker
@@ -72,9 +57,7 @@ public class DailyChallengeService {
             int solvedCount = 0;
 
             for (Student s : classmates) {
-                boolean sSolved = hasSolvedLeetcodeChallenge(s, lcPotd.titleSlug(), lcPotd.title()) ||
-                        hasSolvedCodeforcesChallenge(s, cfPick.contestId(), cfPick.index(), cfPick.title());
-                if (sSolved) {
+                if (hasSolvedLeetcodeChallenge(s, lcPotd.titleSlug(), lcPotd.title())) {
                     solvedCount++;
                 }
             }
@@ -121,23 +104,6 @@ public class DailyChallengeService {
                 String subTitle = sub.getTitle() != null ? sub.getTitle().trim().toLowerCase() : "";
                 if ((!cleanSlug.isEmpty() && cleanSlug.equalsIgnoreCase(subSlug)) ||
                         (!cleanTitle.isEmpty() && cleanTitle.equalsIgnoreCase(subTitle))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean hasSolvedCodeforcesChallenge(Student s, int contestId, String index, String title) {
-        if (s == null || s.getRecentSubmissions() == null) return false;
-        String targetProblemNumber = contestId + (index != null ? index.trim().toUpperCase() : "");
-        String cleanTitle = title != null ? title.trim().toLowerCase() : "";
-
-        for (RecentSubmission sub : s.getRecentSubmissions()) {
-            if (sub.getPlatform() == com.tracker.leetcode.tracker.Models.Platform.CODEFORCES) {
-                String subTitle = sub.getTitle() != null ? sub.getTitle().trim().toLowerCase() : "";
-                String subSlug = sub.getTitleSlug() != null ? sub.getTitleSlug().trim().toUpperCase() : "";
-                if (subSlug.contains(targetProblemNumber) || (!cleanTitle.isEmpty() && subTitle.contains(cleanTitle))) {
                     return true;
                 }
             }

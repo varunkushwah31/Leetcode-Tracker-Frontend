@@ -20,7 +20,6 @@ export function DailyChallengeCard({ classroomId }: Readonly<DailyChallengeCardP
     const [challenge, setChallenge] = useState<DailyChallengeDTO | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [activeTab, setActiveTab] = useState<'LEETCODE' | 'CODEFORCES'>('LEETCODE');
 
     const fetchChallenge = async (silent = false) => {
         if (!silent) setIsLoading(true);
@@ -79,9 +78,7 @@ export function DailyChallengeCard({ classroomId }: Readonly<DailyChallengeCardP
         return null;
     }
 
-    const isLcSolved = challenge.userSolvedLeetcode;
-    const isCfSolved = challenge.userSolvedCodeforces;
-    const isCurrentTabSolved = activeTab === 'LEETCODE' ? isLcSolved : isCfSolved;
+    const isSolved = challenge.userSolvedLeetcode;
 
     const difficultyBadge = (diff?: string) => {
         const d = diff?.toLowerCase();
@@ -109,39 +106,22 @@ export function DailyChallengeCard({ classroomId }: Readonly<DailyChallengeCardP
                             <span>Problem of the Day</span>
                         </CardTitle>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                            Today's challenge • {formattedDateStr}
+                            Official LeetCode Daily Challenge • {formattedDateStr}
                         </p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    {/* Platform Selector Segmented Control */}
-                    <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#141414]/90 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800/80 shadow-xs dark:shadow-none">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('LEETCODE')}
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                                activeTab === 'LEETCODE'
-                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
-                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
-                            }`}
-                        >
-                            <span>LeetCode</span>
-                            {isLcSolved && <CheckCircle className="w-3.5 h-3.5 text-emerald-500" weight="fill" />}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('CODEFORCES')}
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                                activeTab === 'CODEFORCES'
-                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
-                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
-                            }`}
-                        >
-                            <span>Codeforces</span>
-                            {isCfSolved && <CheckCircle className="w-3.5 h-3.5 text-emerald-500" weight="fill" />}
-                        </button>
-                    </div>
+                    {isSolved ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
+                            <CheckCircle className="w-3.5 h-3.5" weight="fill" />
+                            Solved Today
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+                            Pending Today
+                        </span>
+                    )}
 
                     <Button
                         variant="ghost"
@@ -158,139 +138,61 @@ export function DailyChallengeCard({ classroomId }: Readonly<DailyChallengeCardP
 
             <CardContent className="pt-5 space-y-5">
                 {/* Problem Overview Row */}
-                {activeTab === 'LEETCODE' ? (
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-2 min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                                    #{challenge.leetcodeFrontendId || 'Daily'}
-                                </span>
-                                <Badge
-                                    variant="outline"
-                                    className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${difficultyBadge(
-                                        challenge.leetcodeDifficulty
-                                    )}`}
-                                >
-                                    {challenge.leetcodeDifficulty || 'Medium'}
-                                </Badge>
-                                {isLcSolved ? (
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
-                                        <CheckCircle className="w-3.5 h-3.5" weight="fill" />
-                                        Solved Today
-                                    </span>
-                                ) : (
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                                        Pending Today
-                                    </span>
-                                )}
-                            </div>
-
-                            <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight truncate">
-                                {challenge.leetcodeTitle || 'LeetCode Daily Challenge'}
-                            </h3>
-
-                            {challenge.leetcodeTopicTags && challenge.leetcodeTopicTags.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 pt-0.5">
-                                    {challenge.leetcodeTopicTags.slice(0, 4).map((tag) => (
-                                        <span
-                                            key={tag}
-                                            className="text-[11px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/40 font-medium"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="shrink-0 pt-1 sm:pt-0">
-                            <a
-                                href={challenge.leetcodeUrl || 'https://leetcode.com/problemset/all/'}
-                                target="_blank"
-                                rel="noreferrer"
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-2 min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                                #{challenge.leetcodeFrontendId || 'Daily'}
+                            </span>
+                            <Badge
+                                variant="outline"
+                                className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${difficultyBadge(
+                                    challenge.leetcodeDifficulty
+                                )}`}
                             >
-                                <Button
-                                    className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all ${
-                                        isCurrentTabSolved
-                                            ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
-                                            : 'bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-[#5b4fff]/20'
-                                    }`}
-                                >
-                                    <span>{isCurrentTabSolved ? 'Review on LeetCode' : 'Solve on LeetCode'}</span>
-                                    <ExternalLink className="w-3.5 h-3.5" />
-                                </Button>
-                            </a>
+                                {challenge.leetcodeDifficulty || 'Medium'}
+                            </Badge>
                         </div>
-                    </div>
-                ) : (
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-2 min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                                    {challenge.codeforcesContestId
-                                        ? `${challenge.codeforcesContestId}${challenge.codeforcesIndex || ''}`
-                                        : 'CF Pick'}
-                                </span>
-                                {challenge.codeforcesRating ? (
-                                    <Badge
-                                        variant="outline"
-                                        className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
+
+                        <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight truncate">
+                            {challenge.leetcodeTitle || 'LeetCode Daily Challenge'}
+                        </h3>
+
+                        {challenge.leetcodeTopicTags && challenge.leetcodeTopicTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                {challenge.leetcodeTopicTags.slice(0, 4).map((tag) => (
+                                    <span
+                                        key={tag}
+                                        className="text-[11px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/40 font-medium"
                                     >
-                                        {challenge.codeforcesRating} Rating
-                                    </Badge>
-                                ) : null}
-                                {isCfSolved ? (
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
-                                        <CheckCircle className="w-3.5 h-3.5" weight="fill" />
-                                        Solved Today
+                                        {tag}
                                     </span>
-                                ) : (
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                                        Pending Today
-                                    </span>
-                                )}
+                                ))}
                             </div>
-
-                            <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight truncate">
-                                {challenge.codeforcesTitle || 'Codeforces Daily Pick'}
-                            </h3>
-
-                            {challenge.codeforcesTags && challenge.codeforcesTags.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 pt-0.5">
-                                    {challenge.codeforcesTags.slice(0, 4).map((tag) => (
-                                        <span
-                                            key={tag}
-                                            className="text-[11px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/40 font-medium"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="shrink-0 pt-1 sm:pt-0">
-                            <a
-                                href={challenge.codeforcesUrl || 'https://codeforces.com/problemset'}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <Button
-                                    className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all ${
-                                        isCurrentTabSolved
-                                            ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
-                                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
-                                    }`}
-                                >
-                                    <span>{isCurrentTabSolved ? 'Review on Codeforces' : 'Solve on Codeforces'}</span>
-                                    <ExternalLink className="w-3.5 h-3.5" />
-                                </Button>
-                            </a>
-                        </div>
+                        )}
                     </div>
-                )}
 
-                {/* Sleek Integrated Classroom Ticker Footer */}
+                    <div className="shrink-0 pt-1 sm:pt-0">
+                        <a
+                            href={challenge.leetcodeUrl || 'https://leetcode.com/problemset/all/'}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <Button
+                                className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all ${
+                                    isSolved
+                                        ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
+                                        : 'bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-[#5b4fff]/20'
+                                }`}
+                            >
+                                <span>{isSolved ? 'Review on LeetCode' : 'Solve on LeetCode'}</span>
+                                <ExternalLink className="w-3.5 h-3.5" />
+                            </Button>
+                        </a>
+                    </div>
+                </div>
+
+                {/* Integrated Classroom Ticker Footer */}
                 {challenge.classroomTotalStudents > 0 && (
                     <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
