@@ -294,25 +294,50 @@ With Redis caching implemented:
 **Issue**: Serialization errors with complex objects
 - **Solution**: Ensure `JavaTimeModule` is registered in `RedisConfig`
 
+## Redis Cache Warming Worker (`CacheWarmingService`)
+
+To eliminate cold-start lag during morning peak traffic, MentorSync features an automated cache warming worker:
+
+### 1. Scheduled Background Execution
+- **Cron Schedule**: Runs nightly at **03:00 AM UTC** (`@Scheduled(cron = "0 0 3 * * *")`).
+- **Distributed Lock**: Acquires an atomic lock in Redis (`lock:cache:warming`) with a 30-minute TTL using `setIfAbsent()`. This guarantees that in multi-instance or clustered environments, only one instance executes cache warming simultaneously.
+- **Pre-fetched Caches**:
+  - `student-progress`: Calendar heatmap data
+  - `student-stats`: Problem breakdown (Easy, Medium, Hard)
+  - `student-recent`: Latest submissions
+  - `student-profile`: Extended profile metadata
+- **Safe Fallback**: If an individual profile encounters an external API failure, the worker catches the error, logs it, and continues warming subsequent student profiles without aborting.
+
+### 2. On-Demand Administrative Warming
+Administrators and mentors can trigger on-demand cache warming via REST API:
+- **Endpoint**: `POST /api/admin/cache/warm`
+- **Security**: Restricted to `SUPER_ADMIN` or `MENTOR` roles.
+- **Response**:
+  ```json
+  {
+    "status": "SUCCESS",
+    "message": "Cache warming completed successfully",
+    "studentsProcessed": 42,
+    "studentsFailed": 0,
+    "durationMs": 3120
+  }
+  ```
+
+## Redis Pub/Sub WebSocket Bridge (`RedisWebSocketBridge`)
+
+MentorSync utilizes Redis Pub/Sub to synchronize WebSocket events across distributed backend nodes:
+- **Topic**: `mentorsync:classroom:events`
+- **Channel Listener**: Intercepts events such as `UPDATE`, `LEADERBOARD_CHANGED`, `SUBMISSION_VALIDATED`, and `DEADLINE_UPDATED`.
+- **Local Dispatch**: Unpacks the payload and dispatches it over local Spring STOMP broker to `/topic/classrooms/{classroomId}`.
+- **Graceful Degradation**: If Redis Pub/Sub connection is interrupted, events immediately fallback to direct local STOMP dispatch.
+
 ## Best Practices
 
 1. **Use appropriate TTLs**: Don't cache too long (stale data) or too short (no performance benefit)
-
 2. **Invalidate strategically**: Clear related caches when data changes, not just one cache
-
 3. **Monitor cache hit ratio**: Use Redis CLI `INFO stats` to monitor performance
-
 4. **Test with production-like data**: Cache behavior can vary with large datasets
-
 5. **Document cache dependencies**: Know which caches depend on each other
-
-## Future Enhancements
-
-1. **Cache warming**: Preload popular queries on startup
-2. **Conditional caching**: Cache only for certain user roles
-3. **Cache statistics**: Add metrics for cache hit/miss rates
-4. **Distributed caching**: Multi-instance Redis with Cluster mode
-5. **Cache eviction policies**: Custom policies based on access patterns
 
 ## References
 
@@ -323,8 +348,9 @@ With Redis caching implemented:
 
 ---
 
-**Implementation Date**: April 2026  
-**Spring Boot Version**: 4.0.3  
+**Implementation Date**: October 2026  
+**Spring Boot Version**: 4.0.5  
 **Redis**: Compatible with 5.0+  
-**Java Version**: 25
+**Java Version**: 21
+
 
