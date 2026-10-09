@@ -148,8 +148,13 @@ public class StudentService {
         String lockIdentifier = studentId != null ? studentId : student.getLeetcodeUsername();
         String lockKey = "sync:student:" + lockIdentifier;
 
-        // Skip redundant sync if already synced in the last 10 seconds
-        if (student.getLastSyncedAt() != null &&
+        boolean missingContests = (student.getCodeforcesHandle() != null && !student.getCodeforcesHandle().isBlank()
+                && (student.getCodeforcesContestHistory() == null || student.getCodeforcesContestHistory().isEmpty()))
+                || (student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()
+                && (student.getContestHistory() == null || student.getContestHistory().isEmpty()));
+
+        // Skip redundant sync if already synced in the last 10 seconds and not missing contest history
+        if (!missingContests && student.getLastSyncedAt() != null &&
                 Duration.between(student.getLastSyncedAt(), Instant.now()).toSeconds() < 10) {
             log.info("Student [{}] was already synced {} seconds ago, skipping redundant sync",
                     lockIdentifier, Duration.between(student.getLastSyncedAt(), Instant.now()).toSeconds());
@@ -160,7 +165,12 @@ public class StudentService {
             Student target = student;
             if (studentId != null) {
                 target = studentRepository.findById(studentId).orElse(student);
-                if (target.getLastSyncedAt() != null &&
+                boolean stillMissing = (target.getCodeforcesHandle() != null && !target.getCodeforcesHandle().isBlank()
+                        && (target.getCodeforcesContestHistory() == null || target.getCodeforcesContestHistory().isEmpty()))
+                        || (target.getLeetcodeUsername() != null && !target.getLeetcodeUsername().isBlank()
+                        && (target.getContestHistory() == null || target.getContestHistory().isEmpty()));
+
+                if (!stillMissing && target.getLastSyncedAt() != null &&
                         Duration.between(target.getLastSyncedAt(), Instant.now()).toSeconds() < 10) {
                     log.info("Student [{}] was synced while waiting for lock, returning fresh entity", lockIdentifier);
                     return target;

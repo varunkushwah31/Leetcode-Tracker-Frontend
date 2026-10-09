@@ -121,10 +121,16 @@ public class StudentController {
                 && (freshStudentData.getCodeforcesSolvedCount() == null || freshStudentData.getCodeforcesSolvedCount() == 0);
         boolean hasPlatforms = (freshStudentData.getLeetcodeUsername() != null && !freshStudentData.getLeetcodeUsername().isBlank())
                 || (freshStudentData.getCodeforcesHandle() != null && !freshStudentData.getCodeforcesHandle().isBlank());
+        boolean missingCfContests = freshStudentData.getCodeforcesHandle() != null
+                && !freshStudentData.getCodeforcesHandle().isBlank()
+                && (freshStudentData.getCodeforcesContestHistory() == null || freshStudentData.getCodeforcesContestHistory().isEmpty());
+        boolean missingLcContests = freshStudentData.getLeetcodeUsername() != null
+                && !freshStudentData.getLeetcodeUsername().isBlank()
+                && (freshStudentData.getContestHistory() == null || freshStudentData.getContestHistory().isEmpty());
 
-        if ((neverSynced || hasEmptyStats) && hasPlatforms) {
+        if ((neverSynced || hasEmptyStats || missingCfContests || missingLcContests) && hasPlatforms) {
             try {
-                log.info("Student {} has uninitialized profile stats on dashboard load, triggering immediate sync", freshStudentData.getId());
+                log.info("Student {} has uninitialized or incomplete profile stats on dashboard load, triggering immediate sync", freshStudentData.getId());
                 freshStudentData = studentService.syncAllProfileData(freshStudentData);
             } catch (Exception e) {
                 log.warn("Failed immediate auto-fetch on dashboard load for student {}: {}", freshStudentData.getId(), e.getMessage());

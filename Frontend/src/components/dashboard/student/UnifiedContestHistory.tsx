@@ -66,15 +66,44 @@ export function UnifiedContestHistory({
     }, [contestHistory]);
 
     const cfItems: UnifiedContestItem[] = useMemo(() => {
-        return (codeforcesContestHistory || []).map((c) => ({
-            id: `cf-${c.contestId}-${c.ratingUpdateTimeSeconds}`,
-            platform: 'CODEFORCES' as const,
-            title: c.contestName,
-            timestamp: c.ratingUpdateTimeSeconds,
-            rank: c.rank,
-            rating: c.newRating,
-            delta: c.newRating - c.oldRating,
-        }));
+        // Sort chronologically ascending to calculate deltas accurately
+        const sorted = [...(codeforcesContestHistory || [])].sort((a, b) => {
+            const timeA = a.ratingUpdateTimeSeconds || (a as any).timestamp || 0;
+            const timeB = b.ratingUpdateTimeSeconds || (b as any).timestamp || 0;
+            return timeA - timeB;
+        });
+
+        return sorted.map((c, idx) => {
+            const currentRating = c.newRating ?? (c as any).rating ?? (c as any).new_rating ?? 0;
+            const prevRating = idx > 0
+                ? (sorted[idx - 1].newRating ?? (sorted[idx - 1] as any).rating ?? (sorted[idx - 1] as any).new_rating ?? currentRating)
+                : (c.oldRating ?? (c as any).old_rating ?? currentRating);
+
+            // Compute delta:
+            // 1. If oldRating is explicitly provided, use currentRating - oldRating
+            // 2. Or if explicit delta property exists, use it
+            // 3. Otherwise if contest is not the first, compute difference from previous contest in chronological sequence
+            let delta: number | undefined;
+            if (c.oldRating !== undefined && c.oldRating !== null && !Number.isNaN(c.oldRating)) {
+                delta = currentRating - c.oldRating;
+            } else if ((c as any).delta !== undefined && !Number.isNaN((c as any).delta)) {
+                delta = Number((c as any).delta);
+            } else if (idx > 0) {
+                delta = currentRating - prevRating;
+            } else {
+                delta = 0;
+            }
+
+            return {
+                id: `cf-${c.contestId || idx}-${c.ratingUpdateTimeSeconds || (c as any).timestamp || idx}`,
+                platform: 'CODEFORCES' as const,
+                title: c.contestName || (c as any).title || 'Codeforces Round',
+                timestamp: c.ratingUpdateTimeSeconds || (c as any).timestamp || 0,
+                rank: c.rank || 0,
+                rating: currentRating,
+                delta,
+            };
+        });
     }, [codeforcesContestHistory]);
 
     const allItems: UnifiedContestItem[] = useMemo(() => {
@@ -201,9 +230,9 @@ export function UnifiedContestHistory({
                                             contest.platform === 'CODEFORCES' ? 'text-cyan-600 dark:text-cyan-400' : 'text-amber-600 dark:text-[#ffa116]'
                                         }`}
                                     >
-                                        {contest.rating}
+                                        {contest.rating > 0 ? contest.rating : '—'}
                                     </p>
-                                    {contest.delta !== undefined ? (
+                                    {contest.delta !== undefined && !Number.isNaN(contest.delta) ? (
                                         <p
                                             className={`text-[10px] font-bold ${
                                                 contest.delta > 0

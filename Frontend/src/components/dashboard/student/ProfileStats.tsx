@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent } from '../../ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog';
-import { ArrowSquareOutIcon as ExternalLink, FlameIcon, TrophyIcon, TerminalIcon, GearIcon as Settings, SpinnerIcon as Loader2 } from '@phosphor-icons/react';
+import { ArrowSquareOutIcon as ExternalLink, FlameIcon, TrophyIcon, TerminalIcon, GearIcon as Settings, SpinnerIcon as Loader2, TrendUpIcon as TrendingUp, TrendDownIcon as TrendingDown } from '@phosphor-icons/react';
 import type { StudentExtendedDTO } from '@/types';
 import { StudentService } from '@/services/endpoints';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
@@ -71,6 +71,39 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
     const cfRankColor = getCodeforcesRankColor(cfRank);
     const lcSolved = data.leetcodeSolvedCount ?? Math.max(0, totalSolved - (data.codeforcesSolvedCount || 0));
     const cfSolved = data.codeforcesSolvedCount || 0;
+
+    const lcDelta = useMemo(() => {
+        if (!data?.contestHistory || data.contestHistory.length === 0) return null;
+        const sorted = [...data.contestHistory].sort((a, b) => a.timestamp - b.timestamp);
+        const latestIdx = sorted.length - 1;
+        const latest = sorted[latestIdx];
+        const prevRating = latestIdx > 0 ? sorted[latestIdx - 1].rating : 1500;
+        return Math.round(latest.rating) - Math.round(prevRating);
+    }, [data?.contestHistory]);
+
+    const cfDelta = useMemo(() => {
+        if (!data?.codeforcesContestHistory || data.codeforcesContestHistory.length === 0) return null;
+        const sorted = [...data.codeforcesContestHistory].sort((a, b) => {
+            const timeA = a.ratingUpdateTimeSeconds || (a as any).timestamp || 0;
+            const timeB = b.ratingUpdateTimeSeconds || (b as any).timestamp || 0;
+            return timeA - timeB;
+        });
+        const latest = sorted[sorted.length - 1];
+        if (latest.oldRating !== undefined && latest.oldRating !== null && !Number.isNaN(latest.oldRating)) {
+            const cur = latest.newRating ?? (latest as any).rating ?? 0;
+            return cur - latest.oldRating;
+        }
+        if ((latest as any).delta !== undefined && !Number.isNaN((latest as any).delta)) {
+            return Number((latest as any).delta);
+        }
+        if (sorted.length > 1) {
+            const prev = sorted[sorted.length - 2];
+            const cur = latest.newRating ?? (latest as any).rating ?? 0;
+            const prevR = prev.newRating ?? (prev as any).rating ?? 0;
+            return cur - prevR;
+        }
+        return null;
+    }, [data?.codeforcesContestHistory]);
 
     return (
         <div className="mb-10 relative">
@@ -201,18 +234,54 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-[#5b4fff]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">LeetCode Rating</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
-                                        {rating}
-                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-2xl sm:text-3xl font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
+                                            {rating}
+                                        </p>
+                                        {lcDelta !== null && (
+                                            <span className={`inline-flex items-center gap-0.5 text-xs font-bold px-1.5 py-0.5 rounded-md border ${
+                                                lcDelta > 0
+                                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                                    : lcDelta < 0
+                                                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                                                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                                            }`}>
+                                                {lcDelta > 0 ? (
+                                                    <TrendingUp className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                                ) : lcDelta < 0 ? (
+                                                    <TrendingDown className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                                                ) : null}
+                                                {lcDelta > 0 ? `+${lcDelta}` : lcDelta}
+                                            </span>
+                                        )}
+                                    </div>
                                     <p className="text-xs text-zinc-500 mt-1">Contest Rating</p>
                                 </div>
 
                                 <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Codeforces Rating</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
-                                        {cfRating > 0 ? cfRating : 'N/A'}
-                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
+                                            {cfRating > 0 ? cfRating : 'N/A'}
+                                        </p>
+                                        {cfDelta !== null && (
+                                            <span className={`inline-flex items-center gap-0.5 text-xs font-bold px-1.5 py-0.5 rounded-md border ${
+                                                cfDelta > 0
+                                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                                    : cfDelta < 0
+                                                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                                                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                                            }`}>
+                                                {cfDelta > 0 ? (
+                                                    <TrendingUp className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                                ) : cfDelta < 0 ? (
+                                                    <TrendingDown className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                                                ) : null}
+                                                {cfDelta > 0 ? `+${cfDelta}` : cfDelta}
+                                            </span>
+                                        )}
+                                    </div>
                                     <p className={`text-xs capitalize font-semibold mt-1 ${cfRankColor}`}>
                                         {cfRank}
                                     </p>
