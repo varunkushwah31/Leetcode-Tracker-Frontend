@@ -13,7 +13,7 @@ export type ApiFormattedError = Error & { status?: number };
 
 export function isAuthEndpoint(url?: string): boolean {
     if (!url) return false;
-    return url.includes('/v1/auth/');
+    return url.includes('/auth') || url.includes('/v1/auth');
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
@@ -128,9 +128,12 @@ async function handle401Refresh(originalRequest: RetryableRequest) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
         
-        if (typeof window !== 'undefined' && 
-            window.location.pathname !== '/login' && 
-            window.location.pathname !== '/register') {
+        const currentPath = typeof window !== 'undefined'
+            ? (window.location.pathname.replace(/\/+$/, '') || '/')
+            : '';
+        const isAuthPage = currentPath === '/login' || currentPath === '/register';
+
+        if (typeof window !== 'undefined' && !isAuthPage && !isAuthEndpoint(originalRequest.url)) {
             window.location.href = '/login';
         }
 

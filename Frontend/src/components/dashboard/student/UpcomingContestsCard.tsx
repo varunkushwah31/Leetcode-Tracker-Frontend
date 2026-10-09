@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { ScrollArea } from '../../ui/scroll-area';
 import { Button } from '../../ui/button';
@@ -18,24 +18,25 @@ export function UpcomingContestsCard() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [nowSeconds, setNowSeconds] = useState(Math.floor(Date.now() / 1000));
 
-    const fetchContests = async (silent = false) => {
+    const fetchContests = useCallback(async (silent = false) => {
         if (!silent) setIsLoading(true);
         else setIsRefreshing(true);
 
         try {
             const res = await ContestScheduleService.getUpcomingContests(platformFilter);
-            setContests(res.data);
+            setContests(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             console.warn('Could not load upcoming contests:', err);
+            setContests([]);
         } finally {
             setIsLoading(false);
             setIsRefreshing(false);
         }
-    };
+    }, [platformFilter]);
 
     useEffect(() => {
         void fetchContests();
-    }, [platformFilter]);
+    }, [fetchContests]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -44,7 +45,10 @@ export function UpcomingContestsCard() {
         return () => clearInterval(interval);
     }, []);
 
-    const formatCountdown = (startSec: number, durationSec: number, phase: string) => {
+    const formatCountdown = (startSec?: number, durationSec = 7200, phase = 'BEFORE') => {
+        if (!startSec || isNaN(startSec)) {
+            return { text: 'Upcoming', isLive: false };
+        }
         const diff = startSec - nowSeconds;
         if (phase === 'CODING' || (diff <= 0 && diff + durationSec > 0)) {
             return { text: 'LIVE NOW', isLive: true };
@@ -66,18 +70,24 @@ export function UpcomingContestsCard() {
         return { text: `in ${minutes}m`, isLive: false };
     };
 
-    const formatStartTime = (sec: number) => {
-        const date = new Date(sec * 1000);
-        return date.toLocaleDateString(undefined, {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
+    const formatStartTime = (sec?: number) => {
+        if (!sec || isNaN(sec)) return 'TBA';
+        try {
+            const date = new Date(sec * 1000);
+            return date.toLocaleDateString(undefined, {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+        } catch {
+            return 'TBA';
+        }
     };
 
-    const formatDuration = (sec: number) => {
+    const formatDuration = (sec?: number) => {
+        if (!sec || isNaN(sec) || sec <= 0) return 'TBA';
         const hours = Math.floor(sec / 3600);
         const mins = Math.floor((sec % 3600) / 60);
         if (mins === 0) return `${hours}h`;

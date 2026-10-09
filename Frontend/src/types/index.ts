@@ -140,6 +140,28 @@ export interface ChangePasswordRequest {
     confirmPassword?: string;
 }
 
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface VerifyOtpRequest {
+    email: string;
+    otp: string;
+}
+
+export interface ResetPasswordRequest {
+    email: string;
+    resetToken?: string;
+    otp?: string;
+    newPassword: string;
+    confirmPassword?: string;
+}
+
+export interface VerifyOtpResponse {
+    message: string;
+    resetToken: string;
+}
+
 export interface PathQuestion {
     platform?: 'LEETCODE' | 'CODEFORCES';
     title?: string;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
@@ -22,7 +22,7 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
-    const fetchChallenge = async (silent = false) => {
+    const fetchChallenge = useCallback(async (silent = false) => {
         if (!silent) setIsLoading(true);
         else setIsRefreshing(true);
 
@@ -35,11 +35,11 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
             setIsLoading(false);
             setIsRefreshing(false);
         }
-    };
+    }, [classroomId]);
 
     useEffect(() => {
         void fetchChallenge();
-    }, [classroomId]);
+    }, [fetchChallenge]);
 
     const formattedDateStr = useMemo(() => {
         if (!challenge?.date) return 'Today';
@@ -58,6 +58,18 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
             return challenge.date;
         }
     }, [challenge?.date]);
+
+    const isSolved = useMemo(() => {
+        if (!challenge) return false;
+        if (challenge.userSolvedLeetcode) return true;
+        if (!challenge.leetcodeTitleSlug || !recentSubmissions || recentSubmissions.length === 0) return false;
+        const normTarget = challenge.leetcodeTitleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        return recentSubmissions.some((sub) => {
+            const platformMatches = !sub.platform || sub.platform === 'LEETCODE';
+            const normSub = sub.titleSlug ? sub.titleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : '';
+            return platformMatches && normSub === normTarget;
+        });
+    }, [challenge, recentSubmissions]);
 
     if (isLoading) {
         return (
@@ -78,17 +90,6 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
     if (!challenge) {
         return null;
     }
-
-    const isSolved = useMemo(() => {
-        if (challenge.userSolvedLeetcode) return true;
-        if (!challenge.leetcodeTitleSlug || !recentSubmissions || recentSubmissions.length === 0) return false;
-        const normTarget = challenge.leetcodeTitleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        return recentSubmissions.some((sub) => {
-            const platformMatches = !sub.platform || sub.platform === 'LEETCODE';
-            const normSub = sub.titleSlug ? sub.titleSlug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : '';
-            return platformMatches && normSub === normTarget;
-        });
-    }, [challenge.userSolvedLeetcode, challenge.leetcodeTitleSlug, recentSubmissions]);
 
     const difficultyBadge = (diff?: string) => {
         const d = diff?.toLowerCase();

@@ -22,6 +22,7 @@ import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export function StudentDashboard() {
     const { logout, user } = useAuth();
@@ -225,10 +226,12 @@ export function StudentDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        <DailyChallengeCard
-                            classroomId={selectedClassroomId}
-                            recentSubmissions={dashboardData?.recentSubmissions}
-                        />
+                        <ErrorBoundary fallback={null}>
+                            <DailyChallengeCard
+                                classroomId={selectedClassroomId}
+                                recentSubmissions={dashboardData?.recentSubmissions}
+                            />
+                        </ErrorBoundary>
                         <ActivityHeatmap
                             progressHistory={dashboardData?.progressHistory}
                             consistencyStreak={dashboardData?.consistencyStreak}
@@ -256,7 +259,9 @@ export function StudentDashboard() {
 
                     <div className="space-y-8">
                         <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
-                        <UpcomingContestsCard />
+                        <ErrorBoundary fallback={null}>
+                            <UpcomingContestsCard />
+                        </ErrorBoundary>
                         <BadgesList badges={dashboardData?.badges} />
                     </div>
                 </div>

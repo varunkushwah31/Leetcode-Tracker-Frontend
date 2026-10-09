@@ -6,6 +6,10 @@ import type {
     StudentRegisterRequest, 
     MentorRegisterRequest, 
     ChangePasswordRequest,
+    ForgotPasswordRequest,
+    VerifyOtpRequest,
+    ResetPasswordRequest,
+    VerifyOtpResponse,
     LearningPath,
     BulkImportResponseDTO,
     SystemOverviewDTO,
@@ -29,12 +33,20 @@ export const AuthService = {
 
     logout: () => api.post('/v1/auth/logout'),
 
-    // FIXED: Changed axiosInstance to api, and updated the path to match the others!
     verifyEmail: (email: string, otp: string) =>
         api.post<AuthResponse>('/v1/auth/verify-email', { email, otp }),
 
     changePassword: (data: ChangePasswordRequest) =>
-        api.post<{ message: string }>('/v1/auth/change-password', data)
+        api.post<{ message: string }>('/v1/auth/change-password', data),
+
+    forgotPassword: (data: ForgotPasswordRequest | string) =>
+        api.post<{ message: string }>('/v1/auth/forgot-password', typeof data === 'string' ? { email: data } : data),
+
+    verifyOtp: (emailOrData: VerifyOtpRequest | string, otp?: string) =>
+        api.post<VerifyOtpResponse>('/v1/auth/verify-otp', typeof emailOrData === 'string' ? { email: emailOrData, otp: otp || '' } : emailOrData),
+
+    resetPassword: (data: ResetPasswordRequest) =>
+        api.post<{ message: string }>('/v1/auth/reset-password', data)
 };
 
 export const StudentService = {

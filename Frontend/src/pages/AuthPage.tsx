@@ -9,6 +9,7 @@ import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
+import { ForgotPasswordModal } from '../components/common/ForgotPasswordModal';
 import {
   extractLeetcodeUsername,
   extractCodeforcesHandle,
@@ -27,6 +28,7 @@ export function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
   // Keep isLogin aligned if route changes via browser history or navigation
   useEffect(() => {
@@ -403,7 +405,8 @@ export function AuthPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          setError("Password reset link will be sent to your registered email address.");
+                          clearError();
+                          setIsForgotPasswordOpen(true);
                         }}
                         className="text-xs text-[#5b4fff] dark:text-[#968fff] hover:text-[#4d40ea] dark:hover:text-[#b4afff] transition-colors font-medium cursor-pointer bg-transparent border-none p-0"
                       >
@@ -470,6 +473,12 @@ export function AuthPage() {
                 <span>Need help? Contact support</span>
               </Link>
             </div>
+
+            <ForgotPasswordModal
+              open={isForgotPasswordOpen}
+              onOpenChange={setIsForgotPasswordOpen}
+              defaultEmail={formData.email}
+            />
           </div>
         </div>
       </div>
