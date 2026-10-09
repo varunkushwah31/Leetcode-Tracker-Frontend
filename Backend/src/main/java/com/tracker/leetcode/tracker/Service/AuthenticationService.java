@@ -7,6 +7,7 @@ import com.tracker.leetcode.tracker.DTO.RegisterRequest;
 import com.tracker.leetcode.tracker.DTO.StudentRegisterRequest;
 import com.tracker.leetcode.tracker.DTO.ForgotPasswordRequest;
 import com.tracker.leetcode.tracker.DTO.ResetPasswordRequest;
+import com.tracker.leetcode.tracker.DTO.SendStudentOtpRequest;
 import com.tracker.leetcode.tracker.DTO.VerifyOtpRequest;
 import com.tracker.leetcode.tracker.DTO.VerifyOtpResponse;
 import com.tracker.leetcode.tracker.Exception.DuplicateMentorException;
@@ -16,10 +17,12 @@ import com.tracker.leetcode.tracker.Exception.ValidationFailedException;
 import com.tracker.leetcode.tracker.Models.*;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import com.tracker.leetcode.tracker.Repository.PasswordResetOtpRepository;
+import com.tracker.leetcode.tracker.Repository.StudentRegistrationOtpRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import com.tracker.leetcode.tracker.Security.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,7 +48,15 @@ public class AuthenticationService {
     private final RefreshTokenService refreshTokenService;
     private final StudentService studentService;
     private final PasswordResetOtpRepository passwordResetOtpRepository;
+    private final StudentRegistrationOtpRepository studentRegistrationOtpRepository;
     private final ResendEmailService resendEmailService;
+
+    @Value("${application.auth.student-email-verification:true}")
+    private boolean requireStudentEmailVerification = false;
+
+    public void setRequireStudentEmailVerification(boolean requireStudentEmailVerification) {
+        this.requireStudentEmailVerification = requireStudentEmailVerification;
+    }
 
     // 1. REGISTRATION LOGIC
 
@@ -68,8 +79,33 @@ public class AuthenticationService {
 
     public AuthenticationResponse registerStudent(StudentRegisterRequest request){
         log.info("Registering new student: {}", request.email());
-        if (studentRepository.findByEmail(request.email()).isPresent() || mentorRepository.findByEmail(request.email()).isPresent()){
+        String normalizedEmail = request.email() != null ? request.email().trim().toLowerCase() : "";
+        if (studentRepository.findByEmail(request.email()).isPresent() ||
+            studentRepository.findByEmailIgnoreCase(normalizedEmail).isPresent() ||
+            mentorRepository.findByEmail(request.email()).isPresent() ||
+            mentorRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()){
             throw new DuplicateStudentException("Student email already in use.");
+        }
+
+        // Email OTP Verification for student registration
+        if (studentRegistrationOtpRepository != null && (requireStudentEmailVerification || (request.otp() != null && !request.otp().isBlank()))) {
+            if (request.otp() == null || request.otp().isBlank()) {
+                throw new ValidationFailedException("Email verification code is required.");
+            }
+            String submittedOtp = request.otp().trim();
+            var otpRecordOpt = studentRegistrationOtpRepository.findTopByEmailOrderByCreatedAtDesc(normalizedEmail);
+            if (otpRecordOpt.isEmpty()) {
+                throw new ValidationFailedException("No pending verification found for this email. Please request a verification code.");
+            }
+            StudentRegistrationOtp record = otpRecordOpt.get();
+            if (record.getExpiryDate().isBefore(Instant.now())) {
+                studentRegistrationOtpRepository.delete(record);
+                throw new ValidationFailedException("Verification code has expired. Please request a new one.");
+            }
+            if (!record.getOtp().equals(submittedOtp)) {
+                throw new ValidationFailedException("Invalid verification code. Please check and try again.");
+            }
+            studentRegistrationOtpRepository.delete(record);
         }
 
         String rawLc = request.leetcodeUsername() != null ? request.leetcodeUsername().trim() : null;
@@ -299,6 +335,43 @@ public class AuthenticationService {
     }
 
     // 4. FORGOT & RESET PASSWORD VIA RESEND OTP
+
+    public Map<String, String> sendStudentRegistrationOtp(SendStudentOtpRequest request) {
+        String email = request.email() != null ? request.email().trim().toLowerCase() : "";
+        if (email.isBlank()) {
+            throw new ValidationFailedException("Email address is required.");
+        }
+
+        if (studentRepository.findByEmailIgnoreCase(email).isPresent() ||
+            studentRepository.findByEmail(email).isPresent() ||
+            mentorRepository.findByEmailIgnoreCase(email).isPresent() ||
+            mentorRepository.findByEmail(email).isPresent()) {
+            throw new DuplicateStudentException("Email already in use. Please sign in instead.");
+        }
+
+        int randomPin;
+        try {
+            randomPin = SecureRandom.getInstanceStrong().nextInt(900000) + 100000;
+        } catch (NoSuchAlgorithmException e) {
+            randomPin = new SecureRandom().nextInt(900000) + 100000;
+        }
+        String otp = String.valueOf(randomPin);
+
+        studentRegistrationOtpRepository.deleteByEmail(email);
+
+        StudentRegistrationOtp record = StudentRegistrationOtp.builder()
+                .email(email)
+                .otp(otp)
+                .expiryDate(Instant.now().plus(Duration.ofMinutes(10)))
+                .createdAt(Instant.now())
+                .build();
+        studentRegistrationOtpRepository.save(record);
+
+        resendEmailService.sendStudentRegistrationOtp(email, otp, request.name());
+
+        log.info("Sent student registration OTP to email: {}", email);
+        return Map.of("message", "A 6-digit verification code has been sent to " + email);
+    }
 
     public Map<String, String> sendPasswordResetOtp(ForgotPasswordRequest request) {
         String email = request.email() != null ? request.email().trim().toLowerCase() : "";

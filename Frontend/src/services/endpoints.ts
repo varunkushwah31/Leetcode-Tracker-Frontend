@@ -28,6 +28,9 @@ export const AuthService = {
     registerStudent: (data: StudentRegisterRequest) =>
         api.post<AuthResponse>('/v1/auth/register/student', data),
 
+    sendStudentRegistrationOtp: (data: { email: string; name?: string }) =>
+        api.post<{ message: string }>('/v1/auth/register/student/send-otp', data),
+
     registerMentor: (data: MentorRegisterRequest) =>
         api.post<AuthResponse>('/v1/auth/register', data),
 

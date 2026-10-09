@@ -10,7 +10,16 @@ import com.tracker.leetcode.tracker.Models.AuthProvider;
 import com.tracker.leetcode.tracker.Models.Mentor;
 import com.tracker.leetcode.tracker.Models.Role;
 import com.tracker.leetcode.tracker.Models.Student;
+import com.tracker.leetcode.tracker.DTO.ForgotPasswordRequest;
+import com.tracker.leetcode.tracker.DTO.ResetPasswordRequest;
+import com.tracker.leetcode.tracker.DTO.SendStudentOtpRequest;
+import com.tracker.leetcode.tracker.DTO.VerifyOtpRequest;
+import com.tracker.leetcode.tracker.DTO.VerifyOtpResponse;
+import com.tracker.leetcode.tracker.Models.PasswordResetOtp;
+import com.tracker.leetcode.tracker.Models.StudentRegistrationOtp;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
+import com.tracker.leetcode.tracker.Repository.PasswordResetOtpRepository;
+import com.tracker.leetcode.tracker.Repository.StudentRegistrationOtpRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import com.tracker.leetcode.tracker.Security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +31,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,6 +64,15 @@ class AuthenticationServiceTest {
 
     @Mock
     private StudentService studentService;
+
+    @Mock
+    private PasswordResetOtpRepository passwordResetOtpRepository;
+
+    @Mock
+    private StudentRegistrationOtpRepository studentRegistrationOtpRepository;
+
+    @Mock
+    private ResendEmailService resendEmailService;
 
     @InjectMocks
     private AuthenticationService authenticationService;
@@ -297,5 +318,222 @@ class AuthenticationServiceTest {
         );
 
         assertEquals("New password must be at least 6 characters long.", ex.getMessage());
+    }
+
+    // ==================== FORGOT & RESET PASSWORD OTP TESTS ====================
+
+    @Test
+    void sendPasswordResetOtp_WithValidStudentEmail_ShouldDispatchEmail() {
+        Student student = new Student();
+        student.setEmail("student@example.com");
+        student.setName("Alice");
+
+        when(studentRepository.findByEmailIgnoreCase("student@example.com")).thenReturn(Optional.of(student));
+
+        Map<String, String> response = authenticationService.sendPasswordResetOtp(new ForgotPasswordRequest("student@example.com"));
+
+        assertNotNull(response);
+        assertTrue(response.get("message").contains("verification code"));
+        verify(passwordResetOtpRepository).deleteByEmail("student@example.com");
+        verify(passwordResetOtpRepository).save(any(PasswordResetOtp.class));
+        verify(resendEmailService).sendOtpEmail(eq("student@example.com"), anyString(), eq("Alice"));
+    }
+
+    @Test
+    void sendPasswordResetOtp_WithNonExistentEmail_ShouldThrowValidationFailedException() {
+        when(studentRepository.findByEmailIgnoreCase("ghost@example.com")).thenReturn(Optional.empty());
+        when(studentRepository.findByEmail("ghost@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmailIgnoreCase("ghost@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmail("ghost@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.sendPasswordResetOtp(new ForgotPasswordRequest("ghost@example.com"))
+        );
+        verify(resendEmailService, never()).sendOtpEmail(any(), any(), any());
+    }
+
+    @Test
+    void verifyPasswordResetOtp_WithValidOtp_ShouldReturnResetToken() {
+        PasswordResetOtp record = PasswordResetOtp.builder()
+                .email("student@example.com")
+                .otp("123456")
+                .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
+                .build();
+
+        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(record));
+
+        VerifyOtpResponse response = authenticationService.verifyPasswordResetOtp(new VerifyOtpRequest("student@example.com", "123456"));
+
+        assertNotNull(response);
+        assertNotNull(response.resetToken());
+        assertTrue(record.isVerified());
+        verify(passwordResetOtpRepository).save(record);
+    }
+
+    @Test
+    void verifyPasswordResetOtp_WithIncorrectOtp_ShouldThrowValidationFailedException() {
+        PasswordResetOtp record = PasswordResetOtp.builder()
+                .email("student@example.com")
+                .otp("123456")
+                .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
+                .build();
+
+        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(record));
+
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.verifyPasswordResetOtp(new VerifyOtpRequest("student@example.com", "999999"))
+        );
+
+        assertEquals("Invalid verification code. Please check and try again.", ex.getMessage());
+    }
+
+    @Test
+    void resetPasswordWithOtp_WithValidResetToken_ShouldUpdatePassword() {
+        PasswordResetOtp record = PasswordResetOtp.builder()
+                .email("student@example.com")
+                .resetToken("token-123")
+                .verified(true)
+                .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
+                .build();
+
+        Student student = new Student();
+        student.setId("s1");
+        student.setEmail("student@example.com");
+
+        when(passwordResetOtpRepository.findByEmailAndResetToken("student@example.com", "token-123")).thenReturn(Optional.of(record));
+        when(studentRepository.findByEmailIgnoreCase("student@example.com")).thenReturn(Optional.of(student));
+        when(passwordEncoder.encode("brandNewPass123")).thenReturn("encodedNewPass");
+
+        ResetPasswordRequest request = new ResetPasswordRequest(
+                "student@example.com",
+                "token-123",
+                null,
+                "brandNewPass123",
+                "brandNewPass123"
+        );
+
+        Map<String, String> response = authenticationService.resetPasswordWithOtp(request);
+
+        assertNotNull(response);
+        assertEquals("encodedNewPass", student.getPassword());
+        verify(studentRepository).save(student);
+        verify(passwordResetOtpRepository).delete(record);
+        verify(refreshTokenService).deleteByMentorId("s1");
+    }
+
+    // ==================== STUDENT REGISTRATION OTP TESTS ====================
+
+    @Test
+    void sendStudentRegistrationOtp_WithNewEmail_ShouldDispatchEmail() {
+        when(studentRepository.findByEmailIgnoreCase("newstudent@example.com")).thenReturn(Optional.empty());
+        when(studentRepository.findByEmail("newstudent@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmailIgnoreCase("newstudent@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmail("newstudent@example.com")).thenReturn(Optional.empty());
+
+        SendStudentOtpRequest req = new SendStudentOtpRequest("newstudent@example.com", "New Student");
+        Map<String, String> response = authenticationService.sendStudentRegistrationOtp(req);
+
+        assertNotNull(response);
+        verify(studentRegistrationOtpRepository).deleteByEmail("newstudent@example.com");
+        verify(studentRegistrationOtpRepository).save(any(StudentRegistrationOtp.class));
+        verify(resendEmailService).sendStudentRegistrationOtp(eq("newstudent@example.com"), anyString(), eq("New Student"));
+    }
+
+    @Test
+    void sendStudentRegistrationOtp_WithExistingEmail_ShouldThrowDuplicateStudentException() {
+        Student existing = new Student();
+        existing.setEmail("existing@example.com");
+        when(studentRepository.findByEmailIgnoreCase("existing@example.com")).thenReturn(Optional.of(existing));
+
+        SendStudentOtpRequest req = new SendStudentOtpRequest("existing@example.com", "Existing");
+        assertThrows(
+                DuplicateStudentException.class,
+                () -> authenticationService.sendStudentRegistrationOtp(req)
+        );
+
+        verify(studentRegistrationOtpRepository, never()).save(any());
+        verify(resendEmailService, never()).sendStudentRegistrationOtp(any(), any(), any());
+    }
+
+    @Test
+    void registerStudent_WithValidOtp_ShouldCreateStudent() {
+        StudentRegisterRequest req = new StudentRegisterRequest(
+                "Charlie", "charlie@example.com", "pass123", "charlie_lc", null, "654321"
+        );
+
+        StudentRegistrationOtp otpRecord = StudentRegistrationOtp.builder()
+                .email("charlie@example.com")
+                .otp("654321")
+                .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
+                .build();
+
+        when(studentRepository.findByEmail("charlie@example.com")).thenReturn(Optional.empty());
+        when(studentRepository.findByEmailIgnoreCase("charlie@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmail("charlie@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmailIgnoreCase("charlie@example.com")).thenReturn(Optional.empty());
+        when(studentRegistrationOtpRepository.findTopByEmailOrderByCreatedAtDesc("charlie@example.com")).thenReturn(Optional.of(otpRecord));
+        when(studentRepository.findByLeetcodeUsername("charlie_lc")).thenReturn(Optional.empty());
+        when(studentRepository.save(any(Student.class))).thenAnswer(inv -> {
+            Student s = inv.getArgument(0);
+            s.setId("s3");
+            return s;
+        });
+
+        AuthenticationResponse response = authenticationService.registerStudent(req);
+
+        assertNotNull(response);
+        assertEquals(Role.STUDENT, response.role());
+        verify(studentRegistrationOtpRepository).delete(otpRecord);
+        verify(studentRepository).save(any(Student.class));
+    }
+
+    @Test
+    void registerStudent_WithInvalidOtp_ShouldThrowValidationFailedException() {
+        StudentRegisterRequest req = new StudentRegisterRequest(
+                "Charlie", "charlie@example.com", "pass123", "charlie_lc", null, "000000"
+        );
+
+        StudentRegistrationOtp otpRecord = StudentRegistrationOtp.builder()
+                .email("charlie@example.com")
+                .otp("654321")
+                .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
+                .build();
+
+        when(studentRepository.findByEmail("charlie@example.com")).thenReturn(Optional.empty());
+        when(studentRepository.findByEmailIgnoreCase("charlie@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmail("charlie@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmailIgnoreCase("charlie@example.com")).thenReturn(Optional.empty());
+        when(studentRegistrationOtpRepository.findTopByEmailOrderByCreatedAtDesc("charlie@example.com")).thenReturn(Optional.of(otpRecord));
+
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.registerStudent(req)
+        );
+
+        assertEquals("Invalid verification code. Please check and try again.", ex.getMessage());
+        verify(studentRepository, never()).save(any());
+    }
+
+    @Test
+    void registerStudent_WhenVerificationRequiredAndNoOtp_ShouldThrowValidationFailedException() {
+        authenticationService.setRequireStudentEmailVerification(true);
+        StudentRegisterRequest req = new StudentRegisterRequest(
+                "Charlie", "charlie@example.com", "pass123", "charlie_lc", null, null
+        );
+
+        when(studentRepository.findByEmail("charlie@example.com")).thenReturn(Optional.empty());
+        when(studentRepository.findByEmailIgnoreCase("charlie@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmail("charlie@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmailIgnoreCase("charlie@example.com")).thenReturn(Optional.empty());
+
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.registerStudent(req)
+        );
+
+        assertEquals("Email verification code is required.", ex.getMessage());
+        verify(studentRepository, never()).save(any());
     }
 }

@@ -139,6 +139,13 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/register/student/send-otp")
+    public ResponseEntity<java.util.Map<String, String>> sendStudentRegistrationOtp(
+            @Valid @RequestBody com.tracker.leetcode.tracker.DTO.SendStudentOtpRequest request) {
+        var response = authenticationService.sendStudentRegistrationOtp(request);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/register/student")
     public ResponseEntity<AuthenticationResponse> registerStudent(
             @Valid @RequestBody StudentRegisterRequest request,

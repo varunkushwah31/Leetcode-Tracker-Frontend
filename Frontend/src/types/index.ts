@@ -132,6 +132,12 @@ export interface MentorRegisterRequest {
 export interface StudentRegisterRequest extends MentorRegisterRequest {
     leetcodeUsername?: string;
     codeforcesHandle?: string;
+    otp?: string;
+}
+
+export interface SendStudentOtpRequest {
+    email: string;
+    name?: string;
 }
 
 export interface ChangePasswordRequest {

@@ -10,6 +10,8 @@ import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { ForgotPasswordModal } from '../components/common/ForgotPasswordModal';
+import { StudentEmailVerificationModal } from '../components/common/StudentEmailVerificationModal';
+import { AuthService } from '../services/endpoints';
 import {
   extractLeetcodeUsername,
   extractCodeforcesHandle,
@@ -29,6 +31,7 @@ export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [isStudentOtpModalOpen, setIsStudentOtpModalOpen] = useState(false);
 
   // Keep isLogin aligned if route changes via browser history or navigation
   useEffect(() => {
@@ -130,6 +133,7 @@ export function AuthPage() {
     try {
       if (isLogin) {
         await login({ email: formData.email, password: formData.password });
+        navigate('/dashboard');
       } else if (role === 'student') {
         const { leetcodeUsername: cleanLc, codeforcesHandle: cleanCf } = sanitizePlatformHandles(
           formData.leetcodeUsername,
@@ -140,25 +144,52 @@ export function AuthPage() {
           setIsLoading(false);
           return;
         }
-        await registerStudent({
-          ...formData,
-          leetcodeUsername: cleanLc || undefined,
-          codeforcesHandle: cleanCf || undefined,
+
+        // Send verification OTP to student's email
+        await AuthService.sendStudentRegistrationOtp({
+          email: formData.email.trim().toLowerCase(),
+          name: formData.name.trim()
         });
+
+        // Open OTP verification modal
+        setIsStudentOtpModalOpen(true);
       } else {
         await registerMentor({
           name: formData.name, email: formData.email, password: formData.password
         });
+        navigate('/dashboard');
       }
-
-      // Successfully authenticated, go straight to dashboard
-      navigate('/dashboard');
 
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVerifyStudentOtpAndRegister = async (otp: string) => {
+    const { leetcodeUsername: cleanLc, codeforcesHandle: cleanCf } = sanitizePlatformHandles(
+      formData.leetcodeUsername,
+      formData.codeforcesHandle
+    );
+
+    await registerStudent({
+      ...formData,
+      email: formData.email.trim().toLowerCase(),
+      leetcodeUsername: cleanLc || undefined,
+      codeforcesHandle: cleanCf || undefined,
+      otp,
+    });
+
+    setIsStudentOtpModalOpen(false);
+    navigate('/dashboard');
+  };
+
+  const handleResendStudentOtp = async () => {
+    await AuthService.sendStudentRegistrationOtp({
+      email: formData.email.trim().toLowerCase(),
+      name: formData.name.trim()
+    });
   };
 
   const clearError = () => {
@@ -478,6 +509,15 @@ export function AuthPage() {
               open={isForgotPasswordOpen}
               onOpenChange={setIsForgotPasswordOpen}
               defaultEmail={formData.email}
+            />
+
+            <StudentEmailVerificationModal
+              open={isStudentOtpModalOpen}
+              onOpenChange={setIsStudentOtpModalOpen}
+              email={formData.email}
+              studentName={formData.name}
+              onVerifyAndRegister={handleVerifyStudentOtpAndRegister}
+              onResendOtp={handleResendStudentOtp}
             />
           </div>
         </div>
