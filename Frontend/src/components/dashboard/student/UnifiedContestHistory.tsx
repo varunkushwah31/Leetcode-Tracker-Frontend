@@ -44,19 +44,23 @@ export function UnifiedContestHistory({
 
     const lcItems: UnifiedContestItem[] = useMemo(() => {
         // Sort chronologically ascending to calculate deltas accurately
-        const sorted = [...(contestHistory || [])].sort((a, b) => a.timestamp - b.timestamp);
+        const sorted = [...(contestHistory || [])].sort((a, b) => {
+            const timeA = typeof a.timestamp === 'number' ? a.timestamp : Number(a.timestamp) || 0;
+            const timeB = typeof b.timestamp === 'number' ? b.timestamp : Number(b.timestamp) || 0;
+            return timeA - timeB;
+        });
 
         return sorted.map((c, idx) => {
-            const prevRating = idx > 0 ? sorted[idx - 1].rating : 1500;
-            const currentRating = Math.round(c.rating);
-            const delta = currentRating - Math.round(prevRating);
+            const currentRating = Math.round(Number(c.rating) || 0);
+            const prevRating = idx > 0 ? Math.round(Number(sorted[idx - 1].rating) || 1500) : 1500;
+            const delta = currentRating > 0 ? currentRating - prevRating : undefined;
 
             return {
                 id: `lc-${c.title}-${c.timestamp || idx}`,
                 platform: 'LEETCODE' as const,
                 title: c.title,
-                timestamp: c.timestamp,
-                rank: c.ranking,
+                timestamp: typeof c.timestamp === 'number' ? c.timestamp : Number(c.timestamp) || 0,
+                rank: c.ranking || 0,
                 rating: currentRating,
                 delta,
                 problemsSolved: c.problemsSolved,
@@ -70,7 +74,7 @@ export function UnifiedContestHistory({
         const sorted = [...(codeforcesContestHistory || [])].sort((a, b) => {
             const timeA = a.ratingUpdateTimeSeconds || (a as any).timestamp || 0;
             const timeB = b.ratingUpdateTimeSeconds || (b as any).timestamp || 0;
-            return timeA - timeB;
+            return (typeof timeA === 'number' ? timeA : Number(timeA) || 0) - (typeof timeB === 'number' ? timeB : Number(timeB) || 0);
         });
 
         return sorted.map((c, idx) => {
@@ -84,9 +88,9 @@ export function UnifiedContestHistory({
             // 2. Or if explicit delta property exists, use it
             // 3. Otherwise if contest is not the first, compute difference from previous contest in chronological sequence
             let delta: number | undefined;
-            if (c.oldRating !== undefined && c.oldRating !== null && !Number.isNaN(c.oldRating)) {
-                delta = currentRating - c.oldRating;
-            } else if ((c as any).delta !== undefined && !Number.isNaN((c as any).delta)) {
+            if (c.oldRating !== undefined && c.oldRating !== null && !Number.isNaN(Number(c.oldRating))) {
+                delta = currentRating - Number(c.oldRating);
+            } else if ((c as any).delta !== undefined && !Number.isNaN(Number((c as any).delta))) {
                 delta = Number((c as any).delta);
             } else if (idx > 0) {
                 delta = currentRating - prevRating;
@@ -98,7 +102,9 @@ export function UnifiedContestHistory({
                 id: `cf-${c.contestId || idx}-${c.ratingUpdateTimeSeconds || (c as any).timestamp || idx}`,
                 platform: 'CODEFORCES' as const,
                 title: c.contestName || (c as any).title || 'Codeforces Round',
-                timestamp: c.ratingUpdateTimeSeconds || (c as any).timestamp || 0,
+                timestamp: typeof (c.ratingUpdateTimeSeconds || (c as any).timestamp) === 'number'
+                    ? (c.ratingUpdateTimeSeconds || (c as any).timestamp)
+                    : Number(c.ratingUpdateTimeSeconds || (c as any).timestamp) || 0,
                 rank: c.rank || 0,
                 rating: currentRating,
                 delta,
@@ -224,7 +230,7 @@ export function UnifiedContestHistory({
                                         )}
                                     </div>
                                 </div>
-                                <div className="text-right shrink-0">
+                                <div className="shrink-0 min-w-[64px] text-right flex flex-col items-end justify-center">
                                     <p
                                         className={`text-sm font-bold tracking-tight ${
                                             contest.platform === 'CODEFORCES' ? 'text-cyan-600 dark:text-cyan-400' : 'text-amber-600 dark:text-[#ffa116]'
