@@ -189,15 +189,15 @@ export function UnifiedContestHistory({
             </CardHeader>
 
             <CardContent className="p-4 pt-0">
-                <ScrollArea className={`${scrollHeightClass} pr-4`}>
-                    <div className="flex flex-col gap-2.5">
+                <ScrollArea className={`${scrollHeightClass} pr-4 w-full`}>
+                    <div className="flex flex-col gap-2.5 w-full">
                         {displayedItems.map((contest) => (
                             <div
                                 key={contest.id}
-                                className="flex flex-col p-3 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 hover:bg-zinc-100/90 dark:hover:bg-[#1a1a1a]/80 border border-zinc-200/80 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-700/60 rounded-xl transition-all group gap-2"
+                                className="flex items-center justify-between p-3 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 hover:bg-zinc-100/90 dark:hover:bg-[#1a1a1a]/80 border border-zinc-200/80 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-700/60 rounded-xl transition-all group overflow-hidden"
                             >
-                                <div className="flex items-center justify-between gap-2 min-w-0">
-                                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                <div className="min-w-0 flex-1 pr-3">
+                                    <div className="flex items-center gap-1.5 mb-1 min-w-0">
                                         <span
                                             className={`text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${
                                                 contest.platform === 'CODEFORCES'
@@ -214,50 +214,45 @@ export function UnifiedContestHistory({
                                             {contest.title}
                                         </p>
                                     </div>
-                                    <span
-                                        className={`text-xs font-bold tracking-tight shrink-0 px-2 py-0.5 rounded-md ${
+                                    <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+                                        <span className="font-medium text-zinc-700 dark:text-zinc-300 shrink-0">
+                                            Rank #{contest.rank > 0 ? contest.rank.toLocaleString() : 'N/A'}
+                                        </span>
+                                        <span className="text-zinc-400 dark:text-zinc-600 shrink-0">•</span>
+                                        <span className="text-zinc-500 shrink-0">{formatDate(contest.timestamp)}</span>
+                                        {contest.problemsSolved !== undefined && contest.totalProblems !== undefined && (
+                                            <>
+                                                <span className="text-zinc-400 dark:text-zinc-600 shrink-0">•</span>
+                                                <span className="text-zinc-600 dark:text-zinc-400 font-medium truncate">
+                                                    {contest.problemsSolved}/{contest.totalProblems} solved
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="text-right shrink-0 flex flex-col items-end justify-center">
+                                    <p
+                                        className={`text-sm font-bold tracking-tight ${
                                             contest.platform === 'CODEFORCES'
-                                                ? 'text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
-                                                : 'text-amber-600 dark:text-[#ffa116] bg-amber-500/10 border border-amber-500/20'
+                                                ? 'text-cyan-600 dark:text-cyan-400'
+                                                : 'text-amber-600 dark:text-amber-500'
                                         }`}
                                     >
                                         {contest.rating > 0 ? contest.rating : '—'}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400 flex-wrap">
-                                    <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                                        Rank #{contest.rank > 0 ? contest.rank.toLocaleString() : 'N/A'}
-                                    </span>
-                                    <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                                    <span className="text-zinc-500">{formatDate(contest.timestamp)}</span>
-                                    {contest.problemsSolved !== undefined && contest.totalProblems !== undefined && (
-                                        <>
-                                            <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                                            <span className="text-zinc-600 dark:text-zinc-400 font-medium">
-                                                {contest.problemsSolved}/{contest.totalProblems} solved
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center justify-between pt-1.5 border-t border-zinc-200/60 dark:border-zinc-800/60 text-[11px]">
-                                    <span className="text-zinc-500 dark:text-zinc-400 font-medium">Rating Change</span>
+                                    </p>
                                     {contest.delta !== undefined && !Number.isNaN(contest.delta) ? (
-                                        <span
-                                            className={`inline-flex items-center gap-1 font-bold px-1.5 py-0.5 rounded text-[10px] ${
+                                        <p
+                                            className={`text-[11px] font-bold tracking-tight ${
                                                 contest.delta > 0
-                                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                                    ? 'text-emerald-600 dark:text-emerald-400'
                                                     : contest.delta < 0
-                                                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
-                                                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'
+                                                    ? 'text-rose-600 dark:text-rose-400'
+                                                    : 'text-zinc-500 dark:text-zinc-400'
                                             }`}
                                         >
                                             {contest.delta > 0 ? `+${contest.delta}` : contest.delta}
-                                        </span>
-                                    ) : (
-                                        <span className="text-zinc-400 dark:text-zinc-500 font-medium">—</span>
-                                    )}
+                                        </p>
+                                    ) : null}
                                 </div>
                             </div>
                         ))}
