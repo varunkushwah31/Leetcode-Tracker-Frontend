@@ -39,13 +39,10 @@ public class ResendEmailService {
         this.objectMapper = new ObjectMapper();
     }
 
-    /**
-     * Sends a 6-digit password reset OTP email using the Resend REST API.
-     *
-     * @param toEmail   Recipient email address
-     * @param otp       6-digit numeric OTP code
-     * @param userName  Recipient display name (optional)
-     */
+    public boolean isConfigured() {
+        return !resendApiKey.isEmpty();
+    }
+
     /**
      * Sends a 6-digit password reset OTP email using the Resend REST API.
      *
@@ -61,7 +58,7 @@ public class ResendEmailService {
             throw new ValidationFailedException("OTP code is required.");
         }
 
-        if (resendApiKey.isEmpty()) {
+        if (!isConfigured()) {
             log.warn("\n=================================================================\n" +
                      " [DEV MODE] RESEND_API_KEY is not configured.\n" +
                      " Type         : PASSWORD RESET OTP\n" +
@@ -74,7 +71,8 @@ public class ResendEmailService {
 
         String greeting = (userName != null && !userName.isBlank()) ? " " + userName.trim() : "";
         String htmlContent = buildOtpHtmlTemplate(greeting, otp);
-        sendEmailInternal(toEmail, "MentorSync - Password Reset Code: " + otp, htmlContent);
+        String textContent = "Hello" + greeting + ",\n\nWe received a request to reset your password.\nYour verification code is: " + otp + "\n\nThis code is valid for 10 minutes.\n\nIf you did not request this, please disregard this email.";
+        sendEmailInternal(toEmail, "MentorSync - Password Reset Code: " + otp, htmlContent, textContent);
     }
 
     /**
@@ -92,7 +90,7 @@ public class ResendEmailService {
             throw new ValidationFailedException("OTP code is required.");
         }
 
-        if (resendApiKey.isEmpty()) {
+        if (!isConfigured()) {
             log.warn("\n=================================================================\n" +
                      " [DEV MODE] RESEND_API_KEY is not configured.\n" +
                      " Type         : STUDENT REGISTRATION EMAIL VERIFICATION\n" +
@@ -105,21 +103,37 @@ public class ResendEmailService {
 
         String greeting = (userName != null && !userName.isBlank()) ? " " + userName.trim() : "";
         String htmlContent = buildStudentRegistrationOtpHtmlTemplate(greeting, otp);
-        sendEmailInternal(toEmail, "MentorSync - Verify Your Email: " + otp, htmlContent);
+        String textContent = "Welcome to MentorSync" + greeting + "!\n\nPlease enter the 6-digit verification code below to verify your student email:\n\n" + otp + "\n\nThis code expires in 10 minutes.";
+        sendEmailInternal(toEmail, "MentorSync - Verify Your Email: " + otp, htmlContent, textContent);
     }
 
-    private void sendEmailInternal(String toEmail, String subject, String htmlContent) {
+    /**
+     * Sends a mentor nudge email about a pending assignment via Resend.
+     */
+    public void sendNudgeEmail(String toEmail, String studentName, String assignmentName, String className) {
+        if (toEmail == null || toEmail.isBlank()) return;
+        if (!isConfigured()) return;
+
+        String greeting = (studentName != null && !studentName.isBlank()) ? " " + studentName.trim() : "";
+        String htmlContent = buildNudgeHtmlTemplate(greeting, assignmentName, className);
+        String textContent = "Hi" + greeting + ",\n\nThis is a gentle reminder that you have a pending assignment: '" + assignmentName + "' for " + className + ".\nPlease complete it on LeetCode and validate it on your MentorSync dashboard.";
+        sendEmailInternal(toEmail, "Reminder: Pending LeetCode Assignment for " + className, htmlContent, textContent);
+    }
+
+    private void sendEmailInternal(String toEmail, String subject, String htmlContent, String textContent) {
         // Format sender with display name
         String fromHeader = resendFromEmail.contains("<")
                 ? resendFromEmail
                 : "MentorSync <" + resendFromEmail + ">";
 
-        Map<String, Object> payload = Map.of(
-                "from", fromHeader,
-                "to", List.of(toEmail.trim()),
-                "subject", subject,
-                "html", htmlContent
-        );
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("from", fromHeader);
+        payload.put("to", List.of(toEmail.trim()));
+        payload.put("subject", subject);
+        payload.put("html", htmlContent);
+        if (textContent != null && !textContent.isBlank()) {
+            payload.put("text", textContent);
+        }
 
         try {
             String jsonBody = objectMapper.writeValueAsString(payload);
@@ -138,7 +152,7 @@ public class ResendEmailService {
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 log.info("Successfully sent email to {} via Resend. Status: {}", toEmail, response.statusCode());
             } else {
-                String errorDetail = parseResendError(response.body());
+                String errorDetail = parseResendError(response.statusCode(), response.body());
                 log.error("Resend API rejected request for {} with status {}: {}", toEmail, response.statusCode(), response.body());
                 throw new ValidationFailedException("Failed to send verification email: " + errorDetail);
             }
@@ -150,17 +164,38 @@ public class ResendEmailService {
         }
     }
 
-    private String parseResendError(String responseBody) {
+    private String parseResendError(int statusCode, String responseBody) {
         if (responseBody == null || responseBody.isBlank()) {
-            return "Unknown error from email provider.";
+            return "Email provider returned HTTP " + statusCode;
         }
         try {
             JsonNode root = objectMapper.readTree(responseBody);
+            String message = null;
             if (root.has("message")) {
-                return root.get("message").asText();
+                message = root.get("message").asText();
+            } else if (root.has("error")) {
+                message = root.get("error").asText();
             }
-            if (root.has("name")) {
-                return root.get("name").asText();
+
+            if (statusCode == 403 && message != null && message.contains("only send testing emails")) {
+                log.error("\n=================================================================\n" +
+                          " [RESEND CONFIGURATION ACTION REQUIRED]\n" +
+                          " Resend trial domain (onboarding@resend.dev) is restricted to your\n" +
+                          " account owner's email address.\n" +
+                          " To send emails to all students and mentors:\n" +
+                          " 1. Go to https://resend.com/domains and verify your custom domain\n" +
+                          " 2. Set RESEND_FROM_EMAIL to an address on your verified domain\n" +
+                          "    (e.g., MentorSync <auth@yourdomain.com>)\n" +
+                          "=================================================================");
+                return "Trial domain restriction: To send to all emails, add and verify your custom domain on resend.com/domains.";
+            }
+
+            if (statusCode == 429) {
+                return "Email rate limit exceeded. Please wait a moment and try again.";
+            }
+
+            if (message != null && !message.isBlank()) {
+                return message;
             }
         } catch (Exception ignored) {
             // fallback
@@ -272,5 +307,56 @@ public class ResendEmailService {
             </body>
             </html>
             """.formatted(greeting, otp);
+    }
+
+    private String buildNudgeHtmlTemplate(String greeting, String assignmentName, String className) {
+        return """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Pending Assignment Reminder</title>
+            </head>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f7; margin: 0; padding: 24px 12px; color: #1e293b;">
+              <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                <!-- Header -->
+                <tr>
+                  <td style="padding: 32px 32px 20px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; color: #5b4fff; letter-spacing: -0.5px;">MentorSync</h1>
+                    <p style="margin: 4px 0 0; font-size: 13px; color: #64748b; font-weight: 500;">LeetCode &amp; Codeforces Progress Tracker</p>
+                  </td>
+                </tr>
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 28px 32px 20px;">
+                    <div style="display: inline-block; padding: 4px 12px; background-color: #fef3c7; color: #92400e; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+                      Assignment Reminder
+                    </div>
+                    <h2 style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #0f172a;">Hi%s!</h2>
+                    <p style="margin: 0 0 16px; font-size: 14px; line-height: 22px; color: #475569;">
+                      This is a friendly reminder from your mentor that you have a pending assignment for <strong>%s</strong>:
+                    </p>
+                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
+                      <p style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b;">%s</p>
+                    </div>
+                    <p style="margin: 0 0 12px; font-size: 14px; color: #475569; line-height: 22px;">
+                      Please complete it on LeetCode and check your progress on your MentorSync dashboard as soon as possible.
+                    </p>
+                    <p style="margin: 0; font-size: 14px; font-weight: 600; color: #5b4fff;">Happy Coding!</p>
+                  </td>
+                </tr>
+                <!-- Footer -->
+                <tr>
+                  <td style="padding: 20px 32px 28px; background-color: #fafafa; border-top: 1px solid #f1f5f9; text-align: center;">
+                    <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                      &copy; 2026 MentorSync. All rights reserved.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </body>
+            </html>
+            """.formatted(greeting, className, assignmentName);
     }
 }

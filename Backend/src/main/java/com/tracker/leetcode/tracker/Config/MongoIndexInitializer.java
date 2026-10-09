@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexInfo;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.List;
 
 @Slf4j
@@ -28,6 +29,7 @@ public class MongoIndexInitializer implements CommandLineRunner {
         ensureClassroomIndexes();
         ensureLearningPathIndexes();
         ensureRefreshTokenIndexes();
+        ensureOtpIndexes();
     }
 
     private void ensureStudentIndexes() {
@@ -129,6 +131,34 @@ public class MongoIndexInitializer implements CommandLineRunner {
             log.info("RefreshToken collection indexes verified and initialized.");
         } catch (Exception e) {
             log.debug("RefreshToken index check note: {}", e.getMessage());
+        }
+    }
+
+    private void ensureOtpIndexes() {
+        try {
+            var regIndexOps = mongoTemplate.indexOps("student_registration_otps");
+            List<IndexInfo> regExisting = regIndexOps.getIndexInfo();
+            if (regExisting.stream().noneMatch(idx -> idx.isIndexForFields(List.of("email")))) {
+                regIndexOps.ensureIndex(new Index().on("email", Sort.Direction.ASC));
+            }
+            if (regExisting.stream().noneMatch(idx -> idx.isIndexForFields(List.of("expiryDate")))) {
+                regIndexOps.ensureIndex(new Index().on("expiryDate", Sort.Direction.ASC).expire(Duration.ZERO));
+            }
+
+            var resetIndexOps = mongoTemplate.indexOps("password_reset_otps");
+            List<IndexInfo> resetExisting = resetIndexOps.getIndexInfo();
+            if (resetExisting.stream().noneMatch(idx -> idx.isIndexForFields(List.of("email")))) {
+                resetIndexOps.ensureIndex(new Index().on("email", Sort.Direction.ASC));
+            }
+            if (resetExisting.stream().noneMatch(idx -> idx.isIndexForFields(List.of("expiryDate")))) {
+                resetIndexOps.ensureIndex(new Index().on("expiryDate", Sort.Direction.ASC).expire(Duration.ZERO));
+            }
+            if (resetExisting.stream().noneMatch(idx -> idx.isIndexForFields(List.of("resetToken")))) {
+                resetIndexOps.ensureIndex(new Index().on("resetToken", Sort.Direction.ASC).sparse());
+            }
+            log.info("OTP collections indexes and TTL verified and initialized.");
+        } catch (Exception e) {
+            log.debug("OTP index check note: {}", e.getMessage());
         }
     }
 }

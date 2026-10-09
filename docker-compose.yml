@@ -39,6 +39,9 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/LeetcodeTracker
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-onboarding@resend.dev}
+      - REQUIRE_STUDENT_EMAIL_VERIFICATION=${REQUIRE_STUDENT_EMAIL_VERIFICATION:-true}
     depends_on:
       mongodb:
         condition: service_healthy

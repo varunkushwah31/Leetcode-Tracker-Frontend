@@ -30,6 +30,9 @@ public class PasswordResetOtp {
     @Builder.Default
     private boolean verified = false;
 
+    @Builder.Default
+    private int failedAttempts = 0;
+
     @Indexed(expireAfter = "0s")
     private Instant expiryDate;
 

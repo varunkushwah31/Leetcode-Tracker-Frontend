@@ -25,6 +25,9 @@ public class StudentRegistrationOtp {
 
     private String otp;
 
+    @Builder.Default
+    private int failedAttempts = 0;
+
     @Indexed(expireAfter = "0s")
     private Instant expiryDate;
 

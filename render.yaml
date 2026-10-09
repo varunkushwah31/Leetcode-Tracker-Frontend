@@ -42,6 +42,14 @@ services:
         sync: false
       - key: MAIL_PASSWORD
         sync: false
+      - key: RESEND_API_KEY
+        description: "Resend.com API Key (starts with re_...)"
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        description: "Verified Sender Email (e.g. MentorSync <auth@yourdomain.com>)"
+        value: "onboarding@resend.dev"
+      - key: REQUIRE_STUDENT_EMAIL_VERIFICATION
+        value: "true"
       - key: JAVA_OPTS
         value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
 

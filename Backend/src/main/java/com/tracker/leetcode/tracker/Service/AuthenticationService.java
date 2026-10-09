@@ -103,7 +103,14 @@ public class AuthenticationService {
                 throw new ValidationFailedException("Verification code has expired. Please request a new one.");
             }
             if (!record.getOtp().equals(submittedOtp)) {
-                throw new ValidationFailedException("Invalid verification code. Please check and try again.");
+                int attempts = record.getFailedAttempts() + 1;
+                record.setFailedAttempts(attempts);
+                if (attempts >= 5) {
+                    studentRegistrationOtpRepository.delete(record);
+                    throw new ValidationFailedException("Too many incorrect attempts. This verification code has been invalidated. Please request a new code.");
+                }
+                studentRegistrationOtpRepository.save(record);
+                throw new ValidationFailedException("Invalid verification code. " + (5 - attempts) + " attempts remaining.");
             }
             studentRegistrationOtpRepository.delete(record);
         }
@@ -144,7 +151,7 @@ public class AuthenticationService {
 
         Student student = new Student();
         student.setName(request.name());
-        student.setEmail(request.email());
+        student.setEmail(normalizedEmail);
         student.setPassword(passwordEncoder.encode(request.password()));
         student.setLeetcodeUsername(lcUsername);
         student.setCodeforcesHandle(cfHandle);
@@ -349,6 +356,16 @@ public class AuthenticationService {
             throw new DuplicateStudentException("Email already in use. Please sign in instead.");
         }
 
+        // Cooldown protection: prevent spamming OTP requests (60 seconds)
+        var latestRecordOpt = studentRegistrationOtpRepository.findTopByEmailOrderByCreatedAtDesc(email);
+        if (latestRecordOpt.isPresent() && latestRecordOpt.get().getCreatedAt() != null) {
+            long secondsSince = Duration.between(latestRecordOpt.get().getCreatedAt(), Instant.now()).toSeconds();
+            if (secondsSince < 60) {
+                long wait = 60 - secondsSince;
+                throw new ValidationFailedException("Please wait " + wait + " seconds before requesting another verification code.");
+            }
+        }
+
         int randomPin;
         try {
             randomPin = SecureRandom.getInstanceStrong().nextInt(900000) + 100000;
@@ -362,6 +379,7 @@ public class AuthenticationService {
         StudentRegistrationOtp record = StudentRegistrationOtp.builder()
                 .email(email)
                 .otp(otp)
+                .failedAttempts(0)
                 .expiryDate(Instant.now().plus(Duration.ofMinutes(10)))
                 .createdAt(Instant.now())
                 .build();
@@ -398,6 +416,16 @@ public class AuthenticationService {
             throw new ValidationFailedException("No account registered with email '" + email + "'.");
         }
 
+        // Cooldown protection: prevent spamming OTP requests (60 seconds)
+        var latestOtpOpt = passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc(email);
+        if (latestOtpOpt.isPresent() && latestOtpOpt.get().getCreatedAt() != null) {
+            long secondsSince = Duration.between(latestOtpOpt.get().getCreatedAt(), Instant.now()).toSeconds();
+            if (secondsSince < 60) {
+                long wait = 60 - secondsSince;
+                throw new ValidationFailedException("Please wait " + wait + " seconds before requesting another verification code.");
+            }
+        }
+
         // Generate 6-digit cryptographic random OTP
         int randomPin;
         try {
@@ -414,6 +442,7 @@ public class AuthenticationService {
                 .email(email)
                 .otp(otp)
                 .verified(false)
+                .failedAttempts(0)
                 .expiryDate(Instant.now().plus(Duration.ofMinutes(10)))
                 .createdAt(Instant.now())
                 .build();
@@ -446,7 +475,14 @@ public class AuthenticationService {
         }
 
         if (!record.getOtp().equals(otp)) {
-            throw new ValidationFailedException("Invalid verification code. Please check and try again.");
+            int attempts = record.getFailedAttempts() + 1;
+            record.setFailedAttempts(attempts);
+            if (attempts >= 5) {
+                passwordResetOtpRepository.delete(record);
+                throw new ValidationFailedException("Too many incorrect attempts. This verification code has been invalidated. Please request a new one.");
+            }
+            passwordResetOtpRepository.save(record);
+            throw new ValidationFailedException("Invalid verification code. " + (5 - attempts) + " attempts remaining.");
         }
 
         String resetToken = UUID.randomUUID().toString();

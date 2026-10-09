@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final ResendEmailService resendEmailService;
 
     /**
      * Sends a nudge email to a student about a pending assignment.
@@ -30,6 +31,12 @@ public class EmailService {
             // Validate input parameters
             if (toEmail == null || toEmail.trim().isEmpty()) {
                 log.warn("Cannot send email: recipient email is null or empty");
+                return;
+            }
+
+            // Prioritize Resend if configured
+            if (resendEmailService != null && resendEmailService.isConfigured()) {
+                resendEmailService.sendNudgeEmail(toEmail, studentName, assignmentName, className);
                 return;
             }
 

@@ -386,7 +386,7 @@ class AuthenticationServiceTest {
                 () -> authenticationService.verifyPasswordResetOtp(new VerifyOtpRequest("student@example.com", "999999"))
         );
 
-        assertEquals("Invalid verification code. Please check and try again.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Invalid verification code"));
     }
 
     @Test
@@ -512,7 +512,7 @@ class AuthenticationServiceTest {
                 () -> authenticationService.registerStudent(req)
         );
 
-        assertEquals("Invalid verification code. Please check and try again.", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Invalid verification code"));
         verify(studentRepository, never()).save(any());
     }
 
@@ -535,5 +535,47 @@ class AuthenticationServiceTest {
 
         assertEquals("Email verification code is required.", ex.getMessage());
         verify(studentRepository, never()).save(any());
+    }
+
+    @Test
+    void sendStudentRegistrationOtp_WhenWithinCooldown_ShouldThrowValidationFailedException() {
+        StudentRegistrationOtp recent = StudentRegistrationOtp.builder()
+                .email("student@example.com")
+                .createdAt(Instant.now().minus(Duration.ofSeconds(20)))
+                .build();
+
+        when(studentRepository.findByEmailIgnoreCase("student@example.com")).thenReturn(Optional.empty());
+        when(studentRepository.findByEmail("student@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmailIgnoreCase("student@example.com")).thenReturn(Optional.empty());
+        when(mentorRepository.findByEmail("student@example.com")).thenReturn(Optional.empty());
+        when(studentRegistrationOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(recent));
+
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.sendStudentRegistrationOtp(new SendStudentOtpRequest("student@example.com", "Student"))
+        );
+
+        assertTrue(ex.getMessage().contains("Please wait"));
+        verify(resendEmailService, never()).sendStudentRegistrationOtp(any(), any(), any());
+    }
+
+    @Test
+    void verifyPasswordResetOtp_WhenFiveAttemptsExceeded_ShouldInvalidateAndThrow() {
+        PasswordResetOtp record = PasswordResetOtp.builder()
+                .email("student@example.com")
+                .otp("123456")
+                .failedAttempts(4)
+                .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
+                .build();
+
+        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(record));
+
+        ValidationFailedException ex = assertThrows(
+                ValidationFailedException.class,
+                () -> authenticationService.verifyPasswordResetOtp(new VerifyOtpRequest("student@example.com", "999999"))
+        );
+
+        assertTrue(ex.getMessage().contains("Too many incorrect attempts"));
+        verify(passwordResetOtpRepository).delete(record);
     }
 }
