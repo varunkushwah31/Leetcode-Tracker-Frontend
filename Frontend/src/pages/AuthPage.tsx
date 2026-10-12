@@ -20,6 +20,15 @@ import {
   sanitizePlatformHandles
 } from '../lib/handleExtractor';
 
+/**
+ * Feature flag for student registration email OTP verification.
+ * Currently paused in production so students can sign up without OTP friction.
+ * To re-enable when email service is configured, set VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION=true.
+ */
+export const isStudentEmailVerificationEnabled = () => {
+  return import.meta.env.VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION === 'true';
+};
+
 export function AuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -145,14 +154,25 @@ export function AuthPage() {
           return;
         }
 
-        // Send verification OTP to student's email
-        await AuthService.sendStudentRegistrationOtp({
-          email: formData.email.trim().toLowerCase(),
-          name: formData.name.trim()
-        });
+        if (isStudentEmailVerificationEnabled()) {
+          // Send verification OTP to student's email
+          await AuthService.sendStudentRegistrationOtp({
+            email: formData.email.trim().toLowerCase(),
+            name: formData.name.trim()
+          });
 
-        // Open OTP verification modal
-        setIsStudentOtpModalOpen(true);
+          // Open OTP verification modal
+          setIsStudentOtpModalOpen(true);
+        } else {
+          // Direct registration when email verification is paused
+          await registerStudent({
+            ...formData,
+            email: formData.email.trim().toLowerCase(),
+            leetcodeUsername: cleanLc || undefined,
+            codeforcesHandle: cleanCf || undefined,
+          });
+          navigate('/dashboard');
+        }
       } else {
         await registerMentor({
           name: formData.name, email: formData.email, password: formData.password

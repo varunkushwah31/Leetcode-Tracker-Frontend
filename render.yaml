@@ -61,7 +61,7 @@ services:
         description: "EmailJS Private Key (Account -> API Keys -> Security)"
         sync: false
       - key: REQUIRE_STUDENT_EMAIL_VERIFICATION
-        value: "true"
+        value: "false"
       - key: JAVA_OPTS
         value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
 

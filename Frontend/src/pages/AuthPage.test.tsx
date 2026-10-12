@@ -41,6 +41,7 @@ describe('AuthPage Error Rendering & Form Retention', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.stubEnv('VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION', 'true');
         vi.mocked(AuthService.sendStudentRegistrationOtp).mockResolvedValue({
             data: { message: 'OTP sent' }
         } as never);
@@ -183,6 +184,36 @@ describe('AuthPage Error Rendering & Form Retention', () => {
                 leetcodeUsername: 'alexsmith',
                 otp: '123456'
             }));
+        });
+    });
+
+    it('registers student directly without opening OTP modal when email verification is paused', async () => {
+        vi.stubEnv('VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION', 'false');
+        mockRegisterStudent.mockResolvedValue(undefined);
+
+        renderAuthPage('/register');
+
+        const nameInput = screen.getByPlaceholderText('John Doe');
+        const emailInput = screen.getByPlaceholderText('you@example.com');
+        const passwordInput = screen.getByPlaceholderText('••••••••');
+        const lcInput = screen.getByPlaceholderText('username or profile URL');
+        const submitButton = screen.getByRole('button', { name: /create account/i });
+
+        fireEvent.change(nameInput, { target: { value: 'Direct User' } });
+        fireEvent.change(emailInput, { target: { value: 'direct@example.com' } });
+        fireEvent.change(passwordInput, { target: { value: 'securePass123' } });
+        fireEvent.change(lcInput, { target: { value: 'directuser' } });
+
+        fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(mockRegisterStudent).toHaveBeenCalledWith(expect.objectContaining({
+                name: 'Direct User',
+                email: 'direct@example.com',
+                leetcodeUsername: 'directuser'
+            }));
+            expect(AuthService.sendStudentRegistrationOtp).not.toHaveBeenCalled();
+            expect(screen.queryByText(/verify your email address/i)).toBeNull();
         });
     });
 });
