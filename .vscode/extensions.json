@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "ms-vscode-remote.remote-containers",
+    "vscjava.vscode-java-pack",
+    "vmware.vscode-spring-boot",
+    "vscjava.vscode-spring-initializr",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "ms-azuretools.vscode-docker",
+    "mongodb.mongodb-vscode"
+  ]
+}

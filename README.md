@@ -156,7 +156,23 @@ flowchart TD
 
 ## 🚀 Quickstart & Local Setup
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: VS Code Dev Containers (Recommended for macOS & Linux)
+
+The easiest way to develop locally without manually installing Java, Maven, Node.js, MongoDB, or Redis is using **VS Code Dev Containers**:
+
+1. Ensure **Docker** (Docker Desktop or OrbStack) and **VS Code** with the **Dev Containers** extension are installed.
+2. Clone the repository and open it in VS Code:
+   ```bash
+   git clone https://github.com/varunkushwah31/Leetcode-Tracker-Frontend.git
+   cd Leetcode-Tracker-Frontend
+   code .
+   ```
+3. When prompted, click **"Reopen in Container"** (or press `Cmd+Shift+P` / `Ctrl+Shift+P` and select `Dev Containers: Reopen in Container`).
+4. Everything is pre-configured! See [.devcontainer/README.md](.devcontainer/README.md) for full details.
+
+---
+
+### Option 2: Docker Compose
 
 Run the entire stack (MongoDB, Redis, Backend, Frontend) with a single command:
 
@@ -311,6 +327,7 @@ npm test
 
 ## 📚 Project Documentation
 
+* [Dev Container macOS & Local Setup Guide](.devcontainer/README.md)
 * [Backend Architecture & Guide](Backend/README.md)
 * [Frontend Architecture & Guide](Frontend/README.md)
 * [Redis Caching & Warming Implementation](Backend/docs/REDIS_CACHING_GUIDE.md)

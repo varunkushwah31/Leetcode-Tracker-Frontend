@@ -1,0 +1,73 @@
+services:
+  # 1. Main Development Workspace Container
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mentorsync-dev-app
+    volumes:
+      - ..:/workspaces/LeetcodeTrackerFrontend:cached
+      - maven-cache:/home/vscode/.m2
+      - npm-cache:/home/vscode/.npm
+    # Keeps the container running in the background for VS Code to attach
+    command: sleep infinity
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/LeetcodeTracker
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/LeetcodeTracker
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - VITE_API_BASE_URL=/api
+    ports:
+      - "5173:5173"
+      - "8080:8080"
+    networks:
+      - mentorsync-dev-net
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # 2. MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: mentorsync-mongo-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-dev-data:/data/db
+    networks:
+      - mentorsync-dev-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # 3. Redis Cache
+  redis:
+    image: redis:alpine
+    container_name: mentorsync-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - mentorsync-dev-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  mentorsync-dev-net:
+    driver: bridge
+
+volumes:
+  mongo-dev-data:
+  maven-cache:
+  npm-cache:

@@ -1,0 +1,92 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Frontend (Vite React)",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/Frontend"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*VITE.*ready.*",
+          "endsPattern": ".*Local:.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Start Backend (Spring Boot)",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "windows": {
+        "command": ".\\mvnw.cmd spring-boot:run"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/Backend"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "java",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Starting TrackerApplication.*",
+          "endsPattern": ".*Started TrackerApplication.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Start Full Stack (Backend + Frontend)",
+      "dependsOn": [
+        "Start Backend (Spring Boot)",
+        "Start Frontend (Vite React)"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Frontend Tests (Vitest)",
+      "type": "shell",
+      "command": "npm test",
+      "options": {
+        "cwd": "${workspaceFolder}/Frontend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "Run Backend Tests (Maven)",
+      "type": "shell",
+      "command": "./mvnw test",
+      "windows": {
+        "command": ".\\mvnw.cmd test"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/Backend"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always"
+      }
+    }
+  ]
+}

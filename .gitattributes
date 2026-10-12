@@ -1,0 +1,6 @@
+# Enforce LF endings on shell scripts across all platforms
+*.sh text eol=lf
+mvnw text eol=lf
+
+# Keep text files with native endings unless specified
+* text=auto

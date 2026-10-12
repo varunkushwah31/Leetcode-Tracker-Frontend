@@ -1,0 +1,64 @@
+{
+  "name": "MentorSync FullStack Dev Container (Java 21 + Node 22)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/LeetcodeTrackerFrontend",
+  "shutdownAction": "stopCompose",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[java]": {
+          "editor.defaultFormatter": "redhat.java"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        }
+      },
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-spring-initializr",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker",
+        "mongodb.mongodb-vscode"
+      ]
+    }
+  },
+
+  "forwardPorts": [5173, 8080, 27017, 6379],
+  "portsAttributes": {
+    "5173": {
+      "label": "Frontend (React + Vite)",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "Backend (Spring Boot API)",
+      "onAutoForward": "silent"
+    },
+    "27017": {
+      "label": "MongoDB",
+      "onAutoForward": "silent"
+    },
+    "6379": {
+      "label": "Redis",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "remoteUser": "vscode"
+}
