@@ -100,6 +100,11 @@ public class RedisConfig {
         cacheConfigurations.put("mentors-all", defaultCacheConfig.entryTtl(Duration.ofHours(2)));
         cacheConfigurations.put("learning-paths-by-mentor", defaultCacheConfig.entryTtl(Duration.ofHours(3)));
 
+        // Global shared caches (identical for all users across the platform)
+        cacheConfigurations.put("global-potd", defaultCacheConfig.entryTtl(Duration.ofHours(24)));
+        cacheConfigurations.put("upcoming-contests", defaultCacheConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("classroom-potd-ticker", defaultCacheConfig.entryTtl(Duration.ofMinutes(10)));
+
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultCacheConfig)
                 .withInitialCacheConfigurations(cacheConfigurations)
@@ -135,7 +140,17 @@ public class RedisConfig {
             RedisConnectionFactory connectionFactory,
             @org.springframework.context.annotation.Lazy com.tracker.leetcode.tracker.Service.RedisWebSocketBridge webSocketBridge) {
         org.springframework.data.redis.listener.RedisMessageListenerContainer container =
-                new org.springframework.data.redis.listener.RedisMessageListenerContainer();
+                new org.springframework.data.redis.listener.RedisMessageListenerContainer() {
+                    @Override
+                    public void start() {
+                        try {
+                            super.start();
+                        } catch (Exception ex) {
+                            org.slf4j.LoggerFactory.getLogger(RedisConfig.class)
+                                    .warn("Redis pub/sub listener could not start (Redis server unreachable): {}", ex.getMessage());
+                        }
+                    }
+                };
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(webSocketBridge, webSocketBridge.getChannelTopic());
         return container;

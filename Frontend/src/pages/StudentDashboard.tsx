@@ -10,6 +10,8 @@ import { StudentService } from '../services/endpoints';
 import type { StudentExtendedDTO, AssignmentDTO } from '@/types';
 
 import { ProfileStats } from '../components/dashboard/student/ProfileStats';
+import { DailyChallengeCard } from '../components/dashboard/student/DailyChallengeCard';
+import { UpcomingContestsCard } from '../components/dashboard/student/UpcomingContestsCard';
 import { ActivityHeatmap } from '../components/dashboard/student/ActivityHeatmap';
 import { PendingAssignments } from '../components/dashboard/student/PendingAssignments';
 import { ClassroomList } from '../components/dashboard/student/ClassroomList';
@@ -20,6 +22,7 @@ import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export function StudentDashboard() {
     const { logout, user } = useAuth();
@@ -158,7 +161,7 @@ export function StudentDashboard() {
             </div>
 
             <header className="bg-white/90 dark:bg-zinc-900/60 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800 sticky top-0 z-20 shadow-xs transition-colors duration-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <BrandLogo size="md" />
                         <span className="hidden sm:inline-flex text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
@@ -213,7 +216,7 @@ export function StudentDashboard() {
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
 
                 {/* 5. Render any global errors (like an initial 500 error, or a failed sync) */}
                 <ErrorBanner message={pageError} className="mb-6" />
@@ -223,6 +226,12 @@ export function StudentDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
+                        <ErrorBoundary fallback={null}>
+                            <DailyChallengeCard
+                                classroomId={selectedClassroomId}
+                                recentSubmissions={dashboardData?.recentSubmissions}
+                            />
+                        </ErrorBoundary>
                         <ActivityHeatmap
                             progressHistory={dashboardData?.progressHistory}
                             consistencyStreak={dashboardData?.consistencyStreak}
@@ -250,13 +259,16 @@ export function StudentDashboard() {
 
                     <div className="space-y-8">
                         <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
+                        <ErrorBoundary fallback={null}>
+                            <UpcomingContestsCard />
+                        </ErrorBoundary>
                         <BadgesList badges={dashboardData?.badges} />
                     </div>
                 </div>
             </main>
 
             {/* Footer with Contact Us */}
-            <footer className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-zinc-200 dark:border-zinc-800 mt-auto flex justify-center">
+            <footer className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-zinc-200 dark:border-zinc-800 mt-auto flex justify-center">
                 <a href="/contact" className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-[#5b4fff] transition-colors">
                     Need Help? Contact Us
                 </a>

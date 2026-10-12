@@ -87,6 +87,20 @@ Before running the application with Redis caching, ensure you have:
 - Cleared when: `createPath()` or `assignPathToClassroom()` is called
 - Reason: New paths affect mentor's path list, and assignments create classroom changes
 
+### Global Platform Caches (Non-User-Specific)
+
+Because the Daily Problem of the Day (POTD) and Upcoming Contests schedule are 100% identical for every student and mentor across the entire platform, they are cached **globally** in Redis rather than per-user. This eliminates redundant external API calls to LeetCode and Codeforces and guarantees 0ms response times for all users.
+
+| Cache Name | Method | TTL | Key Strategy | Use Case |
+|---|---|---|---|---|
+| `global-potd` | `getGlobalDailyChallenge()` | 24 hours | `'today'` | Caches official LeetCode Daily Challenge globally for all users |
+| `upcoming-contests` | `getUpcomingContests()` | 30 min | `'ALL'`, `'LEETCODE'`, `'CODEFORCES'` | Caches upcoming LeetCode & Codeforces contests globally |
+
+**Global Cache Mechanics**:
+- **`global-potd`**: Fetched once globally from LeetCode GraphQL. Stored under Redis key `global-potd::today`. When individual students request the daily challenge, the challenge metadata is served directly from the global cache in 0ms, and individual student solved status is overlaid in-memory or on the client without hitting LeetCode's API.
+- **`upcoming-contests`**: Fetched and calculated once globally. Stored under `upcoming-contests::ALL`, `upcoming-contests::LEETCODE`, and `upcoming-contests::CODEFORCES`. All users share the exact same scheduled contest list.
+- **Pre-warming**: The nightly Cache Warming Worker (`CacheWarmingService`) primes both `global-potd` and `upcoming-contests` at 03:00 UTC so that morning traffic encounters zero cold-cache lag.
+
 ## TTL Strategy Explained
 
 Different caches have different TTLs based on data volatility:
@@ -294,25 +308,50 @@ With Redis caching implemented:
 **Issue**: Serialization errors with complex objects
 - **Solution**: Ensure `JavaTimeModule` is registered in `RedisConfig`
 
+## Redis Cache Warming Worker (`CacheWarmingService`)
+
+To eliminate cold-start lag during morning peak traffic, MentorSync features an automated cache warming worker:
+
+### 1. Scheduled Background Execution
+- **Cron Schedule**: Runs nightly at **03:00 AM UTC** (`@Scheduled(cron = "0 0 3 * * *")`).
+- **Distributed Lock**: Acquires an atomic lock in Redis (`lock:cache:warming`) with a 30-minute TTL using `setIfAbsent()`. This guarantees that in multi-instance or clustered environments, only one instance executes cache warming simultaneously.
+- **Pre-fetched Caches**:
+  - `student-progress`: Calendar heatmap data
+  - `student-stats`: Problem breakdown (Easy, Medium, Hard)
+  - `student-recent`: Latest submissions
+  - `student-profile`: Extended profile metadata
+- **Safe Fallback**: If an individual profile encounters an external API failure, the worker catches the error, logs it, and continues warming subsequent student profiles without aborting.
+
+### 2. On-Demand Administrative Warming
+Administrators and mentors can trigger on-demand cache warming via REST API:
+- **Endpoint**: `POST /api/admin/cache/warm`
+- **Security**: Restricted to `SUPER_ADMIN` or `MENTOR` roles.
+- **Response**:
+  ```json
+  {
+    "status": "SUCCESS",
+    "message": "Cache warming completed successfully",
+    "studentsProcessed": 42,
+    "studentsFailed": 0,
+    "durationMs": 3120
+  }
+  ```
+
+## Redis Pub/Sub WebSocket Bridge (`RedisWebSocketBridge`)
+
+MentorSync utilizes Redis Pub/Sub to synchronize WebSocket events across distributed backend nodes:
+- **Topic**: `mentorsync:classroom:events`
+- **Channel Listener**: Intercepts events such as `UPDATE`, `LEADERBOARD_CHANGED`, `SUBMISSION_VALIDATED`, and `DEADLINE_UPDATED`.
+- **Local Dispatch**: Unpacks the payload and dispatches it over local Spring STOMP broker to `/topic/classrooms/{classroomId}`.
+- **Graceful Degradation**: If Redis Pub/Sub connection is interrupted, events immediately fallback to direct local STOMP dispatch.
+
 ## Best Practices
 
 1. **Use appropriate TTLs**: Don't cache too long (stale data) or too short (no performance benefit)
-
 2. **Invalidate strategically**: Clear related caches when data changes, not just one cache
-
 3. **Monitor cache hit ratio**: Use Redis CLI `INFO stats` to monitor performance
-
 4. **Test with production-like data**: Cache behavior can vary with large datasets
-
 5. **Document cache dependencies**: Know which caches depend on each other
-
-## Future Enhancements
-
-1. **Cache warming**: Preload popular queries on startup
-2. **Conditional caching**: Cache only for certain user roles
-3. **Cache statistics**: Add metrics for cache hit/miss rates
-4. **Distributed caching**: Multi-instance Redis with Cluster mode
-5. **Cache eviction policies**: Custom policies based on access patterns
 
 ## References
 
@@ -323,8 +362,9 @@ With Redis caching implemented:
 
 ---
 
-**Implementation Date**: April 2026  
-**Spring Boot Version**: 4.0.3  
+**Implementation Date**: October 2026  
+**Spring Boot Version**: 4.0.5  
 **Redis**: Compatible with 5.0+  
-**Java Version**: 25
+**Java Version**: 21
+
 

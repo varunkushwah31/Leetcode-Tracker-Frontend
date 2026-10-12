@@ -231,6 +231,7 @@ public class AdminService {
         // 3. Key Count Estimations by Namespace
         Map<String, Long> keyCounts = new LinkedHashMap<>();
         List<String> prefixes = List.of(
+                "global-potd*", "upcoming-contests*",
                 "student-progress*", "student-stats*", "student-recent*", "student-profile*",
                 "classroom-dashboard*", "classroom-analytics*", "mentor*", "mentors-all*",
                 "learning-paths-by-mentor*", "blacklist:jwt:*", "blacklist:user:*",

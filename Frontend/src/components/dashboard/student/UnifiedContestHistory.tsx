@@ -44,19 +44,23 @@ export function UnifiedContestHistory({
 
     const lcItems: UnifiedContestItem[] = useMemo(() => {
         // Sort chronologically ascending to calculate deltas accurately
-        const sorted = [...(contestHistory || [])].sort((a, b) => a.timestamp - b.timestamp);
+        const sorted = [...(contestHistory || [])].sort((a, b) => {
+            const timeA = typeof a.timestamp === 'number' ? a.timestamp : Number(a.timestamp) || 0;
+            const timeB = typeof b.timestamp === 'number' ? b.timestamp : Number(b.timestamp) || 0;
+            return timeA - timeB;
+        });
 
         return sorted.map((c, idx) => {
-            const prevRating = idx > 0 ? sorted[idx - 1].rating : 1500;
-            const currentRating = Math.round(c.rating);
-            const delta = currentRating - Math.round(prevRating);
+            const currentRating = Math.round(Number(c.rating) || 0);
+            const prevRating = idx > 0 ? Math.round(Number(sorted[idx - 1].rating) || 1500) : 1500;
+            const delta = currentRating > 0 ? currentRating - prevRating : undefined;
 
             return {
                 id: `lc-${c.title}-${c.timestamp || idx}`,
                 platform: 'LEETCODE' as const,
                 title: c.title,
-                timestamp: c.timestamp,
-                rank: c.ranking,
+                timestamp: typeof c.timestamp === 'number' ? c.timestamp : Number(c.timestamp) || 0,
+                rank: c.ranking || 0,
                 rating: currentRating,
                 delta,
                 problemsSolved: c.problemsSolved,
@@ -66,15 +70,46 @@ export function UnifiedContestHistory({
     }, [contestHistory]);
 
     const cfItems: UnifiedContestItem[] = useMemo(() => {
-        return (codeforcesContestHistory || []).map((c) => ({
-            id: `cf-${c.contestId}-${c.ratingUpdateTimeSeconds}`,
-            platform: 'CODEFORCES' as const,
-            title: c.contestName,
-            timestamp: c.ratingUpdateTimeSeconds,
-            rank: c.rank,
-            rating: c.newRating,
-            delta: c.newRating - c.oldRating,
-        }));
+        // Sort chronologically ascending to calculate deltas accurately
+        const sorted = [...(codeforcesContestHistory || [])].sort((a, b) => {
+            const timeA = a.ratingUpdateTimeSeconds || (a as any).timestamp || 0;
+            const timeB = b.ratingUpdateTimeSeconds || (b as any).timestamp || 0;
+            return (typeof timeA === 'number' ? timeA : Number(timeA) || 0) - (typeof timeB === 'number' ? timeB : Number(timeB) || 0);
+        });
+
+        return sorted.map((c, idx) => {
+            const currentRating = c.newRating ?? (c as any).rating ?? (c as any).new_rating ?? 0;
+            const prevRating = idx > 0
+                ? (sorted[idx - 1].newRating ?? (sorted[idx - 1] as any).rating ?? (sorted[idx - 1] as any).new_rating ?? currentRating)
+                : (c.oldRating ?? (c as any).old_rating ?? currentRating);
+
+            // Compute delta:
+            // 1. If oldRating is explicitly provided, use currentRating - oldRating
+            // 2. Or if explicit delta property exists, use it
+            // 3. Otherwise if contest is not the first, compute difference from previous contest in chronological sequence
+            let delta: number | undefined;
+            if (c.oldRating !== undefined && c.oldRating !== null && !Number.isNaN(Number(c.oldRating))) {
+                delta = currentRating - Number(c.oldRating);
+            } else if ((c as any).delta !== undefined && !Number.isNaN(Number((c as any).delta))) {
+                delta = Number((c as any).delta);
+            } else if (idx > 0) {
+                delta = currentRating - prevRating;
+            } else {
+                delta = 0;
+            }
+
+            return {
+                id: `cf-${c.contestId || idx}-${c.ratingUpdateTimeSeconds || (c as any).timestamp || idx}`,
+                platform: 'CODEFORCES' as const,
+                title: c.contestName || (c as any).title || 'Codeforces Round',
+                timestamp: typeof (c.ratingUpdateTimeSeconds || (c as any).timestamp) === 'number'
+                    ? (c.ratingUpdateTimeSeconds || (c as any).timestamp)
+                    : Number(c.ratingUpdateTimeSeconds || (c as any).timestamp) || 0,
+                rank: c.rank || 0,
+                rating: currentRating,
+                delta,
+            };
+        });
     }, [codeforcesContestHistory]);
 
     const allItems: UnifiedContestItem[] = useMemo(() => {
@@ -153,16 +188,16 @@ export function UnifiedContestHistory({
                 )}
             </CardHeader>
 
-            <CardContent className="p-4 pt-0">
-                <ScrollArea className={`${scrollHeightClass} pr-4`}>
-                    <div className="flex flex-col gap-2.5">
+            <CardContent className="p-4 pt-0 overflow-hidden">
+                <ScrollArea className={`${scrollHeightClass} pr-4 w-full [&>div]:!block [&>div]:w-full overflow-hidden`}>
+                    <div className="flex flex-col gap-2.5 w-full min-w-0">
                         {displayedItems.map((contest) => (
                             <div
                                 key={contest.id}
-                                className="flex items-center justify-between p-3 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 hover:bg-zinc-100/90 dark:hover:bg-[#1a1a1a]/80 border border-zinc-200/80 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-700/60 rounded-xl transition-all group"
+                                className="flex items-center justify-between p-3 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 hover:bg-zinc-100/90 dark:hover:bg-[#1a1a1a]/80 border border-zinc-200/80 dark:border-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-700/60 rounded-xl transition-all group overflow-hidden w-full min-w-0"
                             >
-                                <div className="min-w-0 flex-1 pr-3">
-                                    <div className="flex items-center gap-1.5 mb-1 min-w-0">
+                                <div className="min-w-0 flex-1 pr-2 overflow-hidden">
+                                    <div className="flex items-center gap-1.5 mb-1 min-w-0 overflow-hidden">
                                         <span
                                             className={`text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${
                                                 contest.platform === 'CODEFORCES'
@@ -173,39 +208,41 @@ export function UnifiedContestHistory({
                                             {contest.platform === 'CODEFORCES' ? 'CF' : 'LC'}
                                         </span>
                                         <p
-                                            className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200 tracking-tight truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors"
+                                            className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200 tracking-tight truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors min-w-0 flex-1"
                                             title={contest.title}
                                         >
                                             {contest.title}
                                         </p>
                                     </div>
-                                    <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
-                                        <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                                    <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 truncate min-w-0">
+                                        <span className="font-medium text-zinc-700 dark:text-zinc-300 shrink-0">
                                             Rank #{contest.rank > 0 ? contest.rank.toLocaleString() : 'N/A'}
                                         </span>
-                                        <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                                        <span className="text-zinc-500">{formatDate(contest.timestamp)}</span>
+                                        <span className="text-zinc-400 dark:text-zinc-600 shrink-0">•</span>
+                                        <span className="text-zinc-500 shrink-0">{formatDate(contest.timestamp)}</span>
                                         {contest.problemsSolved !== undefined && contest.totalProblems !== undefined && (
                                             <>
-                                                <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                                                <span className="text-zinc-600 dark:text-zinc-400 font-medium">
+                                                <span className="text-zinc-400 dark:text-zinc-600 shrink-0">•</span>
+                                                <span className="text-zinc-600 dark:text-zinc-400 font-medium truncate min-w-0">
                                                     {contest.problemsSolved}/{contest.totalProblems} solved
                                                 </span>
                                             </>
                                         )}
                                     </div>
                                 </div>
-                                <div className="text-right shrink-0">
+                                <div className="text-right shrink-0 min-w-[56px] flex flex-col items-end justify-center self-center pl-1">
                                     <p
-                                        className={`text-sm font-bold tracking-tight ${
-                                            contest.platform === 'CODEFORCES' ? 'text-cyan-600 dark:text-cyan-400' : 'text-amber-600 dark:text-[#ffa116]'
+                                        className={`text-sm font-bold tracking-tight whitespace-nowrap ${
+                                            contest.platform === 'CODEFORCES'
+                                                ? 'text-cyan-600 dark:text-cyan-400'
+                                                : 'text-amber-600 dark:text-amber-500'
                                         }`}
                                     >
-                                        {contest.rating}
+                                        {contest.rating > 0 ? contest.rating : '—'}
                                     </p>
-                                    {contest.delta !== undefined ? (
+                                    {contest.delta !== undefined && !Number.isNaN(contest.delta) ? (
                                         <p
-                                            className={`text-[10px] font-bold ${
+                                            className={`text-[11px] font-bold tracking-tight whitespace-nowrap ${
                                                 contest.delta > 0
                                                     ? 'text-emerald-600 dark:text-emerald-400'
                                                     : contest.delta < 0
@@ -215,15 +252,7 @@ export function UnifiedContestHistory({
                                         >
                                             {contest.delta > 0 ? `+${contest.delta}` : contest.delta}
                                         </p>
-                                    ) : (
-                                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
-                                            {contest.problemsSolved !== undefined && contest.totalProblems !== undefined
-                                                ? `${contest.problemsSolved}/${contest.totalProblems} solved`
-                                                : contest.problemsSolved !== undefined
-                                                ? `${contest.problemsSolved} solved`
-                                                : 'Completed'}
-                                        </p>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
                         ))}

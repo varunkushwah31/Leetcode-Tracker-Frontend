@@ -132,12 +132,40 @@ export interface MentorRegisterRequest {
 export interface StudentRegisterRequest extends MentorRegisterRequest {
     leetcodeUsername?: string;
     codeforcesHandle?: string;
+    otp?: string;
+}
+
+export interface SendStudentOtpRequest {
+    email: string;
+    name?: string;
 }
 
 export interface ChangePasswordRequest {
     currentPassword: string;
     newPassword: string;
     confirmPassword?: string;
+}
+
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface VerifyOtpRequest {
+    email: string;
+    otp: string;
+}
+
+export interface ResetPasswordRequest {
+    email: string;
+    resetToken?: string;
+    otp?: string;
+    newPassword: string;
+    confirmPassword?: string;
+}
+
+export interface VerifyOtpResponse {
+    message: string;
+    resetToken: string;
 }
 
 export interface PathQuestion {
@@ -301,3 +329,36 @@ export interface BulkImportResponseDTO {
     alreadyEnrolledStudents: string[];
     failures: string[];
 }
+
+export interface DailyChallengeDTO {
+    date: string;
+    leetcodeFrontendId?: string;
+    leetcodeTitle?: string;
+    leetcodeTitleSlug?: string;
+    leetcodeDifficulty?: string;
+    leetcodeUrl?: string;
+    leetcodeTopicTags?: string[];
+    codeforcesTitle?: string;
+    codeforcesContestId?: number;
+    codeforcesIndex?: string;
+    codeforcesRating?: number;
+    codeforcesUrl?: string;
+    codeforcesTags?: string[];
+    classroomName?: string;
+    classroomTotalStudents: number;
+    classroomSolvedCount: number;
+    classroomSolvedPercentage: number;
+    userSolvedLeetcode: boolean;
+    userSolvedCodeforces: boolean;
+    userSolved: boolean;
+}
+
+export interface UpcomingContestDTO {
+    id: string;
+    platform: 'LEETCODE' | 'CODEFORCES';
+    title: string;
+    startTimeSeconds: number;
+    durationSeconds: number;
+    url: string;
+    phase: 'BEFORE' | 'CODING';
+}

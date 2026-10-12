@@ -45,7 +45,7 @@ interface ClassroomAnalyticsProps {
 
 type TabType = 'overview' | 'weaknesses' | 'matrix' | 'watchlist' | 'assignments';
 
-export const formatTagName = (tag: string | undefined | null): string => {
+const formatTagName = (tag: string | undefined | null): string => {
     if (!tag) return '';
     const cleaned = tag.replace(/^\*+/, '').trim();
     if (!cleaned) return tag;
@@ -62,7 +62,6 @@ export const formatTagName = (tag: string | undefined | null): string => {
 export function ClassroomAnalytics({
     data,
     classroomId,
-    mentorId: _mentorId,
     isLoading = false,
     onRefresh,
     onStudentClick,
@@ -684,7 +683,7 @@ export function ClassroomAnalytics({
                             <CardContent className="pt-4">
                                 <div className="flex flex-wrap gap-2">
                                     {criticalWeaknessTopics.length > 0 ? (
-                                        criticalWeaknessTopics.map((skill: any, i) => (
+                                        criticalWeaknessTopics.map((skill, i) => (
                                             <div key={i} className="px-3 py-1.5 bg-zinc-50 dark:bg-[#16161f] border border-rose-500/30 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
                                                 <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">{formatTagName(skill.tagName)}</span>
                                                 <span className="text-[11px] font-black text-rose-600 dark:text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded-md">

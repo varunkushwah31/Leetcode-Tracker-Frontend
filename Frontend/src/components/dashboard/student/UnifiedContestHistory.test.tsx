@@ -98,4 +98,43 @@ describe('UnifiedContestHistory', () => {
         expect(screen.getByText('Codeforces Round 952 (Div. 4)')).toBeTruthy();
         expect(screen.getByText('Weekly Contest 401')).toBeTruthy();
     });
+
+    it('renders Codeforces ratings and deltas correctly when only Codeforces contests are present', () => {
+        const multipleCfContests: CodeforcesContestHistory[] = [
+            {
+                contestId: 1120,
+                contestName: 'Codeforces Round 1120 (Div. 1)',
+                rank: 70,
+                oldRating: 3250,
+                newRating: 3307,
+                ratingUpdateTimeSeconds: 1726100000,
+            },
+            {
+                contestId: 1124,
+                contestName: 'Codeforces Round 1124 (Div. 1)',
+                rank: 2,
+                oldRating: 3307,
+                newRating: 3384,
+                ratingUpdateTimeSeconds: 1727300000,
+            },
+        ];
+
+        render(
+            <UnifiedContestHistory contestHistory={[]} codeforcesContestHistory={multipleCfContests} />
+        );
+
+        expect(screen.getByText('Contest History')).toBeTruthy();
+        expect(screen.getByText('2 contests')).toBeTruthy();
+
+        // Check contest titles
+        expect(screen.getByText('Codeforces Round 1124 (Div. 1)')).toBeTruthy();
+        expect(screen.getByText('Codeforces Round 1120 (Div. 1)')).toBeTruthy();
+
+        // Check ratings and deltas
+        expect(screen.getByText('3384')).toBeTruthy();
+        expect(screen.getByText('+77')).toBeTruthy();
+        expect(screen.getByText('3307')).toBeTruthy();
+        expect(screen.getByText('+57')).toBeTruthy();
+    });
 });
+

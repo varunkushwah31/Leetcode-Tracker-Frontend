@@ -6,12 +6,18 @@ import type {
     StudentRegisterRequest, 
     MentorRegisterRequest, 
     ChangePasswordRequest,
+    ForgotPasswordRequest,
+    VerifyOtpRequest,
+    ResetPasswordRequest,
+    VerifyOtpResponse,
     LearningPath,
     BulkImportResponseDTO,
     SystemOverviewDTO,
     StudentSummaryDTO,
     MentorDTO,
-    CacheStatsResponse
+    CacheStatsResponse,
+    DailyChallengeDTO,
+    UpcomingContestDTO
 } from '@/types';
 
 export const AuthService = {
@@ -22,17 +28,28 @@ export const AuthService = {
     registerStudent: (data: StudentRegisterRequest) =>
         api.post<AuthResponse>('/v1/auth/register/student', data),
 
+    sendStudentRegistrationOtp: (data: { email: string; name?: string }) =>
+        api.post<{ message: string }>('/v1/auth/register/student/send-otp', data),
+
     registerMentor: (data: MentorRegisterRequest) =>
         api.post<AuthResponse>('/v1/auth/register', data),
 
     logout: () => api.post('/v1/auth/logout'),
 
-    // FIXED: Changed axiosInstance to api, and updated the path to match the others!
     verifyEmail: (email: string, otp: string) =>
         api.post<AuthResponse>('/v1/auth/verify-email', { email, otp }),
 
     changePassword: (data: ChangePasswordRequest) =>
-        api.post<{ message: string }>('/v1/auth/change-password', data)
+        api.post<{ message: string }>('/v1/auth/change-password', data),
+
+    forgotPassword: (data: ForgotPasswordRequest | string) =>
+        api.post<{ message: string }>('/v1/auth/forgot-password', typeof data === 'string' ? { email: data } : data),
+
+    verifyOtp: (emailOrData: VerifyOtpRequest | string, otp?: string) =>
+        api.post<VerifyOtpResponse>('/v1/auth/verify-otp', typeof emailOrData === 'string' ? { email: emailOrData, otp: otp || '' } : emailOrData),
+
+    resetPassword: (data: ResetPasswordRequest) =>
+        api.post<{ message: string }>('/v1/auth/reset-password', data)
 };
 
 export const StudentService = {
@@ -173,7 +190,19 @@ export const AdminService = {
     deleteClassroom: (id: string) => api.delete<{ message: string }>(`/admin/classrooms/${id}`),
     forceSyncAll: () => api.post<{ message: string }>('/admin/sync-all'),
     getCacheStats: () => api.get<CacheStatsResponse>('/admin/cache/stats'),
-    clearCache: (cacheName?: string) => api.post<{ message?: string; error?: string }>('/admin/cache/clear', null, { params: cacheName ? { cacheName } : {} })
+    clearCache: (cacheName?: string) => api.post<{ message?: string; error?: string }>('/admin/cache/clear', null, { params: cacheName ? { cacheName } : {} }),
+    warmCache: () => api.post<Record<string, unknown>>('/admin/cache/warm')
 };
+
+export const DailyChallengeService = {
+    getDailyChallenge: (classroomId?: string) =>
+        api.get<DailyChallengeDTO>('/challenges/daily', { params: classroomId ? { classroomId } : {} })
+};
+
+export const ContestScheduleService = {
+    getUpcomingContests: (platform?: 'ALL' | 'LEETCODE' | 'CODEFORCES') =>
+        api.get<UpcomingContestDTO[]>('/contests/upcoming', { params: platform && platform !== 'ALL' ? { platform } : {} })
+};
+
 
 

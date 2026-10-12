@@ -4,6 +4,10 @@ import com.tracker.leetcode.tracker.DTO.AuthenticationRequest;
 import com.tracker.leetcode.tracker.DTO.AuthenticationResponse;
 import com.tracker.leetcode.tracker.DTO.RegisterRequest;
 import com.tracker.leetcode.tracker.DTO.StudentRegisterRequest;
+import com.tracker.leetcode.tracker.DTO.ForgotPasswordRequest;
+import com.tracker.leetcode.tracker.DTO.VerifyOtpRequest;
+import com.tracker.leetcode.tracker.DTO.ResetPasswordRequest;
+import com.tracker.leetcode.tracker.DTO.VerifyOtpResponse;
 import com.tracker.leetcode.tracker.Exception.RefreshTokenException;
 import com.tracker.leetcode.tracker.Service.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -135,6 +139,13 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/register/student/send-otp")
+    public ResponseEntity<java.util.Map<String, String>> sendStudentRegistrationOtp(
+            @Valid @RequestBody com.tracker.leetcode.tracker.DTO.SendStudentOtpRequest request) {
+        var response = authenticationService.sendStudentRegistrationOtp(request);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/register/student")
     public ResponseEntity<AuthenticationResponse> registerStudent(
             @Valid @RequestBody StudentRegisterRequest request,
@@ -162,5 +173,26 @@ public class AuthenticationController {
 
         authenticationService.changePassword(authentication.getName(), request);
         return ResponseEntity.ok(java.util.Map.of("message", "Password changed successfully."));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<java.util.Map<String, String>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+        var response = authenticationService.sendPasswordResetOtp(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<VerifyOtpResponse> verifyOtp(
+            @Valid @RequestBody VerifyOtpRequest request) {
+        var response = authenticationService.verifyPasswordResetOtp(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<java.util.Map<String, String>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+        var response = authenticationService.resetPasswordWithOtp(request);
+        return ResponseEntity.ok(response);
     }
 }

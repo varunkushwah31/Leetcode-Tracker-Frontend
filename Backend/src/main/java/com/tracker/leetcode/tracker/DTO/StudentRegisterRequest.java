@@ -18,5 +18,11 @@ public record StudentRegisterRequest(
 
         String leetcodeUsername,
 
-        String codeforcesHandle
-) {}
+        String codeforcesHandle,
+
+        String otp
+) {
+    public StudentRegisterRequest(String name, String email, String password, String leetcodeUsername, String codeforcesHandle) {
+        this(name, email, password, leetcodeUsername, codeforcesHandle, null);
+    }
+}

@@ -4,8 +4,22 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { AuthPage } from './AuthPage';
 import { ThemeProvider } from '../context/ThemeContext';
 import * as authHook from '../hooks/useAuth';
+import { AuthService } from '../services/endpoints';
 
 vi.mock('../hooks/useAuth');
+vi.mock('../services/endpoints', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../services/endpoints')>();
+    return {
+        ...actual,
+        AuthService: {
+            ...actual.AuthService,
+            sendStudentRegistrationOtp: vi.fn(),
+            forgotPassword: vi.fn(),
+            verifyOtp: vi.fn(),
+            resetPassword: vi.fn(),
+        }
+    };
+});
 
 const renderAuthPage = (initialRoute: string) => {
     return render(
@@ -27,6 +41,9 @@ describe('AuthPage Error Rendering & Form Retention', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(AuthService.sendStudentRegistrationOtp).mockResolvedValue({
+            data: { message: 'OTP sent' }
+        } as never);
         vi.mocked(authHook.useAuth).mockReturnValue({
             user: null,
             isAuthenticated: false,
@@ -68,7 +85,7 @@ describe('AuthPage Error Rendering & Form Retention', () => {
     });
 
     it('renders signup form when route is /register and displays error banner without wiping fields', async () => {
-        mockRegisterStudent.mockRejectedValue(new Error('Student with email already exists'));
+        vi.mocked(AuthService.sendStudentRegistrationOtp).mockRejectedValue(new Error('Student with email already exists'));
 
         renderAuthPage('/register');
 
@@ -121,5 +138,51 @@ describe('AuthPage Error Rendering & Form Retention', () => {
         });
 
         expect(mockRegisterStudent).not.toHaveBeenCalled();
+    });
+
+    it('opens email verification modal when student details are valid and completes registration when OTP is provided', async () => {
+        vi.mocked(AuthService.sendStudentRegistrationOtp).mockResolvedValue({
+            data: { message: 'OTP sent' }
+        } as never);
+        mockRegisterStudent.mockResolvedValue(undefined);
+
+        renderAuthPage('/register');
+
+        const nameInput = screen.getByPlaceholderText('John Doe');
+        const emailInput = screen.getByPlaceholderText('you@example.com');
+        const passwordInput = screen.getByPlaceholderText('••••••••');
+        const lcInput = screen.getByPlaceholderText('username or profile URL');
+        const submitButton = screen.getByRole('button', { name: /create account/i });
+
+        fireEvent.change(nameInput, { target: { value: 'Alex Smith' } });
+        fireEvent.change(emailInput, { target: { value: 'alex@example.com' } });
+        fireEvent.change(passwordInput, { target: { value: 'securePass123' } });
+        fireEvent.change(lcInput, { target: { value: 'alexsmith' } });
+
+        fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(AuthService.sendStudentRegistrationOtp).toHaveBeenCalledWith({
+                email: 'alex@example.com',
+                name: 'Alex Smith'
+            });
+            expect(screen.getByText(/verify your email address/i)).toBeTruthy();
+        });
+
+        // Enter OTP in modal
+        const otpInput = screen.getByPlaceholderText('123456');
+        fireEvent.change(otpInput, { target: { value: '123456' } });
+
+        const verifyButton = screen.getByRole('button', { name: /verify & complete registration/i });
+        fireEvent.click(verifyButton);
+
+        await waitFor(() => {
+            expect(mockRegisterStudent).toHaveBeenCalledWith(expect.objectContaining({
+                name: 'Alex Smith',
+                email: 'alex@example.com',
+                leetcodeUsername: 'alexsmith',
+                otp: '123456'
+            }));
+        });
     });
 });

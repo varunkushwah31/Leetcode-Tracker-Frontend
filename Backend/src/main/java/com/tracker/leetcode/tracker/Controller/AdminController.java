@@ -21,6 +21,7 @@ import java.util.Map;
 public class AdminController {
 
     private final AdminService adminService;
+    private final com.tracker.leetcode.tracker.Service.CacheWarmingService cacheWarmingService;
 
     @GetMapping("/overview")
     public ResponseEntity<SystemOverviewDTO> getSystemOverview(){
@@ -73,5 +74,10 @@ public class AdminController {
     @PostMapping("/cache/clear")
     public ResponseEntity<Map<String, String>> clearCache(@RequestParam(required = false) String cacheName) {
         return ResponseEntity.ok(adminService.clearCache(cacheName));
+    }
+
+    @PostMapping("/cache/warm")
+    public ResponseEntity<Map<String, Object>> warmCache() {
+        return ResponseEntity.ok(cacheWarmingService.warmAllCaches());
     }
 }

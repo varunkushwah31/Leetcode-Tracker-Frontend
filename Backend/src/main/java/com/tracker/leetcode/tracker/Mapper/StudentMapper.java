@@ -142,11 +142,22 @@ public class StudentMapper {
                 .orElse(0);
     }
 
+    public static String normalizeSlug(String slug) {
+        if (slug == null || slug.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder(slug.length());
+        for (int i = 0; i < slug.length(); i++) {
+            char c = slug.charAt(i);
+            if (Character.isLetterOrDigit(c)) {
+                sb.append(Character.toLowerCase(c));
+            }
+        }
+        return sb.toString();
+    }
+
     public static boolean isProblemSlugMatch(String subSlug, String assignSlug) {
         if (subSlug == null || assignSlug == null) return false;
-        String cleanSub = subSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
-        String cleanAssign = assignSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
-        return cleanSub.equalsIgnoreCase(cleanAssign);
+        if (subSlug.equalsIgnoreCase(assignSlug)) return true;
+        return normalizeSlug(subSlug).equalsIgnoreCase(normalizeSlug(assignSlug));
     }
 
     public int calculateStreak(List<DailyProgress> history) {
