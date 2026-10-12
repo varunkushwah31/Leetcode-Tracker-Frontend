@@ -27,6 +27,10 @@ public class ResendEmailService {
     private final String resendApiKey;
     private final String resendFromEmail;
     private final String mailUsername;
+    private final String emailJsServiceId;
+    private final String emailJsTemplateId;
+    private final String emailJsPublicKey;
+    private final String emailJsPrivateKey;
     private final JavaMailSender mailSender;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
@@ -35,6 +39,10 @@ public class ResendEmailService {
             @Value("${resend.api-key:}") String resendApiKey,
             @Value("${resend.from-email:onboarding@resend.dev}") String resendFromEmail,
             @Value("${spring.mail.username:}") String mailUsername,
+            @Value("${emailjs.service-id:}") String emailJsServiceId,
+            @Value("${emailjs.template-id:}") String emailJsTemplateId,
+            @Value("${emailjs.public-key:}") String emailJsPublicKey,
+            @Value("${emailjs.private-key:}") String emailJsPrivateKey,
             @org.springframework.beans.factory.annotation.Autowired(required = false) JavaMailSender mailSender
     ) {
         this.resendApiKey = resendApiKey != null ? resendApiKey.trim() : "";
@@ -42,11 +50,23 @@ public class ResendEmailService {
                 ? resendFromEmail.trim()
                 : "onboarding@resend.dev";
         this.mailUsername = mailUsername != null ? mailUsername.trim() : "";
+        this.emailJsServiceId = emailJsServiceId != null ? emailJsServiceId.trim() : "";
+        this.emailJsTemplateId = emailJsTemplateId != null ? emailJsTemplateId.trim() : "";
+        this.emailJsPublicKey = emailJsPublicKey != null ? emailJsPublicKey.trim() : "";
+        this.emailJsPrivateKey = emailJsPrivateKey != null ? emailJsPrivateKey.trim() : "";
         this.mailSender = mailSender;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
         this.objectMapper = new ObjectMapper();
+    }
+
+    public ResendEmailService(String resendApiKey, String resendFromEmail, String mailUsername, JavaMailSender mailSender) {
+        this(resendApiKey, resendFromEmail, mailUsername, "", "", "", "", mailSender);
+    }
+
+    public boolean isEmailJsConfigured() {
+        return !emailJsServiceId.isEmpty() && !emailJsTemplateId.isEmpty() && !emailJsPublicKey.isEmpty();
     }
 
     public boolean isConfigured() {
@@ -58,7 +78,7 @@ public class ResendEmailService {
     }
 
     /**
-     * Sends a 6-digit password reset OTP email using the Resend REST API.
+     * Sends a 6-digit password reset OTP email using EmailJS, Resend, or SMTP.
      *
      * @param toEmail   Recipient email address
      * @param otp       6-digit numeric OTP code
@@ -77,6 +97,11 @@ public class ResendEmailService {
         String textContent = "Hello" + greeting + ",\n\nWe received a request to reset your password.\nYour verification code is: " + otp + "\n\nThis code is valid for 10 minutes.\n\nIf you did not request this, please disregard this email.";
         String subject = "MentorSync - Password Reset Code: " + otp;
 
+        if (isEmailJsConfigured()) {
+            sendViaEmailJs(toEmail, otp, userName, subject);
+            return;
+        }
+
         if (isConfigured()) {
             sendEmailInternal(toEmail, subject, htmlContent, textContent);
             return;
@@ -88,11 +113,11 @@ public class ResendEmailService {
         }
 
         log.warn("\n=================================================================\n" +
-                 " [DEV MODE] Neither RESEND_API_KEY nor MAIL_USERNAME is configured.\n" +
+                 " [DEV MODE] Neither EMAILJS, RESEND_API_KEY nor MAIL_USERNAME is configured.\n" +
                  " Type         : PASSWORD RESET OTP\n" +
                  " Target Email : {}\n" +
                  " OTP Code     : {}\n" +
-                 " (In production, configure Gmail SMTP or Resend to dispatch real emails)\n" +
+                 " (In production, configure EmailJS, Resend, or Gmail SMTP to dispatch real emails)\n" +
                  "=================================================================", toEmail, otp);
     }
 
@@ -116,6 +141,11 @@ public class ResendEmailService {
         String textContent = "Welcome to MentorSync" + greeting + "!\n\nPlease enter the 6-digit verification code below to verify your student email:\n\n" + otp + "\n\nThis code expires in 10 minutes.";
         String subject = "MentorSync - Verify Your Email: " + otp;
 
+        if (isEmailJsConfigured()) {
+            sendViaEmailJs(toEmail, otp, userName, subject);
+            return;
+        }
+
         if (isConfigured()) {
             sendEmailInternal(toEmail, subject, htmlContent, textContent);
             return;
@@ -127,11 +157,11 @@ public class ResendEmailService {
         }
 
         log.warn("\n=================================================================\n" +
-                 " [DEV MODE] Neither RESEND_API_KEY nor MAIL_USERNAME is configured.\n" +
+                 " [DEV MODE] Neither EMAILJS, RESEND_API_KEY nor MAIL_USERNAME is configured.\n" +
                  " Type         : STUDENT REGISTRATION EMAIL VERIFICATION\n" +
                  " Target Email : {}\n" +
                  " OTP Code     : {}\n" +
-                 " (In production, configure Gmail SMTP or Resend to dispatch real emails)\n" +
+                 " (In production, configure EmailJS, Resend, or Gmail SMTP to dispatch real emails)\n" +
                  "=================================================================", toEmail, otp);
     }
 
@@ -153,6 +183,47 @@ public class ResendEmailService {
 
         if (isSmtpConfigured()) {
             sendViaSmtp(toEmail, subject, htmlContent, textContent);
+        }
+    }
+
+    private void sendViaEmailJs(String toEmail, String otp, String userName, String subject) {
+        Map<String, Object> templateParams = new java.util.HashMap<>();
+        templateParams.put("to_email", toEmail.trim());
+        templateParams.put("otp_code", otp);
+        templateParams.put("user_name", (userName != null && !userName.isBlank()) ? userName.trim() : "Student");
+        templateParams.put("subject", subject);
+
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("service_id", emailJsServiceId);
+        payload.put("template_id", emailJsTemplateId);
+        payload.put("user_id", emailJsPublicKey);
+        if (!emailJsPrivateKey.isEmpty()) {
+            payload.put("accessToken", emailJsPrivateKey);
+        }
+        payload.put("template_params", templateParams);
+
+        try {
+            String jsonBody = objectMapper.writeValueAsString(payload);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.emailjs.com/api/v1.0/email/send"))
+                    .header("Content-Type", "application/json")
+                    .header("User-Agent", "MentorSync-Backend/1.0")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody, StandardCharsets.UTF_8))
+                    .timeout(Duration.ofSeconds(15))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                log.info("Successfully sent email to {} via EmailJS API.", toEmail);
+            } else {
+                log.error("EmailJS API failed for {} with status {}: {}", toEmail, response.statusCode(), response.body());
+                throw new ValidationFailedException("Failed to dispatch verification email via EmailJS: " + response.body());
+            }
+        } catch (ValidationFailedException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Exception sending email via EmailJS to {}: {}", toEmail, e.getMessage(), e);
+            throw new ValidationFailedException("Unable to send verification email. Please try again later.");
         }
     }
 
@@ -261,7 +332,7 @@ public class ResendEmailService {
     }
 
     private String buildOtpHtmlTemplate(String greeting, String otp) {
-        return """
+        String template = """
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -283,12 +354,12 @@ public class ResendEmailService {
                   <td style="padding: 28px 32px 20px;">
                     <h2 style="margin: 0 0 12px; font-size: 18px; font-weight: 700; color: #0f172a;">Password Reset Request</h2>
                     <p style="margin: 0 0 16px; font-size: 14px; line-height: 22px; color: #475569;">
-                      Hello%s,<br>
+                      Hello{{GREETING}},<br>
                       We received a request to reset your password. Use the verification code below to verify your identity:
                     </p>
                     <!-- OTP Box -->
                     <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
-                      <span style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #5b4fff; display: inline-block;">%s</span>
+                      <span style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #5b4fff; display: inline-block;">{{OTP}}</span>
                     </div>
                     <p style="margin: 0 0 12px; font-size: 13px; color: #64748b; line-height: 20px;">
                       ⏱️ This code is valid for <strong>10 minutes</strong>. For your security, do not share this code with anyone.
@@ -309,11 +380,14 @@ public class ResendEmailService {
               </table>
             </body>
             </html>
-            """.formatted(greeting, otp);
+            """;
+        return template
+                .replace("{{GREETING}}", greeting != null ? greeting : "")
+                .replace("{{OTP}}", otp != null ? otp : "");
     }
 
     private String buildStudentRegistrationOtpHtmlTemplate(String greeting, String otp) {
-        return """
+        String template = """
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -336,13 +410,13 @@ public class ResendEmailService {
                     <div style="display: inline-block; padding: 4px 12px; background-color: #e0e7ff; color: #4338ca; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
                       Student Registration
                     </div>
-                    <h2 style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #0f172a;">Welcome to MentorSync!%s</h2>
+                    <h2 style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #0f172a;">Welcome to MentorSync!{{GREETING}}</h2>
                     <p style="margin: 0 0 16px; font-size: 14px; line-height: 22px; color: #475569;">
                       Thank you for creating your student account. To confirm that this email address belongs to you, please enter the 6-digit verification code below:
                     </p>
                     <!-- OTP Box -->
                     <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
-                      <span style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #5b4fff; display: inline-block;">%s</span>
+                      <span style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #5b4fff; display: inline-block;">{{OTP}}</span>
                     </div>
                     <p style="margin: 0 0 12px; font-size: 13px; color: #64748b; line-height: 20px;">
                       ⏱️ This code will expire in <strong>10 minutes</strong>. For your security, do not share this code with anyone.
@@ -363,11 +437,14 @@ public class ResendEmailService {
               </table>
             </body>
             </html>
-            """.formatted(greeting, otp);
+            """;
+        return template
+                .replace("{{GREETING}}", greeting != null ? greeting : "")
+                .replace("{{OTP}}", otp != null ? otp : "");
     }
 
     private String buildNudgeHtmlTemplate(String greeting, String assignmentName, String className) {
-        return """
+        String template = """
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -390,12 +467,12 @@ public class ResendEmailService {
                     <div style="display: inline-block; padding: 4px 12px; background-color: #fef3c7; color: #92400e; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
                       Assignment Reminder
                     </div>
-                    <h2 style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #0f172a;">Hi%s!</h2>
+                    <h2 style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #0f172a;">Hi{{GREETING}}!</h2>
                     <p style="margin: 0 0 16px; font-size: 14px; line-height: 22px; color: #475569;">
-                      This is a friendly reminder from your mentor that you have a pending assignment for <strong>%s</strong>:
+                      This is a friendly reminder from your mentor that you have a pending assignment for <strong>{{CLASS_NAME}}</strong>:
                     </p>
                     <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
-                      <p style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b;">%s</p>
+                      <p style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b;">{{ASSIGNMENT_NAME}}</p>
                     </div>
                     <p style="margin: 0 0 12px; font-size: 14px; color: #475569; line-height: 22px;">
                       Please complete it on LeetCode and check your progress on your MentorSync dashboard as soon as possible.
@@ -414,6 +491,10 @@ public class ResendEmailService {
               </table>
             </body>
             </html>
-            """.formatted(greeting, className, assignmentName);
+            """;
+        return template
+                .replace("{{GREETING}}", greeting != null ? greeting : "")
+                .replace("{{CLASS_NAME}}", className != null ? className : "")
+                .replace("{{ASSIGNMENT_NAME}}", assignmentName != null ? assignmentName : "");
     }
 }

@@ -48,6 +48,18 @@ services:
       - key: RESEND_FROM_EMAIL
         description: "Verified Sender Email (e.g. MentorSync <auth@yourdomain.com>)"
         value: "onboarding@resend.dev"
+      - key: EMAILJS_SERVICE_ID
+        description: "EmailJS Service ID (e.g. service_xxxxxxx)"
+        sync: false
+      - key: EMAILJS_TEMPLATE_ID
+        description: "EmailJS Template ID (e.g. template_xxxxxxx)"
+        sync: false
+      - key: EMAILJS_PUBLIC_KEY
+        description: "EmailJS Public Key (Account -> API Keys)"
+        sync: false
+      - key: EMAILJS_PRIVATE_KEY
+        description: "EmailJS Private Key (Account -> API Keys -> Security)"
+        sync: false
       - key: REQUIRE_STUDENT_EMAIL_VERIFICATION
         value: "true"
       - key: JAVA_OPTS
