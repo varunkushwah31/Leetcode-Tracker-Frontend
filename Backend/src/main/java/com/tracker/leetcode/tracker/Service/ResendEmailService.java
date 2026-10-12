@@ -16,23 +16,33 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import jakarta.mail.internet.MimeMessage;
+
 @Slf4j
 @Service
 public class ResendEmailService {
 
     private final String resendApiKey;
     private final String resendFromEmail;
+    private final String mailUsername;
+    private final JavaMailSender mailSender;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
     public ResendEmailService(
             @Value("${resend.api-key:}") String resendApiKey,
-            @Value("${resend.from-email:onboarding@resend.dev}") String resendFromEmail
+            @Value("${resend.from-email:onboarding@resend.dev}") String resendFromEmail,
+            @Value("${spring.mail.username:}") String mailUsername,
+            @org.springframework.beans.factory.annotation.Autowired(required = false) JavaMailSender mailSender
     ) {
         this.resendApiKey = resendApiKey != null ? resendApiKey.trim() : "";
         this.resendFromEmail = (resendFromEmail != null && !resendFromEmail.isBlank())
                 ? resendFromEmail.trim()
                 : "onboarding@resend.dev";
+        this.mailUsername = mailUsername != null ? mailUsername.trim() : "";
+        this.mailSender = mailSender;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
@@ -41,6 +51,10 @@ public class ResendEmailService {
 
     public boolean isConfigured() {
         return !resendApiKey.isEmpty();
+    }
+
+    public boolean isSmtpConfigured() {
+        return mailSender != null && !mailUsername.isBlank();
     }
 
     /**
@@ -58,21 +72,28 @@ public class ResendEmailService {
             throw new ValidationFailedException("OTP code is required.");
         }
 
-        if (!isConfigured()) {
-            log.warn("\n=================================================================\n" +
-                     " [DEV MODE] RESEND_API_KEY is not configured.\n" +
-                     " Type         : PASSWORD RESET OTP\n" +
-                     " Target Email : {}\n" +
-                     " OTP Code     : {}\n" +
-                     " (In production, set RESEND_API_KEY to dispatch real emails)\n" +
-                     "=================================================================", toEmail, otp);
-            return;
-        }
-
         String greeting = (userName != null && !userName.isBlank()) ? " " + userName.trim() : "";
         String htmlContent = buildOtpHtmlTemplate(greeting, otp);
         String textContent = "Hello" + greeting + ",\n\nWe received a request to reset your password.\nYour verification code is: " + otp + "\n\nThis code is valid for 10 minutes.\n\nIf you did not request this, please disregard this email.";
-        sendEmailInternal(toEmail, "MentorSync - Password Reset Code: " + otp, htmlContent, textContent);
+        String subject = "MentorSync - Password Reset Code: " + otp;
+
+        if (isConfigured()) {
+            sendEmailInternal(toEmail, subject, htmlContent, textContent);
+            return;
+        }
+
+        if (isSmtpConfigured()) {
+            sendViaSmtp(toEmail, subject, htmlContent, textContent);
+            return;
+        }
+
+        log.warn("\n=================================================================\n" +
+                 " [DEV MODE] Neither RESEND_API_KEY nor MAIL_USERNAME is configured.\n" +
+                 " Type         : PASSWORD RESET OTP\n" +
+                 " Target Email : {}\n" +
+                 " OTP Code     : {}\n" +
+                 " (In production, configure Gmail SMTP or Resend to dispatch real emails)\n" +
+                 "=================================================================", toEmail, otp);
     }
 
     /**
@@ -90,34 +111,70 @@ public class ResendEmailService {
             throw new ValidationFailedException("OTP code is required.");
         }
 
-        if (!isConfigured()) {
-            log.warn("\n=================================================================\n" +
-                     " [DEV MODE] RESEND_API_KEY is not configured.\n" +
-                     " Type         : STUDENT REGISTRATION EMAIL VERIFICATION\n" +
-                     " Target Email : {}\n" +
-                     " OTP Code     : {}\n" +
-                     " (In production, set RESEND_API_KEY to dispatch real emails)\n" +
-                     "=================================================================", toEmail, otp);
-            return;
-        }
-
         String greeting = (userName != null && !userName.isBlank()) ? " " + userName.trim() : "";
         String htmlContent = buildStudentRegistrationOtpHtmlTemplate(greeting, otp);
         String textContent = "Welcome to MentorSync" + greeting + "!\n\nPlease enter the 6-digit verification code below to verify your student email:\n\n" + otp + "\n\nThis code expires in 10 minutes.";
-        sendEmailInternal(toEmail, "MentorSync - Verify Your Email: " + otp, htmlContent, textContent);
+        String subject = "MentorSync - Verify Your Email: " + otp;
+
+        if (isConfigured()) {
+            sendEmailInternal(toEmail, subject, htmlContent, textContent);
+            return;
+        }
+
+        if (isSmtpConfigured()) {
+            sendViaSmtp(toEmail, subject, htmlContent, textContent);
+            return;
+        }
+
+        log.warn("\n=================================================================\n" +
+                 " [DEV MODE] Neither RESEND_API_KEY nor MAIL_USERNAME is configured.\n" +
+                 " Type         : STUDENT REGISTRATION EMAIL VERIFICATION\n" +
+                 " Target Email : {}\n" +
+                 " OTP Code     : {}\n" +
+                 " (In production, configure Gmail SMTP or Resend to dispatch real emails)\n" +
+                 "=================================================================", toEmail, otp);
     }
 
     /**
-     * Sends a mentor nudge email about a pending assignment via Resend.
+     * Sends a mentor nudge email about a pending assignment via Resend or SMTP.
      */
     public void sendNudgeEmail(String toEmail, String studentName, String assignmentName, String className) {
         if (toEmail == null || toEmail.isBlank()) return;
-        if (!isConfigured()) return;
 
         String greeting = (studentName != null && !studentName.isBlank()) ? " " + studentName.trim() : "";
         String htmlContent = buildNudgeHtmlTemplate(greeting, assignmentName, className);
         String textContent = "Hi" + greeting + ",\n\nThis is a gentle reminder that you have a pending assignment: '" + assignmentName + "' for " + className + ".\nPlease complete it on LeetCode and validate it on your MentorSync dashboard.";
-        sendEmailInternal(toEmail, "Reminder: Pending LeetCode Assignment for " + className, htmlContent, textContent);
+        String subject = "Reminder: Pending LeetCode Assignment for " + className;
+
+        if (isConfigured()) {
+            sendEmailInternal(toEmail, subject, htmlContent, textContent);
+            return;
+        }
+
+        if (isSmtpConfigured()) {
+            sendViaSmtp(toEmail, subject, htmlContent, textContent);
+        }
+    }
+
+    private void sendViaSmtp(String toEmail, String subject, String htmlContent, String textContent) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            String fromHeader = (!mailUsername.isBlank())
+                    ? "MentorSync <" + mailUsername + ">"
+                    : resendFromEmail;
+            helper.setFrom(fromHeader);
+            helper.setTo(toEmail.trim());
+            helper.setSubject(subject);
+            helper.setText(textContent, htmlContent);
+
+            mailSender.send(mimeMessage);
+            log.info("Successfully sent email to {} via SMTP (user: {}).", toEmail, mailUsername);
+        } catch (Exception e) {
+            log.error("Failed to send email to {} via SMTP: {}", toEmail, e.getMessage(), e);
+            throw new ValidationFailedException("Unable to send email via SMTP. Please check your mail credentials.");
+        }
     }
 
     private void sendEmailInternal(String toEmail, String subject, String htmlContent, String textContent) {

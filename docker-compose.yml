@@ -42,6 +42,8 @@ services:
       - RESEND_API_KEY=${RESEND_API_KEY:-}
       - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-onboarding@resend.dev}
       - REQUIRE_STUDENT_EMAIL_VERIFICATION=${REQUIRE_STUDENT_EMAIL_VERIFICATION:-true}
+      - MAIL_USERNAME=${MAIL_USERNAME:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
     depends_on:
       mongodb:
         condition: service_healthy
