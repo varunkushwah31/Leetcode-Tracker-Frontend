@@ -35,6 +35,7 @@ public class ResendEmailService {
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public ResendEmailService(
             @Value("${resend.api-key:}") String resendApiKey,
             @Value("${resend.from-email:onboarding@resend.dev}") String resendFromEmail,
