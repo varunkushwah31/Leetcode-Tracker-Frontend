@@ -59,7 +59,23 @@ This platform automates the tracking of coding assignments by integrating direct
 
 ---
 
-## 🚀 Local Setup & Installation
+## 🚀 Quick Start with Dev Containers (Recommended for macOS & Linux)
+
+The easiest way to develop locally without manually installing Java, Maven, Node.js, MongoDB, or Redis is using **VS Code Dev Containers**:
+
+1. Ensure **Docker** (Docker Desktop or OrbStack) and **VS Code** with the **Dev Containers** extension are installed.
+2. Clone the repository and open it in VS Code:
+   ```bash
+   git clone https://github.com/varunkushwah31/Leetcode-Tracker-Frontend.git
+   cd Leetcode-Tracker-Frontend
+   code .
+   ```
+3. When prompted, click **"Reopen in Container"** (or press `Cmd+Shift+P` / `Ctrl+Shift+P` and select `Dev Containers: Reopen in Container`).
+4. Everything is pre-configured! See [.devcontainer/README.md](.devcontainer/README.md) for full details.
+
+---
+
+## 🛠 Manual Local Setup & Installation
 
 > Repository: [https://github.com/varunkushwah31/Leetcode-Tracker-Frontend](https://github.com/varunkushwah31/Leetcode-Tracker-Frontend)
 
@@ -75,12 +91,12 @@ cd Leetcode-Tracker-Frontend
 1. Navigate to backend:
 
    ```bash
-   cd backend
+   cd Backend
    ```
 
 2. Configure environment variables:
 
-   ```
+   ```bash
    MONGO_URI=mongodb://localhost:27017/LeetcodeTracker
    JWT_SECRET=your_secret_key
    ```
@@ -98,7 +114,7 @@ cd Leetcode-Tracker-Frontend
 1. Navigate to frontend:
 
    ```bash
-   cd frontend
+   cd Frontend
    ```
 
 2. Install dependencies:
