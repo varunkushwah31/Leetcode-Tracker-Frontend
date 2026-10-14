@@ -26,11 +26,8 @@ const sizeToTextClass: Record<BrandLogoSize, string> = {
 };
 
 /**
- * Modern geometric Brand Icon for MentorSync.
- * Symbolizes:
- * 1. The letter 'M' (Mentor & Mastery)
- * 2. Code brackets '<' and '>' meeting at the central nexus
- * 3. A kinetic upward sync chevron and real-time telemetry pulse node
+ * Modern geometric Brand Icon for MentorSync matching the official favicon.
+ * Features three parallel slanted pill bars symbolizing progress, synchronization, and telemetry.
  */
 export const BrandIcon: React.FC<BrandIconProps> = ({
   size = 'md',
@@ -39,9 +36,7 @@ export const BrandIcon: React.FC<BrandIconProps> = ({
 }) => {
   const reactId = useId();
   const cleanId = reactId.replace(/[^a-zA-Z0-9]/g, '');
-  const bgGradId = `ms-bg-${cleanId}`;
-  const syncGradId = `ms-sync-${cleanId}`;
-  const borderGradId = `ms-border-${cleanId}`;
+  const barGradId = `ms-bar-grad-${cleanId}`;
   const glowFilterId = `ms-glow-${cleanId}`;
 
   const dimensionStyle =
@@ -61,78 +56,42 @@ export const BrandIcon: React.FC<BrandIconProps> = ({
         viewBox="0 0 64 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-sm select-none"
+        className="w-full h-full select-none"
         aria-hidden="true"
       >
         <defs>
-          {/* Base squircle gradient: Vibrant Indigo -> Electric Violet */}
-          <linearGradient id={bgGradId} x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#4f46e5" />
-            <stop offset="50%" stopColor="#5b4fff" />
-            <stop offset="100%" stopColor="#7c3aed" />
+          <linearGradient id={barGradId} x1="14" y1="16" x2="50" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#2563eb" />
           </linearGradient>
 
-          {/* Upward sync chevron gradient: Electric Cyan -> Aqua */}
-          <linearGradient id={syncGradId} x1="25" y1="34" x2="39" y2="40" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#38bdf8" />
-            <stop offset="100%" stopColor="#00f2fe" />
-          </linearGradient>
-
-          {/* Crisp border shine */}
-          <linearGradient id={borderGradId} x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#818cf8" stopOpacity="0.15" />
-          </linearGradient>
-
-          {/* Ambient drop shadow */}
           {withGlow && (
             <filter id={glowFilterId} x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#4f46e5" floodOpacity="0.4" />
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#2563eb" floodOpacity="0.4" />
             </filter>
           )}
         </defs>
 
-        {/* Squircle Body */}
-        <rect
-          width="64"
-          height="64"
-          rx="16"
-          fill={`url(#${bgGradId})`}
-          filter={withGlow ? `url(#${glowFilterId})` : undefined}
-        />
-
-        {/* Subtle Frosted Edge Highlight */}
-        <rect
-          x="0.75"
-          y="0.75"
-          width="62.5"
-          height="62.5"
-          rx="15.25"
-          stroke={`url(#${borderGradId})`}
-          strokeWidth="1.5"
-        />
-
-        {/* Futuristic Monogram 'M' with code chevron geometry */}
-        <path
-          d="M 17 44 V 22.5 C 17 20.6 18.8 19.5 20.5 20.3 L 32 28 L 43.5 20.3 C 45.2 19.5 47 20.6 47 22.5 V 44"
-          stroke="white"
-          strokeWidth="4.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* Upward Kinetic Sync Chevron */}
-        <path
-          d="M 25 39.5 L 32 34.5 L 39 39.5"
-          stroke={`url(#${syncGradId})`}
-          strokeWidth="4.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* Telemetry Pulse Spark Node */}
-        <circle cx="32" cy="18" r="2.6" fill="#38bdf8" />
-        <circle cx="32" cy="18" r="1.3" fill="white" />
+        <g filter={withGlow ? `url(#${glowFilterId})` : undefined}>
+          <path
+            d="M 14.5 16.5 L 21.5 47.5"
+            stroke={`url(#${barGradId})`}
+            strokeWidth="8.5"
+            strokeLinecap="round"
+          />
+          <path
+            d="M 28.5 16.5 L 35.5 47.5"
+            stroke={`url(#${barGradId})`}
+            strokeWidth="8.5"
+            strokeLinecap="round"
+          />
+          <path
+            d="M 42.5 16.5 L 49.5 47.5"
+            stroke={`url(#${barGradId})`}
+            strokeWidth="8.5"
+            strokeLinecap="round"
+          />
+        </g>
       </svg>
     </div>
   );
