@@ -63,7 +63,7 @@ services:
       - key: REQUIRE_STUDENT_EMAIL_VERIFICATION
         value: "false"
       - key: JAVA_OPTS
-        value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
+        value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true"
 
   - type: keyvalue
     name: leetcode-redis

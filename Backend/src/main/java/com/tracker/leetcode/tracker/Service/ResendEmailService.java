@@ -57,7 +57,9 @@ public class ResendEmailService {
         this.emailJsPrivateKey = emailJsPrivateKey != null ? emailJsPrivateKey.trim() : "";
         this.mailSender = mailSender;
         this.httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofSeconds(10))
+                .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
         this.objectMapper = new ObjectMapper();
     }
@@ -267,9 +269,10 @@ public class ResendEmailService {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.emailjs.com/api/v1.0/email/send"))
                     .header("Content-Type", "application/json")
-                    .header("User-Agent", "MentorSync-Backend/1.0")
+                    .header("Accept", "application/json, text/plain, */*")
+                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody, StandardCharsets.UTF_8))
-                    .timeout(Duration.ofSeconds(15))
+                    .timeout(Duration.ofSeconds(20))
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
@@ -281,6 +284,9 @@ public class ResendEmailService {
             }
         } catch (ValidationFailedException e) {
             throw e;
+        } catch (java.net.http.HttpTimeoutException e) {
+            log.error("EmailJS request timed out for {}: {}", toEmail, e.getMessage());
+            throw new ValidationFailedException("Verification email service timed out. Please try again or check EmailJS settings.");
         } catch (Exception e) {
             log.error("Exception sending email via EmailJS to {}: {}", toEmail, e.getMessage(), e);
             throw new ValidationFailedException("Unable to send verification email. Please try again later.");
