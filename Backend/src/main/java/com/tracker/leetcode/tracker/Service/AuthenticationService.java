@@ -51,11 +51,23 @@ public class AuthenticationService {
     private final StudentRegistrationOtpRepository studentRegistrationOtpRepository;
     private final ResendEmailService resendEmailService;
 
-    @Value("${application.auth.student-email-verification:true}")
+    @Value("${application.auth.student-email-verification:false}")
     private boolean requireStudentEmailVerification = false;
 
     public void setRequireStudentEmailVerification(boolean requireStudentEmailVerification) {
         this.requireStudentEmailVerification = requireStudentEmailVerification;
+    }
+
+    public boolean isRequireStudentEmailVerification() {
+        return this.requireStudentEmailVerification;
+    }
+
+    public boolean isEmailConfigured() {
+        return resendEmailService != null && (
+                resendEmailService.isEmailJsConfigured() ||
+                resendEmailService.isConfigured() ||
+                resendEmailService.isSmtpConfigured()
+        );
     }
 
     // 1. REGISTRATION LOGIC

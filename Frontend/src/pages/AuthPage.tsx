@@ -41,6 +41,20 @@ export function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [isStudentOtpModalOpen, setIsStudentOtpModalOpen] = useState(false);
+  const [serverEmailVerificationRequired, setServerEmailVerificationRequired] = useState<boolean | null>(null);
+
+  // Dynamically sync auth configuration with backend
+  useEffect(() => {
+    AuthService.getAuthConfig()
+      .then((res) => {
+        if (res.data && typeof res.data.studentEmailVerificationRequired === 'boolean') {
+          setServerEmailVerificationRequired(res.data.studentEmailVerificationRequired);
+        }
+      })
+      .catch(() => {
+        // Fall back gracefully to build-time feature flag if endpoint is unreachable
+      });
+  }, []);
 
   // Keep isLogin aligned if route changes via browser history or navigation
   useEffect(() => {
@@ -154,7 +168,11 @@ export function AuthPage() {
           return;
         }
 
-        if (isStudentEmailVerificationEnabled()) {
+        const shouldVerifyEmail = serverEmailVerificationRequired !== null
+          ? serverEmailVerificationRequired
+          : isStudentEmailVerificationEnabled();
+
+        if (shouldVerifyEmail) {
           // Send verification OTP to student's email
           await AuthService.sendStudentRegistrationOtp({
             email: formData.email.trim().toLowerCase(),
@@ -181,7 +199,22 @@ export function AuthPage() {
       }
 
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      // Auto-recovery: If direct registration was attempted but backend requires email OTP verification
+      if (!isLogin && role === 'student' && /verification code is required|otp.*required/i.test(errorMessage)) {
+        try {
+          await AuthService.sendStudentRegistrationOtp({
+            email: formData.email.trim().toLowerCase(),
+            name: formData.name.trim()
+          });
+          setIsStudentOtpModalOpen(true);
+          return;
+        } catch (otpErr: unknown) {
+          setError(otpErr instanceof Error ? otpErr.message : errorMessage);
+          return;
+        }
+      }
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

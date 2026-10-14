@@ -13,6 +13,7 @@ vi.mock('../services/endpoints', async (importOriginal) => {
         ...actual,
         AuthService: {
             ...actual.AuthService,
+            getAuthConfig: vi.fn(),
             sendStudentRegistrationOtp: vi.fn(),
             forgotPassword: vi.fn(),
             verifyOtp: vi.fn(),
@@ -42,6 +43,9 @@ describe('AuthPage Error Rendering & Form Retention', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.stubEnv('VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION', 'true');
+        vi.mocked(AuthService.getAuthConfig).mockResolvedValue({
+            data: { studentEmailVerificationRequired: true, emailConfigured: true }
+        } as never);
         vi.mocked(AuthService.sendStudentRegistrationOtp).mockResolvedValue({
             data: { message: 'OTP sent' }
         } as never);
@@ -189,6 +193,9 @@ describe('AuthPage Error Rendering & Form Retention', () => {
 
     it('registers student directly without opening OTP modal when email verification is paused', async () => {
         vi.stubEnv('VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION', 'false');
+        vi.mocked(AuthService.getAuthConfig).mockResolvedValue({
+            data: { studentEmailVerificationRequired: false, emailConfigured: false }
+        } as never);
         mockRegisterStudent.mockResolvedValue(undefined);
 
         renderAuthPage('/register');
@@ -214,6 +221,37 @@ describe('AuthPage Error Rendering & Form Retention', () => {
             }));
             expect(AuthService.sendStudentRegistrationOtp).not.toHaveBeenCalled();
             expect(screen.queryByText(/verify your email address/i)).toBeNull();
+        });
+    });
+
+    it('automatically recovers and opens OTP modal when direct registration fails with "Email verification code is required"', async () => {
+        vi.stubEnv('VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION', 'false');
+        vi.mocked(AuthService.getAuthConfig).mockResolvedValue({
+            data: { studentEmailVerificationRequired: false, emailConfigured: true }
+        } as never);
+        mockRegisterStudent.mockRejectedValueOnce(new Error('Email verification code is required.'));
+
+        renderAuthPage('/register');
+
+        const nameInput = screen.getByPlaceholderText('John Doe');
+        const emailInput = screen.getByPlaceholderText('you@example.com');
+        const passwordInput = screen.getByPlaceholderText('••••••••');
+        const lcInput = screen.getByPlaceholderText('username or profile URL');
+        const submitButton = screen.getByRole('button', { name: /create account/i });
+
+        fireEvent.change(nameInput, { target: { value: 'Sam Codes' } });
+        fireEvent.change(emailInput, { target: { value: 'samcodes.148@gmail.com' } });
+        fireEvent.change(passwordInput, { target: { value: 'securePass123' } });
+        fireEvent.change(lcInput, { target: { value: 'samrj' } });
+
+        fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(AuthService.sendStudentRegistrationOtp).toHaveBeenCalledWith({
+                email: 'samcodes.148@gmail.com',
+                name: 'Sam Codes'
+            });
+            expect(screen.getByText(/verify your email address/i)).toBeTruthy();
         });
     });
 });

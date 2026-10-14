@@ -51,6 +51,14 @@ public class AuthenticationController {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
+    @GetMapping("/config")
+    public ResponseEntity<java.util.Map<String, Object>> getAuthConfig() {
+        return ResponseEntity.ok(java.util.Map.of(
+                "studentEmailVerificationRequired", authenticationService.isRequireStudentEmailVerification(),
+                "emailConfigured", authenticationService.isEmailConfigured()
+        ));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterRequest request, HttpServletResponse response){
 

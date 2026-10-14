@@ -22,6 +22,9 @@ import type {
 
 export const AuthService = {
 
+    getAuthConfig: () =>
+        api.get<{ studentEmailVerificationRequired: boolean; emailConfigured: boolean }>('/v1/auth/config'),
+
     login: (credentials: LoginRequest) =>
         api.post<AuthResponse>('/v1/auth/login', credentials),
 
