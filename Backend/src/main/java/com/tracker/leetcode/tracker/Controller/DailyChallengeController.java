@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,5 +39,11 @@ public class DailyChallengeController {
     public ResponseEntity<DailyChallengeDTO> getGlobalDailyChallenge() {
         log.info("Fetching pure global LeetCode POTD (no user context).");
         return ResponseEntity.ok(dailyChallengeService.getGlobalDailyChallenge());
+    }
+
+    @PostMapping("/daily/refresh")
+    public ResponseEntity<DailyChallengeDTO> refreshGlobalDailyChallenge() {
+        log.info("Request to force refresh global LeetCode POTD.");
+        return ResponseEntity.ok(dailyChallengeService.refreshGlobalDailyChallenge());
     }
 }

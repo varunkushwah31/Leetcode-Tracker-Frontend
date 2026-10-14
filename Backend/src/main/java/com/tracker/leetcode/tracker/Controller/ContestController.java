@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,13 @@ public class ContestController {
     ) {
         log.info("Request for upcoming contests with platform filter: {}", platform);
         List<UpcomingContestDTO> contests = contestScheduleService.getUpcomingContests(platform);
+        return ResponseEntity.ok(contests);
+    }
+
+    @PostMapping("/upcoming/refresh")
+    public ResponseEntity<List<UpcomingContestDTO>> refreshUpcomingContests() {
+        log.info("Request to force refresh upcoming contests cache.");
+        List<UpcomingContestDTO> contests = contestScheduleService.refreshUpcomingContests();
         return ResponseEntity.ok(contests);
     }
 }

@@ -82,4 +82,21 @@ class ContestScheduleServiceTest {
         assertNotNull(result);
         assertTrue(result.stream().allMatch(c -> "LEETCODE".equalsIgnoreCase(c.getPlatform())));
     }
+
+    @Test
+    @DisplayName("refreshUpcomingContests forcefully evicts all platform caches and recalculates")
+    void refreshUpcomingContests_EvictsAllPlatformCachesAndRecalculates() {
+        when(cacheManager.getCache("upcoming-contests")).thenReturn(cache);
+
+        List<UpcomingContestDTO> result = contestScheduleService.refreshUpcomingContests();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        verify(cache).evict("ALL");
+        verify(cache).evict("LEETCODE");
+        verify(cache).evict("CODEFORCES");
+        verify(cache).put(eq("ALL"), anyList());
+        verify(cache).put(eq("LEETCODE"), anyList());
+        verify(cache).put(eq("CODEFORCES"), anyList());
+    }
 }

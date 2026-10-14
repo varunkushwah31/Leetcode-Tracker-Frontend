@@ -49,7 +49,7 @@ The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade pla
 ### 1. 🎯 Official LeetCode POTD (`DailyChallengeService`)
 - Integrates directly with LeetCode GraphQL endpoint (`activeDailyCodingChallengeQuestion`).
 - Fetches problem title, difficulty (Easy, Medium, Hard), tags, description preview, hint, and problem URL.
-- **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with a 24-hour TTL. Because the problem of the day is identical across all users, it is shared globally, avoiding redundant external calls.
+- **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with automatic date-staleness validation. Because the problem of the day is identical across all users, it is shared globally, avoiding redundant external calls. Validates against UTC date to guarantee yesterday's POTD is never served.
 - Personal solve verification and collaborative classroom tickers are overlaid in-memory without re-querying LeetCode.
 
 ### 2. ⚔️ Live Upcoming Contests Tracker (`ContestScheduleService`)
@@ -57,9 +57,9 @@ The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade pla
 - **Global Redis Caching (`upcoming-contests`)**: Cached globally under `upcoming-contests` (`ALL`, `LEETCODE`, `CODEFORCES`) with a 30-minute TTL. Shared identically across all users.
 
 ### 3. ⚡ Redis Cache Warming Worker (`CacheWarmingService`)
-- Automated background worker executing daily at **03:00 UTC** (`@Scheduled(cron = "0 0 3 * * *")`).
-- Uses atomic Redis distributed lock (`lock:cache:warming`, 30 min TTL) to ensure single-node execution in clustered environments.
-- Primes global caches (`global-potd`, `upcoming-contests`) and pre-warms student & classroom caches for 0ms morning response times.
+- Automated background worker executing daily at **6:00 AM IST** (`@Scheduled(cron = "0 0 6 * * ?", zone = "Asia/Kolkata")`).
+- Uses atomic Redis distributed lock (`lock:cache-warming`, 30 min TTL) to ensure single-node execution in clustered environments.
+- Primes and synchronizes global caches (`global-potd`, `upcoming-contests`) and pre-warms student & classroom caches for 0ms morning response times.
 - Manual administrative trigger endpoint: `POST /api/admin/cache/warm`.
 
 ### 4. 🔄 Real-Time Clustered WebSockets (`RedisWebSocketBridge`)

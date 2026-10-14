@@ -33,7 +33,7 @@ Mentors can create virtual classrooms, enroll students individually or in bulk v
 
 ### 🎯 Official LeetCode Problem of the Day (POTD)
 * **Live Daily Challenge**: Directly pulls the official daily challenge from LeetCode (`activeDailyCodingChallengeQuestion`) with topic tags, difficulty pills, problem hint, and direct solve links.
-* **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with a 24-hour TTL. Because the problem of the day is 100% identical for every user, it is stored once globally in Redis and shared across all students and mentors, eliminating redundant upstream calls.
+* **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with automatic date-staleness validation. Because the problem of the day is 100% identical for every user, it is stored once globally in Redis and shared across all students and mentors, eliminating redundant upstream calls. Validates against UTC date to guarantee yesterday's POTD is never served.
 * **Collaborative Classroom Ticker**: Surfaces a live classroom participation banner:  
   `"14 of 24 students in your classroom have solved today's POTD!"` — motivating peer accountability and daily problem-solving consistency.
 
@@ -45,8 +45,8 @@ Mentors can create virtual classrooms, enroll students individually or in bulk v
 * **Interactive UI**: Real-time countdown clocks, duration badges, and instant platform filtering (`ALL`, `LEETCODE`, `CODEFORCES`).
 
 ### ⚡ Redis Cache Warming Worker & Distributed Lock
-* **Zero Cold-Cache Lag**: Background scheduled worker runs nightly at **03:00 AM UTC** (`@Scheduled(cron = "0 0 3 * * *")`) to prime global caches (`global-potd`, `upcoming-contests`) and pre-warm student statistics (`student-progress`, `student-stats`, `student-recent`, `student-profile`). Mentors experience instantaneous **0ms** responses during peak morning hours.
-* **Atomic Distributed Locking**: Acquires a Redis lock (`lock:cache:warming`, 30 min TTL) via `setIfAbsent()` to guarantee only one node warms the cache in multi-instance or Kubernetes deployments.
+* **Zero Cold-Cache Lag & Daily Sync**: Background scheduled worker runs daily at **6:00 AM Indian Standard Time (IST)** (`@Scheduled(cron = "0 0 6 * * ?", zone = "Asia/Kolkata")`) to prime global caches (`global-potd`, `upcoming-contests`) and pre-warm student statistics (`student-progress`, `student-stats`, `student-recent`, `student-profile`). Mentors experience instantaneous **0ms** responses during peak morning hours.
+* **Atomic Distributed Locking**: Acquires a Redis lock (`lock:cache-warming`, 30 min TTL) via `setIfAbsent()` to guarantee only one node warms the cache in multi-instance or Kubernetes deployments.
 * **Admin On-Demand Trigger**: Secure administrative endpoint (`POST /api/admin/cache/warm`) allows instant cache re-warming at any time.
 
 ### 🔄 Real-Time Clustered WebSockets
@@ -95,7 +95,7 @@ flowchart TD
         SS["StudentService"]
         DCS["DailyChallengeService"]
         CSS["ContestScheduleService"]
-        CWS["CacheWarmingService (03:00 UTC)"]
+        CWS["CacheWarmingService (06:00 AM IST)"]
         RWB["RedisWebSocketBridge"]
         R4J["Resilience4j (Circuit Breaker & Retry)"]
     end

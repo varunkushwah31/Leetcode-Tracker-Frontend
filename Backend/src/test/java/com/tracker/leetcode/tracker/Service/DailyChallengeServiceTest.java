@@ -56,9 +56,10 @@ class DailyChallengeServiceTest {
     @Test
     @DisplayName("getGlobalDailyChallenge returns cached challenge on cache hit without calling upstream API")
     void getGlobalDailyChallenge_CacheHit_ReturnsCached() {
+        String todayUtc = LocalDate.now(ZoneId.of("UTC")).toString();
         when(cacheManager.getCache("global-potd")).thenReturn(cache);
         DailyChallengeDTO cached = DailyChallengeDTO.builder()
-                .date("2026-10-08")
+                .date(todayUtc)
                 .leetcodeTitle("Number of Islands")
                 .leetcodeTitleSlug("number-of-islands")
                 .build();
@@ -68,7 +69,65 @@ class DailyChallengeServiceTest {
 
         assertNotNull(result);
         assertEquals("Number of Islands", result.getLeetcodeTitle());
+        assertEquals(todayUtc, result.getDate());
         verifyNoInteractions(leetCodeApiClient);
+    }
+
+    @Test
+    @DisplayName("getGlobalDailyChallenge detects stale cached date from yesterday, evicts it, and fetches today's POTD")
+    void getGlobalDailyChallenge_StaleCache_EvictsAndFetchesFresh() {
+        when(cacheManager.getCache("global-potd")).thenReturn(cache);
+        DailyChallengeDTO staleCached = DailyChallengeDTO.builder()
+                .date("2026-10-08") // Stale date from previous day
+                .leetcodeTitle("Old Problem")
+                .leetcodeTitleSlug("old-problem")
+                .build();
+        when(cache.get("today", DailyChallengeDTO.class)).thenReturn(staleCached);
+
+        String todayUtc = LocalDate.now(ZoneId.of("UTC")).toString();
+        LeetCodeApiClient.LeetCodeDailyQuestion freshQuestion = new LeetCodeApiClient.LeetCodeDailyQuestion(
+                todayUtc,
+                "200",
+                "Number of Islands",
+                "number-of-islands",
+                "Medium",
+                "https://leetcode.com/problems/number-of-islands/",
+                List.of("DFS", "BFS")
+        );
+        when(leetCodeApiClient.fetchDailyCodingChallenge()).thenReturn(freshQuestion);
+
+        DailyChallengeDTO result = dailyChallengeService.getGlobalDailyChallenge();
+
+        assertNotNull(result);
+        assertEquals("Number of Islands", result.getLeetcodeTitle());
+        assertEquals(todayUtc, result.getDate());
+        verify(cache).evict("today");
+        verify(cache).put(eq("today"), any(DailyChallengeDTO.class));
+    }
+
+    @Test
+    @DisplayName("refreshGlobalDailyChallenge forcefully evicts fallback and Spring cache and fetches fresh challenge")
+    void refreshGlobalDailyChallenge_EvictsAndFetchesFresh() {
+        when(cacheManager.getCache("global-potd")).thenReturn(cache);
+        String todayUtc = LocalDate.now(ZoneId.of("UTC")).toString();
+        LeetCodeApiClient.LeetCodeDailyQuestion freshQuestion = new LeetCodeApiClient.LeetCodeDailyQuestion(
+                todayUtc,
+                "200",
+                "Number of Islands",
+                "number-of-islands",
+                "Medium",
+                "https://leetcode.com/problems/number-of-islands/",
+                List.of("DFS", "BFS")
+        );
+        when(leetCodeApiClient.fetchDailyCodingChallenge()).thenReturn(freshQuestion);
+
+        DailyChallengeDTO result = dailyChallengeService.refreshGlobalDailyChallenge();
+
+        assertNotNull(result);
+        assertEquals("Number of Islands", result.getLeetcodeTitle());
+        verify(leetCodeApiClient).evictDailyCodingChallengeCache();
+        verify(cache, atLeastOnce()).evict("today");
+        verify(cache).put(eq("today"), any(DailyChallengeDTO.class));
     }
 
     @Test
@@ -99,9 +158,10 @@ class DailyChallengeServiceTest {
     @Test
     @DisplayName("getDailyChallenge with student context computes solved state and classroom ticker")
     void getDailyChallenge_WithStudentAndClassroom_DecoratesProperly() {
+        String todayUtc = LocalDate.now(ZoneId.of("UTC")).toString();
         when(cacheManager.getCache("global-potd")).thenReturn(cache);
         DailyChallengeDTO cached = DailyChallengeDTO.builder()
-                .date("2026-10-08")
+                .date(todayUtc)
                 .leetcodeTitle("Number of Islands")
                 .leetcodeTitleSlug("number-of-islands")
                 .leetcodeDifficulty("Medium")
@@ -137,9 +197,10 @@ class DailyChallengeServiceTest {
     @Test
     @DisplayName("getDailyChallenge uses cached classroom ticker on cache hit without querying studentRepository.findAllById")
     void getDailyChallenge_ClassroomTickerCacheHit_UsesCache() {
+        String todayUtc = LocalDate.now(ZoneId.of("UTC")).toString();
         when(cacheManager.getCache("global-potd")).thenReturn(cache);
         DailyChallengeDTO cached = DailyChallengeDTO.builder()
-                .date("2026-10-08")
+                .date(todayUtc)
                 .leetcodeTitle("Number of Islands")
                 .leetcodeTitleSlug("number-of-islands")
                 .build();

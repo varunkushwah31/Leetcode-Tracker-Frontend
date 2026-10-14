@@ -44,27 +44,39 @@ public class DailyChallengeService {
     /**
      * Retrieves the globally cached LeetCode Daily Challenge.
      * Cached globally in Redis under "global-potd" with key "today" (TTL: 24 hours).
+     * Validates that any cached entry matches today's UTC date to guarantee yesterday's POTD is never served.
      * Shared identically across all students and mentors without user-level computation.
      */
-    @Cacheable(value = "global-potd", key = "'today'")
     public DailyChallengeDTO getGlobalDailyChallenge() {
-        if (cacheManager != null) {
-            Cache cache = cacheManager.getCache("global-potd");
-            if (cache != null) {
-                DailyChallengeDTO cached = cache.get("today", DailyChallengeDTO.class);
-                if (cached != null) {
-                    log.debug("Global POTD cache HIT for today.");
-                    return cached;
+        String todayUtc = LocalDate.now(ZoneId.of("UTC")).toString();
+        Cache cache = null;
+
+        try {
+            if (cacheManager != null) {
+                cache = cacheManager.getCache("global-potd");
+                if (cache != null) {
+                    DailyChallengeDTO cached = cache.get("today", DailyChallengeDTO.class);
+                    if (cached != null) {
+                        if (todayUtc.equals(cached.getDate())) {
+                            log.debug("Global POTD cache HIT for today ({}).", todayUtc);
+                            return cached;
+                        } else {
+                            log.warn("Global POTD cache entry date ({}) is stale (expected today {}). Evicting stale entry.",
+                                    cached.getDate(), todayUtc);
+                            cache.evict("today");
+                        }
+                    }
                 }
             }
+        } catch (Exception e) {
+            log.warn("Error accessing global-potd cache: {}", e.getMessage());
         }
 
-        log.info("Global POTD cache MISS. Querying upstream LeetCode API...");
+        log.info("Global POTD cache MISS or STALE for date {}. Querying upstream LeetCode API...", todayUtc);
         LeetCodeApiClient.LeetCodeDailyQuestion lcPotd = leetCodeApiClient.fetchDailyCodingChallenge();
-        String today = LocalDate.now(ZoneId.of("UTC")).toString();
 
         DailyChallengeDTO challenge = DailyChallengeDTO.builder()
-                .date(today)
+                .date(todayUtc)
                 // Official LeetCode POTD info
                 .leetcodeFrontendId(lcPotd.questionFrontendId())
                 .leetcodeTitle(lcPotd.title())
@@ -76,15 +88,40 @@ public class DailyChallengeService {
                 .userSolved(false)
                 .build();
 
-        if (cacheManager != null) {
-            Cache cache = cacheManager.getCache("global-potd");
-            if (cache != null) {
+        if (cache != null) {
+            try {
                 cache.put("today", challenge);
-                log.info("Cached global POTD in Redis under 'global-potd::today'.");
+                log.info("Cached global POTD in Redis under 'global-potd::today' for date {}.", todayUtc);
+            } catch (Exception e) {
+                log.warn("Failed to put global POTD into cache: {}", e.getMessage());
             }
         }
 
         return challenge;
+    }
+
+    /**
+     * Forces an immediate eviction and fresh synchronization of the global POTD from upstream LeetCode API.
+     * Updates Redis cache under "global-potd" with key "today".
+     */
+    public DailyChallengeDTO refreshGlobalDailyChallenge() {
+        log.info("Forcing global POTD cache refresh...");
+        try {
+            leetCodeApiClient.evictDailyCodingChallengeCache();
+        } catch (Exception e) {
+            log.warn("Error evicting LeetCode client daily challenge cache: {}", e.getMessage());
+        }
+        try {
+            if (cacheManager != null) {
+                Cache cache = cacheManager.getCache("global-potd");
+                if (cache != null) {
+                    cache.evict("today");
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Error evicting global-potd cache: {}", e.getMessage());
+        }
+        return getGlobalDailyChallenge();
     }
 
     /**

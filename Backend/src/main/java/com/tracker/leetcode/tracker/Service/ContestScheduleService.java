@@ -69,38 +69,23 @@ public class ContestScheduleService {
                 : "ALL";
 
         if (cacheManager != null) {
-            Cache cache = cacheManager.getCache("upcoming-contests");
-            if (cache != null) {
-                @SuppressWarnings("unchecked")
-                List<UpcomingContestDTO> cached = cache.get(filterKey, List.class);
-                if (cached != null && !cached.isEmpty()) {
-                    log.debug("Global upcoming contests cache HIT for platform: {}", filterKey);
-                    return cached;
+            try {
+                Cache cache = cacheManager.getCache("upcoming-contests");
+                if (cache != null) {
+                    @SuppressWarnings("unchecked")
+                    List<UpcomingContestDTO> cached = cache.get(filterKey, List.class);
+                    if (cached != null && !cached.isEmpty()) {
+                        log.debug("Global upcoming contests cache HIT for platform: {}", filterKey);
+                        return cached;
+                    }
                 }
+            } catch (Exception e) {
+                log.warn("Error accessing upcoming-contests cache: {}", e.getMessage());
             }
         }
 
         log.info("Global upcoming contests cache MISS for platform: {}. Calculating and querying...", filterKey);
-        List<UpcomingContestDTO> allContests = fetchAndCalculateAllContests();
-
-        // Populate global caches for ALL, LEETCODE, and CODEFORCES simultaneously
-        if (cacheManager != null) {
-            Cache cache = cacheManager.getCache("upcoming-contests");
-            if (cache != null) {
-                cache.put("ALL", allContests);
-
-                List<UpcomingContestDTO> lcList = allContests.stream()
-                        .filter(c -> "LEETCODE".equalsIgnoreCase(c.getPlatform()))
-                        .collect(Collectors.toList());
-                cache.put("LEETCODE", lcList);
-
-                List<UpcomingContestDTO> cfList = allContests.stream()
-                        .filter(c -> "CODEFORCES".equalsIgnoreCase(c.getPlatform()))
-                        .collect(Collectors.toList());
-                cache.put("CODEFORCES", cfList);
-                log.info("Cached global upcoming contests in Redis under 'upcoming-contests' for ALL, LEETCODE, and CODEFORCES.");
-            }
-        }
+        List<UpcomingContestDTO> allContests = fetchAndCacheAllContests();
 
         if ("ALL".equalsIgnoreCase(filterKey)) {
             return allContests;
@@ -109,6 +94,55 @@ public class ContestScheduleService {
         return allContests.stream()
                 .filter(c -> filterKey.equalsIgnoreCase(c.getPlatform()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Forces an immediate eviction and recalculation of all upcoming contests
+     * (ALL, LEETCODE, CODEFORCES) in the Redis cache.
+     */
+    public List<UpcomingContestDTO> refreshUpcomingContests() {
+        log.info("Forcing global upcoming contests cache refresh...");
+        try {
+            if (cacheManager != null) {
+                Cache cache = cacheManager.getCache("upcoming-contests");
+                if (cache != null) {
+                    cache.evict("ALL");
+                    cache.evict("LEETCODE");
+                    cache.evict("CODEFORCES");
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Error evicting upcoming-contests cache: {}", e.getMessage());
+        }
+        return fetchAndCacheAllContests();
+    }
+
+    public List<UpcomingContestDTO> fetchAndCacheAllContests() {
+        List<UpcomingContestDTO> allContests = fetchAndCalculateAllContests();
+
+        // Populate global caches for ALL, LEETCODE, and CODEFORCES simultaneously
+        if (cacheManager != null) {
+            try {
+                Cache cache = cacheManager.getCache("upcoming-contests");
+                if (cache != null) {
+                    cache.put("ALL", allContests);
+
+                    List<UpcomingContestDTO> lcList = allContests.stream()
+                            .filter(c -> "LEETCODE".equalsIgnoreCase(c.getPlatform()))
+                            .collect(Collectors.toList());
+                    cache.put("LEETCODE", lcList);
+
+                    List<UpcomingContestDTO> cfList = allContests.stream()
+                            .filter(c -> "CODEFORCES".equalsIgnoreCase(c.getPlatform()))
+                            .collect(Collectors.toList());
+                    cache.put("CODEFORCES", cfList);
+                    log.info("Cached global upcoming contests in Redis under 'upcoming-contests' for ALL, LEETCODE, and CODEFORCES.");
+                }
+            } catch (Exception e) {
+                log.warn("Error caching upcoming contests in Redis: {}", e.getMessage());
+            }
+        }
+        return allContests;
     }
 
     public List<UpcomingContestDTO> getCachedOrFetchContests() {

@@ -28,12 +28,12 @@ public class CacheWarmingService {
     private final RedisDistributedLockService lockService;
 
     /**
-     * Nightly Cache Warming scheduled during off-peak hours (default 3:00 AM UTC).
+     * Daily Cache Warming & Global POTD / Contest Sync scheduled everyday at 6:00 AM Indian Standard Time (IST).
      * Protected by Redis distributed lock to avoid redundant runs across cluster replicas.
      */
-    @Scheduled(cron = "${app.cache-warming.cron:0 0 3 * * ?}")
+    @Scheduled(cron = "${app.cache-warming.cron:0 0 6 * * ?}", zone = "${app.cache-warming.zone:Asia/Kolkata}")
     public void scheduledCacheWarming() {
-        log.info("Initiating scheduled off-peak Redis Cache Warming worker...");
+        log.info("Initiating scheduled 6:00 AM IST Redis Cache Warming & POTD/Contest sync worker...");
         boolean executed = lockService.executeWithLockOrSkip("lock:cache-warming", Duration.ofMinutes(30), this::warmAllCaches);
         if (!executed) {
             log.info("Redis Cache Warming skipped - distributed lock held by another cluster instance.");
@@ -49,19 +49,19 @@ public class CacheWarmingService {
         int classroomsWarmed = 0;
         int mentorsWarmed = 0;
 
-        log.info("Executing comprehensive Redis Cache Warming worker...");
+        log.info("Executing comprehensive Redis Cache Warming worker (6:00 AM IST sync)...");
 
-        // 1. Warm Global POTD & Upcoming Contests
+        // 1. Force Refresh Global POTD & Upcoming Contests
         try {
-            dailyChallengeService.getGlobalDailyChallenge();
-            log.info("Global POTD cache primed successfully in Redis.");
+            dailyChallengeService.refreshGlobalDailyChallenge();
+            log.info("Global POTD refreshed and primed successfully in Redis.");
         } catch (Exception e) {
             log.warn("Cache warming global POTD failed: {}", e.getMessage());
         }
 
         try {
-            contestScheduleService.getUpcomingContests("ALL");
-            log.info("Global upcoming contests caches primed successfully in Redis.");
+            contestScheduleService.refreshUpcomingContests();
+            log.info("Global upcoming contests refreshed and primed successfully in Redis.");
         } catch (Exception e) {
             log.warn("Cache warming global Contests failed: {}", e.getMessage());
         }

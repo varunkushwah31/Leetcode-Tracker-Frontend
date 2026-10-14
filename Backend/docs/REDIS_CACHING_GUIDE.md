@@ -93,13 +93,13 @@ Because the Daily Problem of the Day (POTD) and Upcoming Contests schedule are 1
 
 | Cache Name | Method | TTL | Key Strategy | Use Case |
 |---|---|---|---|---|
-| `global-potd` | `getGlobalDailyChallenge()` | 24 hours | `'today'` | Caches official LeetCode Daily Challenge globally for all users |
+| `global-potd` | `getGlobalDailyChallenge()` | 24 hours | `'today'` | Caches official LeetCode Daily Challenge globally for all users with date validation |
 | `upcoming-contests` | `getUpcomingContests()` | 30 min | `'ALL'`, `'LEETCODE'`, `'CODEFORCES'` | Caches upcoming LeetCode & Codeforces contests globally |
 
 **Global Cache Mechanics**:
-- **`global-potd`**: Fetched once globally from LeetCode GraphQL. Stored under Redis key `global-potd::today`. When individual students request the daily challenge, the challenge metadata is served directly from the global cache in 0ms, and individual student solved status is overlaid in-memory or on the client without hitting LeetCode's API.
+- **`global-potd`**: Fetched once globally from LeetCode GraphQL. Stored under Redis key `global-potd::today`. When individual students request the daily challenge, the challenge metadata is served directly from the global cache in 0ms, and individual student solved status is overlaid in-memory or on the client without hitting LeetCode's API. The backend verifies that the cached challenge date matches today's UTC date, automatically evicting yesterday's problem if cached prior to midnight UTC rollover.
 - **`upcoming-contests`**: Fetched and calculated once globally. Stored under `upcoming-contests::ALL`, `upcoming-contests::LEETCODE`, and `upcoming-contests::CODEFORCES`. All users share the exact same scheduled contest list.
-- **Pre-warming**: The nightly Cache Warming Worker (`CacheWarmingService`) primes both `global-potd` and `upcoming-contests` at 03:00 UTC so that morning traffic encounters zero cold-cache lag.
+- **Pre-warming & Synchronization**: The daily Cache Warming Worker (`CacheWarmingService`) refreshes both `global-potd` and `upcoming-contests` everyday at **6:00 AM IST** (`zone = "Asia/Kolkata"`) so that morning traffic encounters zero cold-cache lag and always views today's freshly rolled-over challenge.
 
 ## TTL Strategy Explained
 
@@ -313,8 +313,8 @@ With Redis caching implemented:
 To eliminate cold-start lag during morning peak traffic, MentorSync features an automated cache warming worker:
 
 ### 1. Scheduled Background Execution
-- **Cron Schedule**: Runs nightly at **03:00 AM UTC** (`@Scheduled(cron = "0 0 3 * * *")`).
-- **Distributed Lock**: Acquires an atomic lock in Redis (`lock:cache:warming`) with a 30-minute TTL using `setIfAbsent()`. This guarantees that in multi-instance or clustered environments, only one instance executes cache warming simultaneously.
+- **Cron Schedule**: Runs daily at **6:00 AM Indian Standard Time (IST)** (`@Scheduled(cron = "0 0 6 * * ?", zone = "Asia/Kolkata")`).
+- **Distributed Lock**: Acquires an atomic lock in Redis (`lock:cache-warming`) with a 30-minute TTL using `setIfAbsent()`. This guarantees that in multi-instance or clustered environments, only one instance executes cache warming simultaneously.
 - **Pre-fetched Caches**:
   - `student-progress`: Calendar heatmap data
   - `student-stats`: Problem breakdown (Easy, Medium, Hard)

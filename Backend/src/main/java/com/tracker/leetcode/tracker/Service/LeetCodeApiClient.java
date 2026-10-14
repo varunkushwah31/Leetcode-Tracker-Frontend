@@ -511,6 +511,16 @@ public class LeetCodeApiClient {
             List<String> topicTags
     ) {}
 
+    public void evictDailyCodingChallengeCache() {
+        String todayKey = "leetcode:daily:challenge:" + LocalDate.now(ZoneId.of("UTC")).toString();
+        try {
+            redisTemplate.delete(todayKey);
+            log.info("Evicted LeetCode daily challenge fallback cache: {}", todayKey);
+        } catch (Exception e) {
+            log.warn("Failed to evict LeetCode daily challenge fallback cache: {}", e.getMessage());
+        }
+    }
+
     @CircuitBreaker(name = "leetcodeApi", fallbackMethod = "fetchDailyCodingChallengeFallback")
     @RateLimiter(name = "leetcodeApi")
     @Retry(name = "leetcodeApi")
