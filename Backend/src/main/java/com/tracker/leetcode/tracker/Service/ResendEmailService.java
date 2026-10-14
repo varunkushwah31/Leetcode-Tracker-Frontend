@@ -418,8 +418,8 @@ public class ResendEmailService {
                       We received a request to reset your password. Use the verification code below to verify your identity:
                     </p>
                     <!-- OTP Box -->
-                    <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
-                      <span style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #5b4fff; display: inline-block;">{{OTP}}</span>
+                    <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 18px 10px; text-align: center; margin: 24px 0;">
+                      <span style="font-family: 'SF Mono', Consolas, Menlo, Monaco, monospace; font-size: 28px; font-weight: 800; letter-spacing: 5px; color: #5b4fff; display: inline-block; word-break: break-all;">{{OTP}}</span>
                     </div>
                     <p style="margin: 0 0 12px; font-size: 13px; color: #64748b; line-height: 20px;">
                       ⏱️ This code is valid for <strong>10 minutes</strong>. For your security, do not share this code with anyone.
@@ -475,8 +475,8 @@ public class ResendEmailService {
                       Thank you for creating your student account. To confirm that this email address belongs to you, please enter the 6-digit verification code below:
                     </p>
                     <!-- OTP Box -->
-                    <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
-                      <span style="font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #5b4fff; display: inline-block;">{{OTP}}</span>
+                    <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 18px 10px; text-align: center; margin: 24px 0;">
+                      <span style="font-family: 'SF Mono', Consolas, Menlo, Monaco, monospace; font-size: 28px; font-weight: 800; letter-spacing: 5px; color: #5b4fff; display: inline-block; word-break: break-all;">{{OTP}}</span>
                     </div>
                     <p style="margin: 0 0 12px; font-size: 13px; color: #64748b; line-height: 20px;">
                       ⏱️ This code will expire in <strong>10 minutes</strong>. For your security, do not share this code with anyone.

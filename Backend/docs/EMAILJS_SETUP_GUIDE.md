@@ -57,143 +57,189 @@ This guide teaches you step-by-step how to set up and configure **EmailJS** for 
     body {
       margin: 0;
       padding: 0;
-      background-color: #0f172a;
+      background-color: #09090b;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #e2e8f0;
+      color: #f4f4f5;
+      -webkit-font-smoothing: antialiased;
     }
-    .wrapper {
-      width: 100%;
-      table-layout: fixed;
-      background-color: #0f172a;
-      padding: 40px 10px;
-    }
-    .main {
-      background-color: #1e293b;
+    .email-container {
+      max-width: 480px;
       margin: 0 auto;
-      width: 100%;
-      max-width: 540px;
+      background-color: #121217;
       border-radius: 16px;
       overflow: hidden;
-      border: 1px solid #334155;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      border: 1px solid #27272a;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
     }
-    .header {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-      padding: 32px 24px;
-      text-align: center;
-    }
-    .header h1 {
-      color: #ffffff;
-      margin: 0;
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-    .header p {
-      color: #c7d2fe;
-      margin: 6px 0 0 0;
-      font-size: 13px;
-      font-weight: 500;
-    }
-    .content {
-      padding: 32px 28px;
-    }
-    .greeting {
-      font-size: 16px;
-      font-weight: 600;
-      color: #f8fafc;
-      margin-bottom: 12px;
-    }
-    .body-text {
-      font-size: 14px;
-      line-height: 1.6;
-      color: #94a3b8;
-      margin-bottom: 24px;
-    }
-    .otp-box {
-      background-color: #0f172a;
-      border: 2px dashed #6366f1;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      margin: 24px 0;
-    }
-    .otp-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #818cf8;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .otp-code {
-      font-family: 'SF Mono', Consolas, Monaco, monospace;
-      font-size: 36px;
-      font-weight: 800;
-      letter-spacing: 8px;
-      color: #ffffff;
-      margin: 0;
-      padding: 4px 0;
-    }
-    .expiry {
-      display: inline-block;
-      margin-top: 10px;
-      font-size: 12px;
-      color: #f59e0b;
-      font-weight: 500;
-    }
-    .warning {
-      background-color: rgba(239, 68, 68, 0.1);
-      border-left: 3px solid #ef4444;
-      padding: 12px 16px;
-      border-radius: 6px;
-      margin-top: 24px;
-      font-size: 12px;
-      color: #fca5a5;
-      line-height: 1.5;
-    }
-    .footer {
-      border-top: 1px solid #334155;
-      padding: 20px 24px;
-      text-align: center;
-      font-size: 12px;
-      color: #64748b;
-      background-color: #172033;
+    @media only screen and (max-width: 480px) {
+      .email-container {
+        border-radius: 12px !important;
+      }
+      .content-padding {
+        padding: 24px 16px !important;
+      }
+      .otp-code-text {
+        font-size: 24px !important;
+        letter-spacing: 3px !important;
+      }
     }
   </style>
 </head>
-<body>
-  <div class="wrapper">
-    <div class="main">
-      <div class="header">
-        <h1>⚡ MentorSync</h1>
-        <p>LeetCode & Codeforces Automated Classroom Platform</p>
-      </div>
-      <div class="content">
-        <div class="greeting">Hello {{user_name}},</div>
-        <div class="body-text">
-          We received a verification request for your MentorSync account. Please use the one-time verification code below to complete your action:
-        </div>
-        <div class="otp-box">
-          <div class="otp-label">One-Time Verification Code</div>
-          <div class="otp-code">{{otp_code}}</div>
-          <div class="expiry">⏱ Valid for {{expiry_minutes}} minutes</div>
-        </div>
-        <div class="body-text" style="margin-bottom: 0;">
-          If you did not make this request, you can safely ignore this email. No changes will be applied to your account without this code.
-        </div>
-        <div class="warning">
-          <strong>Security Notice:</strong> Never share this verification code with anyone. MentorSync mentors or staff will never ask for your OTP.
-        </div>
-      </div>
-      <div class="footer">
-        © MentorSync • Automated Competitive Programming Performance Tracker
-      </div>
-    </div>
-  </div>
+<body style="margin: 0; padding: 32px 12px; background-color: #09090b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f4f4f5;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+    <tr>
+      <td align="center">
+        <!-- Main Card Container -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" class="email-container" style="max-width: 480px; margin: 0 auto; background-color: #121217; border-radius: 16px; overflow: hidden; border: 1px solid #27272a; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);">
+          <!-- Top Accent Gradient Line -->
+          <tr>
+            <td style="height: 4px; background: linear-gradient(90deg, #5b4fff 0%, #8b5cf6 50%, #3b82f6 100%);"></td>
+          </tr>
+          <!-- Brand Header -->
+          <tr>
+            <td align="center" style="padding: 28px 24px 14px; text-align: center;">
+              <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="width: 42px; height: 42px; background: linear-gradient(135deg, #5b4fff 0%, #7c3aed 100%); border-radius: 12px; text-align: center; vertical-align: middle; box-shadow: 0 4px 14px rgba(91, 79, 255, 0.4);">
+                    <span style="color: #ffffff; font-size: 20px; font-weight: 900; line-height: 42px; display: inline-block;">⚡</span>
+                  </td>
+                </tr>
+              </table>
+              <h1 style="color: #ffffff; font-size: 20px; font-weight: 800; margin: 12px 0 0; letter-spacing: -0.3px;">MentorSync</h1>
+              <p style="color: #71717a; font-size: 11px; font-weight: 600; margin: 4px 0 0; text-transform: uppercase; letter-spacing: 1px;">Security &amp; Account Verification</p>
+            </td>
+          </tr>
+          <!-- Content Body -->
+          <tr>
+            <td class="content-padding" style="padding: 12px 28px 28px;">
+              <div style="font-size: 15px; font-weight: 700; color: #f4f4f5; margin-bottom: 8px;">
+                Hi {{user_name}},
+              </div>
+              <div style="font-size: 13px; line-height: 1.6; color: #a1a1aa; margin-bottom: 20px;">
+                We received a request to verify your email address. Use the one-time verification code below to complete your action:
+              </div>
+
+              <!-- Modern OTP Box (Mobile-Responsive & Overflow-Safe) -->
+              <div style="background-color: #181820; border: 1px solid rgba(91, 79, 255, 0.35); border-radius: 14px; padding: 20px 10px; text-align: center; margin: 20px 0; box-shadow: 0 4px 20px rgba(91, 79, 255, 0.08);">
+                <div style="font-size: 10px; font-weight: 700; color: #968fff; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">
+                  Verification Code
+                </div>
+                <div class="otp-code-text" style="font-family: 'SF Mono', Consolas, Menlo, Monaco, monospace; font-size: 26px; font-weight: 800; letter-spacing: 4px; color: #ffffff; margin: 4px 0; word-break: break-all; overflow-wrap: break-word; max-width: 100%;">
+                  {{otp_code}}
+                </div>
+                <div style="margin-top: 10px;">
+                  <span style="display: inline-block; background-color: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; border-radius: 9999px; padding: 3px 12px; font-size: 11px; font-weight: 600;">
+                    ⏱ Valid for {{expiry_minutes}} minutes
+                  </span>
+                </div>
+              </div>
+
+              <div style="font-size: 12px; line-height: 1.5; color: #71717a; margin-top: 18px;">
+                If you did not request this code, you can safely ignore this email. No changes will be applied to your account without this verification.
+              </div>
+
+              <!-- Security Notice -->
+              <div style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid #27272a; border-radius: 10px; padding: 12px 14px; margin-top: 20px; font-size: 11px; color: #a1a1aa; line-height: 1.5;">
+                <span style="color: #968fff; font-weight: 700;">🔒 Security Notice:</span> Never share this code with anyone. MentorSync mentors or staff will never ask for your verification code.
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 16px 24px; background-color: #0c0c10; border-top: 1px solid #1f1f23; text-align: center;">
+              <p style="margin: 0; font-size: 11px; color: #52525b; line-height: 1.5;">
+                MentorSync • LeetCode &amp; Codeforces Automated Platform<br>
+                This is an automated security notification. Please do not reply directly.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
 ```
+
+*(Optional) If you prefer a clean **Light Theme** (Stripe / GitHub style), use this alternative template:*
+
+<details>
+<summary>👉 Click to expand MentorSync Studio Light Theme HTML</summary>
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MentorSync Verification Code</title>
+</head>
+<body style="margin: 0; padding: 32px 12px; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #18181b;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+    <tr>
+      <td align="center">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 480px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e4e4e7; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);">
+          <tr>
+            <td style="height: 4px; background: linear-gradient(90deg, #5b4fff 0%, #8b5cf6 50%, #3b82f6 100%);"></td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 28px 24px 14px; text-align: center;">
+              <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="width: 42px; height: 42px; background: #5b4fff; border-radius: 12px; text-align: center; vertical-align: middle;">
+                    <span style="color: #ffffff; font-size: 20px; font-weight: 900; line-height: 42px; display: inline-block;">⚡</span>
+                  </td>
+                </tr>
+              </table>
+              <h1 style="color: #18181b; font-size: 20px; font-weight: 800; margin: 12px 0 0; letter-spacing: -0.3px;">MentorSync</h1>
+              <p style="color: #71717a; font-size: 11px; font-weight: 600; margin: 4px 0 0; text-transform: uppercase; letter-spacing: 1px;">Security &amp; Account Verification</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 28px 28px;">
+              <div style="font-size: 15px; font-weight: 700; color: #18181b; margin-bottom: 8px;">
+                Hi {{user_name}},
+              </div>
+              <div style="font-size: 13px; line-height: 1.6; color: #52525b; margin-bottom: 20px;">
+                We received a request to verify your email address. Use the one-time verification code below to complete your action:
+              </div>
+              <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 14px; padding: 20px 10px; text-align: center; margin: 20px 0;">
+                <div style="font-size: 10px; font-weight: 700; color: #5b4fff; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">
+                  Verification Code
+                </div>
+                <div style="font-family: 'SF Mono', Consolas, Menlo, Monaco, monospace; font-size: 26px; font-weight: 800; letter-spacing: 4px; color: #4338ca; margin: 4px 0; word-break: break-all; overflow-wrap: break-word;">
+                  {{otp_code}}
+                </div>
+                <div style="margin-top: 10px;">
+                  <span style="display: inline-block; background-color: #fef3c7; border: 1px solid #fde68a; color: #b45309; border-radius: 9999px; padding: 3px 12px; font-size: 11px; font-weight: 600;">
+                    ⏱ Valid for {{expiry_minutes}} minutes
+                  </span>
+                </div>
+              </div>
+              <div style="font-size: 12px; line-height: 1.5; color: #71717a; margin-top: 18px;">
+                If you did not request this code, you can safely ignore this email.
+              </div>
+              <div style="background-color: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 10px; padding: 12px 14px; margin-top: 20px; font-size: 11px; color: #52525b; line-height: 1.5;">
+                <span style="color: #5b4fff; font-weight: 700;">🔒 Security Notice:</span> Never share this code with anyone. MentorSync mentors or staff will never ask for your verification code.
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 16px 24px; background-color: #fafafa; border-top: 1px solid #f4f4f5; text-align: center;">
+              <p style="margin: 0; font-size: 11px; color: #71717a; line-height: 1.5;">
+                MentorSync • LeetCode &amp; Codeforces Automated Platform
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+```
+
+</details>
 
 5. Click **Save** in the top right.
 6. **Copy your Template ID**: It looks like `template_xxxxxxx`.
