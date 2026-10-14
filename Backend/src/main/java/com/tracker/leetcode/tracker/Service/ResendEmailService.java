@@ -187,12 +187,71 @@ public class ResendEmailService {
         }
     }
 
+    /**
+     * Sends a test verification email to confirm the email provider (EmailJS, Resend, or SMTP)
+     * is functioning properly in production.
+     */
+    public Map<String, Object> sendTestEmail(String toEmail) {
+        if (toEmail == null || toEmail.isBlank()) {
+            throw new ValidationFailedException("Recipient email address is required.");
+        }
+        String testOtp = "123456";
+        String userName = "Test User";
+        String subject = "MentorSync - Verification Test Code: " + testOtp;
+
+        String provider;
+        if (isEmailJsConfigured()) {
+            sendViaEmailJs(toEmail, testOtp, userName, subject);
+            provider = "EMAILJS";
+        } else if (isConfigured()) {
+            String htmlContent = buildOtpHtmlTemplate(" " + userName, testOtp);
+            String textContent = "Hello " + userName + ",\n\nYour test verification code is: " + testOtp;
+            sendEmailInternal(toEmail, subject, htmlContent, textContent);
+            provider = "RESEND";
+        } else if (isSmtpConfigured()) {
+            String htmlContent = buildOtpHtmlTemplate(" " + userName, testOtp);
+            String textContent = "Hello " + userName + ",\n\nYour test verification code is: " + testOtp;
+            sendViaSmtp(toEmail, subject, htmlContent, textContent);
+            provider = "SMTP";
+        } else {
+            provider = "DEV_CONSOLE";
+            log.warn("\n=================================================================\n" +
+                     " [DEV MODE] Test email dispatched.\n" +
+                     " Provider     : NONE (Console Log Only)\n" +
+                     " Target Email : {}\n" +
+                     " OTP Code     : {}\n" +
+                     "=================================================================", toEmail, testOtp);
+        }
+
+        return Map.of(
+                "status", "SUCCESS",
+                "message", "Test verification email dispatched successfully to " + toEmail.trim(),
+                "provider", provider,
+                "emailJsConfigured", isEmailJsConfigured(),
+                "resendConfigured", isConfigured(),
+                "smtpConfigured", isSmtpConfigured()
+        );
+    }
+
     private void sendViaEmailJs(String toEmail, String otp, String userName, String subject) {
+        sendViaEmailJs(toEmail, otp, userName, subject, "");
+    }
+
+    private void sendViaEmailJs(String toEmail, String otp, String userName, String subject, String message) {
         Map<String, Object> templateParams = new java.util.HashMap<>();
+        String safeName = (userName != null && !userName.isBlank()) ? userName.trim() : "Student";
         templateParams.put("to_email", toEmail.trim());
-        templateParams.put("otp_code", otp);
-        templateParams.put("user_name", (userName != null && !userName.isBlank()) ? userName.trim() : "Student");
+        templateParams.put("email", toEmail.trim());
+        templateParams.put("to_name", safeName);
+        templateParams.put("user_name", safeName);
+        templateParams.put("name", safeName);
+        templateParams.put("otp_code", otp != null ? otp : "");
+        templateParams.put("otp", otp != null ? otp : "");
+        templateParams.put("code", otp != null ? otp : "");
         templateParams.put("subject", subject);
+        templateParams.put("message", message != null ? message : "");
+        templateParams.put("expiry_minutes", "10");
+        templateParams.put("app_name", "MentorSync");
 
         Map<String, Object> payload = new java.util.HashMap<>();
         payload.put("service_id", emailJsServiceId);

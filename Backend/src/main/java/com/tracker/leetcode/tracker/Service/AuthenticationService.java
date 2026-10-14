@@ -599,4 +599,8 @@ public class AuthenticationService {
                 .role(mentor.getRole())
                 .build();
     }
+
+    public Map<String, Object> sendTestEmail(String toEmail) {
+        return resendEmailService.sendTestEmail(toEmail);
+    }
 }

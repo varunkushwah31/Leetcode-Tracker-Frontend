@@ -22,6 +22,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final com.tracker.leetcode.tracker.Service.CacheWarmingService cacheWarmingService;
+    private final com.tracker.leetcode.tracker.Service.ResendEmailService resendEmailService;
 
     @GetMapping("/overview")
     public ResponseEntity<SystemOverviewDTO> getSystemOverview(){
@@ -79,5 +80,10 @@ public class AdminController {
     @PostMapping("/cache/warm")
     public ResponseEntity<Map<String, Object>> warmCache() {
         return ResponseEntity.ok(cacheWarmingService.warmAllCaches());
+    }
+
+    @PostMapping("/email/test")
+    public ResponseEntity<Map<String, Object>> testEmail(@RequestParam String email) {
+        return ResponseEntity.ok(resendEmailService.sendTestEmail(email));
     }
 }

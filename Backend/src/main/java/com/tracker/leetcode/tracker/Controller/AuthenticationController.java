@@ -195,4 +195,10 @@ public class AuthenticationController {
         var response = authenticationService.resetPasswordWithOtp(request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/test-email")
+    public ResponseEntity<java.util.Map<String, Object>> testEmail(
+            @RequestParam String email) {
+        return ResponseEntity.ok(authenticationService.sendTestEmail(email));
+    }
 }

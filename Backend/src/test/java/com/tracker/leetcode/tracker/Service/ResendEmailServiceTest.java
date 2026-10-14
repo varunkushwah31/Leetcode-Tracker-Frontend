@@ -64,4 +64,22 @@ class ResendEmailServiceTest {
                 emailService.sendStudentRegistrationOtp("student@example.com", "", "Tourist")
         );
     }
+
+    @Test
+    @DisplayName("sendTestEmail in dev mode should return success map with DEV_CONSOLE provider")
+    void sendTestEmail_DevMode_ShouldSucceed() {
+        var result = emailService.sendTestEmail("test@example.com");
+        assertNotNull(result);
+        assertEquals("SUCCESS", result.get("status"));
+        assertEquals("DEV_CONSOLE", result.get("provider"));
+        assertFalse((Boolean) result.get("emailJsConfigured"));
+    }
+
+    @Test
+    @DisplayName("sendTestEmail with blank email should throw ValidationFailedException")
+    void sendTestEmail_BlankEmail_ShouldThrow() {
+        assertThrows(ValidationFailedException.class, () ->
+                emailService.sendTestEmail("")
+        );
+    }
 }
