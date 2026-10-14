@@ -424,9 +424,9 @@ public class ResendEmailService {
                             <tr>
                               <td align="center">
                                 <svg width="44" height="34" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
-                                  <path d="M10 6L15 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
-                                  <path d="M20 6L25 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
-                                  <path d="M30 6L35 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M10 6L15 28" stroke="#968FFF" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M20 6L25 28" stroke="#968FFF" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M30 6L35 28" stroke="#968FFF" stroke-width="5.5" stroke-linecap="round" />
                                 </svg>
                               </td>
                             </tr>
@@ -470,7 +470,7 @@ public class ResendEmailService {
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                   <tr>
                                     <td valign="top" style="width: 20px; padding-right: 12px; padding-top: 2px;">
-                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#968FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
                                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                         <path d="m9 12 2 2 4-4" />
                                       </svg>
@@ -538,9 +538,9 @@ public class ResendEmailService {
                             <tr>
                               <td align="center">
                                 <svg width="44" height="34" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
-                                  <path d="M10 6L15 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
-                                  <path d="M20 6L25 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
-                                  <path d="M30 6L35 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M10 6L15 28" stroke="#968FFF" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M20 6L25 28" stroke="#968FFF" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M30 6L35 28" stroke="#968FFF" stroke-width="5.5" stroke-linecap="round" />
                                 </svg>
                               </td>
                             </tr>
@@ -584,7 +584,7 @@ public class ResendEmailService {
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                   <tr>
                                     <td valign="top" style="width: 20px; padding-right: 12px; padding-top: 2px;">
-                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#968FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
                                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                         <path d="m9 12 2 2 4-4" />
                                       </svg>

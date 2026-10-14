@@ -1,15 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <style>
-    .ms-bar {
-      stroke: #2563eb;
-    }
-    @media (prefers-color-scheme: dark) {
-      .ms-bar {
-        stroke: #3b82f6;
-      }
-    }
-  </style>
-  <path class="ms-bar" d="M 14.5 16.5 L 21.5 47.5" stroke-width="8.5" stroke-linecap="round"/>
-  <path class="ms-bar" d="M 28.5 16.5 L 35.5 47.5" stroke-width="8.5" stroke-linecap="round"/>
-  <path class="ms-bar" d="M 42.5 16.5 L 49.5 47.5" stroke-width="8.5" stroke-linecap="round"/>
+  <path d="M 14.5 16.5 L 21.5 47.5" stroke="#968FFF" stroke-width="8.5" stroke-linecap="round"/>
+  <path d="M 28.5 16.5 L 35.5 47.5" stroke="#968FFF" stroke-width="8.5" stroke-linecap="round"/>
+  <path d="M 42.5 16.5 L 49.5 47.5" stroke="#968FFF" stroke-width="8.5" stroke-linecap="round"/>
 </svg>

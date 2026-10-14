@@ -61,13 +61,13 @@ export const BrandIcon: React.FC<BrandIconProps> = ({
       >
         <defs>
           <linearGradient id={barGradId} x1="14" y1="16" x2="50" y2="48" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#3b82f6" />
-            <stop offset="100%" stopColor="#2563eb" />
+            <stop offset="0%" stopColor="#b4aeff" />
+            <stop offset="100%" stopColor="#968fff" />
           </linearGradient>
 
           {withGlow && (
             <filter id={glowFilterId} x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#2563eb" floodOpacity="0.4" />
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#968fff" floodOpacity="0.45" />
             </filter>
           )}
         </defs>
