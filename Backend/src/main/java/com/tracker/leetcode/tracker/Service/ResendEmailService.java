@@ -254,6 +254,7 @@ public class ResendEmailService {
         templateParams.put("message", message != null ? message : "");
         templateParams.put("expiry_minutes", "10");
         templateParams.put("app_name", "MentorSync");
+        templateParams.put("support_email", "support@mentorsync.dev");
 
         Map<String, Object> payload = new java.util.HashMap<>();
         payload.put("service_id", emailJsServiceId);
@@ -399,48 +400,107 @@ public class ResendEmailService {
 
     private String buildOtpHtmlTemplate(String greeting, String otp) {
         String template = """
-            <!DOCTYPE html>
-            <html lang="en">
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
             <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Password Reset Code</title>
+              <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>Reset Your Password</title>
+              <style type="text/css">
+                body, table, td, a, p, span, div { 
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+                }
+              </style>
             </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f7; margin: 0; padding: 24px 12px; color: #1e293b;">
-              <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                <!-- Header -->
+            <body style="margin: 0; padding: 48px 12px; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #1f2937;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
                 <tr>
-                  <td style="padding: 32px 32px 20px; text-align: center; border-bottom: 1px solid #f1f5f9;">
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; color: #5b4fff; letter-spacing: -0.5px;">MentorSync</h1>
-                    <p style="margin: 4px 0 0; font-size: 13px; color: #64748b; font-weight: 500;">LeetCode &amp; Codeforces Progress Tracker</p>
-                  </td>
-                </tr>
-                <!-- Content -->
-                <tr>
-                  <td style="padding: 28px 32px 20px;">
-                    <h2 style="margin: 0 0 12px; font-size: 18px; font-weight: 700; color: #0f172a;">Password Reset Request</h2>
-                    <p style="margin: 0 0 16px; font-size: 14px; line-height: 22px; color: #475569;">
-                      Hello{{GREETING}},<br>
-                      We received a request to reset your password. Use the verification code below to verify your identity:
-                    </p>
-                    <!-- OTP Box -->
-                    <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 18px 10px; text-align: center; margin: 24px 0;">
-                      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #5b4fff; display: inline-block; word-break: break-all;">{{OTP}}</span>
-                    </div>
-                    <p style="margin: 0 0 12px; font-size: 13px; color: #64748b; line-height: 20px;">
-                      This code is valid for <strong>10 minutes</strong>. For your security, do not share this code with anyone.
-                    </p>
-                    <p style="margin: 0; font-size: 13px; color: #94a3b8; line-height: 20px;">
-                      If you did not request this change, you can safely disregard this email. Your current password remains active and secure.
-                    </p>
-                  </td>
-                </tr>
-                <!-- Footer -->
-                <tr>
-                  <td style="padding: 20px 32px 28px; background-color: #fafafa; border-top: 1px solid #f1f5f9; text-align: center;">
-                    <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-                      &copy; 2026 MentorSync. All rights reserved.
-                    </p>
+                  <td align="center">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                      <tr>
+                        <td style="padding: 44px 40px 40px 40px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                          <!-- Brand Logo -->
+                          <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto 24px;">
+                            <tr>
+                              <td align="center">
+                                <svg width="44" height="34" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                                  <path d="M10 6L15 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M20 6L25 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M30 6L35 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
+                                </svg>
+                              </td>
+                            </tr>
+                          </table>
+
+                          <h1 style="margin: 0 0 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 24px; font-weight: 700; color: #111827; text-align: center; letter-spacing: -0.4px;">
+                            Reset Your Password
+                          </h1>
+                          <p style="margin: 0 0 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #6b7280; text-align: center;">
+                            Security verification for MentorSync
+                          </p>
+
+                          <p style="margin: 0 0 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #111827;">
+                            Hello{{GREETING}},
+                          </p>
+                          <p style="margin: 0 0 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #4b5563;">
+                            We received a request to reset the password for your MentorSync account. Please use the verification code below to proceed:
+                          </p>
+
+                          <!-- Minimalist OTP Box -->
+                          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin: 0 0 24px;">
+                            <tr>
+                              <td align="center" style="padding: 24px 16px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; margin-bottom: 8px;">
+                                  Password Reset Code
+                                </div>
+                                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: 8px; color: #0f172a; margin: 4px 0 6px;">
+                                  {{OTP}}
+                                </div>
+                                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #64748b; font-weight: 500; margin-top: 6px;">
+                                  Valid for 10 minutes &bull; Do not share this code
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- Security Notice Box -->
+                          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f9fafb; border: 1px solid #eaecf0; border-radius: 10px; margin: 0;">
+                            <tr>
+                              <td style="padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr>
+                                    <td valign="top" style="width: 20px; padding-right: 12px; padding-top: 2px;">
+                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        <path d="m9 12 2 2 4-4" />
+                                      </svg>
+                                    </td>
+                                    <td valign="top" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                                      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 2px;">
+                                        Security Notice
+                                      </div>
+                                      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4b5563; line-height: 1.5;">
+                                        This verification code will expire in 10 minutes. If you did not request a password reset, you can safely ignore this email.
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto;">
+                      <tr>
+                        <td align="center" style="padding: 20px 16px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #9ca3af; line-height: 1.5; text-align: center;">
+                          This is an automated security notification from MentorSync. Please do not reply.
+                        </td>
+                      </tr>
+                    </table>
+
                   </td>
                 </tr>
               </table>
@@ -454,50 +514,107 @@ public class ResendEmailService {
 
     private String buildStudentRegistrationOtpHtmlTemplate(String greeting, String otp) {
         String template = """
-            <!DOCTYPE html>
-            <html lang="en">
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
             <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Verify Your Student Email</title>
+              <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>Verify Your Email Address</title>
+              <style type="text/css">
+                body, table, td, a, p, span, div { 
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+                }
+              </style>
             </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f7; margin: 0; padding: 24px 12px; color: #1e293b;">
-              <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                <!-- Header -->
+            <body style="margin: 0; padding: 48px 12px; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #1f2937;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
                 <tr>
-                  <td style="padding: 32px 32px 20px; text-align: center; border-bottom: 1px solid #f1f5f9;">
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; color: #5b4fff; letter-spacing: -0.5px;">MentorSync</h1>
-                    <p style="margin: 4px 0 0; font-size: 13px; color: #64748b; font-weight: 500;">LeetCode &amp; Codeforces Progress Tracker</p>
-                  </td>
-                </tr>
-                <!-- Content -->
-                <tr>
-                  <td style="padding: 28px 32px 20px;">
-                    <div style="display: inline-block; padding: 4px 12px; background-color: #e0e7ff; color: #4338ca; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
-                      Student Registration
-                    </div>
-                    <h2 style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #0f172a;">Welcome to MentorSync!{{GREETING}}</h2>
-                    <p style="margin: 0 0 16px; font-size: 14px; line-height: 22px; color: #475569;">
-                      Thank you for creating your student account. To confirm that this email address belongs to you, please enter the 6-digit verification code below:
-                    </p>
-                    <!-- OTP Box -->
-                    <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 18px 10px; text-align: center; margin: 24px 0;">
-                      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #5b4fff; display: inline-block; word-break: break-all;">{{OTP}}</span>
-                    </div>
-                    <p style="margin: 0 0 12px; font-size: 13px; color: #64748b; line-height: 20px;">
-                      This code will expire in <strong>10 minutes</strong>. For your security, do not share this code with anyone.
-                    </p>
-                    <p style="margin: 0; font-size: 13px; color: #94a3b8; line-height: 20px;">
-                      If you did not initiate this registration, you can safely ignore this email.
-                    </p>
-                  </td>
-                </tr>
-                <!-- Footer -->
-                <tr>
-                  <td style="padding: 20px 32px 28px; background-color: #fafafa; border-top: 1px solid #f1f5f9; text-align: center;">
-                    <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-                      &copy; 2026 MentorSync. All rights reserved.
-                    </p>
+                  <td align="center">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                      <tr>
+                        <td style="padding: 44px 40px 40px 40px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                          <!-- Brand Logo -->
+                          <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto 24px;">
+                            <tr>
+                              <td align="center">
+                                <svg width="44" height="34" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                                  <path d="M10 6L15 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M20 6L25 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
+                                  <path d="M30 6L35 28" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" />
+                                </svg>
+                              </td>
+                            </tr>
+                          </table>
+
+                          <h1 style="margin: 0 0 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 24px; font-weight: 700; color: #111827; text-align: center; letter-spacing: -0.4px;">
+                            Verify Your Email Address
+                          </h1>
+                          <p style="margin: 0 0 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #6b7280; text-align: center;">
+                            Thank you for registering with MentorSync
+                          </p>
+
+                          <p style="margin: 0 0 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #111827;">
+                            Hello{{GREETING}},
+                          </p>
+                          <p style="margin: 0 0 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #4b5563;">
+                            Welcome to MentorSync! We're excited to have you on board. To complete your registration and verify your email address, please enter the one-time verification code below:
+                          </p>
+
+                          <!-- Minimalist OTP Box -->
+                          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin: 0 0 24px;">
+                            <tr>
+                              <td align="center" style="padding: 24px 16px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; margin-bottom: 8px;">
+                                  Verification Code
+                                </div>
+                                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: 8px; color: #0f172a; margin: 4px 0 6px;">
+                                  {{OTP}}
+                                </div>
+                                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #64748b; font-weight: 500; margin-top: 6px;">
+                                  Valid for 10 minutes &bull; Do not share this code
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- Security Notice Box -->
+                          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f9fafb; border: 1px solid #eaecf0; border-radius: 10px; margin: 0;">
+                            <tr>
+                              <td style="padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr>
+                                    <td valign="top" style="width: 20px; padding-right: 12px; padding-top: 2px;">
+                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        <path d="m9 12 2 2 4-4" />
+                                      </svg>
+                                    </td>
+                                    <td valign="top" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                                      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 2px;">
+                                        Security Notice
+                                      </div>
+                                      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4b5563; line-height: 1.5;">
+                                        This verification code will expire in 10 minutes. For your security, please do not share this email or code with anyone.
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto;">
+                      <tr>
+                        <td align="center" style="padding: 20px 16px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #9ca3af; line-height: 1.5; text-align: center;">
+                          This is an automated verification message from MentorSync. Please do not reply.
+                        </td>
+                      </tr>
+                    </table>
+
                   </td>
                 </tr>
               </table>
