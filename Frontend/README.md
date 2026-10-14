@@ -1,32 +1,32 @@
-# ⚡ MentorSync Frontend (React 19 + TypeScript + Vite)
+# MentorSync Frontend (React 19 + TypeScript + Vite)
 
 The modern, responsive web application for **MentorSync (LeetCode LMS)** — built with **React 19**, **TypeScript**, **Vite**, and **Tailwind CSS v4**. It delivers real-time dashboards for students, mentors, and administrators with gamified tracking, live WebSocket updates, and competitive programming analytics.
 
 ---
 
-## ✨ Features & Dashboards
+## Features & Dashboards
 
-### 👨‍🎓 Student Dashboard
+### Student Dashboard
 - **Daily Problem of the Day (POTD)**: Displays today's official LeetCode Daily Challenge with topic tags, difficulty badges, and a collaborative classroom ticker (*"3 of 5 students in TEST solved today's POTD!"*).
 - **Upcoming Contests Tracker**: Live schedule of LeetCode (Weekly/Biweekly) and Codeforces contests with dynamic countdown timers, platform filtering, and direct one-click registration.
 - **Dual-Platform Statistics**: Activity heatmap calendar, problem breakdown by difficulty (Easy, Medium, Hard), and unified contest rating progress across LeetCode and Codeforces.
 - **One-Click Assignment Verification**: Auto-validates completed homework against the student's LeetCode profile without manual screenshot submissions.
 
-### 👩‍🏫 Mentor Dashboard
+### Mentor Dashboard
 - **Classroom Hub**: Create classrooms, manage enrolled students, and bulk-import students via CSV.
 - **Auto-Detect Assignment Creator**: Mentors paste any LeetCode problem URL, and the system automatically fetches the problem title, slug, and difficulty.
 - **Live Leaderboard**: Real-time rankings sorted by streaks, contest ratings, solved counts, or pending tasks.
 - **Engagement Tools**: Automated email nudges for students falling behind on assignments.
 - **Reporting**: Export student performance and assignment completion metrics directly to CSV.
 
-### 🛡️ Super Admin Dashboard
+### Super Admin Dashboard
 - **System Overview**: High-level platform health metrics, user distributions, and system telemetry.
 - **Global Data Sync**: Trigger background synchronization of all student profiles across external APIs.
 - **Redis Cache Control**: Inspect Redis cache memory, view hit/miss statistics, flush individual caches, or manually run the Cache Warming Worker.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Technology | Purpose | Version |
 |---|---|---|
@@ -43,7 +43,7 @@ The modern, responsive web application for **MentorSync (LeetCode LMS)** — bui
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 Frontend/src/
@@ -66,7 +66,7 @@ Frontend/src/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher
@@ -92,7 +92,7 @@ The application will be available at `http://localhost:5173`.
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 Create a `.env` file in the `Frontend/` root:
 
@@ -106,7 +106,7 @@ VITE_WS_URL=http://localhost:8080/ws-endpoint
 
 ---
 
-## 🧪 Testing & Quality
+## Testing & Quality
 
 ```bash
 # Run unit tests
@@ -124,7 +124,7 @@ npm run build
 
 ---
 
-## 🎨 UI & Design Principles
+## UI & Design Principles
 - **Aesthetic Rhythm**: Built on solid brand colors (`#5b4fff` primary purple) paired with dark slate card surfaces (`#121824`, `#1e293b`), avoiding noisy multi-color gradients.
 - **Responsive Layout**: Designed for seamless usage across desktop displays, tablets, and mobile screens.
 - **Accessibility**: ARIA-compliant primitives via Radix UI, high contrast typography, and custom sleek scrollbars.

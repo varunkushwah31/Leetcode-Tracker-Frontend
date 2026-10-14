@@ -1,4 +1,4 @@
-# 🐳 MentorSync Dev Container Guide (macOS & Cross-Platform)
+# MentorSync Dev Container Guide (macOS & Cross-Platform)
 
 Welcome! This Dev Container provides an instant, zero-configuration development environment tailored for **macOS (Apple Silicon M1/M2/M3/M4 & Intel)** as well as Linux and Windows.
 
@@ -12,7 +12,7 @@ When opened in VS Code, it automatically configures:
 
 ---
 
-## 🛠️ First-Time Mac Setup (Prerequisites)
+## First-Time Mac Setup (Prerequisites)
 
 If this is your first time developing on a Mac, follow these quick steps:
 
@@ -35,7 +35,7 @@ In VS Code:
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Open the Project in VS Code
 Open your terminal on Mac (`Terminal` or `iTerm2`) and clone the repository:
@@ -57,7 +57,7 @@ VS Code will now build the container, start MongoDB and Redis, install dependenc
 
 ---
 
-## 💻 Running the Application Inside the Dev Container
+## Running the Application Inside the Dev Container
 
 Once VS Code connects, open an integrated terminal (`Ctrl + ` `~` or menu `Terminal -> New Terminal`).
 
@@ -85,7 +85,7 @@ npm run dev
 
 ---
 
-## 🌐 Accessing Services from your Mac Browser
+## Accessing Services from your Mac Browser
 
 Open your favorite Mac browser (Chrome, Safari, Arc, Firefox):
 
@@ -98,9 +98,9 @@ Open your favorite Mac browser (Chrome, Safari, Arc, Firefox):
 
 ---
 
-## 🍎 Handy Mac Tips for Windows Switchers
+## Handy Mac Tips for Windows Switchers
 
-- **Command Key**: Use `Cmd (⌘)` instead of `Ctrl` for most VS Code shortcuts:
+- **Command Key**: Use `Cmd` instead of `Ctrl` for most VS Code shortcuts:
   - `Cmd + P`: Quick file search
   - `Cmd + Shift + P`: Command palette
   - `Cmd + Shift + F`: Global search

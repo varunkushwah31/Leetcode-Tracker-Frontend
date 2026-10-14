@@ -347,7 +347,7 @@ export function ForgotPasswordModal({
                                         setError(null);
                                     }}
                                     disabled={isLoading}
-                                    className="text-center font-mono text-xl tracking-[0.35em] bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 focus:border-[#5b4fff] rounded-xl h-12"
+                                    className="text-center font-sans font-bold tabular-nums text-2xl tracking-[0.28em] pl-[0.28em] bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-[#5b4fff] focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl h-12 transition-all"
                                 />
                                 <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 pt-0.5">
                                     <span>Code expires in 10 minutes</span>

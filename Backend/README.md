@@ -1,10 +1,10 @@
-# ☕ MentorSync Backend (Spring Boot 4)
+# MentorSync Backend (Spring Boot 4)
 
 The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade platform that connects educators, mentors, and students. Built with **Spring Boot 4.0.5** and **Java 21**, it automates coding assignment tracking, synchronizes competitive programming stats across **LeetCode** and **Codeforces**, and powers real-time classroom leaderboards.
 
 ---
 
-## 🏛 System Architecture
+## System Architecture
 
 ```
                   ┌─────────────────────────────────────────┐
@@ -44,37 +44,37 @@ The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade pla
 
 ---
 
-## 🚀 Key Modules & Capabilities
+## Key Modules & Capabilities
 
-### 1. 🎯 Official LeetCode POTD (`DailyChallengeService`)
+### 1. Official LeetCode POTD (`DailyChallengeService`)
 - Integrates directly with LeetCode GraphQL endpoint (`activeDailyCodingChallengeQuestion`).
 - Fetches problem title, difficulty (Easy, Medium, Hard), tags, description preview, hint, and problem URL.
 - **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with automatic date-staleness validation. Because the problem of the day is identical across all users, it is shared globally, avoiding redundant external calls. Validates against UTC date to guarantee yesterday's POTD is never served.
 - Personal solve verification and collaborative classroom tickers are overlaid in-memory without re-querying LeetCode.
 
-### 2. ⚔️ Live Upcoming Contests Tracker (`ContestScheduleService`)
+### 2. Live Upcoming Contests Tracker (`ContestScheduleService`)
 - **LeetCode & Codeforces Aggregation**: Combines upcoming Weekly/Biweekly contests and Codeforces rounds with countdowns and direct registration URLs.
 - **Global Redis Caching (`upcoming-contests`)**: Cached globally under `upcoming-contests` (`ALL`, `LEETCODE`, `CODEFORCES`) with a 30-minute TTL. Shared identically across all users.
 
-### 3. ⚡ Redis Cache Warming Worker (`CacheWarmingService`)
+### 3. Redis Cache Warming Worker (`CacheWarmingService`)
 - Automated background worker executing daily at **6:00 AM IST** (`@Scheduled(cron = "0 0 6 * * ?", zone = "Asia/Kolkata")`).
 - Uses atomic Redis distributed lock (`lock:cache-warming`, 30 min TTL) to ensure single-node execution in clustered environments.
 - Primes and synchronizes global caches (`global-potd`, `upcoming-contests`) and pre-warms student & classroom caches for 0ms morning response times.
 - Manual administrative trigger endpoint: `POST /api/admin/cache/warm`.
 
-### 4. 🔄 Real-Time Clustered WebSockets (`RedisWebSocketBridge`)
+### 4. Real-Time Clustered WebSockets (`RedisWebSocketBridge`)
 - Native STOMP broker over `/ws-endpoint` with fallback SockJS support.
 - Redis Pub/Sub topic (`mentorsync:classroom:events`) bridges events across multi-instance clusters.
 - Broadcasts real-time events for assignment submissions, score changes, deadline updates, and student enrollments to `/topic/classrooms/{classroomId}`.
 
-### 5. 🛡️ Resilience & Fault Tolerance
+### 5. Resilience & Fault Tolerance
 - **Resilience4j Circuit Breaker**: Opens on 50% failure rate over 10 calls, immediately falling back to cached Redis data without crashing.
 - **Exponential Backoff Retry**: 3 retry attempts with exponential delays (2s, 4s) to survive transient network timeouts.
 - **Rate Limiting**: Throttles calls to 15 requests per 10 seconds to safeguard IP reputation with external providers.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Component | Technology | Version |
 |---|---|---|
@@ -89,7 +89,7 @@ The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade pla
 
 ---
 
-## 📋 REST API Reference
+## REST API Reference
 
 ### Authentication (`/api/auth`)
 | Method | Endpoint | Description |
@@ -147,7 +147,7 @@ The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade pla
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 Configure the following variables in your `.env` or IDE run configuration:
 
@@ -175,7 +175,7 @@ MAIL_PASSWORD=your-app-password
 
 ---
 
-## 🧪 Testing & Verification
+## Testing & Verification
 
 Run the full backend test suite:
 
@@ -191,7 +191,7 @@ Run the full backend test suite:
 
 ---
 
-## 📚 Technical Documentation
+## Technical Documentation
 
 - [Redis Caching & Warming Guide](docs/REDIS_CACHING_GUIDE.md)
 - [Resilience4j Circuit Breaker & Rate Limiter Guide](docs/RESILIENCE4J_IMPLEMENTATION_GUIDE.md)

@@ -47,7 +47,7 @@ export function StudentEmailVerificationModal({
         if (open) {
             setOtp('');
             setError(null);
-            setInfoMessage(`We've sent a 6-digit verification code to ${email}`);
+            setInfoMessage("We've sent a 6-digit verification code to your email address:");
             setResendCooldown(60);
         }
     }, [open, email]);
@@ -145,7 +145,7 @@ export function StudentEmailVerificationModal({
                             <Envelope className="w-4 h-4 shrink-0 mt-0.5 text-[#5b4fff]" weight="fill" />
                             <div className="leading-relaxed">
                                 <span>{infoMessage}</span>
-                                <div className="mt-1 font-mono font-semibold text-zinc-800 dark:text-zinc-200">
+                                <div className="mt-1 font-semibold text-zinc-900 dark:text-zinc-100 break-all">
                                     {email}
                                 </div>
                             </div>
@@ -177,7 +177,7 @@ export function StudentEmailVerificationModal({
                                     setOtp(digitsOnly);
                                     if (error) setError(null);
                                 }}
-                                className="font-mono text-center text-2xl tracking-[0.4em] font-bold h-12 rounded-xl bg-zinc-50 dark:bg-[#18181b] border-zinc-300 dark:border-zinc-800 focus-visible:ring-1 focus-visible:ring-[#5b4fff]"
+                                className="text-center font-sans font-bold tabular-nums text-2xl tracking-[0.28em] pl-[0.28em] h-12 rounded-xl bg-zinc-50 dark:bg-[#18181b] border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] transition-all"
                             />
                         </div>
 

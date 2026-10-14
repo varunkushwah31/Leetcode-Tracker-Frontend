@@ -1,4 +1,4 @@
-# 🚀 MentorSync — LeetCode & Codeforces LMS
+# MentorSync — LeetCode & Codeforces LMS
 
 <div align="center">
 
@@ -15,13 +15,13 @@
 
 **A high-performance Learning Management System bridging educators, mentors, and students with automated coding assignment verification, dual-platform competitive programming telemetry, and real-time clustered leaderboards.**
 
-[Explore Features](#-feature-highlights) • [System Architecture](#-system-architecture) • [Quickstart](#-quickstart--local-setup) • [API Reference](#-api-endpoints-reference) • [Documentation](#-project-documentation)
+[Explore Features](#feature-highlights) • [System Architecture](#system-architecture) • [Quickstart](#quickstart--local-setup) • [API Reference](#api-endpoints-reference) • [Documentation](#project-documentation)
 
 </div>
 
 ---
 
-## 📖 Overview
+## Overview
 
 **MentorSync** eliminates manual grading and administrative friction for coding bootcamps, university computer science departments, and competitive programming clubs. By integrating directly with **LeetCode** (GraphQL API) and **Codeforces** (REST API), MentorSync continuously tracks problem solutions, contest rating progressions, and assignment deadlines.
 
@@ -29,53 +29,53 @@ Mentors can create virtual classrooms, enroll students individually or in bulk v
 
 ---
 
-## ✨ Feature Highlights
+## Feature Highlights
 
-### 🎯 Official LeetCode Problem of the Day (POTD)
+### Official LeetCode Problem of the Day (POTD)
 * **Live Daily Challenge**: Directly pulls the official daily challenge from LeetCode (`activeDailyCodingChallengeQuestion`) with topic tags, difficulty pills, problem hint, and direct solve links.
 * **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with automatic date-staleness validation. Because the problem of the day is 100% identical for every user, it is stored once globally in Redis and shared across all students and mentors, eliminating redundant upstream calls. Validates against UTC date to guarantee yesterday's POTD is never served.
 * **Collaborative Classroom Ticker**: Surfaces a live classroom participation banner:  
   `"14 of 24 students in your classroom have solved today's POTD!"` — motivating peer accountability and daily problem-solving consistency.
 
-### ⚔️ Live Upcoming Contests Tracker
+### Live Upcoming Contests Tracker
 * **Dual-Platform Schedule**: Aggregates upcoming contest schedules from both **LeetCode** (Weekly & Biweekly) and **Codeforces** (Div 1/2/3/4).
 * **Global Redis Caching (`upcoming-contests`)**: Cached globally under `upcoming-contests` (`ALL`, `LEETCODE`, `CODEFORCES`) with a 30-minute TTL. Shared identically across all users without user-level computation.
 * **404 Prevention Filter**: Automatically restricts LeetCode contests strictly to active, published upcoming events (eliminating dead links to unannounced future weeks).
 * **Direct Registration Links**: Generates one-click registration redirects (`https://codeforces.com/contestRegistration/{id}`) for upcoming Codeforces contests.
 * **Interactive UI**: Real-time countdown clocks, duration badges, and instant platform filtering (`ALL`, `LEETCODE`, `CODEFORCES`).
 
-### ⚡ Redis Cache Warming Worker & Distributed Lock
+### Redis Cache Warming Worker & Distributed Lock
 * **Zero Cold-Cache Lag & Daily Sync**: Background scheduled worker runs daily at **6:00 AM Indian Standard Time (IST)** (`@Scheduled(cron = "0 0 6 * * ?", zone = "Asia/Kolkata")`) to prime global caches (`global-potd`, `upcoming-contests`) and pre-warm student statistics (`student-progress`, `student-stats`, `student-recent`, `student-profile`). Mentors experience instantaneous **0ms** responses during peak morning hours.
 * **Atomic Distributed Locking**: Acquires a Redis lock (`lock:cache-warming`, 30 min TTL) via `setIfAbsent()` to guarantee only one node warms the cache in multi-instance or Kubernetes deployments.
 * **Admin On-Demand Trigger**: Secure administrative endpoint (`POST /api/admin/cache/warm`) allows instant cache re-warming at any time.
 
-### 🔄 Real-Time Clustered WebSockets
+### Real-Time Clustered WebSockets
 * **STOMP over WebSocket**: Connected clients receive instant updates over `/topic/classrooms/{classroomId}` without needing manual page reloads.
 * **Redis Pub/Sub Cluster Bridge**: The `RedisWebSocketBridge` publishes events to `mentorsync:classroom:events`. Clustered server instances synchronize state seamlessly, dispatching local WebSocket notifications to connected students and mentors.
 
-### 🛡️ Enterprise Resilience & Fault Tolerance
+### Enterprise Resilience & Fault Tolerance
 * **Resilience4j Circuit Breaker**: Tracks upstream LeetCode API error rates. If failures exceed 50%, the circuit opens to prevent cascading timeouts, immediately serving cached Redis data.
 * **Exponential Backoff Retry**: Automatically retries transient failures up to 3 times with progressive delays (2s, 4s).
 * **Rate Limiting**: Throttles calls to 15 requests per 10 seconds to safeguard your server IP against third-party API throttling and bans.
 
-### 🏫 Classroom & Assignment Management
+### Classroom & Assignment Management
 * **Auto-Fetch Problem Titles**: Mentors simply paste a LeetCode problem URL — MentorSync automatically extracts the title slug, queries the API, and auto-populates the assignment title and difficulty.
 * **Automated Verification**: Students validate homework with one click (`auto-validate`); MentorSync queries LeetCode's recent submissions to verify problem acceptance and timestamps.
 * **Student Nudge System**: Mentors can trigger automated email reminders to students with overdue or pending assignments.
 * **CSV Bulk Import & Export**: One-click bulk student onboarding via CSV and instant export of classroom performance metrics.
 
-### 📊 Comprehensive Telemetry & Analytics
+### Comprehensive Telemetry & Analytics
 * **Consistency Heatmap**: Full interactive GitHub-style calendar heatmap displaying daily coding submissions.
 * **Multi-Metric Leaderboard**: Sort student rankings dynamically by **Streak**, **Total Solved**, **Contest Rating**, or **Pending Assignments**.
 * **Unified Contest History**: Synchronized graph displaying LeetCode and Codeforces historical rating curves and global ranks.
 
-### 🔐 Enterprise Security & RBAC
+### Enterprise Security & RBAC
 * **Stateless JWT**: Short-lived access tokens paired with secure **HTTP-Only Refresh Cookies** that resist XSS attacks.
 * **Role-Based Access Control**: Granular permissions across `STUDENT`, `MENTOR`, and `SUPER_ADMIN`.
 
 ---
 
-## 🏛 System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
@@ -129,7 +129,7 @@ flowchart TD
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Backend
 * **Language & Framework**: Java 21 LTS, Spring Boot 4.0.5
@@ -154,7 +154,7 @@ flowchart TD
 
 ---
 
-## 🚀 Quickstart & Local Setup
+## Quickstart & Local Setup
 
 ### Option 1: VS Code Dev Containers (Recommended for macOS & Linux)
 
@@ -247,7 +247,7 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## ⚙️ Environment Variables Reference
+## Environment Variables Reference
 
 | Variable | Scope | Default | Description |
 |---|---|---|---|
@@ -265,21 +265,21 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## 📋 API Endpoints Reference
+## API Endpoints Reference
 
-### 🔐 Authentication (`/api/auth`)
+### Authentication (`/api/auth`)
 * `POST /api/auth/register` — Register a mentor or admin account.
 * `POST /api/auth/register/student` — Register a student with LeetCode/Codeforces handles.
 * `POST /api/auth/login` — Sign in, returns JWT access token and sets HTTP-Only refresh cookie.
 * `POST /api/auth/refresh` — Issue fresh access token via HTTP-Only cookie.
 * `POST /api/auth/logout` — Revoke session and clear cookies.
 
-### 🎯 Challenges & Contests
+### Challenges & Contests
 * `GET /api/challenges/daily?classroomId={id}` — Retrieve today's official LeetCode POTD with student solved status & classroom progress.
 * `GET /api/challenges/daily/global` — Retrieve pure globally cached LeetCode POTD (no user context, 0ms latency).
 * `GET /api/contests/upcoming?platform={ALL|LEETCODE|CODEFORCES}` — Retrieve upcoming contests with countdowns and registration links (globally cached).
 
-### 🏫 Classrooms (`/api/classrooms`)
+### Classrooms (`/api/classrooms`)
 * `POST /api/classrooms` — Create classroom (`mentorId`, `className`).
 * `GET /api/classrooms/{id}/dashboard` — Fetch full classroom dashboard details.
 * `POST /api/classrooms/{id}/students` — Add student to classroom.
@@ -292,7 +292,7 @@ Open `http://localhost:5173` in your browser.
 * `GET /api/classrooms/{id}/export` — Export classroom student performance to CSV.
 * `POST /api/classrooms/{id}/students/{studentId}/nudge` — Dispatch email reminder for pending tasks.
 
-### 👨‍🎓 Students (`/api/students`)
+### Students (`/api/students`)
 * `GET /api/students/me/dashboard` — Fetch student dashboard, heatmap, and assignments.
 * `POST /api/students/me/sync` — Force profile re-sync with LeetCode & Codeforces.
 * `PUT /api/students/me/handles` — Update competitive programming handles.
@@ -300,7 +300,7 @@ Open `http://localhost:5173` in your browser.
 * `POST /api/students/me/classrooms/{cId}/assignments/{aId}/validate` — Verify submission with submission URL.
 * `GET /api/students/me/report` — Export personal progress report to CSV.
 
-### 🛡️ Administration & Cache (`/api/admin`)
+### Administration & Cache (`/api/admin`)
 * `GET /api/admin/overview` — System health, total counts, and user metrics.
 * `POST /api/admin/sync-all` — Force-sync all students across external platforms.
 * `GET /api/admin/cache/stats` — Inspect Redis cache hit/miss stats and key metrics.
@@ -309,7 +309,7 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## 🧪 Testing & Verification
+## Testing & Verification
 
 Both backend and frontend are thoroughly tested with automated suites:
 
@@ -325,7 +325,7 @@ npm test
 
 ---
 
-## 📚 Project Documentation
+## Project Documentation
 
 * [Dev Container macOS & Local Setup Guide](.devcontainer/README.md)
 * [Backend Architecture & Guide](Backend/README.md)
@@ -335,7 +335,7 @@ npm test
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -345,6 +345,6 @@ npm test
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
