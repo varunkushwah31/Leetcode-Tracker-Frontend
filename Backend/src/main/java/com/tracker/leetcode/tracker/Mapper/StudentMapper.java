@@ -4,12 +4,16 @@ import com.tracker.leetcode.tracker.DTO.*;
 import com.tracker.leetcode.tracker.Models.Assignment;
 import com.tracker.leetcode.tracker.Models.DailyProgress;
 import com.tracker.leetcode.tracker.Models.ProblemStats;
+import com.tracker.leetcode.tracker.Models.RecentSubmission;
 import com.tracker.leetcode.tracker.Models.Student;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class StudentMapper {
@@ -68,7 +72,7 @@ public class StudentMapper {
                 .leetcodeSolvedCount(leetcodeSolved)
                 .codeforcesSolvedCount(codeforcesSolved)
                 .totalSolved(combinedTotalSolved)
-                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getStreak()))
+                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getStreak(), student.getRecentSubmissions()))
                 .completedAssignments(completed)
                 .pendingAssignments(pending)
                 .avatarUrl(student.getAvatarUrl())
@@ -122,7 +126,7 @@ public class StudentMapper {
                 .badges(student.getBadges())
                 .contestHistory(student.getContestHistory())
                 .codeforcesContestHistory(student.getCodeforcesContestHistory())
-                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getStreak()))
+                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getStreak(), student.getRecentSubmissions()))
                 .skills(student.getSkills())
                 .problemStats(student.getProblemStats())
                 .recentSubmissions(student.getRecentSubmissions())
@@ -163,51 +167,67 @@ public class StudentMapper {
     public static final java.time.ZoneId IST_ZONE = java.time.ZoneId.of("Asia/Kolkata");
 
     public int calculateStreak(List<DailyProgress> history) {
-        return calculateStreak(history, null);
+        return calculateStreak(history, null, null);
     }
 
     public int calculateStreak(List<DailyProgress> history, Integer officialStreak) {
-        int official = (officialStreak != null && officialStreak > 0) ? officialStreak : 0;
+        return calculateStreak(history, officialStreak, null);
+    }
 
-        if (history == null || history.isEmpty()) {
-            return official;
+    public int calculateStreak(List<DailyProgress> history, Integer officialStreak, List<RecentSubmission> recentSubmissions) {
+        Set<LocalDate> activeDates = new HashSet<>();
+
+        if (history != null) {
+            for (DailyProgress dp : history) {
+                if (dp != null && dp.getDate() != null && dp.getQuestionSolved() > 0) {
+                    activeDates.add(dp.getDate());
+                }
+            }
         }
 
-        List<LocalDate> activeDates = history.stream()
-                .filter(d -> d != null && d.getDate() != null && d.getQuestionSolved() > 0)
-                .map(DailyProgress::getDate)
-                .distinct()
-                .sorted(Comparator.reverseOrder())
-                .toList();
+        if (recentSubmissions != null) {
+            for (RecentSubmission sub : recentSubmissions) {
+                if (sub != null && sub.getTimestamp() > 0) {
+                    LocalDate d = Instant.ofEpochSecond(sub.getTimestamp()).atZone(IST_ZONE).toLocalDate();
+                    activeDates.add(d);
+                }
+            }
+        }
 
         if (activeDates.isEmpty()) {
-            return official;
+            return 0;
         }
 
         LocalDate today = LocalDate.now(IST_ZONE);
         LocalDate yesterday = today.minusDays(1);
 
-        LocalDate mostRecent = activeDates.get(0);
-        int calculatedStreak = 0;
+        boolean solvedToday = activeDates.contains(today);
+        boolean solvedYesterday = activeDates.contains(yesterday);
 
-        // An active streak is alive if most recent solve was today or yesterday
-        // (or within a 2-day grace period for timezone shifts/freeze protection)
-        boolean isAlive = mostRecent.equals(today) 
-                || mostRecent.equals(yesterday)
-                || mostRecent.equals(yesterday.minusDays(1));
-
-        if (isAlive) {
-            LocalDate expectedDate = mostRecent;
-            for (LocalDate date : activeDates) {
-                if (date.equals(expectedDate)) {
-                    calculatedStreak++;
-                    expectedDate = expectedDate.minusDays(1);
-                } else {
-                    break;
-                }
-            }
+        // A streak is CURRENTLY ACTIVE only if at least one problem was solved
+        // today or yesterday in Indian Standard Time (Asia/Kolkata) across either platform.
+        // If neither today nor yesterday has solves across both platforms, current streak is 0.
+        if (!solvedToday && !solvedYesterday) {
+            return 0;
         }
 
-        return Math.max(official, calculatedStreak);
+        // Active streak sequence starts from today (if solved today) or yesterday (if today is still underway)
+        LocalDate checkDate = solvedToday ? today : yesterday;
+        int combinedStreak = 0;
+
+        while (activeDates.contains(checkDate)) {
+            combinedStreak++;
+            checkDate = checkDate.minusDays(1);
+        }
+
+        // Only preserve an official platform streak (e.g. LeetCode streak freeze preservation)
+        // if the student's streak is active AND yesterday was solved.
+        // If yesterday was NOT solved on either platform, the streak cannot exceed 1 day.
+        int finalStreak = combinedStreak;
+        if (officialStreak != null && officialStreak > 0 && solvedYesterday) {
+            finalStreak = Math.max(combinedStreak, officialStreak);
+        }
+
+        return finalStreak;
     }
 }

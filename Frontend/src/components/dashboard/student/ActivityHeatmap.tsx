@@ -92,15 +92,20 @@ export function ActivityHeatmap({
             prevDate = curDate;
         });
 
-        // Current streak ending today or yesterday
-        const now = new Date();
-        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        const yesterday = new Date(now);
+        // Current streak ending today or yesterday in IST
+        const getISTDate = () => {
+            const d = new Date();
+            const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+            return new Date(utc + (3600000 * 5.5));
+        };
+        const istNow = getISTDate();
+        const todayStr = `${istNow.getFullYear()}-${String(istNow.getMonth() + 1).padStart(2, '0')}-${String(istNow.getDate()).padStart(2, '0')}`;
+        const yesterday = new Date(istNow);
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
 
         if (pMap[todayStr] || pMap[yesterdayStr]) {
-            const startCheck = pMap[todayStr] ? now : yesterday;
+            const startCheck = pMap[todayStr] ? istNow : yesterday;
             const checkDate = new Date(startCheck.getFullYear(), startCheck.getMonth(), startCheck.getDate());
             let count = 0;
             while (true) {
@@ -124,7 +129,7 @@ export function ActivityHeatmap({
     }, [progressHistory]);
 
     const effectiveMaxStreak = Math.max(calculatedMaxStreak, consistencyStreak || 0);
-    const effectiveCurrentStreak = Math.max(calculatedCurrentStreak, consistencyStreak || 0);
+    const effectiveCurrentStreak = consistencyStreak !== undefined && consistencyStreak > 0 ? consistencyStreak : calculatedCurrentStreak;
 
     // 2. Generate week columns based on selected range
     const { weeks, rangeSubmissions, rangeActiveDays } = useMemo(() => {
