@@ -116,26 +116,16 @@ public class LeetCodeApiClient {
         }
 
         JsonNode userCalendar = matchedUser.path("userCalendar");
-        int officialStreak = 0;
-        if (!userCalendar.isMissingNode() && !userCalendar.isNull()) {
-            officialStreak = userCalendar.path("streak").asInt(0);
-        }
 
         JsonNode calendarNode = userCalendar.path("submissionCalendar");
         if (calendarNode.isMissingNode() || calendarNode.isNull() || calendarNode.asString("").isBlank()) {
             log.info("LeetCode returned no calendar data for user: {}", username);
-            cacheDataForFallback("leetcode:streak:" + username.toLowerCase(), 0);
             return new ArrayList<>();
         }
-
-        LocalDate today = LocalDate.now(IST_ZONE);
-        LocalDate yesterday = today.minusDays(1);
-        LocalDate mostRecentLcDate = null;
 
         try {
             String calendarStr = calendarNode.asString();
             if (calendarStr == null || calendarStr.isBlank() || "{}".equals(calendarStr.trim())) {
-                cacheDataForFallback("leetcode:streak:" + username.toLowerCase(), 0);
                 return new ArrayList<>();
             }
             Map<String, Integer> submissionMap = objectMapper.readValue(calendarStr, new TypeReference<>() {});
@@ -144,16 +134,7 @@ public class LeetCodeApiClient {
             for (Map.Entry<String, Integer> entry : submissionMap.entrySet()) {
                 LocalDate date = Instant.ofEpochSecond(Long.parseLong(entry.getKey())).atZone(IST_ZONE).toLocalDate();
                 progressList.add(new DailyProgress(date, entry.getValue()));
-                if (mostRecentLcDate == null || date.isAfter(mostRecentLcDate)) {
-                    mostRecentLcDate = date;
-                }
             }
-
-            // An official LeetCode streak is active only if the student solved on LeetCode today or yesterday in IST.
-            // If the last solve was before yesterday, their current LeetCode streak is broken (0).
-            boolean isLcActive = mostRecentLcDate != null && (mostRecentLcDate.equals(today) || mostRecentLcDate.equals(yesterday));
-            int activeStreak = isLcActive ? officialStreak : 0;
-            cacheDataForFallback("leetcode:streak:" + username.toLowerCase(), activeStreak);
 
             // Cache for fallback
             cacheDataForFallback("leetcode:calendar:" + username, progressList);
@@ -309,11 +290,7 @@ public class LeetCodeApiClient {
         extendedData.setRank(profile.path("ranking").asString("Unranked"));
         extendedData.setAvatarUrl(profile.path("userAvatar").asString(null)); // <-- CAPTURE THE AVATAR!
 
-        JsonNode calNode = matchedUser.path("userCalendar");
-        if (!calNode.isMissingNode() && !calNode.isNull()) {
-            Integer cachedActiveStreak = getFallbackDataFromCache("leetcode:streak:" + username.toLowerCase(), Integer.class);
-            extendedData.setStreak(cachedActiveStreak != null ? cachedActiveStreak : 0);
-        }
+        extendedData.setStreak(0);
 
         extendedData.setSocialMedia(new SocialMedia(
                 matchedUser.path("githubUrl").asString(null),

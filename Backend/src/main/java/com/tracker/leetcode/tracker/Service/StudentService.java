@@ -319,9 +319,6 @@ public class StudentService {
                 student.setSocialMedia(ext.getSocialMedia());
                 student.setBadges(ext.getBadges());
                 student.setContestHistory(ext.getContestHistory());
-                if (ext.getStreak() != null) {
-                    student.setStreak(ext.getStreak());
-                }
                 if (ext.getAvatarUrl() != null && !ext.getAvatarUrl().isBlank()) {
                     student.setAvatarUrl(ext.getAvatarUrl());
                 }
@@ -376,7 +373,7 @@ public class StudentService {
         }
 
         // Calculate true current streak across both platforms and store in student entity
-        int combinedCurrentStreak = studentMapper.calculateStreak(student.getProgressHistory(), student.getStreak(), student.getRecentSubmissions());
+        int combinedCurrentStreak = studentMapper.calculateStreak(student.getProgressHistory(), student.getRecentSubmissions());
         student.setStreak(combinedCurrentStreak);
 
         // 4. Auto-validate any pending assignments
@@ -448,7 +445,7 @@ public class StudentService {
                     student.getCurrentContestRating(),
                     student.getCodeforcesRating() != null ? student.getCodeforcesRating() : 0.0
             );
-            int streak = studentMapper.calculateStreak(student.getProgressHistory(), student.getStreak(), student.getRecentSubmissions());
+            int streak = studentMapper.calculateStreak(student.getProgressHistory(), student.getRecentSubmissions());
 
             leaderboardService.updateStudentMetrics(
                     student.getId(),
@@ -715,7 +712,7 @@ public class StudentService {
         csv.append("Codeforces Rating,").append(student.getCodeforcesRating() != null ? student.getCodeforcesRating() : 0).append("\n");
         csv.append("Codeforces Max Rating,").append(student.getCodeforcesMaxRating() != null ? student.getCodeforcesMaxRating() : 0).append("\n");
         csv.append("Codeforces Rank,").append(escapeCsv(student.getCodeforcesRank())).append("\n");
-        int streak = student.getProgressHistory() != null ? studentMapper.calculateStreak(student.getProgressHistory(), student.getStreak(), student.getRecentSubmissions()) : 0;
+        int streak = student.getProgressHistory() != null ? studentMapper.calculateStreak(student.getProgressHistory(), student.getRecentSubmissions()) : 0;
         csv.append("Daily Streak,").append(streak).append("\n\n");
 
         // Section 2: Topic & Skill Mastery

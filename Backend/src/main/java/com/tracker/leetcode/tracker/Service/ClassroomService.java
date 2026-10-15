@@ -1550,7 +1550,7 @@ public class ClassroomService {
             }
 
             // 5. Consistency Streak
-            int sStreak = studentMapper.calculateStreak(s.getProgressHistory(), s.getStreak(), s.getRecentSubmissions());
+            int sStreak = studentMapper.calculateStreak(s.getProgressHistory(), s.getRecentSubmissions());
             totalStreak += sStreak;
             if (sStreak > maxStreak) {
                 maxStreak = sStreak;
@@ -1584,7 +1584,7 @@ public class ClassroomService {
         for (Student s : students) {
             boolean isActive = studentActiveMap.getOrDefault(s.getId(), false);
             int sSolved = studentTotalSolvedMap.getOrDefault(s.getId(), 0);
-            int sStreak = studentMapper.calculateStreak(s.getProgressHistory());
+            int sStreak = studentMapper.calculateStreak(s.getProgressHistory(), s.getRecentSubmissions());
 
             String riskLevel = null;
             String riskReason = null;
@@ -1934,7 +1934,7 @@ public class ClassroomService {
                     student.getCurrentContestRating(),
                     student.getCodeforcesRating() != null ? student.getCodeforcesRating() : 0.0
             );
-            int streak = student.getProgressHistory() != null ? studentMapper.calculateStreak(student.getProgressHistory(), student.getStreak(), student.getRecentSubmissions()) : 0;
+            int streak = student.getProgressHistory() != null ? studentMapper.calculateStreak(student.getProgressHistory(), student.getRecentSubmissions()) : 0;
 
             redisLeaderboardService.updateStudentMetrics(
                     student.getId(),

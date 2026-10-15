@@ -72,7 +72,7 @@ public class StudentMapper {
                 .leetcodeSolvedCount(leetcodeSolved)
                 .codeforcesSolvedCount(codeforcesSolved)
                 .totalSolved(combinedTotalSolved)
-                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getStreak(), student.getRecentSubmissions()))
+                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getRecentSubmissions()))
                 .completedAssignments(completed)
                 .pendingAssignments(pending)
                 .avatarUrl(student.getAvatarUrl())
@@ -126,7 +126,7 @@ public class StudentMapper {
                 .badges(student.getBadges())
                 .contestHistory(student.getContestHistory())
                 .codeforcesContestHistory(student.getCodeforcesContestHistory())
-                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getStreak(), student.getRecentSubmissions()))
+                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getRecentSubmissions()))
                 .skills(student.getSkills())
                 .problemStats(student.getProblemStats())
                 .recentSubmissions(student.getRecentSubmissions())
@@ -167,14 +167,14 @@ public class StudentMapper {
     public static final java.time.ZoneId IST_ZONE = java.time.ZoneId.of("Asia/Kolkata");
 
     public int calculateStreak(List<DailyProgress> history) {
-        return calculateStreak(history, null, null);
+        return calculateStreak(history, (List<RecentSubmission>) null);
     }
 
-    public int calculateStreak(List<DailyProgress> history, Integer officialStreak) {
-        return calculateStreak(history, officialStreak, null);
+    public int calculateStreak(List<DailyProgress> history, Integer ignoredOfficialStreak, List<RecentSubmission> recentSubmissions) {
+        return calculateStreak(history, recentSubmissions);
     }
 
-    public int calculateStreak(List<DailyProgress> history, Integer officialStreak, List<RecentSubmission> recentSubmissions) {
+    public int calculateStreak(List<DailyProgress> history, List<RecentSubmission> recentSubmissions) {
         Set<LocalDate> activeDates = new HashSet<>();
 
         if (history != null) {
@@ -220,14 +220,6 @@ public class StudentMapper {
             checkDate = checkDate.minusDays(1);
         }
 
-        // Only preserve an official platform streak (e.g. LeetCode streak freeze preservation)
-        // if the student's streak is active AND yesterday was solved.
-        // If yesterday was NOT solved on either platform, the streak cannot exceed 1 day.
-        int finalStreak = combinedStreak;
-        if (officialStreak != null && officialStreak > 0 && solvedYesterday) {
-            finalStreak = Math.max(combinedStreak, officialStreak);
-        }
-
-        return finalStreak;
+        return combinedStreak;
     }
 }
