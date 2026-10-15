@@ -57,7 +57,7 @@ describe('ActivityHeatmap', { timeout: 20000 }, () => {
     it('uses consistencyStreak if it is larger than calculated max streak', () => {
         render(<ActivityHeatmap progressHistory={mockProgress} consistencyStreak={15} />);
 
-        expect(screen.getByText('15d')).toBeTruthy();
+        expect(screen.getAllByText('15d').length).toBeGreaterThanOrEqual(1);
     });
 
     it('renders weekday labels and activity legend', () => {

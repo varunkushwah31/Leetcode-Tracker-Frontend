@@ -17,6 +17,7 @@ import com.tracker.leetcode.tracker.Repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -454,6 +455,35 @@ public class ClassroomService {
                 .enrolledStudents(studentSummaries)
                 .assignments(classroom.getAssignments() != null ? classroom.getAssignments() : new ArrayList<>())
                 .build();
+    }
+
+    // 3b. Sync Entire Classroom Profiles
+    @CacheEvict(value = {"classroom-dashboard", "classroom-analytics"}, allEntries = true)
+    public ClassroomDashboardDTO syncClassroom(String classroomId, String sortBy) {
+        log.info("Starting complete sync for classroom ID: {}", classroomId);
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+
+        List<Student> students = studentRepository.findAllById(classroom.getStudentIds());
+        if (studentService != null && !students.isEmpty()) {
+            for (Student s : students) {
+                try {
+                    studentService.syncAllProfileData(s);
+                    // 350ms delay between students to stay well within Codeforces and LeetCode rate limits
+                    Thread.sleep(350);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    log.warn("Classroom student sync error for [{}]: {}", s.getName(), e.getMessage());
+                }
+            }
+        }
+
+        Cache dashCache = cacheManager.getCache("classroom-dashboard");
+        if (dashCache != null) dashCache.clear();
+
+        return getClassroomDashboard(classroomId, sortBy);
     }
 
     // 4. Assign a question to the classroom

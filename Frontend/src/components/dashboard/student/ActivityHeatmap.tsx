@@ -124,7 +124,7 @@ export function ActivityHeatmap({
     }, [progressHistory]);
 
     const effectiveMaxStreak = Math.max(calculatedMaxStreak, consistencyStreak || 0);
-    const effectiveCurrentStreak = calculatedCurrentStreak;
+    const effectiveCurrentStreak = Math.max(calculatedCurrentStreak, consistencyStreak || 0);
 
     // 2. Generate week columns based on selected range
     const { weeks, rangeSubmissions, rangeActiveDays } = useMemo(() => {

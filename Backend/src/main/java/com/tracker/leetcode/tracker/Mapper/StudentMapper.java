@@ -68,7 +68,7 @@ public class StudentMapper {
                 .leetcodeSolvedCount(leetcodeSolved)
                 .codeforcesSolvedCount(codeforcesSolved)
                 .totalSolved(combinedTotalSolved)
-                .consistencyStreak(calculateStreak(student.getProgressHistory()))
+                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getStreak()))
                 .completedAssignments(completed)
                 .pendingAssignments(pending)
                 .avatarUrl(student.getAvatarUrl())
@@ -122,7 +122,7 @@ public class StudentMapper {
                 .badges(student.getBadges())
                 .contestHistory(student.getContestHistory())
                 .codeforcesContestHistory(student.getCodeforcesContestHistory())
-                .consistencyStreak(calculateStreak(student.getProgressHistory()))
+                .consistencyStreak(calculateStreak(student.getProgressHistory(), student.getStreak()))
                 .skills(student.getSkills())
                 .problemStats(student.getProblemStats())
                 .recentSubmissions(student.getRecentSubmissions())
@@ -160,37 +160,54 @@ public class StudentMapper {
         return normalizeSlug(subSlug).equalsIgnoreCase(normalizeSlug(assignSlug));
     }
 
+    public static final java.time.ZoneId IST_ZONE = java.time.ZoneId.of("Asia/Kolkata");
+
     public int calculateStreak(List<DailyProgress> history) {
-        if (history == null || history.isEmpty()) return 0;
+        return calculateStreak(history, null);
+    }
+
+    public int calculateStreak(List<DailyProgress> history, Integer officialStreak) {
+        int official = (officialStreak != null && officialStreak > 0) ? officialStreak : 0;
+
+        if (history == null || history.isEmpty()) {
+            return official;
+        }
 
         List<LocalDate> activeDates = history.stream()
-                .filter(d -> d.getQuestionSolved() > 0)
+                .filter(d -> d != null && d.getDate() != null && d.getQuestionSolved() > 0)
                 .map(DailyProgress::getDate)
                 .distinct()
                 .sorted(Comparator.reverseOrder())
                 .toList();
 
-        if (activeDates.isEmpty()) return 0;
+        if (activeDates.isEmpty()) {
+            return official;
+        }
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(IST_ZONE);
         LocalDate yesterday = today.minusDays(1);
 
         LocalDate mostRecent = activeDates.get(0);
-        if (!mostRecent.equals(today) && !mostRecent.equals(yesterday)) {
-            return 0;
-        }
+        int calculatedStreak = 0;
 
-        int streak = 0;
-        LocalDate expectedDate = mostRecent;
+        // An active streak is alive if most recent solve was today or yesterday
+        // (or within a 2-day grace period for timezone shifts/freeze protection)
+        boolean isAlive = mostRecent.equals(today) 
+                || mostRecent.equals(yesterday)
+                || mostRecent.equals(yesterday.minusDays(1));
 
-        for (LocalDate date : activeDates) {
-            if (date.equals(expectedDate)) {
-                streak++;
-                expectedDate = expectedDate.minusDays(1);
-            } else {
-                break;
+        if (isAlive) {
+            LocalDate expectedDate = mostRecent;
+            for (LocalDate date : activeDates) {
+                if (date.equals(expectedDate)) {
+                    calculatedStreak++;
+                    expectedDate = expectedDate.minusDays(1);
+                } else {
+                    break;
+                }
             }
         }
-        return streak;
+
+        return Math.max(official, calculatedStreak);
     }
 }

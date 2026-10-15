@@ -151,6 +151,16 @@ public class ClassroomController {
         return ResponseEntity.ok(classroomService.getClassroomDashboard(classroomId, sortBy));
     }
 
+    // 3b. Sync Entire Classroom Profiles
+    // URL: POST /api/classrooms/{id}/sync
+    @PostMapping("/{classroomId}/sync")
+    public ResponseEntity<ClassroomDashboardDTO> syncClassroom(
+            @PathVariable String classroomId,
+            @RequestParam(required = false, defaultValue = "solved") String sortBy) {
+
+        return ResponseEntity.ok(classroomService.syncClassroom(classroomId, sortBy));
+    }
+
     // 4. Assign a Question to the Classroom
     // URL: POST /api/classrooms/{id}/assignments
     /* Body Example:

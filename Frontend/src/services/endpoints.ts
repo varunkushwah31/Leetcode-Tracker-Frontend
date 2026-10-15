@@ -97,6 +97,7 @@ export const ClassroomService = {
             headers: { 'Content-Type': 'application/json' }
         }),
     getDashboard: (classroomId: string, sortBy: string = 'solved') => api.get(`/classrooms/${classroomId}/dashboard`, { params: { sortBy } }),
+    syncClassroom: (classroomId: string, sortBy: string = 'solved') => api.post(`/classrooms/${classroomId}/sync`, null, { params: { sortBy } }),
     addStudent: (classroomId: string, identifier: string, mentorId?: string) => {
         const payload = {
             identifier,

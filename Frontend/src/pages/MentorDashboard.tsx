@@ -39,7 +39,7 @@ import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 
-async function syncStudentsInBatches(students: { id?: string; leetcodeUsername?: string; codeforcesHandle?: string }[], batchSize = 3): Promise<void> {
+async function syncStudentsInBatches(students: { id?: string; leetcodeUsername?: string; codeforcesHandle?: string }[], batchSize = 2): Promise<void> {
     for (let i = 0; i < students.length; i += batchSize) {
         const batch = students.slice(i, i + batchSize);
         await Promise.allSettled(
@@ -49,7 +49,7 @@ async function syncStudentsInBatches(students: { id?: string; leetcodeUsername?:
             })
         );
         if (i + batchSize < students.length) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 2500));
         }
     }
 }
@@ -319,8 +319,22 @@ export function MentorDashboard() {
         setError(null);
         setIsClassroomSyncing(true);
         try {
-            await syncStudentsInBatches(selectedClassroom.enrolledStudents);
-            await fetchDashboardData();
+            let syncedViaBackend = false;
+            try {
+                const res = await ClassroomService.syncClassroom(selectedClassroom.classroomId, sortBy);
+                if (res.data) {
+                    setSelectedClassroom(res.data);
+                    setClassrooms(prev => prev.map(c => c.classroomId === res.data.classroomId ? res.data : c));
+                    syncedViaBackend = true;
+                }
+            } catch {
+                syncedViaBackend = false;
+            }
+
+            if (!syncedViaBackend) {
+                await syncStudentsInBatches(selectedClassroom.enrolledStudents);
+                await fetchDashboardData();
+            }
         } catch (err: unknown) {
             setError(getErrorMessage(err, 'Failed to sync classroom.'));
         } finally {

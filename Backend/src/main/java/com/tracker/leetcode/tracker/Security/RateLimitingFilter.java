@@ -61,6 +61,19 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         Tier tier = determineTier(path);
         String clientIdentifier = resolveClientIdentifier(request);
 
+        // Mentors and Admins syncing student profiles or classroom data should not be throttled by single-student sync quota
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            boolean isMentorOrAdmin = auth.getAuthorities().stream().anyMatch(a -> 
+                "ROLE_MENTOR".equals(a.getAuthority()) ||
+                "ROLE_SUPER_ADMIN".equals(a.getAuthority()) ||
+                "ROLE_ADMIN".equals(a.getAuthority())
+            );
+            if (isMentorOrAdmin && tier == Tier.LEETCODE_SYNC) {
+                tier = Tier.GENERAL;
+            }
+        }
+
         RateLimitResult result = rateLimitingService.checkLimit(clientIdentifier, tier);
 
         // Always attach standard rate limit metadata headers

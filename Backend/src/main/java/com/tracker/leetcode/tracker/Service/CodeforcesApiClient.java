@@ -46,7 +46,24 @@ public class CodeforcesApiClient {
         this.headers.set(HttpHeaders.USER_AGENT, "MentorSync-Tracker/1.0 (Educational competitive programming tracker)");
     }
 
+    public static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
+    private static final Object CF_REQUEST_LOCK = new Object();
+    private static long lastCfRequestTime = 0;
+
     private JsonNode executeGetRequest(String endpoint, String identifier) {
+        synchronized (CF_REQUEST_LOCK) {
+            long now = System.currentTimeMillis();
+            long elapsed = now - lastCfRequestTime;
+            if (elapsed < 350) {
+                try {
+                    Thread.sleep(350 - elapsed);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            lastCfRequestTime = System.currentTimeMillis();
+        }
+
         try {
             HttpEntity<Void> request = new HttpEntity<>(headers);
             ResponseEntity<String> response = restTemplate.exchange(
@@ -252,7 +269,7 @@ public class CodeforcesApiClient {
                         // Heatmap daily activity
                         if (creationTime > 0) {
                             LocalDate date = Instant.ofEpochSecond(creationTime)
-                                    .atZone(ZoneId.systemDefault())
+                                    .atZone(IST_ZONE)
                                     .toLocalDate();
                             dailyMap.merge(date, 1, Integer::sum);
                         }

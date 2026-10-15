@@ -98,13 +98,15 @@ public class LeetCodeApiClient {
         return null;
     }
 
+    public static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
+
     // 1. Fetch Calendar Heatmap Data
     @CircuitBreaker(name = "leetcodeApi", fallbackMethod = "fetchCalendarDataFallback")
     @Retry(name = "leetcodeApi")
     @RateLimiter(name = "leetcodeApi")
     public List<DailyProgress> fetchCalendarData(String username) {
         String query = """
-                {"query":"query userProfileCalendar($username: String!) { matchedUser(username: $username) { userCalendar { submissionCalendar } } }","variables":{"username":"%s"}}
+                {"query":"query userProfileCalendar($username: String!) { matchedUser(username: $username) { userCalendar { streak totalActiveDays submissionCalendar } } }","variables":{"username":"%s"}}
                 """.formatted(username);
 
         JsonNode root = executeGraphQLQuery(query, username);
@@ -113,7 +115,13 @@ public class LeetCodeApiClient {
             throw new LeetCodeApiException("LeetCode user not found: " + username);
         }
 
-        JsonNode calendarNode = matchedUser.path("userCalendar").path("submissionCalendar");
+        JsonNode userCalendar = matchedUser.path("userCalendar");
+        if (!userCalendar.isMissingNode() && !userCalendar.isNull()) {
+            int officialStreak = userCalendar.path("streak").asInt(0);
+            cacheDataForFallback("leetcode:streak:" + username.toLowerCase(), officialStreak);
+        }
+
+        JsonNode calendarNode = userCalendar.path("submissionCalendar");
 
         if (calendarNode.isMissingNode() || calendarNode.isNull() || calendarNode.asString("").isBlank()) {
             log.info("LeetCode returned no calendar data for user: {}", username);
@@ -129,7 +137,7 @@ public class LeetCodeApiClient {
             List<DailyProgress> progressList = new ArrayList<>();
 
             for (Map.Entry<String, Integer> entry : submissionMap.entrySet()) {
-                LocalDate date = Instant.ofEpochSecond(Long.parseLong(entry.getKey())).atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate date = Instant.ofEpochSecond(Long.parseLong(entry.getKey())).atZone(IST_ZONE).toLocalDate();
                 progressList.add(new DailyProgress(date, entry.getValue()));
             }
 
@@ -261,14 +269,14 @@ public class LeetCodeApiClient {
         throw new LeetCodeApiException("LeetCode API is temporarily unavailable and no cached data exists for user: " + username);
     }
 
-    // 4. Fetch Extended Profile (Badges, Socials, Contests, Rank, About, AVATAR)
+    // 4. Fetch Extended Profile (Badges, Socials, Contests, Rank, About, AVATAR, Streak)
     @CircuitBreaker(name = "leetcodeApi", fallbackMethod = "fetchExtendedProfileDetailsFallback")
     @Retry(name = "leetcodeApi")
     @RateLimiter(name = "leetcodeApi")
     public Student fetchExtendedProfileDetails(String username) {
-        // ADDED 'userAvatar' TO THE GRAPHQL QUERY
+        // ADDED 'userAvatar' AND 'userCalendar' TO THE GRAPHQL QUERY
         String query = """
-                {"query":"query fullProfile($username: String!) { matchedUser(username: $username) { githubUrl twitterUrl linkedinUrl profile { ranking aboutMe userAvatar } badges { name icon creationDate } } userContestRanking(username: $username) { rating } userContestRankingHistory(username: $username) { attended rating ranking problemsSolved totalProblems contest { title startTime } } }","variables":{"username":"%s"}}
+                {"query":"query fullProfile($username: String!) { matchedUser(username: $username) { githubUrl twitterUrl linkedinUrl profile { ranking aboutMe userAvatar } badges { name icon creationDate } userCalendar { streak totalActiveDays } } userContestRanking(username: $username) { rating } userContestRankingHistory(username: $username) { attended rating ranking problemsSolved totalProblems contest { title startTime } } }","variables":{"username":"%s"}}
                 """.formatted(username);
 
         JsonNode root = executeGraphQLQuery(query, username);
@@ -286,6 +294,11 @@ public class LeetCodeApiClient {
         extendedData.setAbout(profile.path("aboutMe").asString(null));
         extendedData.setRank(profile.path("ranking").asString("Unranked"));
         extendedData.setAvatarUrl(profile.path("userAvatar").asString(null)); // <-- CAPTURE THE AVATAR!
+
+        JsonNode calNode = matchedUser.path("userCalendar");
+        if (!calNode.isMissingNode() && !calNode.isNull()) {
+            extendedData.setStreak(calNode.path("streak").asInt(0));
+        }
 
         extendedData.setSocialMedia(new SocialMedia(
                 matchedUser.path("githubUrl").asString(null),

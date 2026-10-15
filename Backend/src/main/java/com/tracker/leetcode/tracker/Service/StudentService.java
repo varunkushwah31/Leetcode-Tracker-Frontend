@@ -319,6 +319,9 @@ public class StudentService {
                 student.setSocialMedia(ext.getSocialMedia());
                 student.setBadges(ext.getBadges());
                 student.setContestHistory(ext.getContestHistory());
+                if (ext.getStreak() != null && ext.getStreak() > 0) {
+                    student.setStreak(ext.getStreak());
+                }
                 if (ext.getAvatarUrl() != null && !ext.getAvatarUrl().isBlank()) {
                     student.setAvatarUrl(ext.getAvatarUrl());
                 }

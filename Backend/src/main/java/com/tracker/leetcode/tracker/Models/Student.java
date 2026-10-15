@@ -47,6 +47,7 @@ public class Student implements UserDetails {
     private String codeforcesAvatarUrl;
     private Integer codeforcesSolvedCount = 0;
 
+    private Integer streak = 0;
     private List<DailyProgress> progressHistory = new ArrayList<>();
     private List<Badge> badges = new ArrayList<>();
     private List<ContestHistory> contestHistory = new ArrayList<>();
