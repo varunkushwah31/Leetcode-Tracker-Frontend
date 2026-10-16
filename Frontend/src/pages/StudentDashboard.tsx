@@ -182,17 +182,6 @@ export function StudentDashboard() {
                         >
                             {isSyncing ? <Loader2 className="w-4 h-4 animate-spin text-[#5b4fff]" /> : <Activity className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" />}
                         </Button>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="sm:hidden border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer h-8.5 w-8.5"
-                            onClick={handleExportReport}
-                            disabled={isExporting}
-                            title="Export Report (CSV)"
-                            aria-label="Export Report (CSV)"
-                        >
-                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin text-zinc-500" /> : <Download className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />}
-                        </Button>
 
                         {/* Desktop Action Buttons */}
                         <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer text-xs font-semibold h-10 px-3.5" onClick={handleExportReport} disabled={isExporting}>

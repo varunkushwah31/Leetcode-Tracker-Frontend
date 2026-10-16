@@ -268,7 +268,7 @@ export function ClassroomAnalytics({
                         <div className="p-3 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-xl shadow-inner shrink-0">
                             <UsersIcon className="w-6 h-6" />
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                             <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Cohort Engagement</p>
                             <div className="flex items-baseline gap-2">
                                 <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight">
@@ -381,27 +381,29 @@ export function ClassroomAnalytics({
                 <button
                     type="button"
                     onClick={() => setActiveTab('overview')}
-                    className={`whitespace-nowrap shrink-0 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+                    className={`whitespace-nowrap shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[11px] sm:text-xs font-medium transition-all duration-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer ${
                         activeTab === 'overview'
                             ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
-                    <Activity className="w-4 h-4 text-[#5b4fff]" />
-                    Overview & Benchmarks
+                    <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#5b4fff]" />
+                    <span className="sm:hidden">Overview</span>
+                    <span className="hidden sm:inline">Overview & Benchmarks</span>
                 </button>
 
                 <button
                     type="button"
                     onClick={() => setActiveTab('weaknesses')}
-                    className={`whitespace-nowrap shrink-0 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+                    className={`whitespace-nowrap shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[11px] sm:text-xs font-medium transition-all duration-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer ${
                         activeTab === 'weaknesses'
                             ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
-                    <AlertTriangle className="w-4 h-4 text-rose-500" />
-                    Critical Weaknesses & Interventions
+                    <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500" />
+                    <span className="sm:hidden">Gaps</span>
+                    <span className="hidden sm:inline">Critical Weaknesses & Interventions</span>
                     {criticalWeaknessTopics.length > 0 && (
                         <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
                             activeTab === 'weaknesses'
@@ -416,27 +418,29 @@ export function ClassroomAnalytics({
                 <button
                     type="button"
                     onClick={() => setActiveTab('matrix')}
-                    className={`whitespace-nowrap shrink-0 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+                    className={`whitespace-nowrap shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[11px] sm:text-xs font-medium transition-all duration-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer ${
                         activeTab === 'matrix'
                             ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
-                    <TrendingUp className="w-4 h-4 text-emerald-500" />
-                    Topic Competency Matrix
+                    <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
+                    <span className="sm:hidden">Matrix</span>
+                    <span className="hidden sm:inline">Topic Competency Matrix</span>
                 </button>
 
                 <button
                     type="button"
                     onClick={() => setActiveTab('watchlist')}
-                    className={`whitespace-nowrap shrink-0 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+                    className={`whitespace-nowrap shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[11px] sm:text-xs font-medium transition-all duration-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer ${
                         activeTab === 'watchlist'
                             ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
-                    <ShieldWarningIcon className="w-4 h-4 text-amber-500" />
-                    At-Risk Watchlist
+                    <ShieldWarningIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
+                    <span className="sm:hidden">Watchlist</span>
+                    <span className="hidden sm:inline">At-Risk Watchlist</span>
                     {atRiskCount > 0 && (
                         <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
                             activeTab === 'watchlist'
@@ -451,14 +455,15 @@ export function ClassroomAnalytics({
                 <button
                     type="button"
                     onClick={() => setActiveTab('assignments')}
-                    className={`whitespace-nowrap shrink-0 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+                    className={`whitespace-nowrap shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[11px] sm:text-xs font-medium transition-all duration-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer ${
                         activeTab === 'assignments'
                             ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                 >
-                    <BookOpenIcon className="w-4 h-4 text-blue-500" />
-                    Assignment Health
+                    <BookOpenIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
+                    <span className="sm:hidden">Assignments</span>
+                    <span className="hidden sm:inline">Assignment Health</span>
                     {data.assignmentCompletionRate !== undefined && (
                         <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold border ${
                             activeTab === 'assignments'

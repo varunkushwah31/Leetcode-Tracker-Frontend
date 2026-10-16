@@ -267,15 +267,15 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     <p className="text-xs text-zinc-500 mt-1">Contest Rating</p>
                                 </div>
 
-                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-3.5 sm:p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Codeforces Rating</p>
-                                    <div className="flex items-center gap-2">
-                                        <p className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
+                                    <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Codeforces Rating</p>
+                                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                        <p className="text-lg sm:text-2xl lg:text-3xl font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
                                             {cfRating > 0 ? cfRating : 'N/A'}
                                         </p>
                                         {cfDelta !== null && (
-                                            <span className={`inline-flex items-center gap-0.5 text-xs font-bold px-1.5 py-0.5 rounded-md border ${
+                                            <span className={`inline-flex items-center gap-0.5 text-[10px] sm:text-xs font-bold px-1.5 py-0.5 rounded-md border ${
                                                 cfDelta > 0
                                                     ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                                     : cfDelta < 0

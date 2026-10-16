@@ -699,13 +699,13 @@ export function MentorDashboard() {
                                         <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-2">{selectedClassroom.className}</h1>
                                         <p className="text-[14px] sm:text-[15px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><BookOpenIcon className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
                                     </div>
-                                    <div className="flex flex-wrap items-center gap-2.5 w-full xl:w-auto">
+                                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 w-full xl:w-auto">
                                         <Button
                                             onClick={handleSyncClassroom}
                                             disabled={isClassroomSyncing}
                                             variant="outline"
                                             aria-label="Sync classroom data"
-                                            className="bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl"
+                                            className="col-span-2 sm:col-span-1 w-full sm:w-auto justify-center bg-white dark:bg-transparent border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl h-10"
                                         >
                                             {isClassroomSyncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2 text-zinc-500 dark:text-zinc-400" />}
                                             {isClassroomSyncing ? 'Syncing Class...' : 'Sync Class Data'}
@@ -715,24 +715,27 @@ export function MentorDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl w-full sm:w-max overflow-x-auto no-scrollbar sm:custom-scrollbar mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
+                                <div className="grid grid-cols-3 sm:flex bg-white dark:bg-[#121217] p-1.5 rounded-xl w-full sm:w-max mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
                                     <button
-                                        className={`whitespace-nowrap px-4 sm:px-5 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-medium rounded-lg transition-all duration-200 shrink-0 ${activeTab === 'leaderboard' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`px-2 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-[14px] font-medium rounded-lg transition-all duration-200 text-center justify-center shrink-0 ${activeTab === 'leaderboard' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('leaderboard')}
                                     >
-                                        Class Leaderboard
+                                        <span className="sm:hidden">Leaderboard</span>
+                                        <span className="hidden sm:inline">Class Leaderboard</span>
                                     </button>
                                     <button
-                                        className={`whitespace-nowrap px-4 sm:px-5 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-medium rounded-lg transition-all duration-200 shrink-0 ${activeTab === 'analytics' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`px-2 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-[14px] font-medium rounded-lg transition-all duration-200 text-center justify-center shrink-0 ${activeTab === 'analytics' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('analytics')}
                                     >
-                                        Weakness & Analytics
+                                        <span className="sm:hidden">Analytics</span>
+                                        <span className="hidden sm:inline">Weakness & Analytics</span>
                                     </button>
                                     <button
-                                        className={`whitespace-nowrap px-4 sm:px-5 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-medium rounded-lg transition-all duration-200 shrink-0 ${activeTab === 'assignments' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`px-2 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-[14px] font-medium rounded-lg transition-all duration-200 text-center justify-center shrink-0 ${activeTab === 'assignments' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('assignments')}
                                     >
-                                        Manage Assignments
+                                        <span className="sm:hidden">Assignments</span>
+                                        <span className="hidden sm:inline">Manage Assignments</span>
                                     </button>
                                 </div>
 

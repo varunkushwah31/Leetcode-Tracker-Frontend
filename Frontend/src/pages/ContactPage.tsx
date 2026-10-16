@@ -106,25 +106,25 @@ export function ContactPage() {
 
                 <div className="w-full max-w-120 relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
 
-                    <div className="lg:hidden flex items-center justify-between mb-8">
-                        <BrandLogo size="md" theme="auto" />
+                    <div className="lg:hidden flex items-center justify-between mb-5 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60">
+                        <BrandLogo size="sm" theme="auto" />
                         <div className="flex items-center gap-2">
-                            <ThemeToggle className="bg-zinc-100 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800" />
+                            <ThemeToggle className="bg-zinc-100 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-8.5 w-8.5" />
                             <Link
                                 to="/"
-                                className="flex items-center gap-1.5 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:-translate-x-0.5"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 text-xs font-semibold transition-all hover:-translate-x-0.5"
                             >
                                 <ArrowLeftIcon className="h-3.5 w-3.5" />
-                                Home
+                                <span>Home</span>
                             </Link>
                         </div>
                     </div>
 
-                    <div className="mb-8">
-                        <h2 className="text-[28px] font-bold text-zinc-900 dark:text-white tracking-tight mb-2">
+                    <div className="mb-6">
+                        <h2 className="text-2xl sm:text-[28px] font-bold text-zinc-900 dark:text-white tracking-tight mb-1.5">
                             Get in touch
                         </h2>
-                        <p className="text-zinc-600 dark:text-zinc-400 text-[15px]">
+                        <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-[15px]">
                             Fill out the form below and our team will get back to you within 24 hours.
                         </p>
                     </div>
@@ -146,10 +146,10 @@ export function ContactPage() {
                             </Button>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                             <ErrorBanner message={error} />
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                                 <div className="space-y-1.5">
                                     <Label className="uppercase text-[11px] tracking-wider text-zinc-600 dark:text-zinc-400 font-semibold block">Your Name</Label>
                                     <Input
@@ -157,7 +157,7 @@ export function ContactPage() {
                                         placeholder="John Doe"
                                         value={formData.name}
                                         onChange={(e) => { setFormData({...formData, name: e.target.value}); clearError(); }}
-                                        className="bg-zinc-50 dark:bg-[#222] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4"
+                                        className="bg-zinc-50 dark:bg-[#18181c] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -168,7 +168,7 @@ export function ContactPage() {
                                         placeholder="john@example.com"
                                         value={formData.email}
                                         onChange={(e) => { setFormData({...formData, email: e.target.value}); clearError(); }}
-                                        className="bg-zinc-50 dark:bg-[#222] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4"
+                                        className="bg-zinc-50 dark:bg-[#18181c] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
                                     />
                                 </div>
                             </div>
@@ -180,7 +180,7 @@ export function ContactPage() {
                                     placeholder="How can we help you?"
                                     value={formData.subject}
                                     onChange={(e) => { setFormData({...formData, subject: e.target.value}); clearError(); }}
-                                    className="bg-zinc-50 dark:bg-[#222] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-12 rounded-xl w-full transition-all px-4"
+                                    className="bg-zinc-50 dark:bg-[#18181c] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
                                 />
                             </div>
 
@@ -191,7 +191,7 @@ export function ContactPage() {
                                     placeholder="Tell us more about your inquiry..."
                                     value={formData.message}
                                     onChange={(e) => { setFormData({...formData, message: e.target.value}); clearError(); }}
-                                    className="flex min-h-35 w-full rounded-xl bg-zinc-50 dark:bg-[#222] border border-zinc-300 dark:border-zinc-800 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5b4fff] disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-y custom-scrollbar"
+                                    className="flex min-h-32 sm:min-h-35 w-full rounded-xl bg-zinc-50 dark:bg-[#18181c] border border-zinc-200 dark:border-zinc-800 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5b4fff] disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-y custom-scrollbar"
                                 />
                             </div>
 

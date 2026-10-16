@@ -249,25 +249,22 @@ export function AuthPage() {
 
   return (
       <div className="min-h-screen flex bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white font-sans selection:bg-[#5b4fff] selection:text-white relative transition-colors duration-200">
-        {/* Navigation & Controls */}
-        <Link
-          to="/"
-          className="fixed top-5 left-5 sm:top-6 sm:left-6 z-30 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/80 dark:bg-zinc-900/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 text-xs font-semibold transition-all hover:-translate-x-0.5 shadow-md backdrop-blur-md"
-        >
-          <ArrowLeftIcon className="w-3.5 h-3.5" />
-          <span>Back to Home</span>
-        </Link>
-
-        <div className="fixed top-5 right-5 sm:top-6 sm:right-6 z-30 flex items-center gap-2.5">
-          <ThemeToggle className="bg-white/80 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 shadow-md backdrop-blur-md" />
-        </div>
-
         {/* Left Panel - Visuals & Branding */}
         <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-50 dark:bg-[#09090e] border-r border-zinc-200 dark:border-zinc-900 flex-col justify-center p-10 xl:p-16 transition-colors duration-200">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(91,79,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.04)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
           <div className="relative z-10 w-full max-w-lg mx-auto">
-            <div className="mb-8">
+            <div className="flex items-center justify-between mb-8 xl:mb-12">
               <BrandLogo size="md" theme="auto" />
+              <div className="flex items-center gap-3">
+                <ThemeToggle className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800" />
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors text-sm font-medium hover:-translate-x-0.5"
+                >
+                  <ArrowLeftIcon className="h-4 w-4" />
+                  Back to Home
+                </Link>
+              </div>
             </div>
             <h1 className="text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight mb-4 text-zinc-900 dark:text-white">
               The modern OS for <br />
@@ -316,10 +313,20 @@ export function AuthPage() {
             <AmbientGlow variant="center" />
           </div>
 
-          <div className="w-full max-w-lg relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto mt-16 sm:my-auto">
-            {/* Mobile Header with Logo */}
-            <div className="flex items-center mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800/60 lg:hidden">
+          <div className="w-full max-w-lg relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto">
+            {/* Mobile Header with Logo & Navigation */}
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60 lg:hidden">
               <BrandLogo size="sm" theme="auto" />
+              <div className="flex items-center gap-2">
+                <ThemeToggle className="bg-zinc-100 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-8.5 w-8.5" />
+                <Link
+                  to="/"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 text-xs font-semibold transition-all hover:-translate-x-0.5"
+                >
+                  <ArrowLeftIcon className="w-3.5 h-3.5" />
+                  <span>Home</span>
+                </Link>
+              </div>
             </div>
             <div className="mb-4 sm:mb-5">
               <h2 className="text-2xl sm:text-[26px] font-bold text-zinc-900 dark:text-white tracking-tight mb-1">

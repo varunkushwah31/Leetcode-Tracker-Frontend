@@ -70,7 +70,7 @@ export function ActivityHeatmap({
             }
         });
 
-        const activeDates = Object.keys(pMap).sort();
+        const activeDates = Object.keys(pMap).sort((a, b) => a.localeCompare(b));
         let maxS = 0;
         let currentS = 0;
         let tempStreak = 0;
@@ -211,13 +211,16 @@ export function ActivityHeatmap({
     // 3. Smooth scroll to end for 6 months and 1 year
     useEffect(() => {
         if (scrollContainerRef.current && (range === '6months' || range === '1year')) {
-            requestAnimationFrame(() => {
+            const scrollToCurrent = () => {
                 if (scrollContainerRef.current) {
                     scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
                 }
-            });
+            };
+            scrollToCurrent();
+            const timer = setTimeout(scrollToCurrent, 100);
+            return () => clearTimeout(timer);
         }
-    }, [range]);
+    }, [range, weeks]);
 
     const rangeLabel = range === '12weeks' ? 'past 12 weeks' : range === '6months' ? 'past 6 months' : 'past one year';
 
@@ -244,8 +247,8 @@ export function ActivityHeatmap({
                 </div>
 
                 {/* Right Header Section: Stats & Range Tabs */}
-                <div className="flex flex-col sm:items-end gap-2 shrink-0">
-                    <div className="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/60 px-3 py-1.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
+                <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto shrink-0">
+                    <div className="flex items-center justify-center sm:justify-start gap-2.5 sm:gap-3 text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/60 px-3 py-1.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 w-full sm:w-auto">
                         <span>
                             Active: <strong className="text-zinc-900 dark:text-white font-bold">{rangeActiveDays}d</strong>
                         </span>
@@ -261,11 +264,11 @@ export function ActivityHeatmap({
                     </div>
 
                     {/* Range Selector Pills */}
-                    <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#141414]/90 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800/80 shadow-xs dark:shadow-none">
+                    <div className="grid grid-cols-3 sm:flex items-center gap-1 bg-zinc-100 dark:bg-[#141414]/90 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800/80 shadow-xs dark:shadow-none w-full sm:w-auto">
                         <button
                             type="button"
                             onClick={() => setRange('12weeks')}
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all text-center cursor-pointer ${
                                 range === '12weeks'
                                     ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -276,7 +279,7 @@ export function ActivityHeatmap({
                         <button
                             type="button"
                             onClick={() => setRange('6months')}
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all text-center cursor-pointer ${
                                 range === '6months'
                                     ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -287,7 +290,7 @@ export function ActivityHeatmap({
                         <button
                             type="button"
                             onClick={() => setRange('1year')}
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all text-center cursor-pointer ${
                                 range === '1year'
                                     ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'

@@ -47,11 +47,11 @@ export function ContestRatingsSection({
                 </div>
 
                 {/* Filter Pills */}
-                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-[#141414]/80 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800/80 self-start sm:self-auto shadow-xs dark:shadow-none">
+                <div className="grid grid-cols-3 sm:flex items-center gap-1 bg-zinc-100 dark:bg-[#141414]/80 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800/80 w-full sm:w-auto shadow-xs dark:shadow-none">
                     <button
                         type="button"
                         onClick={() => setActiveTab('all')}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                        className={`text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg transition-all text-center justify-center cursor-pointer ${
                             activeTab === 'all'
                                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -62,26 +62,26 @@ export function ContestRatingsSection({
                     <button
                         type="button"
                         onClick={() => setActiveTab('leetcode')}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                        className={`text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
                             activeTab === 'leetcode'
                                 ? 'bg-amber-500/15 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-xs'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400'
                         }`}
                     >
-                        <TrophyIcon className="w-3.5 h-3.5" />
-                        LeetCode ({lcCount})
+                        <TrophyIcon className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">LeetCode ({lcCount})</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setActiveTab('codeforces')}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                        className={`text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
                             activeTab === 'codeforces'
                                 ? 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 shadow-xs'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-cyan-600 dark:hover:text-cyan-400'
                         }`}
                     >
-                        <TrophyIcon className="w-3.5 h-3.5" />
-                        Codeforces ({cfCount})
+                        <TrophyIcon className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">Codeforces ({cfCount})</span>
                     </button>
                 </div>
             </div>
