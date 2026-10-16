@@ -137,13 +137,14 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
 
     const handleConfirmRemove = async () => {
         if (!classroomId || !studentToRemove) return;
+        const studentIdentifier = studentToRemove.id || studentToRemove.leetcodeUsername || studentToRemove.codeforcesHandle;
+        if (!studentIdentifier) {
+            setRemoveError("Unable to identify student.");
+            return;
+        }
         setIsRemoving(true);
         setRemoveError(null);
         try {
-            const studentIdentifier = studentToRemove.id || studentToRemove.leetcodeUsername || studentToRemove.codeforcesHandle;
-            if (!studentIdentifier) {
-                throw new Error("Unable to identify student.");
-            }
             await ClassroomService.removeStudent(classroomId, studentIdentifier, mentorId);
             setStudentToRemove(null);
             if (onRefresh) {
@@ -219,13 +220,13 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
         const q = searchQuery.trim().toLowerCase();
         const filtered = students.filter(s =>
             !q ||
-            (s.name && s.name.toLowerCase().includes(q)) ||
-            (s.leetcodeUsername && s.leetcodeUsername.toLowerCase().includes(q)) ||
-            (s.codeforcesHandle && s.codeforcesHandle.toLowerCase().includes(q))
+            (s.name?.toLowerCase().includes(q)) ||
+            (s.leetcodeUsername?.toLowerCase().includes(q)) ||
+            (s.codeforcesHandle?.toLowerCase().includes(q))
         );
 
         return [...filtered].sort((a, b) => {
-            let diff = 0;
+            let diff: number;
             switch (sortField) {
                 case 'consistency':
                 case 'streak': {
@@ -269,8 +270,8 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                 case 'rank': {
                     const parseRank = (r?: string) => {
                         if (!r) return Number.MAX_SAFE_INTEGER;
-                        const num = parseInt(r.replace(/[^0-9]/g, ''), 10);
-                        return isNaN(num) ? Number.MAX_SAFE_INTEGER : num;
+                        const num = Number.parseInt(r.replace(/\D/g, ''), 10);
+                        return Number.isNaN(num) ? Number.MAX_SAFE_INTEGER : num;
                     };
                     diff = parseRank(a.rank) - parseRank(b.rank);
                     break;
@@ -301,8 +302,8 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                         <CardTitle className="text-[22px] font-bold text-zinc-900 dark:text-white tracking-tight">Student Leaderboard</CardTitle>
                         <CardDescription className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Track and compare student progress</CardDescription>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="relative">
+                    <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                        <div className="relative w-full sm:w-auto">
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                             <input
                                 type="text"
@@ -330,9 +331,9 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 Export Matrix
                             </Button>
                         )}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
                             <Select value={sortField} onValueChange={(val) => handleSortChange(val, val === 'name' || val === 'rank' ? 'asc' : 'desc')}>
-                                <SelectTrigger className="w-48 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white h-10 rounded-xl focus:ring-1 focus:ring-[#5b4fff] text-xs font-semibold">
+                                <SelectTrigger className="flex-1 sm:w-48 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white h-10 rounded-xl focus:ring-1 focus:ring-[#5b4fff] text-xs font-semibold">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="bg-white dark:bg-[#1a1b2e] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl shadow-xl">
@@ -372,7 +373,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
             </CardHeader>
             <CardContent className="p-0">
                 <div className="overflow-x-auto">
-                    <table className="w-full">
+                    <table className="w-full min-w-180">
                         <thead className="bg-zinc-50/80 dark:bg-[#1a1b2e]/50 border-b border-zinc-200/80 dark:border-zinc-800/60 select-none">
                         <tr>
                             <th

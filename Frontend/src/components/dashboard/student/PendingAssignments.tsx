@@ -126,18 +126,18 @@ export function PendingAssignments({
 
     return (
         <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
-            <CardHeader className="bg-transparent border-b border-zinc-200/80 dark:border-zinc-800/60 flex flex-row items-center justify-between">
+            <CardHeader className="bg-transparent border-b border-zinc-200/80 dark:border-zinc-800/60 p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                    <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white tracking-tight">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-zinc-900 dark:text-white tracking-tight">
                         <BookOpenIcon className="w-5 h-5 text-[#5b4fff] dark:text-[#968fff]" /> Pending Assignments
                     </CardTitle>
-                    <CardDescription className="mt-1 text-zinc-500 dark:text-zinc-400">
+                    <CardDescription className="mt-1 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
                         {selectedClassroomId ? 'Filtered by selected classroom' : 'Assigned by your mentors on LeetCode & Codeforces'}
                     </CardDescription>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     {selectedClassroomId && (
-                        <Button onClick={onClearFilter} variant="ghost" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                        <Button onClick={onClearFilter} variant="ghost" size="sm" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
                             Clear Filter
                         </Button>
                     )}
@@ -145,6 +145,7 @@ export function PendingAssignments({
                         onClick={onSync}
                         disabled={isSyncing}
                         variant="outline"
+                        size="sm"
                         className="bg-transparent border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
                     >
                         {isSyncing ? (
@@ -174,7 +175,7 @@ export function PendingAssignments({
                         const isAutoValidatingThis = isAutoValidating === item.assignment.id;
 
                         return (
-                            <div key={`${item.classroomId}-${item.assignment.id}`} className="p-6 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors">
+                            <div key={`${item.classroomId}-${item.assignment.id}`} className="p-4 sm:p-6 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors">
                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                                     <div>
                                         <div className="flex items-center gap-2 mb-2">

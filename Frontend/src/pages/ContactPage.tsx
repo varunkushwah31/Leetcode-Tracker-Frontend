@@ -98,13 +98,13 @@ export function ContactPage() {
             </div>
 
             {/* Right Panel - Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative bg-[#f8fafc] dark:bg-[#0a0a0a] overflow-hidden transition-colors duration-200">
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-10 relative bg-[#f8fafc] dark:bg-[#0a0a0a] overflow-hidden transition-colors duration-200">
                 <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none"></div>
                 <div className="hidden dark:block">
                     <AmbientGlow variant="center" />
                 </div>
 
-                <div className="w-full max-w-120 relative z-10 bg-white dark:bg-[#111116] p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="w-full max-w-120 relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
 
                     <div className="lg:hidden flex items-center justify-between mb-8">
                         <BrandLogo size="md" theme="auto" />

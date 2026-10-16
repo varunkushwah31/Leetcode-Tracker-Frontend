@@ -161,14 +161,40 @@ export function StudentDashboard() {
             </div>
 
             <header className="bg-white/90 dark:bg-zinc-900/60 backdrop-blur-xl border-b border-zinc-200/90 dark:border-zinc-800 sticky top-0 z-20 shadow-xs transition-colors duration-200">
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <BrandLogo size="md" />
+                <div className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 py-3 sm:py-3.5 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                        <BrandLogo size="sm" className="sm:hidden" />
+                        <BrandLogo size="md" className="hidden sm:inline-flex" />
                         <span className="hidden sm:inline-flex text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
                             Student
                         </span>
                     </div>
-                    <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-1.5 sm:gap-4">
+                        {/* Mobile Quick Action Buttons */}
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="sm:hidden border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer h-8.5 w-8.5"
+                            onClick={handleSync}
+                            disabled={isSyncing}
+                            title="Sync Profile"
+                            aria-label="Sync Profile"
+                        >
+                            {isSyncing ? <Loader2 className="w-4 h-4 animate-spin text-[#5b4fff]" /> : <Activity className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" />}
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="sm:hidden border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer h-8.5 w-8.5"
+                            onClick={handleExportReport}
+                            disabled={isExporting}
+                            title="Export Report (CSV)"
+                            aria-label="Export Report (CSV)"
+                        >
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin text-zinc-500" /> : <Download className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />}
+                        </Button>
+
+                        {/* Desktop Action Buttons */}
                         <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer text-xs font-semibold h-10 px-3.5" onClick={handleExportReport} disabled={isExporting}>
                             {isExporting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-zinc-500" /> : <Download className="w-4 h-4 mr-1.5 text-[#5b4fff] dark:text-[#968fff]" />}
                             <span>Export Report (CSV)</span>
@@ -183,13 +209,13 @@ export function StudentDashboard() {
                             Help
                         </Link>
 
-                        <ThemeToggle />
+                        <ThemeToggle className="h-8.5 w-8.5 sm:h-9 sm:w-9" />
 
                         <div className="w-px h-6 bg-zinc-200 dark:bg-zinc-800 hidden sm:block mx-1" />
-                        <div className="flex items-center gap-3">
-                            <Avatar className="border border-zinc-200 dark:border-zinc-700">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <Avatar className="w-8 h-8 sm:w-9 sm:h-9 border border-zinc-200 dark:border-zinc-700">
                                 <AvatarImage src={dashboardData?.avatarUrl} />
-                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold">{user?.name?.substring(0, 2) || 'ST'}</AvatarFallback>
+                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs sm:text-sm">{user?.name?.substring(0, 2) || 'ST'}</AvatarFallback>
                             </Avatar>
                             <div className="text-right hidden sm:block">
                                 <p className="text-sm font-bold text-zinc-900 dark:text-white">{dashboardData?.name || user?.name}</p>
@@ -201,7 +227,7 @@ export function StudentDashboard() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                                    className="h-8.5 w-8.5 sm:h-9 sm:w-9 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                                     title="Change Password"
                                     aria-label="Change Password"
                                 >
@@ -209,14 +235,14 @@ export function StudentDashboard() {
                                 </Button>
                             }
                         />
-                        <Button variant="ghost" size="icon" onClick={logout} className="hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 text-zinc-500 dark:text-zinc-400" title="Sign Out" aria-label="Sign Out">
+                        <Button variant="ghost" size="icon" onClick={logout} className="h-8.5 w-8.5 sm:h-9 sm:w-9 hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 text-zinc-500 dark:text-zinc-400" title="Sign Out" aria-label="Sign Out">
                             <LogOut className="w-4 h-4" />
                         </Button>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <main className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 w-full">
 
                 {/* 5. Render any global errors (like an initial 500 error, or a failed sync) */}
                 <ErrorBanner message={pageError} className="mb-6" />

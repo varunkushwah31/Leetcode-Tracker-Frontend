@@ -210,18 +210,18 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
             </div>
 
                 {/* Top Banner */}
-                <Card className={`p-8 ${cardClasses}`}>
+                <Card className={`p-4 sm:p-8 ${cardClasses}`}>
                     <div className="flex flex-col xl:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center space-x-6">
-                            <Avatar className="w-24 h-24 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-full">
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
+                            <Avatar className="w-16 h-16 sm:w-24 sm:h-24 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-full shrink-0">
                                 <AvatarImage src={data.avatarUrl} />
-                                <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] text-3xl font-bold">
+                                <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] text-xl sm:text-3xl font-bold">
                                     {data.name?.substring(0, 2).toUpperCase() || 'ST'}
                                 </AvatarFallback>
                             </Avatar>
                             <div>
-                                <h1 className="text-3xl font-extrabold mb-1 text-zinc-900 dark:text-white tracking-tight">{data.name}</h1>
-                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                <h1 className="text-xl sm:text-3xl font-extrabold mb-1 text-zinc-900 dark:text-white tracking-tight">{data.name}</h1>
+                                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-3">
                                     {data.leetcodeUsername && (
                                         <a href={`https://leetcode.com/${data.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-[#5b4fff] dark:hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-[#1a1b2e]/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
                                             LC: @{data.leetcodeUsername} <ExternalLink className="h-3 w-3 ml-1.5" />
@@ -236,7 +236,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap justify-center sm:justify-start gap-6 sm:gap-8 bg-zinc-50/80 dark:bg-[#1a1b2e]/40 p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner">
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-8 bg-zinc-50/80 dark:bg-[#1a1b2e]/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rank</p>
                                 <p className="text-2xl font-bold text-zinc-900 dark:text-white">{data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : (data.codeforcesRank || 'N/A')}</p>

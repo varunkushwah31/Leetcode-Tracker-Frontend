@@ -4,6 +4,9 @@
 @import "@fontsource-variable/inter";
 @variant dark (&:where(.dark, .dark *));
 @layer base {
+  html, body {
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 antialiased transition-colors duration-300;
   }
@@ -258,12 +261,12 @@ body {
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,
-  ::before,
-  ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+    scroll-behavior: auto;
   }
 }
 
@@ -309,4 +312,13 @@ button:not(:disabled):active,
 }
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.35);
+}
+
+/* Hide scrollbar for clean horizontal mobile swipes */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

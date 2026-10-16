@@ -9,7 +9,9 @@ import {
     SparkleIcon as Sparkles,
     TargetIcon,
     MedalIcon as Award,
-    CodeIcon as Code2Icon
+    CodeIcon as Code2Icon,
+    ListIcon as MenuIcon,
+    XIcon
 } from '@phosphor-icons/react';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { BrandLogo } from '../components/common/BrandLogo';
@@ -17,9 +19,11 @@ import { ThemeToggle } from '../components/ui/ThemeToggle';
 
 export function LandingPage() {
     const [activeTab, setActiveTab] = useState<'mentor' | 'student'>('student');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     // 1. Create a custom scroll handler
     const scrollToFeatures = () => {
+        setMobileMenuOpen(false);
         const featuresSection = document.getElementById('features');
         if (featuresSection) {
             featuresSection.scrollIntoView({ behavior: 'smooth' });
@@ -35,31 +39,110 @@ export function LandingPage() {
                 <AmbientGlow />
             </div>
 
+            {/* Mobile Backdrop */}
+            {mobileMenuOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/40 dark:bg-black/70 backdrop-blur-sm md:hidden transition-opacity"
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
+
             {/* Floating Header */}
-            <header className="fixed top-6 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-white/85 dark:bg-[#0a0a0a]/75 backdrop-blur-2xl border border-zinc-200/80 dark:border-white/5 shadow-xl px-4 sm:px-6 py-3 flex items-center justify-between transition-all">
-                <BrandLogo size="md" theme="auto" />
-                <nav className="flex items-center gap-2.5 sm:gap-5">
-                    <button
-                        type="button"
-                        onClick={scrollToFeatures}
-                        className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors hidden md:block cursor-pointer"
-                    >
-                        Features
-                    </button>
-                    <Link to="/how-to-use" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors hidden sm:block">
-                        How to Use
-                    </Link>
-                    <Link to="/contact" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors hidden md:block">
-                        Contact
-                    </Link>
-                    <Link to="/login" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff]">
-                        Sign In
-                    </Link>
-                    <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10" />
-                    <Link to="/login" className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-4 sm:px-6 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 shimmer-sweep interactive-press">
-                        Get Started
-                    </Link>
-                </nav>
+            <header className="fixed top-4 sm:top-6 left-3 right-3 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-white/90 dark:bg-[#0a0a0a]/85 backdrop-blur-2xl border border-zinc-200/80 dark:border-white/10 shadow-xl px-3.5 sm:px-6 py-2.5 sm:py-3 flex flex-col transition-all">
+                <div className="flex items-center justify-between w-full">
+                    <BrandLogo size="sm" className="sm:hidden" theme="auto" />
+                    <BrandLogo size="md" className="hidden sm:inline-flex" theme="auto" />
+
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex items-center gap-5">
+                        <button
+                            type="button"
+                            onClick={scrollToFeatures}
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer"
+                        >
+                            Features
+                        </button>
+                        <Link to="/how-to-use" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors">
+                            How to Use
+                        </Link>
+                        <Link to="/contact" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors">
+                            Contact
+                        </Link>
+                        <Link to="/login" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff]">
+                            Sign In
+                        </Link>
+                        <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10" />
+                        <Link to="/login" className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-5 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 shimmer-sweep interactive-press">
+                            Get Started
+                        </Link>
+                    </nav>
+
+                    {/* Mobile Controls */}
+                    <div className="flex md:hidden items-center gap-2">
+                        <ThemeToggle className="bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 h-9 w-9" />
+                        <Link
+                            to="/login"
+                            className="bg-[#5b4fff] text-white text-xs font-semibold px-3 py-2 rounded-xl"
+                        >
+                            Get Started
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={() => setMobileMenuOpen(prev => !prev)}
+                            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                            className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 focus:outline-none cursor-pointer"
+                        >
+                            {mobileMenuOpen ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Dropdown Panel */}
+                {mobileMenuOpen && (
+                    <div className="md:hidden mt-3 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <button
+                            type="button"
+                            onClick={scrollToFeatures}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-left transition-colors cursor-pointer"
+                        >
+                            <span>Features</span>
+                            <ChevronRight className="w-4 h-4 text-zinc-400" />
+                        </button>
+                        <Link
+                            to="/how-to-use"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                        >
+                            <span>How to Use & Docs</span>
+                            <ChevronRight className="w-4 h-4 text-zinc-400" />
+                        </Link>
+                        <Link
+                            to="/contact"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                        >
+                            <span>Contact & Support</span>
+                            <ChevronRight className="w-4 h-4 text-zinc-400" />
+                        </Link>
+                        <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2">
+                            <Link
+                                to="/login"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                            >
+                                Sign In
+                            </Link>
+                            <Link
+                                to="/register"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl bg-[#5b4fff] text-white hover:bg-[#4d40ef] transition-colors shadow-sm"
+                            >
+                                Create Account
+                            </Link>
+                        </div>
+                    </div>
+                )}
             </header>
 
             {/* Main Content */}

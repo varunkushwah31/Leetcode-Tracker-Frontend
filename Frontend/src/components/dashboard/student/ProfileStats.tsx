@@ -5,7 +5,7 @@ import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog';
 import { ArrowSquareOutIcon as ExternalLink, FlameIcon, TrophyIcon, TerminalIcon, GearIcon as Settings, SpinnerIcon as Loader2, TrendUpIcon as TrendingUp, TrendDownIcon as TrendingDown } from '@phosphor-icons/react';
-import type { StudentExtendedDTO } from '@/types';
+import type { StudentExtendedDTO, CodeforcesContestHistory } from '@/types';
 import { StudentService } from '@/services/endpoints';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
 
@@ -28,12 +28,54 @@ function getCodeforcesRankColor(rank?: string): string {
     return 'text-zinc-500 dark:text-zinc-400';
 }
 
+interface RawCodeforcesContestItem extends Partial<CodeforcesContestHistory> {
+    timestamp?: number | string;
+    rating?: number;
+    delta?: number;
+}
+
 export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Readonly<ProfileStatsProps>) {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [lcUsername, setLcUsername] = useState(data?.leetcodeUsername || '');
     const [cfHandle, setCfHandle] = useState(data?.codeforcesHandle || '');
     const [isSaving, setIsSaving] = useState(false);
     const [editError, setEditError] = useState<string | null>(null);
+
+    const lcDelta = useMemo(() => {
+        if (!data?.contestHistory || data.contestHistory.length === 0) return null;
+        const sorted = [...data.contestHistory].sort((a, b) => a.timestamp - b.timestamp);
+        const latestIdx = sorted.length - 1;
+        const latest = sorted[latestIdx];
+        const prevRating = latestIdx > 0 ? sorted[latestIdx - 1].rating : 1500;
+        return Math.round(latest.rating) - Math.round(prevRating);
+    }, [data?.contestHistory]);
+
+    const cfDelta = useMemo(() => {
+        if (!data?.codeforcesContestHistory || data.codeforcesContestHistory.length === 0) return null;
+        const sorted = [...data.codeforcesContestHistory].sort((a, b) => {
+            const rawA = a as RawCodeforcesContestItem;
+            const rawB = b as RawCodeforcesContestItem;
+            const timeA = Number(rawA.ratingUpdateTimeSeconds ?? rawA.timestamp ?? 0);
+            const timeB = Number(rawB.ratingUpdateTimeSeconds ?? rawB.timestamp ?? 0);
+            return timeA - timeB;
+        });
+        const latest = sorted.at(-1)!;
+        const rawLatest = latest as RawCodeforcesContestItem;
+        if (rawLatest.oldRating !== undefined && rawLatest.oldRating !== null && !Number.isNaN(rawLatest.oldRating)) {
+            const cur = rawLatest.newRating ?? rawLatest.rating ?? 0;
+            return cur - rawLatest.oldRating;
+        }
+        if (rawLatest.delta !== undefined && !Number.isNaN(rawLatest.delta)) {
+            return Number(rawLatest.delta);
+        }
+        if (sorted.length > 1) {
+            const prev = sorted.at(-2)! as RawCodeforcesContestItem;
+            const cur = rawLatest.newRating ?? rawLatest.rating ?? 0;
+            const prevR = prev.newRating ?? prev.rating ?? 0;
+            return cur - prevR;
+        }
+        return null;
+    }, [data?.codeforcesContestHistory]);
 
     if (!data) return null;
 
@@ -72,39 +114,6 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
     const lcSolved = data.leetcodeSolvedCount ?? Math.max(0, totalSolved - (data.codeforcesSolvedCount || 0));
     const cfSolved = data.codeforcesSolvedCount || 0;
 
-    const lcDelta = useMemo(() => {
-        if (!data?.contestHistory || data.contestHistory.length === 0) return null;
-        const sorted = [...data.contestHistory].sort((a, b) => a.timestamp - b.timestamp);
-        const latestIdx = sorted.length - 1;
-        const latest = sorted[latestIdx];
-        const prevRating = latestIdx > 0 ? sorted[latestIdx - 1].rating : 1500;
-        return Math.round(latest.rating) - Math.round(prevRating);
-    }, [data?.contestHistory]);
-
-    const cfDelta = useMemo(() => {
-        if (!data?.codeforcesContestHistory || data.codeforcesContestHistory.length === 0) return null;
-        const sorted = [...data.codeforcesContestHistory].sort((a, b) => {
-            const timeA = a.ratingUpdateTimeSeconds || (a as any).timestamp || 0;
-            const timeB = b.ratingUpdateTimeSeconds || (b as any).timestamp || 0;
-            return timeA - timeB;
-        });
-        const latest = sorted[sorted.length - 1];
-        if (latest.oldRating !== undefined && latest.oldRating !== null && !Number.isNaN(latest.oldRating)) {
-            const cur = latest.newRating ?? (latest as any).rating ?? 0;
-            return cur - latest.oldRating;
-        }
-        if ((latest as any).delta !== undefined && !Number.isNaN((latest as any).delta)) {
-            return Number((latest as any).delta);
-        }
-        if (sorted.length > 1) {
-            const prev = sorted[sorted.length - 2];
-            const cur = latest.newRating ?? (latest as any).rating ?? 0;
-            const prevR = prev.newRating ?? (prev as any).rating ?? 0;
-            return cur - prevR;
-        }
-        return null;
-    }, [data?.codeforcesContestHistory]);
-
     return (
         <div className="mb-10 relative">
             {/* Ambient glow behind profile in dark mode only */}
@@ -117,28 +126,28 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                 {/* Gradient subtle top border */}
                 <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#5b4fff]/40 dark:via-[#5b4fff]/50 to-transparent"></div>
 
-                <CardContent className="p-8 sm:p-10">
-                    <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+                <CardContent className="p-4.5 sm:p-8 lg:p-10">
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
 
                         {/* Avatar with pulsing glow */}
-                        <div className="relative group">
+                        <div className="relative group shrink-0">
                             <div className="absolute inset-0 bg-[#5b4fff] rounded-full blur-2xl opacity-10 dark:opacity-20 group-hover:opacity-30 dark:group-hover:opacity-40 transition-opacity duration-700"></div>
-                            <Avatar className="w-28 h-28 border-[3px] border-white dark:border-[#1a1b2e] ring-4 ring-[#5b4fff]/10 dark:ring-[#5b4fff]/20 shadow-xl dark:shadow-2xl relative z-10">
+                            <Avatar className="w-20 h-20 sm:w-28 sm:h-28 border-[3px] border-white dark:border-[#1a1b2e] ring-4 ring-[#5b4fff]/10 dark:ring-[#5b4fff]/20 shadow-xl dark:shadow-2xl relative z-10">
                                 <AvatarImage src={data.avatarUrl} className="object-cover" />
-                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-[#1a1b2e] dark:to-[#2a2b4e] text-[#5b4fff] dark:text-[#968fff] text-3xl font-bold">
+                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-[#1a1b2e] dark:to-[#2a2b4e] text-[#5b4fff] dark:text-[#968fff] text-2xl sm:text-3xl font-bold">
                                     {data.name?.substring(0, 2) || 'ST'}
                                 </AvatarFallback>
                             </Avatar>
-                            <div className="absolute -bottom-2 -right-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-1.5 rounded-full z-20 shadow-md">
-                                <FlameIcon className="w-5 h-5 text-orange-500 animate-flame" />
+                            <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-1 sm:p-1.5 rounded-full z-20 shadow-md">
+                                <FlameIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 animate-flame" />
                             </div>
                         </div>
 
                         <div className="flex-1 w-full text-center md:text-left">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 sm:mb-6">
                                 <div>
-                                    <div className="flex items-center justify-center md:justify-start gap-3">
-                                        <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-transparent dark:bg-clip-text dark:bg-linear-to-r dark:from-white dark:to-zinc-400 tracking-tight mb-1">
+                                    <div className="flex items-center justify-center md:justify-start gap-2.5 sm:gap-3">
+                                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-zinc-900 dark:text-transparent dark:bg-clip-text dark:bg-linear-to-r dark:from-white dark:to-zinc-400 tracking-tight mb-1">
                                             {data.name || 'Student'}
                                         </h2>
                                         <button
@@ -150,7 +159,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                             <Settings className="w-4 h-4" />
                                         </button>
                                     </div>
-                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-1">
+                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 mt-1">
                                         {/* LeetCode Pill */}
                                         {data.leetcodeUsername ? (
                                             <div className="flex items-center gap-1.5 bg-amber-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-amber-500/20 dark:border-zinc-800 text-xs interactive-press">
@@ -201,45 +210,45 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     </div>
                                 </div>
 
-                                <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-[#1a1b2e]/60 border border-amber-500/20 dark:border-[#5b4fff]/20 px-4 py-2 rounded-full self-center md:self-auto shadow-xs dark:shadow-none hover:scale-105 transition-transform duration-200 cursor-default">
+                                <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-[#1a1b2e]/60 border border-amber-500/20 dark:border-[#5b4fff]/20 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full self-center md:self-auto shadow-xs dark:shadow-none hover:scale-105 transition-transform duration-200 cursor-default">
                                     <FlameIcon className="w-4 h-4 text-orange-500 animate-flame" />
-                                    <span className="text-sm font-bold text-zinc-900 dark:text-white"><span className="text-orange-500 dark:text-orange-400 mr-1.5">{data.consistencyStreak || 0}</span>Day Combined Streak</span>
+                                    <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white"><span className="text-orange-500 dark:text-orange-400 mr-1.5">{data.consistencyStreak || 0}</span>Day Combined Streak</span>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mt-6 sm:mt-8">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-3.5 sm:p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">LeetCode Rank</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center transition-transform duration-300 group-hover:scale-105 origin-left">
-                                        <TrophyIcon className="w-5 h-5 text-amber-500 mr-2 shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]" />
+                                    <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1.5 sm:mb-2">LeetCode Rank</p>
+                                    <p className="text-lg sm:text-2xl lg:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center transition-transform duration-300 group-hover:scale-105 origin-left truncate">
+                                        <TrophyIcon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 mr-1.5 sm:mr-2 shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]" />
                                         {data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : 'N/A'}
                                     </p>
                                 </div>
 
-                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-3.5 sm:p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <div className="flex items-center justify-between">
-                                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Total Solved</p>
-                                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Unified</span>
+                                        <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Total Solved</p>
+                                        <span className="text-[9px] sm:text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Unified</span>
                                     </div>
-                                    <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
+                                    <p className="text-lg sm:text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
                                         {totalSolved}
                                     </p>
-                                    <p className="text-xs text-zinc-500 mt-1">
+                                    <p className="text-[11px] sm:text-xs text-zinc-500 mt-1 truncate">
                                         LC: <span className="text-zinc-800 dark:text-zinc-300 font-semibold">{lcSolved}</span> • CF: <span className="text-zinc-800 dark:text-zinc-300 font-semibold">{cfSolved}</span>
                                     </p>
                                 </div>
 
-                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
+                                <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-3.5 sm:p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-[#5b4fff]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">LeetCode Rating</p>
-                                    <div className="flex items-center gap-2">
-                                        <p className="text-2xl sm:text-3xl font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
+                                    <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">LeetCode Rating</p>
+                                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                        <p className="text-lg sm:text-2xl lg:text-3xl font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left">
                                             {rating}
                                         </p>
                                         {lcDelta !== null && (
-                                            <span className={`inline-flex items-center gap-0.5 text-xs font-bold px-1.5 py-0.5 rounded-md border ${
+                                            <span className={`inline-flex items-center gap-0.5 text-[10px] sm:text-xs font-bold px-1.5 py-0.5 rounded-md border ${
                                                 lcDelta > 0
                                                     ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                                     : lcDelta < 0
@@ -305,8 +314,9 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
 
                     <div className="space-y-4 py-3">
                         <div className="space-y-1.5">
-                            <label className="text-xs uppercase font-semibold text-zinc-600 dark:text-zinc-400">LeetCode Username</label>
+                            <label htmlFor="edit-lc-username" className="text-xs uppercase font-semibold text-zinc-600 dark:text-zinc-400">LeetCode Username</label>
                             <Input
+                                id="edit-lc-username"
                                 value={lcUsername}
                                 onChange={(e) => setLcUsername(e.target.value)}
                                 placeholder="neetcode123"
@@ -314,8 +324,9 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs uppercase font-semibold text-zinc-600 dark:text-zinc-400">Codeforces Handle</label>
+                            <label htmlFor="edit-cf-handle" className="text-xs uppercase font-semibold text-zinc-600 dark:text-zinc-400">Codeforces Handle</label>
                             <Input
+                                id="edit-cf-handle"
                                 value={cfHandle}
                                 onChange={(e) => setCfHandle(e.target.value)}
                                 placeholder="tourist"

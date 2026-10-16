@@ -40,18 +40,22 @@ import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 
 async function syncStudentsInBatches(students: { id?: string; leetcodeUsername?: string; codeforcesHandle?: string }[], batchSize = 2): Promise<void> {
-    for (let i = 0; i < students.length; i += batchSize) {
-        const batch = students.slice(i, i + batchSize);
+    const runBatch = async (startIndex: number): Promise<void> => {
+        if (startIndex >= students.length) return;
+        const batch = students.slice(startIndex, startIndex + batchSize);
         await Promise.allSettled(
             batch.map(student => {
                 const target = student.id || student.leetcodeUsername || student.codeforcesHandle;
                 return target ? StudentService.syncProfile(target) : Promise.resolve();
             })
         );
-        if (i + batchSize < students.length) {
+        if (startIndex + batchSize < students.length) {
             await new Promise(resolve => setTimeout(resolve, 2500));
         }
-    }
+        return runBatch(startIndex + batchSize);
+    };
+
+    return runBatch(0);
 }
 
 interface ClassroomTabContentProps {
@@ -99,7 +103,6 @@ function ClassroomTabContent({
             <ClassroomAnalytics
                 data={analyticsData}
                 classroomId={selectedClassroom.classroomId}
-                mentorId={mentorId}
                 isLoading={isAnalyticsLoading}
                 onRefresh={onRefresh}
                 onStudentClick={onStudentClick}
@@ -687,16 +690,16 @@ export function MentorDashboard() {
                         }
 
                         return (
-                            <div className="max-w-7xl mx-auto p-6 lg:p-10 min-h-full w-full">
+                            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 min-h-full w-full">
                                 {/* Main Dashboard Error Banner */}
                                 <ErrorBanner message={error} />
 
                                 <div className="mb-8 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
                                     <div>
-                                        <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-2">{selectedClassroom.className}</h1>
-                                        <p className="text-[15px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><BookOpenIcon className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
+                                        <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-2">{selectedClassroom.className}</h1>
+                                        <p className="text-[14px] sm:text-[15px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><BookOpenIcon className="w-4 h-4 text-[#5b4fff]" /> {selectedClassroom.enrolledStudents?.length || 0} enrolled students</p>
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex flex-wrap items-center gap-2.5 w-full xl:w-auto">
                                         <Button
                                             onClick={handleSyncClassroom}
                                             disabled={isClassroomSyncing}
@@ -712,21 +715,21 @@ export function MentorDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl w-max mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs">
+                                <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl w-full sm:w-max overflow-x-auto no-scrollbar sm:custom-scrollbar mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
                                     <button
-                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'leaderboard' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`whitespace-nowrap px-4 sm:px-5 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-medium rounded-lg transition-all duration-200 shrink-0 ${activeTab === 'leaderboard' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('leaderboard')}
                                     >
                                         Class Leaderboard
                                     </button>
                                     <button
-                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'analytics' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`whitespace-nowrap px-4 sm:px-5 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-medium rounded-lg transition-all duration-200 shrink-0 ${activeTab === 'analytics' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('analytics')}
                                     >
                                         Weakness & Analytics
                                     </button>
                                     <button
-                                        className={`px-5 py-2.5 text-[14px] font-medium rounded-lg transition-all duration-200 ${activeTab === 'assignments' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`whitespace-nowrap px-4 sm:px-5 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-medium rounded-lg transition-all duration-200 shrink-0 ${activeTab === 'assignments' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('assignments')}
                                     >
                                         Manage Assignments

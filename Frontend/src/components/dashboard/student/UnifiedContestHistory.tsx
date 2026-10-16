@@ -25,6 +25,15 @@ interface UnifiedContestHistoryProps {
     scrollHeightClass?: string;
 }
 
+interface RawCodeforcesContestItem extends Partial<CodeforcesContestHistory> {
+    timestamp?: number | string;
+    rating?: number;
+    new_rating?: number;
+    old_rating?: number;
+    delta?: number;
+    title?: string;
+}
+
 export function UnifiedContestHistory({
     contestHistory = [],
     codeforcesContestHistory = [],
@@ -72,40 +81,43 @@ export function UnifiedContestHistory({
     const cfItems: UnifiedContestItem[] = useMemo(() => {
         // Sort chronologically ascending to calculate deltas accurately
         const sorted = [...(codeforcesContestHistory || [])].sort((a, b) => {
-            const timeA = a.ratingUpdateTimeSeconds || (a as any).timestamp || 0;
-            const timeB = b.ratingUpdateTimeSeconds || (b as any).timestamp || 0;
+            const rawA = a as RawCodeforcesContestItem;
+            const rawB = b as RawCodeforcesContestItem;
+            const timeA = rawA.ratingUpdateTimeSeconds ?? rawA.timestamp ?? 0;
+            const timeB = rawB.ratingUpdateTimeSeconds ?? rawB.timestamp ?? 0;
             return (typeof timeA === 'number' ? timeA : Number(timeA) || 0) - (typeof timeB === 'number' ? timeB : Number(timeB) || 0);
         });
 
         return sorted.map((c, idx) => {
-            const currentRating = c.newRating ?? (c as any).rating ?? (c as any).new_rating ?? 0;
-            const prevRating = idx > 0
-                ? (sorted[idx - 1].newRating ?? (sorted[idx - 1] as any).rating ?? (sorted[idx - 1] as any).new_rating ?? currentRating)
-                : (c.oldRating ?? (c as any).old_rating ?? currentRating);
+            const raw = c as RawCodeforcesContestItem;
+            const currentRating = raw.newRating ?? raw.rating ?? raw.new_rating ?? 0;
+            const prevRaw = idx > 0 ? (sorted[idx - 1] as RawCodeforcesContestItem) : null;
+            const prevRating = prevRaw
+                ? (prevRaw.newRating ?? prevRaw.rating ?? prevRaw.new_rating ?? currentRating)
+                : (raw.oldRating ?? raw.old_rating ?? currentRating);
 
             // Compute delta:
             // 1. If oldRating is explicitly provided, use currentRating - oldRating
             // 2. Or if explicit delta property exists, use it
             // 3. Otherwise if contest is not the first, compute difference from previous contest in chronological sequence
             let delta: number | undefined;
-            if (c.oldRating !== undefined && c.oldRating !== null && !Number.isNaN(Number(c.oldRating))) {
-                delta = currentRating - Number(c.oldRating);
-            } else if ((c as any).delta !== undefined && !Number.isNaN(Number((c as any).delta))) {
-                delta = Number((c as any).delta);
+            if (raw.oldRating !== undefined && raw.oldRating !== null && !Number.isNaN(Number(raw.oldRating))) {
+                delta = currentRating - Number(raw.oldRating);
+            } else if (raw.delta !== undefined && !Number.isNaN(Number(raw.delta))) {
+                delta = Number(raw.delta);
             } else if (idx > 0) {
                 delta = currentRating - prevRating;
             } else {
                 delta = 0;
             }
 
+            const ts = raw.ratingUpdateTimeSeconds ?? raw.timestamp;
             return {
-                id: `cf-${c.contestId || idx}-${c.ratingUpdateTimeSeconds || (c as any).timestamp || idx}`,
+                id: `cf-${raw.contestId || idx}-${ts || idx}`,
                 platform: 'CODEFORCES' as const,
-                title: c.contestName || (c as any).title || 'Codeforces Round',
-                timestamp: typeof (c.ratingUpdateTimeSeconds || (c as any).timestamp) === 'number'
-                    ? (c.ratingUpdateTimeSeconds || (c as any).timestamp)
-                    : Number(c.ratingUpdateTimeSeconds || (c as any).timestamp) || 0,
-                rank: c.rank || 0,
+                title: raw.contestName || raw.title || 'Codeforces Round',
+                timestamp: typeof ts === 'number' ? ts : Number(ts) || 0,
+                rank: raw.rank || 0,
                 rating: currentRating,
                 delta,
             };

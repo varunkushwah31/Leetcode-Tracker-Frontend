@@ -25,7 +25,7 @@ import {
  * Currently paused in production so students can sign up without OTP friction.
  * To re-enable when email service is configured, set VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION=true.
  */
-export const isStudentEmailVerificationEnabled = () => {
+const isStudentEmailVerificationEnabled = () => {
   return import.meta.env.VITE_REQUIRE_STUDENT_EMAIL_VERIFICATION === 'true';
 };
 
@@ -45,7 +45,7 @@ export function AuthPage() {
 
   // Dynamically sync auth configuration with backend
   useEffect(() => {
-    AuthService.getAuthConfig()
+    void AuthService.getAuthConfig()
       .then((res) => {
         if (res.data && typeof res.data.studentEmailVerificationRequired === 'boolean') {
           setServerEmailVerificationRequired(res.data.studentEmailVerificationRequired);
@@ -64,7 +64,7 @@ export function AuthPage() {
   const toggleAuthMode = (newIsLogin: boolean) => {
     setIsLogin(newIsLogin);
     setError(null);
-    navigate(newIsLogin ? '/login' : '/register');
+    void navigate(newIsLogin ? '/login' : '/register');
   };
 
   const { login, registerMentor, registerStudent } = useAuth();
@@ -149,14 +149,14 @@ export function AuthPage() {
     }
   };
 
-  const handleAuth = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAuth = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
     try {
       if (isLogin) {
         await login({ email: formData.email, password: formData.password });
-        navigate('/dashboard');
+        void navigate('/dashboard');
       } else if (role === 'student') {
         const { leetcodeUsername: cleanLc, codeforcesHandle: cleanCf } = sanitizePlatformHandles(
           formData.leetcodeUsername,
@@ -168,9 +168,7 @@ export function AuthPage() {
           return;
         }
 
-        const shouldVerifyEmail = serverEmailVerificationRequired !== null
-          ? serverEmailVerificationRequired
-          : isStudentEmailVerificationEnabled();
+        const shouldVerifyEmail = serverEmailVerificationRequired ?? isStudentEmailVerificationEnabled();
 
         if (shouldVerifyEmail) {
           // Send verification OTP to student's email
@@ -189,13 +187,13 @@ export function AuthPage() {
             leetcodeUsername: cleanLc || undefined,
             codeforcesHandle: cleanCf || undefined,
           });
-          navigate('/dashboard');
+          void navigate('/dashboard');
         }
       } else {
         await registerMentor({
           name: formData.name, email: formData.email, password: formData.password
         });
-        navigate('/dashboard');
+        void navigate('/dashboard');
       }
 
     } catch (err: unknown) {
@@ -235,7 +233,7 @@ export function AuthPage() {
     });
 
     setIsStudentOtpModalOpen(false);
-    navigate('/dashboard');
+    void navigate('/dashboard');
   };
 
   const handleResendStudentOtp = async () => {
@@ -318,7 +316,7 @@ export function AuthPage() {
             <AmbientGlow variant="center" />
           </div>
 
-          <div className="w-full max-w-lg relative z-10 bg-white dark:bg-[#111116] p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto mt-14 sm:my-auto">
+          <div className="w-full max-w-lg relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto mt-16 sm:my-auto">
             {/* Mobile Header with Logo */}
             <div className="flex items-center mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800/60 lg:hidden">
               <BrandLogo size="sm" theme="auto" />
@@ -360,7 +358,7 @@ export function AuthPage() {
                   </button>
                 </div>
             )}
-            <form onSubmit={handleAuth} className="space-y-3.5">
+            <form onSubmit={(e) => { void handleAuth(e); }} className="space-y-3.5">
               {!isLogin ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1.5">

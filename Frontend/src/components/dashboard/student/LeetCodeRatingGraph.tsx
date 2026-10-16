@@ -38,6 +38,13 @@ function generateSmoothPath(points: Point[]): string {
     return path;
 }
 
+// SVG coordinates config
+const VIEW_BOX_WIDTH = 500;
+const VIEW_BOX_HEIGHT = 175;
+const PADDING = { top: 35, bottom: 28, left: 24, right: 28 } as const;
+const PLOT_WIDTH = VIEW_BOX_WIDTH - PADDING.left - PADDING.right;
+const PLOT_HEIGHT = VIEW_BOX_HEIGHT - PADDING.top - PADDING.bottom;
+
 export function LeetCodeRatingGraph({
     contestHistory = [],
     currentContestRating = 0,
@@ -53,13 +60,6 @@ export function LeetCodeRatingGraph({
 
     // Hovered index tracking
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-    // SVG coordinates config
-    const viewBoxWidth = 500;
-    const viewBoxHeight = 175;
-    const padding = { top: 35, bottom: 28, left: 24, right: 28 };
-    const plotWidth = viewBoxWidth - padding.left - padding.right;
-    const plotHeight = viewBoxHeight - padding.top - padding.bottom;
 
     const { points, startYear, endYear } = useMemo(() => {
         if (sortedContests.length === 0) {
@@ -81,21 +81,21 @@ export function LeetCodeRatingGraph({
 
         const pts: Point[] = sortedContests.map((c, i) => {
             const x = sortedContests.length === 1
-                ? padding.left + plotWidth / 2
-                : padding.left + (i / (sortedContests.length - 1)) * plotWidth;
-            const y = padding.top + plotHeight - ((c.rating - minR) / (maxR - minR)) * plotHeight;
+                ? PADDING.left + PLOT_WIDTH / 2
+                : PADDING.left + (i / (sortedContests.length - 1)) * PLOT_WIDTH;
+            const y = PADDING.top + PLOT_HEIGHT - ((c.rating - minR) / (maxR - minR)) * PLOT_HEIGHT;
             return { x, y, contest: c };
         });
 
         const firstDate = new Date(sortedContests[0].timestamp * 1000);
-        const lastDate = new Date(sortedContests[sortedContests.length - 1].timestamp * 1000);
+        const lastDate = new Date(sortedContests.at(-1)!.timestamp * 1000);
 
         return {
             points: pts,
             startYear: String(firstDate.getFullYear()),
             endYear: String(lastDate.getFullYear())
         };
-    }, [sortedContests, plotWidth, plotHeight, padding.left, padding.top]);
+    }, [sortedContests]);
 
     const activeIndex = hoveredIndex ?? (points.length > 0 ? points.length - 1 : null);
     const activePoint = activeIndex !== null && points[activeIndex] ? points[activeIndex] : null;
@@ -104,7 +104,7 @@ export function LeetCodeRatingGraph({
         if (!svgRef.current || points.length === 0) return;
         const rect = svgRef.current.getBoundingClientRect();
         const clientX = e.clientX - rect.left;
-        const relativeX = (clientX / rect.width) * viewBoxWidth;
+        const relativeX = (clientX / rect.width) * VIEW_BOX_WIDTH;
 
         let closestIdx = 0;
         let minDiff = Infinity;
@@ -116,7 +116,25 @@ export function LeetCodeRatingGraph({
             }
         });
         setHoveredIndex(closestIdx);
-    }, [points, viewBoxWidth]);
+    }, [points]);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
+        if (!svgRef.current || points.length === 0 || !e.touches[0]) return;
+        const rect = svgRef.current.getBoundingClientRect();
+        const clientX = e.touches[0].clientX - rect.left;
+        const relativeX = (clientX / rect.width) * VIEW_BOX_WIDTH;
+
+        let closestIdx = 0;
+        let minDiff = Infinity;
+        points.forEach((p, idx) => {
+            const diff = Math.abs(p.x - relativeX);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closestIdx = idx;
+            }
+        });
+        setHoveredIndex(closestIdx);
+    }, [points]);
 
     const handleMouseLeave = useCallback(() => {
         setHoveredIndex(null);
@@ -129,35 +147,30 @@ export function LeetCodeRatingGraph({
 
     const displayRating = effectiveRating > 0
         ? effectiveRating.toLocaleString()
-        : (sortedContests.length > 0 ? Math.round(sortedContests[sortedContests.length - 1].rating).toLocaleString() : '—');
+        : (sortedContests.at(-1) ? Math.round(sortedContests.at(-1)!.rating).toLocaleString() : '—');
 
-    const displayRank = useMemo(() => {
-        if (activePoint?.contest.ranking) {
-            return `#${activePoint.contest.ranking.toLocaleString()}`;
-        }
-        if (globalRanking) {
-            const parsed = Number.parseInt(globalRanking, 10);
-            return !Number.isNaN(parsed) ? `#${parsed.toLocaleString()}` : globalRanking;
-        }
-        return '—';
-    }, [activePoint, globalRanking]);
+    const displayRank = activePoint?.contest.ranking
+        ? `#${activePoint.contest.ranking.toLocaleString()}`
+        : globalRanking
+            ? (!Number.isNaN(Number.parseInt(globalRanking, 10))
+                ? `#${Number.parseInt(globalRanking, 10).toLocaleString()}`
+                : globalRanking)
+            : '—';
 
-    const displayDelta = useMemo(() => {
-        if (!activePoint || activeIndex === null) return null;
-        const prevRating = activeIndex > 0 ? sortedContests[activeIndex - 1].rating : 1500;
-        return Math.round(activePoint.contest.rating) - Math.round(prevRating);
-    }, [activePoint, activeIndex, sortedContests]);
+    const displayDelta = activePoint && activeIndex !== null
+        ? Math.round(activePoint.contest.rating) - Math.round(activeIndex > 0 ? sortedContests[activeIndex - 1].rating : 1500)
+        : null;
 
     const attendedCount = sortedContests.length;
 
     const linePath = useMemo(() => generateSmoothPath(points), [points]);
     const areaPath = useMemo(() => {
         if (points.length === 0) return '';
-        const baseLine = viewBoxHeight - padding.bottom;
+        const baseLine = VIEW_BOX_HEIGHT - PADDING.bottom;
         const first = points[0];
-        const last = points[points.length - 1];
+        const last = points.at(-1)!;
         return `${linePath} L ${last.x.toFixed(1)} ${baseLine} L ${first.x.toFixed(1)} ${baseLine} Z`;
-    }, [linePath, points, viewBoxHeight, padding.bottom]);
+    }, [linePath, points]);
 
     const formatDate = (ts: number) => {
         return new Date(ts * 1000).toLocaleDateString(undefined, {
@@ -168,13 +181,13 @@ export function LeetCodeRatingGraph({
     };
 
     // Calculate pill position relative to active point
-    const pillMetrics = useMemo(() => {
+    const pillMetrics = (() => {
         if (!activePoint) return null;
         const pillWidth = 52;
         const pillHeight = 22;
 
         let pillX: number;
-        if (activePoint.x > viewBoxWidth - 70) {
+        if (activePoint.x > VIEW_BOX_WIDTH - 70) {
             pillX = activePoint.x - pillWidth - 6;
         } else if (activePoint.x < 70) {
             pillX = activePoint.x + 6;
@@ -202,7 +215,7 @@ export function LeetCodeRatingGraph({
         const stemEndX = pillX + pillWidth / 2;
 
         return { pillX, pillY, pillWidth, pillHeight, stemStartX, stemStartY, stemEndX, stemEndY };
-    }, [activePoint, viewBoxWidth]);
+    })();
 
     return (
         <Card className={`relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-all h-full flex flex-col justify-between ${className}`}>
@@ -265,11 +278,17 @@ export function LeetCodeRatingGraph({
                         <div className="relative select-none">
                             <svg
                                 ref={svgRef}
-                                viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-                                className="w-full h-40 sm:h-44 overflow-visible cursor-crosshair"
+                                viewBox={`0 0 ${VIEW_BOX_WIDTH} ${VIEW_BOX_HEIGHT}`}
+                                className="w-full h-40 sm:h-44 overflow-visible cursor-crosshair touch-pan-y"
+                                role="img"
+                                aria-label="LeetCode contest rating progression chart"
                                 onMouseMove={handleMouseMove}
                                 onMouseLeave={handleMouseLeave}
+                                onTouchStart={handleTouchMove}
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={handleMouseLeave}
                             >
+                                <title>LeetCode Contest Rating Progression</title>
                                 <defs>
                                     <linearGradient id="lc-rating-gradient" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="0%" stopColor="#ffa116" stopOpacity="0.25" />
@@ -282,19 +301,19 @@ export function LeetCodeRatingGraph({
 
                                 {/* Horizontal guide lines */}
                                 <line
-                                    x1={padding.left}
-                                    y1={padding.top}
-                                    x2={viewBoxWidth - padding.right}
-                                    y2={padding.top}
+                                    x1={PADDING.left}
+                                    y1={PADDING.top}
+                                    x2={VIEW_BOX_WIDTH - PADDING.right}
+                                    y2={PADDING.top}
                                     stroke="currentColor"
                                     className="text-zinc-200 dark:text-zinc-800"
                                     strokeDasharray="3 3"
                                 />
                                 <line
-                                    x1={padding.left}
-                                    y1={viewBoxHeight - padding.bottom}
-                                    x2={viewBoxWidth - padding.right}
-                                    y2={viewBoxHeight - padding.bottom}
+                                    x1={PADDING.left}
+                                    y1={VIEW_BOX_HEIGHT - PADDING.bottom}
+                                    x2={VIEW_BOX_WIDTH - PADDING.right}
+                                    y2={VIEW_BOX_HEIGHT - PADDING.bottom}
                                     stroke="currentColor"
                                     className="text-zinc-200 dark:text-zinc-800"
                                 />
@@ -322,9 +341,9 @@ export function LeetCodeRatingGraph({
                                         {/* Vertical dashed guide line */}
                                         <line
                                             x1={activePoint.x}
-                                            y1={padding.top}
+                                            y1={PADDING.top}
                                             x2={activePoint.x}
-                                            y2={viewBoxHeight - padding.bottom}
+                                            y2={VIEW_BOX_HEIGHT - PADDING.bottom}
                                             stroke="rgba(255, 161, 22, 0.3)"
                                             strokeDasharray="2 2"
                                             strokeWidth="1"
@@ -382,8 +401,8 @@ export function LeetCodeRatingGraph({
                                 {/* X-axis Timeline Year markers at bottom */}
                                 {startYear && (
                                     <text
-                                        x={padding.left}
-                                        y={viewBoxHeight - 8}
+                                        x={PADDING.left}
+                                        y={VIEW_BOX_HEIGHT - 8}
                                         fill="#71717a"
                                         fontSize="11"
                                         fontWeight="600"
@@ -393,8 +412,8 @@ export function LeetCodeRatingGraph({
                                 )}
                                 {endYear && startYear !== endYear && (
                                     <text
-                                        x={viewBoxWidth - padding.right}
-                                        y={viewBoxHeight - 8}
+                                        x={VIEW_BOX_WIDTH - PADDING.right}
+                                        y={VIEW_BOX_HEIGHT - 8}
                                         textAnchor="end"
                                         fill="#71717a"
                                         fontSize="11"
