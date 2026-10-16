@@ -66,7 +66,7 @@ export function StudentEmailVerificationModal({
         setError(null);
 
         const cleanOtp = otp.trim();
-        if (!cleanOtp || cleanOtp.length !== 6) {
+        if (cleanOtp?.length !== 6) {
             setError('Please enter the complete 6-digit verification code.');
             return;
         }
@@ -120,7 +120,10 @@ export function StudentEmailVerificationModal({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md bg-white dark:bg-[#111116] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl rounded-2xl p-6 sm:p-7">
+            <DialogContent className="sm:max-w-md bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.85)] rounded-2xl p-6 sm:p-7 overflow-hidden">
+                {/* Luminous Top Horizon Beam */}
+                <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-[#5b4fff]/40 to-transparent pointer-events-none" />
+
                 <DialogHeader className="gap-2">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
@@ -177,7 +180,7 @@ export function StudentEmailVerificationModal({
                                     setOtp(digitsOnly);
                                     if (error) setError(null);
                                 }}
-                                className="text-center font-sans font-bold tabular-nums text-2xl tracking-[0.28em] pl-[0.28em] h-12 rounded-xl bg-zinc-50 dark:bg-[#18181b] border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] transition-all"
+                                className="text-center font-sans font-bold tabular-nums text-2xl tracking-[0.28em] pl-[0.28em] h-12 rounded-xl bg-zinc-100/90 dark:bg-[#18181b] border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] transition-all"
                             />
                         </div>
 

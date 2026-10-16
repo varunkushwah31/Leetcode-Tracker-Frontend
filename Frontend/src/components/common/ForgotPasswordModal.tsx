@@ -133,7 +133,7 @@ export function ForgotPasswordModal({
         setSuccessMessage(null);
 
         const trimmedOtp = otp.trim();
-        if (!trimmedOtp || trimmedOtp.length !== 6) {
+        if (trimmedOtp?.length !== 6) {
             setError('Please enter the complete 6-digit OTP sent to your email.');
             return;
         }
@@ -207,7 +207,10 @@ export function ForgotPasswordModal({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className="sm:max-w-md bg-white dark:bg-[#111116] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl rounded-2xl p-6 sm:p-7">
+            <DialogContent className="sm:max-w-md bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.85)] rounded-2xl p-6 sm:p-7 overflow-hidden">
+                {/* Luminous Top Horizon Beam */}
+                <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-[#5b4fff]/40 to-transparent pointer-events-none" />
+
                 {/* Header */}
                 <DialogHeader className="gap-2">
                     <div className="flex items-center gap-3">
@@ -276,7 +279,7 @@ export function ForgotPasswordModal({
                                         value={email}
                                         onChange={(e) => { setEmail(e.target.value); setError(null); }}
                                         disabled={isLoading}
-                                        className="pl-10 bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 focus:border-[#5b4fff] rounded-xl text-sm h-10"
+                                        className="pl-10 bg-zinc-100/90 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl text-sm h-10 transition-all"
                                     />
                                 </div>
                                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -290,14 +293,14 @@ export function ForgotPasswordModal({
                                     variant="outline"
                                     onClick={() => setIsOpen(false)}
                                     disabled={isLoading}
-                                    className="rounded-xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-4"
+                                    className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold h-10 px-4 transition-colors cursor-pointer"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={isLoading || !email.trim()}
-                                    className="rounded-xl bg-[#5b4fff] hover:bg-[#4d40ea] text-white text-xs font-semibold h-10 px-5 shadow-sm transition-all flex items-center gap-1.5"
+                                    className="rounded-xl bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-5 shadow-lg shadow-[#5b4fff]/25 transition-all flex items-center gap-1.5 cursor-pointer"
                                 >
                                     {isLoading ? (
                                         <>
@@ -347,7 +350,7 @@ export function ForgotPasswordModal({
                                         setError(null);
                                     }}
                                     disabled={isLoading}
-                                    className="text-center font-sans font-bold tabular-nums text-2xl tracking-[0.28em] pl-[0.28em] bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-[#5b4fff] focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl h-12 transition-all"
+                                    className="text-center font-sans font-bold tabular-nums text-2xl tracking-[0.28em] pl-[0.28em] bg-zinc-100/90 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-[#5b4fff] focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl h-12 transition-all"
                                 />
                                 <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 pt-0.5">
                                     <span>Code expires in 10 minutes</span>
@@ -372,14 +375,14 @@ export function ForgotPasswordModal({
                                     variant="outline"
                                     onClick={() => { setStep('EMAIL'); setError(null); }}
                                     disabled={isLoading}
-                                    className="rounded-xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-3.5"
+                                    className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold h-10 px-3.5 transition-colors cursor-pointer"
                                 >
                                     Back
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={isLoading || otp.length !== 6}
-                                    className="rounded-xl bg-[#5b4fff] hover:bg-[#4d40ea] text-white text-xs font-semibold h-10 px-5 shadow-sm transition-all flex items-center gap-1.5"
+                                    className="rounded-xl bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-5 shadow-lg shadow-[#5b4fff]/25 transition-all flex items-center gap-1.5 cursor-pointer"
                                 >
                                     {isLoading ? (
                                         <>
@@ -415,7 +418,7 @@ export function ForgotPasswordModal({
                                         value={newPassword}
                                         onChange={(e) => { setNewPassword(e.target.value); setError(null); }}
                                         disabled={isLoading}
-                                        className="pr-10 bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 focus:border-[#5b4fff] rounded-xl text-sm h-10"
+                                        className="pr-10 bg-zinc-100/90 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl text-sm h-10 transition-all"
                                     />
                                     <button
                                         type="button"
@@ -442,7 +445,7 @@ export function ForgotPasswordModal({
                                         value={confirmPassword}
                                         onChange={(e) => { setConfirmPassword(e.target.value); setError(null); }}
                                         disabled={isLoading}
-                                        className="pr-10 bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 focus:border-[#5b4fff] rounded-xl text-sm h-10"
+                                        className="pr-10 bg-zinc-100/90 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl text-sm h-10 transition-all"
                                     />
                                     <button
                                         type="button"
@@ -456,7 +459,7 @@ export function ForgotPasswordModal({
                             </div>
 
                             {/* Validation indicators */}
-                            <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181f] border border-zinc-200/80 dark:border-zinc-800/80 space-y-1 text-[11px]">
+                            <div className="p-2.5 rounded-xl bg-zinc-50/80 dark:bg-[#18181b]/70 border border-zinc-200/80 dark:border-zinc-800/80 space-y-1 text-[11px]">
                                 <div className="flex items-center gap-1.5">
                                     <ShieldCheck
                                         className={`w-3.5 h-3.5 ${newPassword.length >= 6 ? 'text-emerald-500' : 'text-zinc-400'}`}
@@ -483,14 +486,14 @@ export function ForgotPasswordModal({
                                     variant="outline"
                                     onClick={() => { setStep('OTP'); setError(null); }}
                                     disabled={isLoading}
-                                    className="rounded-xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-3.5"
+                                    className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold h-10 px-3.5 transition-colors cursor-pointer"
                                 >
                                     Back
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={isLoading || newPassword.length < 6 || newPassword !== confirmPassword}
-                                    className="rounded-xl bg-[#5b4fff] hover:bg-[#4d40ea] text-white text-xs font-semibold h-10 px-5 shadow-sm transition-all flex items-center gap-1.5"
+                                    className="rounded-xl bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-5 shadow-lg shadow-[#5b4fff]/25 transition-all flex items-center gap-1.5 cursor-pointer"
                                 >
                                     {isLoading ? (
                                         <>

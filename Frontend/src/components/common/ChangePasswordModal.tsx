@@ -131,7 +131,10 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className="sm:max-w-md bg-white dark:bg-[#111116] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl rounded-2xl">
+            <DialogContent className="sm:max-w-md bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.85)] rounded-2xl overflow-hidden">
+                {/* Luminous Top Horizon Beam */}
+                <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-[#5b4fff]/40 to-transparent pointer-events-none" />
+
                 <DialogHeader className="gap-2">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
@@ -172,13 +175,15 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
                         <div className="relative">
                             <Input
                                 id="current-password"
+                                name="current-password"
                                 type={showCurrent ? 'text' : 'password'}
+                                autoComplete="current-password"
                                 value={currentPassword}
                                 onChange={(e) => setCurrentPassword(e.target.value)}
                                 placeholder="Enter current password"
                                 disabled={isLoading || !!successMessage}
                                 required
-                                className="pr-10 bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 focus:border-[#5b4fff] rounded-xl text-sm"
+                                className="pr-10 bg-zinc-100/90 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10 text-sm"
                             />
                             <button
                                 type="button"
@@ -203,13 +208,15 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
                         <div className="relative">
                             <Input
                                 id="new-password"
+                                name="new-password"
                                 type={showNew ? 'text' : 'password'}
+                                autoComplete="new-password"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 placeholder="At least 6 characters"
                                 disabled={isLoading || !!successMessage}
                                 required
-                                className="pr-10 bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 focus:border-[#5b4fff] rounded-xl text-sm"
+                                className="pr-10 bg-zinc-100/90 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10 text-sm"
                             />
                             <button
                                 type="button"
@@ -234,13 +241,15 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
                         <div className="relative">
                             <Input
                                 id="confirm-password"
+                                name="confirm-password"
                                 type={showConfirm ? 'text' : 'password'}
+                                autoComplete="new-password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 placeholder="Re-enter new password"
                                 disabled={isLoading || !!successMessage}
                                 required
-                                className="pr-10 bg-zinc-50 dark:bg-[#18181f] border-zinc-200 dark:border-zinc-800 focus:border-[#5b4fff] rounded-xl text-sm"
+                                className="pr-10 bg-zinc-100/90 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10 text-sm"
                             />
                             <button
                                 type="button"
@@ -255,7 +264,7 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
                     </div>
 
                     {/* Validation hints */}
-                    <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181f] border border-zinc-200/80 dark:border-zinc-800/80 space-y-1">
+                    <div className="p-2.5 rounded-xl bg-zinc-50/80 dark:bg-[#18181b]/70 border border-zinc-200/80 dark:border-zinc-800/80 space-y-1">
                         <div className="flex items-center gap-1.5 text-[11px]">
                             <ShieldCheck
                                 className={`w-3.5 h-3.5 ${
@@ -302,14 +311,14 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
                             variant="outline"
                             onClick={() => setIsOpen(false)}
                             disabled={isLoading}
-                            className="rounded-xl border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-4"
+                            className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold h-10 px-4 transition-colors cursor-pointer"
                         >
                             Cancel
                         </Button>
                         <Button
                             type="submit"
                             disabled={isLoading || !!successMessage}
-                            className="rounded-xl bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-5 shadow-sm transition-all"
+                            className="rounded-xl bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-5 shadow-lg shadow-[#5b4fff]/25 transition-all cursor-pointer"
                         >
                             {isLoading ? (
                                 <>
