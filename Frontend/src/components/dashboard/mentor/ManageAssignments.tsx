@@ -67,7 +67,7 @@ export function ManageAssignments({ classroomId, mentorId, assignments = [], onR
         const newDate = new Date(editDeadlineValue);
         const newEndTimestamp = Math.floor(newDate.getTime() / 1000);
 
-        if (isNaN(newEndTimestamp) || newEndTimestamp <= 0) {
+        if (Number.isNaN(newEndTimestamp) || newEndTimestamp <= 0) {
             setEditDeadlineError('Please select a valid deadline date and time.');
             return;
         }
@@ -120,10 +120,10 @@ export function ManageAssignments({ classroomId, mentorId, assignments = [], onR
 
                 <div className="space-y-4">
                     {assignments.map((assignment) => (
-                        <div key={assignment.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 border border-zinc-200/80 dark:border-zinc-800/50 hover:bg-zinc-100/90 dark:hover:bg-[#1a1a1a]/80 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-xl transition-all gap-4">
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h4 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
+                        <div key={assignment.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 sm:p-4 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 border border-zinc-200/80 dark:border-zinc-800/50 hover:bg-zinc-100/90 dark:hover:bg-[#1a1a1a]/80 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-xl transition-all gap-3 sm:gap-4 min-w-0">
+                            <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+                                    <h4 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight wrap-break-word">
                                         {assignment.problemNumber
                                             ? `Problem #${assignment.problemNumber}: ${assignment.title || assignment.titleSlug}`
                                             : (assignment.title ? `${assignment.title} (${assignment.titleSlug})` : assignment.titleSlug)}
@@ -132,23 +132,23 @@ export function ManageAssignments({ classroomId, mentorId, assignments = [], onR
                                         variant="outline"
                                         className={
                                             assignment.platform === 'CODEFORCES'
-                                                ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20 text-[10px] uppercase font-bold'
-                                                : 'bg-amber-500/10 text-amber-600 dark:text-[#ffa116] border-amber-500/20 text-[10px] uppercase font-bold'
+                                                ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20 text-[10px] uppercase font-bold shrink-0'
+                                                : 'bg-amber-500/10 text-amber-600 dark:text-[#ffa116] border-amber-500/20 text-[10px] uppercase font-bold shrink-0'
                                         }
                                     >
                                         {assignment.platform || 'LEETCODE'}
                                     </Badge>
-                                    <Badge variant="outline" className="bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20 text-[10px] uppercase">Active</Badge>
+                                    <Badge variant="outline" className="bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20 text-[10px] uppercase shrink-0">Active</Badge>
                                 </div>
-                                <div className="flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                                    <span className="flex items-center"><Calendar className="w-3.5 h-3.5 mr-1.5 text-zinc-400 dark:text-zinc-500" /> Due: {formatDate(assignment.endTimestamp)}</span>
+                                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                                    <span className="flex items-center"><Calendar className="w-3.5 h-3.5 mr-1.5 text-zinc-400 dark:text-zinc-500 shrink-0" /> Due: {formatDate(assignment.endTimestamp)}</span>
                                     <a href={assignment.questionLink} target="_blank" rel="noopener noreferrer" className="flex items-center text-[#5b4fff] hover:text-[#4a3fdf] dark:hover:text-[#b4afff] transition-colors">
                                         View on {assignment.platform === 'CODEFORCES' ? 'Codeforces' : 'LeetCode'} <ExternalLink className="w-3 h-3 ml-1" />
                                     </a>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                                 <Button
                                     onClick={() => handleOpenEditDeadline(assignment)}
                                     variant="outline"

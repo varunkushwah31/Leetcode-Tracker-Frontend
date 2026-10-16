@@ -517,7 +517,7 @@ export function MentorDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col">
+            <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col w-full min-w-0">
                 {/* Luminous Multi-Layer Ambient Glow */}
                 <div className="hidden dark:block">
                     <AmbientGlow />
@@ -647,7 +647,7 @@ export function MentorDashboard() {
                     </div>
                 </header>
 
-                <div className="relative z-10 flex-1 flex flex-col">
+                <div className="relative z-10 flex-1 flex flex-col w-full min-w-0 overflow-x-hidden">
                     {(() => {
                         if (showAdminOverview) {
                             return (
@@ -690,7 +690,7 @@ export function MentorDashboard() {
                         }
 
                         return (
-                            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 min-h-full w-full">
+                            <div className="max-w-7xl mx-auto p-3 sm:p-6 lg:p-10 min-h-full w-full min-w-0">
                                 {/* Main Dashboard Error Banner */}
                                 <ErrorBanner message={error} />
 

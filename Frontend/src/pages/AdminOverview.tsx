@@ -307,10 +307,10 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
     const dialogCardClasses = "bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl rounded-2xl";
 
     return (
-        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300 space-y-8">
+        <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300 space-y-6 sm:space-y-8 min-w-0 overflow-x-hidden">
             {/* Header & Command Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-800/80">
-                <div>
+            <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 sm:pb-6 border-b border-zinc-200 dark:border-zinc-800/80 min-w-0">
+                <div className="min-w-0">
                     <Button
                         variant="ghost"
                         onClick={onBack}
@@ -319,19 +319,19 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                         <ArrowLeftIcon className="h-3.5 w-3.5 mr-1.5" /> Return to Mentor View
                     </Button>
                     <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] flex items-center justify-center border border-[#5b4fff]/25 shadow-sm">
-                            <ShieldCheck className="w-6 h-6" weight="fill" />
+                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] flex items-center justify-center border border-[#5b4fff]/25 shadow-sm shrink-0">
+                            <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" weight="fill" />
                         </div>
-                        <div>
-                            <div className="flex items-center gap-2.5">
-                                <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                        <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
                                     Super Admin Center
                                 </h1>
-                                <Badge className="bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/30 font-semibold px-2 py-0.5 text-[11px]">
+                                <Badge className="bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/30 font-semibold px-2 py-0.5 text-[10px] sm:text-[11px] shrink-0">
                                     ROOT PRIVILEGES
                                 </Badge>
                             </div>
-                            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                                 Global governance, platform telemetry, faculty management, and Redis cache diagnostics.
                             </p>
                         </div>
@@ -339,11 +339,11 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                 </div>
 
                 {/* Global Quick Action Buttons */}
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 w-full md:w-auto">
                     <Button
                         variant="outline"
                         onClick={() => fetchAllData()}
-                        className="border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-3.5 rounded-xl cursor-pointer"
+                        className="border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-3.5 rounded-xl cursor-pointer w-full sm:w-auto justify-center"
                     >
                         <RefreshCw className="w-4 h-4 mr-1.5 text-zinc-500" />
                         Refresh
@@ -352,7 +352,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     <Button
                         variant="outline"
                         onClick={() => setClearAllCacheOpen(true)}
-                        className="border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-3.5 rounded-xl transition-colors cursor-pointer"
+                        className="border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold h-10 px-3.5 rounded-xl transition-colors cursor-pointer w-full sm:w-auto justify-center"
                     >
                         <DatabaseIcon className="w-4 h-4 mr-1.5 text-amber-600 dark:text-amber-400" />
                         Flush Caches
@@ -361,7 +361,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                     <Button
                         onClick={handleForceSync}
                         disabled={isSyncingAll}
-                        className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-sm transition-all cursor-pointer"
+                        className="col-span-2 sm:col-span-1 bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-sm transition-all cursor-pointer w-full sm:w-auto justify-center"
                     >
                         {isSyncingAll ? (
                             <>
@@ -381,81 +381,81 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
             {/* Error Banner */}
             <ErrorBanner message={syncError} className="mb-4" />
 
-            {/* Key Metric Overview Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Key Metric Overview Cards - 2x2 Grid on Mobile, 4 Columns on Large Screens */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                 <Card className={cardClasses}>
-                    <CardContent className="p-5 flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <CardContent className="p-3.5 sm:p-5 flex items-start sm:items-center justify-between gap-2">
+                        <div className="min-w-0">
+                            <p className="text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider truncate">
                                 Total Students
                             </p>
-                            <h3 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-1">
+                            <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-zinc-900 dark:text-white mt-0.5 sm:mt-1">
                                 {overviewData.totalStudents}
                             </h3>
-                            <div className="flex items-center gap-1.5 mt-2 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                            <div className="flex items-center gap-1 mt-1 sm:mt-2 text-[10px] sm:text-[11px] font-medium text-zinc-500 dark:text-zinc-400 truncate">
                                 <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{overviewData.dualPlatformStudents || 0}</span> dual-platform
                             </div>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20">
-                            <UsersIcon className="w-6 h-6" />
+                        <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20 shrink-0 mt-0.5 sm:mt-0">
+                            <UsersIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                         </div>
                     </CardContent>
                 </Card>
 
                 <Card className={cardClasses}>
-                    <CardContent className="p-5 flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <CardContent className="p-3.5 sm:p-5 flex items-start sm:items-center justify-between gap-2">
+                        <div className="min-w-0">
+                            <p className="text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider truncate">
                                 Active Mentors
                             </p>
-                            <h3 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-1">
+                            <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-zinc-900 dark:text-white mt-0.5 sm:mt-1">
                                 {overviewData.totalMentors}
                             </h3>
-                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2">
-                                Across all active faculties
+                            <p className="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 sm:mt-2 truncate">
+                                Across faculties
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-                            <UserCheckIcon className="w-6 h-6" />
+                        <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 shrink-0 mt-0.5 sm:mt-0">
+                            <UserCheckIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                         </div>
                     </CardContent>
                 </Card>
 
                 <Card className={cardClasses}>
-                    <CardContent className="p-5 flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <CardContent className="p-3.5 sm:p-5 flex items-start sm:items-center justify-between gap-2">
+                        <div className="min-w-0">
+                            <p className="text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider truncate">
                                 Cohorts & Classes
                             </p>
-                            <h3 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-1">
+                            <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-zinc-900 dark:text-white mt-0.5 sm:mt-1">
                                 {overviewData.totalClassrooms}
                             </h3>
-                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2">
-                                <span className="font-semibold text-emerald-600 dark:text-emerald-400">{overviewData.totalAssignments || 0}</span> total assignments
+                            <p className="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 sm:mt-2 truncate">
+                                <span className="font-semibold text-emerald-600 dark:text-emerald-400">{overviewData.totalAssignments || 0}</span> assignments
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20">
-                            <BookOpenIcon className="w-6 h-6" />
+                        <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20 shrink-0 mt-0.5 sm:mt-0">
+                            <BookOpenIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                         </div>
                     </CardContent>
                 </Card>
 
                 <Card className={cardClasses}>
-                    <CardContent className="p-5 flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                                Redis Cache Engine
+                    <CardContent className="p-3.5 sm:p-5 flex items-start sm:items-center justify-between gap-2">
+                        <div className="min-w-0">
+                            <p className="text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider truncate">
+                                Redis Engine
                             </p>
-                            <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white mt-1 flex items-center gap-1.5">
-                                <span className={`inline-block w-2.5 h-2.5 rounded-full ${cacheStats?.redisStatus === 'CONNECTED' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                            <h3 className="text-base sm:text-xl md:text-2xl font-bold text-zinc-900 dark:text-white mt-0.5 sm:mt-1 flex items-center gap-1.5 truncate">
+                                <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${cacheStats?.redisStatus === 'CONNECTED' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
                                 {cacheStats?.redisStatus === 'CONNECTED' ? 'Online' : 'Degraded'}
                             </h3>
-                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 truncate max-w-36">
+                            <p className="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 sm:mt-2 truncate max-w-36">
                                 Mem: <span className="font-semibold text-zinc-800 dark:text-zinc-200">{cacheStats?.usedMemoryHuman || 'Active'}</span>
                             </p>
                         </div>
-                        <div className="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/20">
-                            <HardDrivesIcon className="w-6 h-6" />
+                        <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/20 shrink-0 mt-0.5 sm:mt-0">
+                            <HardDrivesIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                         </div>
                     </CardContent>
                 </Card>
@@ -463,41 +463,48 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
 
             {/* Navigation Tabs */}
             <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as typeof activeTab)} className="w-full">
-                <TabsList className="h-auto flex items-center gap-1.5 p-1.5 bg-white dark:bg-[#121217] rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs max-w-full overflow-x-auto justify-start">
+                <TabsList className="h-auto flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 bg-white dark:bg-[#121217] rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs max-w-full overflow-x-auto justify-start no-scrollbar">
                     <TabsTrigger
                         value="overview"
                         onClick={() => setActiveTab('overview')}
-                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
+                        className="rounded-lg text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer whitespace-nowrap shrink-0"
                     >
-                        Telemetry & Platform
+                        <span className="sm:hidden">Telemetry</span>
+                        <span className="hidden sm:inline">Telemetry & Platform</span>
                     </TabsTrigger>
                     <TabsTrigger
                         value="mentors"
                         onClick={() => setActiveTab('mentors')}
-                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
+                        aria-label={`Mentors & Faculty (${overviewData.allMentors?.length || 0})`}
+                        className="rounded-lg text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer whitespace-nowrap shrink-0"
                     >
-                        Mentors & Faculty ({overviewData.allMentors?.length || 0})
+                        <span className="sm:hidden">Mentors ({overviewData.allMentors?.length || 0})</span>
+                        <span className="hidden sm:inline">Mentors & Faculty ({overviewData.allMentors?.length || 0})</span>
                     </TabsTrigger>
                     <TabsTrigger
                         value="classrooms"
                         onClick={() => setActiveTab('classrooms')}
-                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
+                        className="rounded-lg text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer whitespace-nowrap shrink-0"
                     >
                         Classrooms ({overviewData.allClassrooms?.length || 0})
                     </TabsTrigger>
                     <TabsTrigger
                         value="students"
                         onClick={() => setActiveTab('students')}
-                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
+                        aria-label={`Students Directory (${students.length})`}
+                        className="rounded-lg text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer whitespace-nowrap shrink-0"
                     >
-                        Students Directory ({students.length})
+                        <span className="sm:hidden">Students ({students.length})</span>
+                        <span className="hidden sm:inline">Students Directory ({students.length})</span>
                     </TabsTrigger>
                     <TabsTrigger
                         value="cache"
                         onClick={() => setActiveTab('cache')}
-                        className="rounded-lg text-xs font-semibold px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer"
+                        aria-label="Redis Diagnostics"
+                        className="rounded-lg text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-[#2a2a2a] dark:data-[state=active]:text-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-zinc-800 dark:data-[state=active]:border-zinc-700/50 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all cursor-pointer whitespace-nowrap shrink-0"
                     >
-                        Redis Diagnostics
+                        <span className="sm:hidden">Redis</span>
+                        <span className="hidden sm:inline">Redis Diagnostics</span>
                     </TabsTrigger>
                 </TabsList>
 
@@ -641,31 +648,31 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                         <ScrollArea className="h-115">
                             <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
                                 {filteredMentors.map((mentor) => (
-                                    <div key={mentor.id} className="p-4 flex items-center justify-between hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
-                                        <div className="flex items-center gap-3.5">
-                                            <Avatar className="h-10 w-10 border border-zinc-200/80 dark:border-zinc-800/80">
+                                    <div key={mentor.id} className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
+                                        <div className="flex items-center gap-3.5 min-w-0">
+                                            <Avatar className="h-10 w-10 border border-zinc-200/80 dark:border-zinc-800/80 shrink-0">
                                                 <AvatarFallback className="bg-zinc-100 dark:bg-[#16161f] text-zinc-700 dark:text-zinc-200 font-bold text-xs">
                                                     {(mentor.name || mentor.email || 'Mentor').substring(0, 2).toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <p className="font-bold text-sm text-zinc-900 dark:text-white">{mentor.name || mentor.email || 'Unnamed Mentor'}</p>
+                                            <div className="min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <p className="font-bold text-sm text-zinc-900 dark:text-white truncate">{mentor.name || mentor.email || 'Unnamed Mentor'}</p>
                                                     {mentor.role === 'SUPER_ADMIN' ? (
-                                                        <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 text-[10px] py-0">
+                                                        <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 text-[10px] py-0 shrink-0">
                                                             SUPER ADMIN
                                                         </Badge>
                                                     ) : (
-                                                        <Badge variant="outline" className="bg-zinc-100 dark:bg-[#16161f] text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800/80 text-[10px] py-0">
+                                                        <Badge variant="outline" className="bg-zinc-100 dark:bg-[#16161f] text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800/80 text-[10px] py-0 shrink-0">
                                                             MENTOR
                                                         </Badge>
                                                     )}
                                                 </div>
-                                                {mentor.email && <p className="text-xs text-zinc-500 dark:text-zinc-400">{mentor.email}</p>}
+                                                {mentor.email && <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{mentor.email}</p>}
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center shrink-0">
                                             <Badge variant="outline" className="bg-zinc-100 dark:bg-[#16161f] text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800/80 text-xs rounded-lg">
                                                 {mentor.classroomIds?.length || 0} Classrooms
                                             </Badge>
@@ -673,7 +680,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => setDeletingMentor(mentor)}
-                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl cursor-pointer"
+                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl cursor-pointer h-8 w-8"
                                                 title="Delete Mentor"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -709,15 +716,15 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                         <ScrollArea className="h-115">
                             <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
                                 {filteredClassrooms.map((cls) => (
-                                    <div key={cls.classroomId} className="p-4 flex items-center justify-between hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
-                                        <div>
-                                            <p className="font-bold text-sm text-zinc-900 dark:text-white">{cls.className || 'Unnamed Class'}</p>
-                                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                    <div key={cls.classroomId} className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
+                                        <div className="min-w-0">
+                                            <p className="font-bold text-sm text-zinc-900 dark:text-white truncate">{cls.className || 'Unnamed Class'}</p>
+                                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
                                                 Instructor: <span className="font-medium text-zinc-700 dark:text-zinc-300">{cls.mentorName || 'Unassigned'}</span>
                                             </p>
                                         </div>
 
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center shrink-0">
                                             <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 text-xs rounded-lg">
                                                 {cls.enrolledStudents?.length || 0} Students
                                             </Badge>
@@ -728,7 +735,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => setDeletingClassroom(cls)}
-                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl cursor-pointer"
+                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl cursor-pointer h-8 w-8"
                                                 title="Force Delete Classroom"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -771,17 +778,17 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
 
                                     return (
                                         <div key={student.id || student.leetcodeUsername || student.email || `st-${idx}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
-                                            <div className="flex items-center gap-3.5">
-                                                <Avatar className="h-10 w-10 border border-zinc-200/80 dark:border-zinc-800/80">
+                                            <div className="flex items-center gap-3.5 min-w-0">
+                                                <Avatar className="h-10 w-10 border border-zinc-200/80 dark:border-zinc-800/80 shrink-0">
                                                     <AvatarImage src={student.avatarUrl} />
                                                     <AvatarFallback className="bg-zinc-100 dark:bg-[#16161f] text-zinc-700 dark:text-zinc-200 font-bold text-xs">
                                                         {studentFallback}
                                                     </AvatarFallback>
                                                 </Avatar>
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <p className="font-bold text-sm text-zinc-900 dark:text-white">{studentDisplayName}</p>
-                                                        {student.email && <span className="text-xs text-zinc-400">({student.email})</span>}
+                                                <div className="min-w-0">
+                                                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
+                                                        <p className="font-bold text-sm text-zinc-900 dark:text-white truncate">{studentDisplayName}</p>
+                                                        {student.email && <span className="text-xs text-zinc-400 truncate max-w-full">({student.email})</span>}
                                                     </div>
                                                 <div className="flex flex-wrap items-center gap-2 mt-1">
                                                     {student.leetcodeUsername && (
@@ -881,13 +888,13 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                     const count = cacheStats?.namespaceKeyCounts?.[`${cName}*`] ??
                                         cacheStats?.namespaceKeyCounts?.[cName] ?? 0;
                                     return (
-                                        <div key={cName} className="p-4 flex items-center justify-between hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors">
-                                            <div>
-                                                <p className="font-mono text-xs font-semibold text-zinc-900 dark:text-white">{cName}</p>
+                                        <div key={cName} className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors">
+                                            <div className="min-w-0">
+                                                <p className="font-mono text-xs font-semibold text-zinc-900 dark:text-white truncate">{cName}</p>
                                                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Spring Cache Region</p>
                                             </div>
 
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center shrink-0">
                                                 <Badge variant="outline" className="bg-zinc-100 dark:bg-[#16161f] text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-800/80 text-xs rounded-lg">
                                                     {count >= 0 ? `${count} estimated keys` : 'Active'}
                                                 </Badge>

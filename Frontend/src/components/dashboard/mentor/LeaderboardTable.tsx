@@ -376,15 +376,15 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
             </CardHeader>
             <CardContent className="p-0">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-180">
+                    <table className="w-full sm:min-w-180">
                         <thead className="bg-zinc-50/80 dark:bg-[#1a1b2e]/50 border-b border-zinc-200/80 dark:border-zinc-800/60 select-none">
                         <tr>
                             <th
                                 onClick={() => handleSortChange('rank')}
-                                className="py-3 px-2 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                className="py-3 px-1.5 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors w-10 sm:w-auto"
                                 title={`Sort by Rank (${sortField === 'rank' ? (sortDirection === 'asc' ? 'Ascending' : 'Descending') : 'Click to sort'})`}
                             >
-                                <div className="flex items-center justify-center gap-1.5">
+                                <div className="flex items-center justify-center gap-1 sm:gap-1.5">
                                     <span className={sortField === 'rank' ? 'text-[#5b4fff] dark:text-[#968fff]' : 'text-zinc-500 group-hover/th:text-zinc-900 dark:group-hover/th:text-white'}>
                                         Rank
                                     </span>
@@ -393,10 +393,10 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                             </th>
                             <th
                                 onClick={() => handleSortChange('name')}
-                                className="text-left py-3 px-3 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                className="text-left py-3 px-2 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
                                 title={`Sort by Student Name (${sortField === 'name' ? (sortDirection === 'asc' ? 'A to Z' : 'Z to A') : 'Click to sort A to Z'})`}
                             >
-                                <div className="flex items-center gap-1.5">
+                                <div className="flex items-center gap-1 sm:gap-1.5">
                                     <span className={sortField === 'name' ? 'text-[#5b4fff] dark:text-[#968fff]' : 'text-zinc-500 group-hover/th:text-zinc-900 dark:group-hover/th:text-white'}>
                                         Student
                                     </span>
@@ -405,7 +405,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                             </th>
                             <th
                                 onClick={() => handleSortChange('consistency')}
-                                className="text-center py-3 px-3 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                className="hidden sm:table-cell text-center py-3 px-3 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
                                 title={`Sort by Daily Streak (${sortField === 'consistency' ? (sortDirection === 'desc' ? 'High to Low' : 'Low to High') : 'Click to sort by streak'})`}
                             >
                                 <div className="flex items-center justify-center gap-1.5">
@@ -417,7 +417,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                             </th>
                             <th
                                 onClick={() => handleSortChange('solved')}
-                                className="text-center py-3 px-3 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                className="hidden sm:table-cell text-center py-3 px-3 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
                                 title={`Sort by Total Solved (${sortField === 'solved' ? (sortDirection === 'desc' ? 'High to Low' : 'Low to High') : 'Click to sort by total solved'})`}
                             >
                                 <div className="flex items-center justify-center gap-1.5">
@@ -429,7 +429,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                             </th>
                             <th
                                 onClick={() => handleSortChange('rating')}
-                                className="text-center py-3 px-3 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                className="hidden sm:table-cell text-center py-3 px-3 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
                                 title={`Sort by Contest Rating (${sortField === 'rating' ? (sortDirection === 'desc' ? 'High to Low' : 'Low to High') : 'Click to sort by rating'})`}
                             >
                                 <div className="flex items-center justify-center gap-1.5">
@@ -441,7 +441,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                             </th>
                             <th
                                 onClick={() => handleSortChange(sortField === 'completed' ? 'pending' : 'completed')}
-                                className="text-right py-3 px-3 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
+                                className="text-right py-3 px-2 sm:py-4 sm:px-6 text-[11px] font-bold uppercase tracking-wider cursor-pointer group/th hover:bg-zinc-100/60 dark:hover:bg-zinc-800/30 transition-colors"
                                 title={`Sort by Assignments (${sortField === 'completed' ? 'Currently Done, click for Pending' : 'Click to sort by completed'})`}
                             >
                                 <div className="flex items-center justify-end gap-1.5">
@@ -456,22 +456,22 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                         <tbody className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
                         {sortedAndFilteredStudents?.map((student, index) => (
                             <tr key={student.id} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername || student.codeforcesHandle || student.id || '')}>
-                                <td className="py-3 px-2 sm:py-4 sm:px-6">
-                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mx-auto transition-transform duration-200 group-hover:scale-115 ${getRankBadgeClass(index)}`}>
+                                <td className="py-3 px-1.5 sm:py-4 sm:px-6 w-10 sm:w-auto">
+                                    <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full font-bold text-xs sm:text-sm mx-auto transition-transform duration-200 group-hover:scale-115 ${getRankBadgeClass(index)}`}>
                                         {index + 1}
                                     </div>
                                 </td>
-                                <td className="py-3 px-3 sm:py-4 sm:px-6">
-                                    <div className="flex items-center gap-3.5">
-                                        <Avatar className="w-10 h-10 border border-zinc-200 dark:border-zinc-800">
+                                <td className="py-3 px-2 sm:py-4 sm:px-6 min-w-0">
+                                    <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+                                        <Avatar className="w-8 h-8 sm:w-10 sm:h-10 border border-zinc-200 dark:border-zinc-800 shrink-0">
                                             <AvatarImage src={student.avatarUrl} />
-                                            <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] font-bold">{student.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                            <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] font-bold text-xs sm:text-sm">{student.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                                         </Avatar>
-                                        <div>
-                                            <p className="font-semibold text-zinc-900 dark:text-white group-hover:text-[#5b4fff] dark:group-hover:text-[#b4afff] transition-colors">{student.name}</p>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-semibold text-xs sm:text-sm text-zinc-900 dark:text-white group-hover:text-[#5b4fff] dark:group-hover:text-[#b4afff] transition-colors truncate">{student.name}</p>
                                             <div className="flex items-center gap-1.5 flex-wrap">
                                                 {student.leetcodeUsername && (
-                                                    <span className="text-xs text-zinc-500 font-medium tracking-wide">@{student.leetcodeUsername}</span>
+                                                    <span className="text-[11px] sm:text-xs text-zinc-500 font-medium tracking-wide">@{student.leetcodeUsername}</span>
                                                 )}
                                                 {student.codeforcesHandle && (
                                                     <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.2 rounded border border-blue-200 dark:border-blue-500/20">
@@ -479,7 +479,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="flex sm:hidden items-center gap-2 mt-1.5 pt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+                                            <div className="flex sm:hidden flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 pt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
                                                 <span className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
                                                     <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold">Solved:</span> {student.totalSolved || 0}
                                                 </span>
@@ -500,13 +500,13 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                         </div>
                                     </div>
                                 </td>
-                                <td className="py-3 px-3 sm:py-4 sm:px-6 text-center">
+                                <td className="hidden sm:table-cell py-3 px-3 sm:py-4 sm:px-6 text-center">
                                     <div className="flex items-center justify-center gap-1.5">
                                         <FlameIcon className={`w-4 h-4 ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500 animate-flame' : 'text-zinc-300 dark:text-zinc-700'}`} />
                                         <span className={`font-bold ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-600'}`}>{student.consistencyStreak || 0}</span>
                                     </div>
                                 </td>
-                                <td className="py-3 px-3 sm:py-4 sm:px-6 text-center">
+                                <td className="hidden sm:table-cell py-3 px-3 sm:py-4 sm:px-6 text-center">
                                     <span className="font-bold text-zinc-800 dark:text-zinc-200 text-base">{student.totalSolved || 0}</span>
                                     {Boolean(student.codeforcesSolvedCount && student.codeforcesSolvedCount > 0) && (
                                         <div className="text-[10px] text-zinc-500 font-medium">
@@ -514,7 +514,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                         </div>
                                     )}
                                 </td>
-                                <td className="py-3 px-3 sm:py-4 sm:px-6 text-center">
+                                <td className="hidden sm:table-cell py-3 px-3 sm:py-4 sm:px-6 text-center">
                                     {(student.currentContestRating ?? 0) > 0 || ((student.codeforcesRating ?? 0) > 0) ? (
                                         <div className="flex flex-col items-center">
                                             <span className="font-bold text-zinc-800 dark:text-zinc-200 text-sm">
@@ -536,28 +536,28 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                         <span className="text-xs text-zinc-400 dark:text-zinc-600 italic">Unrated</span>
                                     )}
                                 </td>
-                                <td className="py-3 px-3 sm:py-4 sm:px-6">
-                                    <div className="flex flex-col items-end gap-1.5">
-                                        <div className="flex items-center gap-1.5">
-                                            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.completedAssignments || 0} Done</Badge>
+                                <td className="py-3 px-2 sm:py-4 sm:px-6">
+                                    <div className="flex flex-col items-end gap-1 sm:gap-1.5 shrink-0">
+                                        <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-end">
+                                            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 px-2 sm:px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.completedAssignments || 0} Done</Badge>
                                             {Boolean(student.pendingAssignments && student.pendingAssignments > 0) && (
-                                                <Badge variant="outline" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.pendingAssignments} Pending</Badge>
+                                                <Badge variant="outline" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 px-2 sm:px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">{student.pendingAssignments} Pending</Badge>
                                             )}
                                         </div>
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-end">
                                             <button
                                                 type="button"
                                                 onClick={(e) => handleExportStudentReport(e, student.leetcodeUsername || student.codeforcesHandle || student.id || '')}
                                                 disabled={exportingReportStudent === (student.leetcodeUsername || student.codeforcesHandle || student.id)}
                                                 title="Download student performance report (CSV)"
-                                                className="group/report inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-50 dark:bg-zinc-800/80 transition-all cursor-pointer interactive-press"
+                                                className="group/report inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-md border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-50 dark:bg-zinc-800/80 transition-all cursor-pointer interactive-press"
                                             >
                                                 {exportingReportStudent === (student.leetcodeUsername || student.codeforcesHandle || student.id) ? (
                                                     <Loader2 className="w-2.5 h-2.5 animate-spin text-[#5b4fff]" />
                                                 ) : (
                                                     <Download className="w-2.5 h-2.5 text-zinc-500 group-hover/report:text-[#5b4fff]" />
                                                 )}
-                                                <span>Report CSV</span>
+                                                <span>Report<span className="hidden sm:inline"> CSV</span></span>
                                             </button>
                                             {(student.pendingAssignments ?? 0) > 0 && classroomId && student.id && (
                                                 <button
@@ -565,7 +565,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                     onClick={(e) => handleNudge(e, student.id!)}
                                                     disabled={nudgingStudentId === student.id || Boolean(nudgedStudents[student.id])}
                                                     title="Send reminder email to student"
-                                                    className={`group/nudge inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border transition-all interactive-press ${
+                                                    className={`group/nudge inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-md border transition-all interactive-press ${
                                                         nudgedStudents[student.id]
                                                             ? 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 cursor-default'
                                                             : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 dark:bg-zinc-800 cursor-pointer'
@@ -584,7 +584,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                         setRemoveError(null);
                                                     }}
                                                     title="Remove student from classroom"
-                                                    className="group/remove inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-900/50 hover:border-rose-300 dark:hover:border-rose-800 text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 bg-rose-50/50 dark:bg-rose-950/20 hover:bg-rose-100/60 dark:hover:bg-rose-900/30 transition-all cursor-pointer interactive-press"
+                                                    className="group/remove inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-900/50 hover:border-rose-300 dark:hover:border-rose-800 text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 bg-rose-50/50 dark:bg-rose-950/20 hover:bg-rose-100/60 dark:hover:bg-rose-900/30 transition-all cursor-pointer interactive-press"
                                                 >
                                                     <Trash2 className="w-2.5 h-2.5 text-rose-500 group-hover/remove:text-rose-600 dark:group-hover/remove:text-rose-400" />
                                                     <span>Remove</span>
