@@ -1,7 +1,7 @@
 import React, { useId } from 'react';
 import { Link } from 'react-router-dom';
 
-export type BrandLogoSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type BrandLogoSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'responsive';
 
 export interface BrandIconProps {
   size?: BrandLogoSize | number;
@@ -15,6 +15,7 @@ const sizeToIconClass: Record<BrandLogoSize, string> = {
   md: 'w-9.5 h-9.5',
   lg: 'w-11.5 h-11.5',
   xl: 'w-14 h-14',
+  responsive: 'w-7.5 h-7.5 sm:w-9.5 sm:h-9.5',
 };
 
 const sizeToTextClass: Record<BrandLogoSize, string> = {
@@ -23,6 +24,7 @@ const sizeToTextClass: Record<BrandLogoSize, string> = {
   md: 'text-xl',
   lg: 'text-2xl',
   xl: 'text-3xl',
+  responsive: 'text-lg sm:text-xl',
 };
 
 /**
@@ -130,7 +132,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       : 'text-zinc-900 dark:text-white';
 
   const content = (
-    <div className={`flex items-center gap-3 group select-none ${className}`}>
+    <div className={`flex items-center gap-3 group select-none ${asLink ? '' : className}`}>
       <div className="transition-transform duration-200 group-hover:scale-105">
         <BrandIcon size={size} withGlow={withGlow} />
       </div>
@@ -157,7 +159,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       <Link
         to={to}
         aria-label="MentorSync Home"
-        className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 rounded-xl"
+        className={`inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] focus-visible:ring-offset-2 rounded-xl ${className}`}
       >
         {content}
       </Link>

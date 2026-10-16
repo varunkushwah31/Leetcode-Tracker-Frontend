@@ -98,13 +98,13 @@ export function ContactPage() {
             </div>
 
             {/* Right Panel - Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-10 relative bg-[#f8fafc] dark:bg-[#0a0a0a] overflow-hidden transition-colors duration-200">
+            <div className="w-full lg:w-1/2 min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 relative bg-[#f8fafc] dark:bg-[#0a0a0a] overflow-y-auto transition-colors duration-200">
                 <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none"></div>
                 <div className="hidden dark:block">
                     <AmbientGlow variant="center" />
                 </div>
 
-                <div className="w-full max-w-120 relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="w-full max-w-120 relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto">
 
                     <div className="lg:hidden flex items-center justify-between mb-5 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60">
                         <BrandLogo size="sm" theme="auto" />
@@ -209,6 +209,37 @@ export function ContactPage() {
                             </Button>
                         </form>
                     )}
+
+                    {/* Direct Contact Channels for Mobile */}
+                    <div className="lg:hidden mt-6 pt-5 border-t border-zinc-200/80 dark:border-zinc-800/60">
+                        <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2.5">Or reach us directly</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <a
+                                href="mailto:hello@mentorsync.in"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-[#18181c] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 transition-colors"
+                            >
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+                                    <Mail className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Email Us</p>
+                                    <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">hello@mentorsync.in</p>
+                                </div>
+                            </a>
+                            <a
+                                href="tel:+919876543210"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-[#18181c] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 transition-colors"
+                            >
+                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+                                    <PhoneIcon className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Call Us</p>
+                                    <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">+91 98765 43210</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
 
                 </div>
             </div>

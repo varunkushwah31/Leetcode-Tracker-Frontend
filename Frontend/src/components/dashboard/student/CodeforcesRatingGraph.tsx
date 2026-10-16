@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Card, CardContent } from '../../ui/card';
 import { TrophyIcon, CalendarBlankIcon as Calendar, TrendUpIcon as TrendingUp, TrendDownIcon as TrendingDown } from '@phosphor-icons/react';
 import type { CodeforcesContestHistory } from '@/types';
@@ -87,9 +87,9 @@ export function CodeforcesRatingGraph({
 
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-    const { points, startYear, endYear } = useMemo(() => {
+    const { points, startYear, endYear, linePath, areaPath } = useMemo(() => {
         if (sortedContests.length === 0) {
-            return { points: [], startYear: '', endYear: '' };
+            return { points: [], startYear: '', endYear: '', linePath: '', areaPath: '' };
         }
 
         const ratings = sortedContests.map(c => c.newRating);
@@ -116,17 +116,25 @@ export function CodeforcesRatingGraph({
         const firstDate = new Date(sortedContests[0].ratingUpdateTimeSeconds * 1000);
         const lastDate = new Date(sortedContests.at(-1)!.ratingUpdateTimeSeconds * 1000);
 
+        const line = generateSmoothPath(pts);
+        const baseLine = VIEW_BOX_HEIGHT - PADDING.bottom;
+        const first = pts[0];
+        const last = pts.at(-1)!;
+        const area = `${line} L ${last.x.toFixed(1)} ${baseLine} L ${first.x.toFixed(1)} ${baseLine} Z`;
+
         return {
             points: pts,
             startYear: String(firstDate.getFullYear()),
-            endYear: String(lastDate.getFullYear())
+            endYear: String(lastDate.getFullYear()),
+            linePath: line,
+            areaPath: area
         };
     }, [sortedContests]);
 
     const activeIndex = hoveredIndex ?? (points.length > 0 ? points.length - 1 : null);
     const activePoint = activeIndex !== null && points[activeIndex] ? points[activeIndex] : null;
 
-    const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
         if (!svgRef.current || points.length === 0) return;
         const rect = svgRef.current.getBoundingClientRect();
         const clientX = e.clientX - rect.left;
@@ -142,9 +150,9 @@ export function CodeforcesRatingGraph({
             }
         });
         setHoveredIndex(closestIdx);
-    }, [points]);
+    };
 
-    const handleTouchMove = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
+    const handleTouchMove = (e: React.TouchEvent<SVGSVGElement>) => {
         if (!svgRef.current || points.length === 0 || !e.touches[0]) return;
         const rect = svgRef.current.getBoundingClientRect();
         const clientX = e.touches[0].clientX - rect.left;
@@ -160,11 +168,11 @@ export function CodeforcesRatingGraph({
             }
         });
         setHoveredIndex(closestIdx);
-    }, [points]);
+    };
 
-    const handleMouseLeave = useCallback(() => {
+    const handleMouseLeave = () => {
         setHoveredIndex(null);
-    }, []);
+    };
 
     // Format display values
     const effectiveRating = activePoint
@@ -181,15 +189,6 @@ export function CodeforcesRatingGraph({
 
     const attendedCount = sortedContests.length;
     const rankStyle = getRankBadgeStyle(rank);
-
-    const linePath = useMemo(() => generateSmoothPath(points), [points]);
-    const areaPath = useMemo(() => {
-        if (points.length === 0) return '';
-        const baseLine = VIEW_BOX_HEIGHT - PADDING.bottom;
-        const first = points[0];
-        const last = points.at(-1)!;
-        return `${linePath} L ${last.x.toFixed(1)} ${baseLine} L ${first.x.toFixed(1)} ${baseLine} Z`;
-    }, [linePath, points]);
 
     const formatDate = (ts: number) => {
         return new Date(ts * 1000).toLocaleDateString(undefined, {

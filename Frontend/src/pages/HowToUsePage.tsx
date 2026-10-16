@@ -101,8 +101,7 @@ https://codeforces.com/profile/petr`;
             {/* Floating Header matching Landing Page */}
             <header className="fixed top-4 sm:top-6 left-3 right-3 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-white/90 dark:bg-[#0a0a0a]/85 backdrop-blur-2xl border border-zinc-200/80 dark:border-white/10 shadow-xl px-3.5 sm:px-6 py-2.5 sm:py-3 flex flex-col transition-all">
                 <div className="flex items-center justify-between w-full">
-                    <BrandLogo size="sm" className="sm:hidden" theme="auto" />
-                    <BrandLogo size="md" className="hidden sm:inline-flex" theme="auto" />
+                    <BrandLogo size="responsive" theme="auto" />
 
                     <nav className="hidden md:flex items-center gap-5">
                         <Link
@@ -139,11 +138,11 @@ https://codeforces.com/profile/petr`;
                     </nav>
 
                     {/* Mobile Controls */}
-                    <div className="flex md:hidden items-center gap-2">
-                        <ThemeToggle className="bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 h-9 w-9" />
+                    <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
+                        <ThemeToggle className="bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 h-8.5 w-8.5 sm:h-9 sm:w-9" />
                         <Link
                             to="/login"
-                            className="bg-[#5b4fff] text-white text-xs font-semibold px-3 py-2 rounded-xl"
+                            className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-xl whitespace-nowrap shrink-0 transition-colors"
                         >
                             Get Started
                         </Link>
@@ -151,7 +150,7 @@ https://codeforces.com/profile/petr`;
                             type="button"
                             onClick={() => setMobileMenuOpen(prev => !prev)}
                             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-                            className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 focus:outline-none cursor-pointer"
+                            className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 focus:outline-none cursor-pointer shrink-0"
                         >
                             {mobileMenuOpen ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
                         </button>

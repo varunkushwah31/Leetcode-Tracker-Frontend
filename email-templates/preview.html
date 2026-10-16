@@ -10,7 +10,7 @@
       --card-bg: #1e293b;
       --border: #334155;
       --text: #f8fafc;
-      --text-muted: #cbd5e1;
+      --text-muted: #e2e8f0;
       --primary: #5b4fff;
       --primary-hover: #4a3ecc;
       --success: #047857;
@@ -42,11 +42,11 @@
       font-size: 16px;
     }
     .badge {
-      background: #1e3a8a;
-      border: 1px solid #3b82f6;
-      color: #ffffff;
+      background: #172554;
+      border: 1px solid #60a5fa;
+      color: #f8fafc;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       padding: 2px 8px;
       border-radius: 999px;
       text-transform: uppercase;
@@ -146,6 +146,8 @@
       transition: max-width 0.25s ease;
       min-height: 820px;
     }
+    /* noinspection CssUnusedSymbol */
+    .preview-frame.mobile,
     .preview-frame[data-view="mobile"] {
       max-width: 375px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
@@ -169,6 +171,8 @@
       pointer-events: none;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
+    /* noinspection CssUnusedSymbol */
+    .toast.show,
     .toast[data-show="true"] {
       opacity: 1;
       transform: translateY(0);
@@ -199,7 +203,7 @@
   </header>
 
   <div class="app-body">
-    <aside class="sidebar">
+    <form class="sidebar" onsubmit="return false;" aria-label="Live Preview Settings">
       <div style="font-size: 14px; font-weight: 700; margin-bottom: 4px;">Live Preview Controls</div>
       <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
         Update test variables to verify responsiveness &amp; legibility:
@@ -207,28 +211,28 @@
 
       <div class="field-group">
         <label for="inputName">User Name ({{user_name}})</label>
-        <input type="text" id="inputName" name="user_name" value="John Doe" oninput="renderTemplate()">
+        <input type="text" id="inputName" name="user_name" value="John Doe" aria-label="User Name" oninput="renderTemplate()">
       </div>
 
       <div class="field-group">
         <label for="inputOtp">OTP Code ({{otp_code}})</label>
-        <input type="text" id="inputOtp" name="otp_code" value="482910" maxlength="8" oninput="renderTemplate()">
+        <input type="text" id="inputOtp" name="otp_code" value="482910" maxlength="8" aria-label="OTP Code" oninput="renderTemplate()">
       </div>
 
       <div class="field-group">
         <label for="inputExpiry">Expiry Minutes ({{expiry_minutes}})</label>
-        <input type="text" id="inputExpiry" name="expiry_minutes" value="10" oninput="renderTemplate()">
+        <input type="text" id="inputExpiry" name="expiry_minutes" value="10" aria-label="Expiry Minutes" oninput="renderTemplate()">
       </div>
 
       <div class="field-group">
         <label for="inputAppName">App Name ({{app_name}})</label>
-        <input type="text" id="inputAppName" name="app_name" value="MentorSync" oninput="renderTemplate()">
+        <input type="text" id="inputAppName" name="app_name" value="MentorSync" aria-label="App Name" oninput="renderTemplate()">
       </div>
 
-      <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11px; color: #cbd5e1; line-height: 1.5;">
+      <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11px; color: #e2e8f0; line-height: 1.5;">
         Compatible with Gmail, Apple Mail, Outlook (Windows/Mac/Web), iOS Mail, and Android.
       </div>
-    </aside>
+    </form>
 
     <main class="preview-viewport">
       <iframe id="previewFrame" class="preview-frame" data-view="desktop" title="Email Template Live Preview"></iframe>
@@ -252,7 +256,7 @@
       const otpCode = document.getElementById("inputOtp").value || "123456";
       const expiry = document.getElementById("inputExpiry").value || "10";
       const appName = document.getElementById("inputAppName").value || "MentorSync";
-      const supportEmail = document.getElementById("inputSupportEmail").value || "support@mentorsync.dev";
+      const supportEmail = document.getElementById("inputSupportEmail")?.value || "support@mentorsync.dev";
 
       let rendered = rawTemplate
         .replaceAll('{{user_name}}', userName)
@@ -276,10 +280,12 @@
 
       if (mode === "mobile") {
         frame.dataset.view = "mobile";
+        frame.classList.add("mobile");
         btnMobile.classList.add("active");
         btnDesktop.classList.remove("active");
       } else {
         frame.dataset.view = "desktop";
+        frame.classList.remove("mobile");
         btnDesktop.classList.add("active");
         btnMobile.classList.remove("active");
       }
@@ -289,7 +295,11 @@
       navigator.clipboard.writeText(rawTemplate).then(() => {
         const toast = document.getElementById("toast");
         toast.dataset.show = "true";
-        setTimeout(() => { toast.dataset.show = "false"; }, 2500);
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.dataset.show = "false";
+          toast.classList.remove("show");
+        }, 2500);
       });
     }
 
