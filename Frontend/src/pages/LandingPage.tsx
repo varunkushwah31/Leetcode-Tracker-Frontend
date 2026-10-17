@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { 
     UsersIcon,
     CaretRightIcon as ChevronRight,
-    CaretDownIcon,
     CheckCircleIcon,
     CodeIcon as Code2Icon,
     ListIcon as MenuIcon,
@@ -322,29 +321,6 @@ const SAMPLE_VERIFICATIONS: SampleVerification[] = [
     }
 ];
 
-const FAQ_ITEMS = [
-    {
-        question: "How does MentorSync verify submissions without student credentials?",
-        answer: "MentorSync queries the official public GraphQL and REST submission endpoints for LeetCode and Codeforces. Students never share passwords or auth tokens. When a student submits a problem URL or when our automatic background poll runs, the engine validates the problem ID, accepted verdict status, runtime percentile, and submission timestamp directly from public records."
-    },
-    {
-        question: "Can educators import existing cohorts from CSV or Google Classroom?",
-        answer: "Yes. MentorSync features a 1-click roster importer that accepts standard CSV exports from Google Sheets, Microsoft Excel, or Google Classroom. The importer automatically sanitizes whitespace, parses LeetCode and Codeforces profile URLs via regex into handles, and registers all students into your classroom in seconds."
-    },
-    {
-        question: "How does contest rating tracking work across both LeetCode and Codeforces?",
-        answer: "MentorSync runs scheduled background synchronization after every official contest round. It fetches LeetCode Weekly and Biweekly contest ratings along with Codeforces Div. 1, 2, and 3 competition ratings. Student profile dashboards display dual rating curves, global rank titles (Knight, Guardian, Specialist, Expert), and combined algorithmic solve tallies."
-    },
-    {
-        question: "How does MentorSync detect and prevent false or duplicate submissions?",
-        answer: "The verification engine matches the submission timestamp to your classroom assignment window and verifies that the submission belongs specifically to the student's linked profile. It also extracts runtime and memory consumption percentiles, ensuring solutions are authentic before awarding completion points."
-    },
-    {
-        question: "What is the caching architecture and how does it prevent API rate limits?",
-        answer: "MentorSync uses a multi-tier Redis caching cluster that caches solved problem telemetry with intelligent TTLs. Subsequent queries from mentors, batch rank recalculations, and public dashboard visits hit Redis with 4ms latency (98.6% cache hit rate), fully insulating upstream platforms from rate limiting."
-    }
-];
-
 export function LandingPage() {
     const [canvasTab, setCanvasTab] = useState<'leaderboard' | 'profile' | 'analytics'>('leaderboard');
     const [leaderboardSort, setLeaderboardSort] = useState<'total' | 'lc' | 'cf' | 'streak'>('total');
@@ -354,7 +330,6 @@ export function LandingPage() {
     const [isVerifyingSim, setIsVerifyingSim] = useState(false);
     const [topicFilter, setTopicFilter] = useState<'all' | 'weaknesses'>('all');
     const [dispatchSuccess, setDispatchSuccess] = useState(false);
-    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const scrollToSection = (id: string) => {
@@ -1390,53 +1365,6 @@ export function LandingPage() {
                                 Synchronized Calendars
                             </span>
                         </div>
-                    </div>
-                </section>
-
-                {/* TECHNICAL FAQ ACCORDION SECTION */}
-                <section className="w-full max-w-4xl mx-auto mb-28 sm:mb-36">
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-3">
-                            Frequently Asked Questions
-                        </h2>
-                        <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto">
-                            Technical specifications and operational details for bootcamp coordinators and engineering instructors.
-                        </p>
-                    </div>
-
-                    <div className="space-y-3">
-                        {FAQ_ITEMS.map((faq, index) => {
-                            const isOpen = openFaqIndex === index;
-                            return (
-                                <div
-                                    key={index}
-                                    className="rounded-2xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 overflow-hidden shadow-xs transition-all"
-                                >
-                                    <button
-                                        type="button"
-                                        onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                                        aria-expanded={isOpen}
-                                        className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer hover:bg-zinc-50/50 dark:hover:bg-white/[0.02] transition-colors"
-                                    >
-                                        <span className="font-bold text-sm sm:text-base text-zinc-900 dark:text-white">
-                                            {faq.question}
-                                        </span>
-                                        <CaretDownIcon
-                                            className={`w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200 ${
-                                                isOpen ? 'rotate-180 text-[#5b4fff]' : ''
-                                            }`}
-                                            weight="bold"
-                                        />
-                                    </button>
-
-                                    {isOpen && (
-                                        <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-1 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed border-t border-zinc-100 dark:border-zinc-800/60">
-                                            {faq.answer}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
                     </div>
                 </section>
 
