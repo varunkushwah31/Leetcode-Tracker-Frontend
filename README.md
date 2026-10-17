@@ -25,7 +25,7 @@
 
 ---
 
-## 🌐 Live Deployments
+## Live Deployments
 
 | Component | Platform | URL | Status |
 | :--- | :--- | :--- | :--- |
@@ -44,52 +44,52 @@ Mentors can create virtual classrooms, enroll students individually or in bulk v
 
 ## Feature Highlights
 
-### 🔑 OAuth 2.0 Social Authentication (Google & GitHub)
+### OAuth 2.0 Social Authentication (Google & GitHub)
 * **One-Click Sign-In**: Frictionless authentication with Google and GitHub accounts.
 * **Intelligent Account Linking**: Automatically links to existing Student or Mentor profiles based on verified email, preserving roles and permissions.
 * **Auto-Registration & Onboarding**: First-time social logins are automatically registered as Students, with a guided dashboard prompt to link their LeetCode and Codeforces usernames.
 * **Cross-Site Security**: Issues short-lived cryptographic JWT access tokens alongside rotating `HttpOnly` refresh token cookies (`SameSite=None`, `Secure=true`) supporting cross-domain setups between Vercel and Render.
 * **Reverse Proxy SSL Forwarding**: Uses `server.forward-headers-strategy=framework` to seamlessly handle cloud load balancer SSL termination, preventing OAuth redirect URI mismatches.
 
-### ⚡ Official LeetCode Problem of the Day (POTD)
+### Official LeetCode Problem of the Day (POTD)
 * **Live Daily Challenge**: Directly pulls the official daily challenge from LeetCode (`activeDailyCodingChallengeQuestion`) with topic tags, difficulty pills, problem hint, and direct solve links.
 * **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with automatic date-staleness validation. Because the problem of the day is 100% identical for every user, it is stored once globally in Redis and shared across all students and mentors, eliminating redundant upstream calls.
 * **Collaborative Classroom Ticker**: Surfaces a live classroom participation banner:  
   `"14 of 24 students in your classroom have solved today's POTD!"` — motivating peer accountability and daily problem-solving consistency.
 
-### 🏆 Live Upcoming Contests Tracker
+### Live Upcoming Contests Tracker
 * **Dual-Platform Schedule**: Aggregates upcoming contest schedules from both **LeetCode** (Weekly & Biweekly) and **Codeforces** (Div 1/2/3/4).
 * **Global Redis Caching (`upcoming-contests`)**: Cached globally under `upcoming-contests` (`ALL`, `LEETCODE`, `CODEFORCES`) with a 30-minute TTL.
 * **404 Prevention Filter**: Automatically restricts LeetCode contests strictly to active, published upcoming events.
 * **Direct Registration Links**: Generates one-click registration redirects (`https://codeforces.com/contestRegistration/{id}`) for upcoming Codeforces contests.
 * **Interactive UI**: Real-time countdown clocks, duration badges, and instant platform filtering.
 
-### 🔄 Redis Cache Warming Worker & Distributed Lock
+### Redis Cache Warming Worker & Distributed Lock
 * **Zero Cold-Cache Lag**: Background scheduled worker runs daily at **6:00 AM Indian Standard Time (IST)** (`@Scheduled(cron = "0 0 6 * * ?", zone = "Asia/Kolkata")`) to prime global caches (`global-potd`, `upcoming-contests`) and pre-warm student statistics (`student-progress`, `student-stats`, `student-recent`, `student-profile`).
 * **Atomic Distributed Locking**: Acquires a Redis lock (`lock:cache-warming`, 30 min TTL) via `setIfAbsent()` to guarantee only one node warms the cache in multi-instance or clustered deployments.
 * **Admin On-Demand Trigger**: Secure administrative endpoint (`POST /api/admin/cache/warm`) allows instant cache re-warming at any time.
 
-### 📡 Real-Time Clustered WebSockets
+### Real-Time Clustered WebSockets
 * **STOMP over WebSocket**: Connected clients receive instant updates over `/topic/classrooms/{classroomId}` without needing manual page reloads.
 * **Redis Pub/Sub Cluster Bridge**: The `RedisWebSocketBridge` publishes events to `mentorsync:classroom:events`. Clustered server instances synchronize state seamlessly, dispatching local WebSocket notifications to connected students and mentors.
 
-### 🛡️ Enterprise Resilience & Fault Tolerance
+### Enterprise Resilience & Fault Tolerance
 * **Resilience4j Circuit Breaker**: Tracks upstream LeetCode API error rates. If failures exceed 50%, the circuit opens to prevent cascading timeouts, immediately serving cached Redis data.
 * **Exponential Backoff Retry**: Automatically retries transient failures up to 3 times with progressive delays (2s, 4s).
 * **Rate Limiting**: Throttles calls to 15 requests per 10 seconds to safeguard your server IP against third-party API throttling.
 
-### 🏫 Classroom & Assignment Management
+### Classroom & Assignment Management
 * **Auto-Fetch Problem Titles**: Mentors paste a LeetCode problem URL — MentorSync automatically extracts the title slug, queries the API, and auto-populates the assignment title and difficulty.
 * **Automated Verification**: Students validate homework with one click (`auto-validate`); MentorSync queries LeetCode's recent submissions to verify problem acceptance and timestamps.
 * **Student Nudge System**: Mentors can trigger automated email reminders to students with overdue or pending assignments.
 * **CSV Bulk Import & Export**: One-click bulk student onboarding via CSV and instant export of classroom performance metrics.
 
-### 📈 Comprehensive Telemetry & Analytics
+### Comprehensive Telemetry & Analytics
 * **Consistency Heatmap**: Full interactive GitHub-style calendar heatmap displaying daily coding submissions.
 * **Multi-Metric Leaderboard**: Sort student rankings dynamically by **Streak**, **Total Solved**, **Contest Rating**, or **Pending Assignments**.
 * **Unified Contest History**: Synchronized graph displaying LeetCode and Codeforces historical rating curves and global ranks.
 
-### 📞 Contact & Support Portal
+### Contact & Support Portal
 * **Integrated Contact Page**: Real-time validated contact form with quick topic suggestions.
 * **Direct Contact Details**: Support email (`varunkushwah31@gmail.com`), phone (`8218568519`), and headquarters (`KIET, Ghaziabad, India`).
 
