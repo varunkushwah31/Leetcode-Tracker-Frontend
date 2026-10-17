@@ -1,28 +1,46 @@
 # MentorSync Frontend (React 19 + TypeScript + Vite)
 
-The modern, responsive web application for **MentorSync (LeetCode LMS)** — built with **React 19**, **TypeScript**, **Vite**, and **Tailwind CSS v4**. It delivers real-time dashboards for students, mentors, and administrators with gamified tracking, live WebSocket updates, and competitive programming analytics.
+[![Live Web App](https://img.shields.io/badge/Deployed_on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://mentorssync.vercel.app/)
+![React 19](https://img.shields.io/badge/React-19.2.4-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?logo=typescript&logoColor=white)
+![Vite 8](https://img.shields.io/badge/Vite-8.3.1-646C9F?logo=vite&logoColor=white)
+![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.2.2-38B2AC?logo=tailwindcss&logoColor=white)
+![Vitest Tests](https://img.shields.io/badge/Vitest-99%20Passed-success)
+
+The modern, responsive web application for **MentorSync** — built with **React 19**, **TypeScript**, **Vite**, and **Tailwind CSS v4**. Deployed live on **[Vercel](https://mentorssync.vercel.app/)**, it connects seamlessly to the Spring Boot backend on **[Render](https://leettracker-backend-nq7r.onrender.com)**.
+
+---
+
+## Live Deployment
+
+* **URL**: [https://mentorssync.vercel.app/](https://mentorssync.vercel.app/)
+* **Platform**: Vercel
+* **SPA Routing**: Configured via [`vercel.json`](vercel.json)
 
 ---
 
 ## Features & Dashboards
 
-### Student Dashboard
-- **Daily Problem of the Day (POTD)**: Displays today's official LeetCode Daily Challenge with topic tags, difficulty badges, and a collaborative classroom ticker (*"3 of 5 students in TEST solved today's POTD!"*).
+### 1. Authentication & Social OAuth 2.0
+- **Google & GitHub Social Login**: One-click authentication with real-time feedback and state management.
+- **Handshake Redirect Handler** (`/oauth2/redirect`): Extracts access tokens from callback query parameters and securely initializes the authentication session.
+- **Onboarding Prompt**: Automatic welcome notification for new OAuth signups to connect their LeetCode and Codeforces usernames.
+
+### 2. Student Dashboard
+- **Daily Problem of the Day (POTD)**: Displays today's official LeetCode Daily Challenge with topic tags, difficulty badges, and a collaborative classroom participation ticker.
 - **Upcoming Contests Tracker**: Live schedule of LeetCode (Weekly/Biweekly) and Codeforces contests with dynamic countdown timers, platform filtering, and direct one-click registration.
-- **Dual-Platform Statistics**: Activity heatmap calendar, problem breakdown by difficulty (Easy, Medium, Hard), and unified contest rating progress across LeetCode and Codeforces.
+- **Dual-Platform Statistics**: Activity heatmap calendar, difficulty breakdown (Easy, Medium, Hard), and unified contest rating progress across LeetCode and Codeforces.
 - **One-Click Assignment Verification**: Auto-validates completed homework against the student's LeetCode profile without manual screenshot submissions.
 
-### Mentor Dashboard
+### 3. Mentor Dashboard
 - **Classroom Hub**: Create classrooms, manage enrolled students, and bulk-import students via CSV.
-- **Auto-Detect Assignment Creator**: Mentors paste any LeetCode problem URL, and the system automatically fetches the problem title, slug, and difficulty.
+- **Auto-Detect Assignment Creator**: Mentors paste any LeetCode problem URL, and the system automatically extracts problem details.
 - **Live Leaderboard**: Real-time rankings sorted by streaks, contest ratings, solved counts, or pending tasks.
 - **Engagement Tools**: Automated email nudges for students falling behind on assignments.
 - **Reporting**: Export student performance and assignment completion metrics directly to CSV.
 
-### Super Admin Dashboard
-- **System Overview**: High-level platform health metrics, user distributions, and system telemetry.
-- **Global Data Sync**: Trigger background synchronization of all student profiles across external APIs.
-- **Redis Cache Control**: Inspect Redis cache memory, view hit/miss statistics, flush individual caches, or manually run the Cache Warming Worker.
+### 4. Contact & Support Portal
+- **Interactive Form**: Validation, quick topic chips, and direct inquiry submission to mentors and administrators.
 
 ---
 
@@ -32,99 +50,38 @@ The modern, responsive web application for **MentorSync (LeetCode LMS)** — bui
 |---|---|---|
 | **React** | Component-driven UI library | `19.2.4` |
 | **TypeScript** | Type-safe development | `5.9.3` |
-| **Vite** | Next-generation build tool & dev server | `8.0.1` |
+| **Vite** | Next-generation build tool & dev server | `8.3.1` |
 | **Tailwind CSS** | Utility-first CSS styling | `v4.2.2` |
-| **Radix UI / Shadcn** | Accessible headless UI primitives | Latest |
+| **Radix UI** | Accessible headless UI primitives | Latest |
 | **@phosphor-icons/react** | Iconography | `2.1.10` |
 | **@stomp/stompjs** | Real-time WebSocket STOMP client | `7.3.0` |
-| **Axios** | HTTP client with JWT interceptors | `1.20.0` |
+| **Axios** | HTTP client with automatic token refresh | `1.20.0` |
 | **React Router** | Client-side routing | `7.13.2` |
-| **Vitest** | Unit and component testing | `5.0.3` |
-
----
-
-## Project Structure
-
-```
-Frontend/src/
-├── assets/                  # Static assets and brand logos
-├── components/
-│   ├── auth/                # ProtectedRoute and authentication guards
-│   ├── dashboard/
-│   │   ├── admin/           # Admin overview, user management, cache controls
-│   │   ├── mentor/          # Classroom hub, assignment dialogs, nudges
-│   │   └── student/         # DailyChallengeCard, UpcomingContestsCard,
-│   │                        # HeatmapCalendar, UnifiedContestHistory
-│   ├── layout/              # Navbar, Sidebar, App Shell
-│   └── ui/                  # Button, Card, Badge, Dialog, ScrollArea, Tabs
-├── context/                 # AuthContext and state providers
-├── hooks/                   # Custom hooks (useAuth, useClassroomWebSocket)
-├── pages/                   # Login, Register, StudentDashboard, MentorDashboard, etc.
-├── services/                # Axios API modules (api.ts, challengeService.ts, etc.)
-└── tests/                   # Vitest unit test suites
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
-
-### Installation
-
-```bash
-# 1. Navigate to the frontend directory
-cd Frontend
-
-# 2. Install dependencies
-npm install
-
-# 3. Create .env file
-cp .env.example .env # (or create .env with variables below)
-
-# 4. Start development server
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`.
+| **Vitest** | Unit and component testing (99 tests passed) | `5.0.3` |
 
 ---
 
 ## Environment Variables
 
-Create a `.env` file in the `Frontend/` root:
-
-```env
-# Base API URL pointing to the Spring Boot backend
-VITE_API_BASE_URL=http://localhost:8080/api
-
-# Base WebSocket URL
-VITE_WS_URL=http://localhost:8080/ws-endpoint
-```
+| Variable | Description | Local Dev | Production (Vercel) |
+|---|---|---|---|
+| `VITE_API_BASE_URL` | Base URL for REST API endpoints | `/api` | `https://leettracker-backend-nq7r.onrender.com/api` |
+| `VITE_OAUTH_BASE_URL` | Base origin for OAuth handshakes | *omitted* | `https://leettracker-backend-nq7r.onrender.com` |
 
 ---
 
-## Testing & Quality
+## Development & Verification
 
 ```bash
-# Run unit tests
+# Install dependencies
+npm install
+
+# Run Vitest test suite (99 tests across 19 suites)
 npm test
 
-# Run tests with coverage report
-npm run test:coverage
-
-# Lint source files
-npm run lint
-
-# Production build check
+# Build production bundle
 npm run build
+
+# Start local development server
+npm run dev
 ```
-
----
-
-## UI & Design Principles
-- **Aesthetic Rhythm**: Built on solid brand colors (`#5b4fff` primary purple) paired with dark slate card surfaces (`#121824`, `#1e293b`), avoiding noisy multi-color gradients.
-- **Responsive Layout**: Designed for seamless usage across desktop displays, tablets, and mobile screens.
-- **Accessibility**: ARIA-compliant primitives via Radix UI, high contrast typography, and custom sleek scrollbars.

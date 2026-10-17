@@ -1,76 +1,59 @@
 # MentorSync Backend (Spring Boot 4)
 
-The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade platform that connects educators, mentors, and students. Built with **Spring Boot 4.0.5** and **Java 21**, it automates coding assignment tracking, synchronizes competitive programming stats across **LeetCode** and **Codeforces**, and powers real-time classroom leaderboards.
+[![Live Backend](https://img.shields.io/badge/Deployed_on-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://leettracker-backend-nq7r.onrender.com)
+![Java 21](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
+![Spring Boot 4](https://img.shields.io/badge/Spring_Boot-4.0.5-6DB33F?logo=springboot&logoColor=white)
+![Spring Security OAuth2](https://img.shields.io/badge/Spring_Security-OAuth2-6DB33F?logo=springsecurity&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?logo=redis&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-47A248?logo=mongodb&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-139%20Passed-success)
+
+The backend engine for **MentorSync** — an enterprise-grade platform connecting educators, mentors, and students. Built with **Spring Boot 4.0.5** and **Java 21**, deployed live on **[Render](https://leettracker-backend-nq7r.onrender.com)** to power real-time dashboards for **[Vercel](https://mentorssync.vercel.app/)**.
 
 ---
 
-## System Architecture
+## Live Deployment
 
-```
-                  ┌─────────────────────────────────────────┐
-                  │           React 19 Frontend             │
-                  └─────────────┬───────────────────────────┘
-                                │ HTTP / REST & WebSockets
-                                ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                   MentorSync Spring Boot 4 Core                       │
-│                                                                        │
-│  ┌──────────────────┐  ┌─────────────────────┐  ┌───────────────────┐  │
-│  │ Security Filter  │  │ Controller Layer    │  │ STOMP Broker      │  │
-│  │ (JWT & RBAC)     │  │ (REST Endpoints)    │  │ (WebSocket /ws)   │  │
-│  └────────┬─────────┘  └──────────┬──────────┘  └─────────┬─────────┘  │
-│           │                       │                       │            │
-│  ┌────────▼───────────────────────▼───────────────────────▼─────────┐  │
-│  │                        Service Layer                             │  │
-│  │  - ClassroomService      - DailyChallengeService                 │  │
-│  │  - StudentService        - ContestScheduleService                │  │
-│  │  - AdminService          - CacheWarmingService                   │  │
-│  │  - AuthService           - RedisWebSocketBridge                  │  │
-│  └────────┬───────────────────────┬───────────────────────┬─────────┘  │
-│           │                       │                       │            │
-│  ┌────────▼──────────┐ ┌──────────▼──────────┐ ┌──────────▼─────────┐  │
-│  │ Spring Data Mongo │ │ Resilience4j Engine │ │ Spring Data Redis  │  │
-│  │ (Repositories)    │ │ (Circuit Breaker)   │ │ (Cache & Pub/Sub)  │  │
-│  └────────┬──────────┘ └──────────┬──────────┘ └──────────┬─────────┘  │
-└───────────┼───────────────────────┼───────────────────────┼────────────┘
-            │                       │                       │
-            ▼                       ▼                       ▼
-      ┌───────────┐         ┌──────────────┐         ┌─────────────┐
-      │  MongoDB  │         │ External API │         │    Redis    │
-      │ (Cluster) │         │ (LC GraphQL  │         │  (Cache &   │
-      │           │         │  & CF REST)  │         │   Pub/Sub)  │
-      └───────────┘         └──────────────┘         └─────────────┘
-```
+* **Base URL**: `https://leettracker-backend-nq7r.onrender.com`
+* **API Prefix**: `/api` (or `/api/v1`)
+* **OAuth2 Authorize**: `https://leettracker-backend-nq7r.onrender.com/oauth2/authorization/{google|github}`
+* **WebSocket Endpoint**: `https://leettracker-backend-nq7r.onrender.com/ws-endpoint`
 
 ---
 
 ## Key Modules & Capabilities
 
-### 1. Official LeetCode POTD (`DailyChallengeService`)
+### 1. OAuth 2.0 Social Authentication (`OAuth2LoginSuccessHandler`)
+- Seamless social login with Google and GitHub.
+- Extracts user attributes (`email`, `name`, `picture` / `avatar_url`, `login`).
+- Links existing Student/Mentor records, or auto-registers first-time users as Students.
+- Sets cross-domain `HttpOnly` refresh token cookies (`SameSite=None`, `Secure=true`) and redirects to `APP_OAUTH2_REDIRECT_URI` (`https://mentorssync.vercel.app/oauth2/redirect`).
+- Fully supports cloud reverse-proxy SSL termination (`server.forward-headers-strategy=framework`).
+
+### 2. Official LeetCode POTD (`DailyChallengeService`)
 - Integrates directly with LeetCode GraphQL endpoint (`activeDailyCodingChallengeQuestion`).
 - Fetches problem title, difficulty (Easy, Medium, Hard), tags, description preview, hint, and problem URL.
-- **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with automatic date-staleness validation. Because the problem of the day is identical across all users, it is shared globally, avoiding redundant external calls. Validates against UTC date to guarantee yesterday's POTD is never served.
-- Personal solve verification and collaborative classroom tickers are overlaid in-memory without re-querying LeetCode.
+- **Global Redis Caching (`global-potd`)**: Cached globally under `global-potd::today` with automatic date-staleness validation.
 
-### 2. Live Upcoming Contests Tracker (`ContestScheduleService`)
-- **LeetCode & Codeforces Aggregation**: Combines upcoming Weekly/Biweekly contests and Codeforces rounds with countdowns and direct registration URLs.
-- **Global Redis Caching (`upcoming-contests`)**: Cached globally under `upcoming-contests` (`ALL`, `LEETCODE`, `CODEFORCES`) with a 30-minute TTL. Shared identically across all users.
+### 3. Live Upcoming Contests Tracker (`ContestScheduleService`)
+- **Dual-Platform Aggregation**: Combines upcoming Weekly/Biweekly contests and Codeforces rounds with countdowns and direct registration URLs.
+- **Global Redis Caching (`upcoming-contests`)**: Cached globally under `upcoming-contests` (`ALL`, `LEETCODE`, `CODEFORCES`) with a 30-minute TTL.
 
-### 3. Redis Cache Warming Worker (`CacheWarmingService`)
+### 4. Redis Cache Warming Worker (`CacheWarmingService`)
 - Automated background worker executing daily at **6:00 AM IST** (`@Scheduled(cron = "0 0 6 * * ?", zone = "Asia/Kolkata")`).
 - Uses atomic Redis distributed lock (`lock:cache-warming`, 30 min TTL) to ensure single-node execution in clustered environments.
-- Primes and synchronizes global caches (`global-potd`, `upcoming-contests`) and pre-warms student & classroom caches for 0ms morning response times.
-- Manual administrative trigger endpoint: `POST /api/admin/cache/warm`.
+- Primes global caches (`global-potd`, `upcoming-contests`) and pre-warms student & classroom caches for 0ms morning response times.
+- Manual trigger: `POST /api/admin/cache/warm`.
 
-### 4. Real-Time Clustered WebSockets (`RedisWebSocketBridge`)
+### 5. Real-Time Clustered WebSockets (`RedisWebSocketBridge`)
 - Native STOMP broker over `/ws-endpoint` with fallback SockJS support.
 - Redis Pub/Sub topic (`mentorsync:classroom:events`) bridges events across multi-instance clusters.
-- Broadcasts real-time events for assignment submissions, score changes, deadline updates, and student enrollments to `/topic/classrooms/{classroomId}`.
+- Broadcasts real-time events to `/topic/classrooms/{classroomId}`.
 
-### 5. Resilience & Fault Tolerance
-- **Resilience4j Circuit Breaker**: Opens on 50% failure rate over 10 calls, immediately falling back to cached Redis data without crashing.
-- **Exponential Backoff Retry**: 3 retry attempts with exponential delays (2s, 4s) to survive transient network timeouts.
-- **Rate Limiting**: Throttles calls to 15 requests per 10 seconds to safeguard IP reputation with external providers.
+### 6. Resilience & Fault Tolerance
+- **Resilience4j Circuit Breaker**: Opens on 50% failure rate over 10 calls, falling back to cached Redis data.
+- **Exponential Backoff Retry**: 3 retry attempts with progressive delays (2s, 4s).
+- **Rate Limiting**: Throttles calls to 15 requests per 10 seconds.
 
 ---
 
@@ -80,118 +63,40 @@ The backend engine for **MentorSync (LeetCode LMS)** — an enterprise-grade pla
 |---|---|---|
 | **Framework** | Spring Boot | `4.0.5` |
 | **Language** | Java (JDK) | `21` LTS |
-| **Security** | Spring Security + JJWT | `0.12.6` |
+| **Security** | Spring Security + Spring OAuth2 Client + JJWT | `0.12.6` |
 | **Database** | MongoDB (Spring Data Mongo) | 6.0+ |
 | **Cache & Pub/Sub** | Redis (Spring Data Redis / Jedis) | 7.0+ |
 | **Fault Tolerance** | Resilience4j | `2.2.0` |
 | **Real-time** | Spring WebSocket + STOMP Messaging | `4.0.5` |
-| **Testing** | JUnit 5, Mockito, Spring Boot Test | — |
+| **Testing** | JUnit 5, Mockito (139 unit tests passed) | — |
 
 ---
 
-## REST API Reference
+## Production Environment Variables (Render)
 
-### Authentication (`/api/auth`)
-| Method | Endpoint | Description |
+| Variable | Value | Purpose |
 |---|---|---|
-| `POST` | `/api/auth/register` | Register mentor or admin |
-| `POST` | `/api/auth/register/student` | Register student with LeetCode handle |
-| `POST` | `/api/auth/login` | Authenticate user, receive JWT & HTTP-Only refresh cookie |
-| `POST` | `/api/auth/refresh` | Rotate access token using HTTP-Only refresh cookie |
-| `POST` | `/api/auth/logout` | Invalidate active refresh token |
-| `POST` | `/api/auth/change-password` | Update account password |
-
-### Challenges & Contests (`/api/challenges`, `/api/contests`)
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/challenges/daily` | Get today's LeetCode POTD with student solved status & classroom ticker |
-| `GET` | `/api/challenges/daily/global` | Get pure globally cached LeetCode POTD (no user context, 0ms) |
-| `GET` | `/api/contests/upcoming` | Get upcoming LeetCode & Codeforces contests (globally cached) |
-
-### Classrooms (`/api/classrooms`)
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/classrooms` | Create a new classroom |
-| `GET` | `/api/classrooms/{id}/dashboard` | Get comprehensive classroom dashboard |
-| `POST` | `/api/classrooms/{id}/students` | Add student to classroom |
-| `DELETE` | `/api/classrooms/{id}/students/{studentId}` | Remove student from classroom |
-| `POST` | `/api/classrooms/{id}/students/bulk` | Bulk import students via CSV |
-| `POST` | `/api/classrooms/{id}/assignments` | Create assignment (auto-fetches problem title) |
-| `DELETE` | `/api/classrooms/{id}/assignments/{assignmentId}` | Delete assignment |
-| `PUT` | `/api/classrooms/{id}/assignments/{assignmentId}/deadline` | Update assignment deadline |
-| `GET` | `/api/classrooms/{id}/leaderboard` | Get classroom leaderboard |
-| `GET` | `/api/classrooms/{id}/export` | Export classroom performance to CSV |
-| `GET` | `/api/classrooms/{id}/export/assignments` | Export assignment completion to CSV |
-| `POST` | `/api/classrooms/{id}/students/{studentId}/nudge` | Send reminder email for pending tasks |
-
-### Students (`/api/students`)
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/students/me/dashboard` | Get student dashboard stats, profile, & assignments |
-| `POST` | `/api/students/me/sync` | Force profile sync across LeetCode & Codeforces |
-| `PUT` | `/api/students/me/handles` | Update LeetCode / Codeforces handles |
-| `POST` | `/api/students/me/classrooms/{cId}/assignments/{aId}/auto-validate` | Validate assignment directly against LeetCode API |
-| `POST` | `/api/students/me/classrooms/{cId}/assignments/{aId}/validate` | Validate assignment via submission URL |
-| `GET` | `/api/students/me/report` | Download personal performance CSV report |
-
-### Admin (`/api/admin`)
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/admin/overview` | Platform health, active counts, and resource stats |
-| `GET` | `/api/admin/students` | Get summary of all registered students |
-| `POST` | `/api/admin/students/{id}/sync` | Force-sync single student's platform data |
-| `POST` | `/api/admin/sync-all` | Trigger full synchronization for all students |
-| `GET` | `/api/admin/cache/stats` | Redis cache key counts, memory, and hit/miss stats |
-| `POST` | `/api/admin/cache/clear` | Clear specific cache or flush all caches |
-| `POST` | `/api/admin/cache/warm` | Manually run background cache warming worker |
+| `APP_OAUTH2_REDIRECT_URI` | `https://mentorssync.vercel.app/oauth2/redirect` | Post-login redirect to frontend |
+| `CORS_ALLOWED_ORIGINS` | `https://mentorssync.vercel.app,http://localhost:5173,http://localhost:3000` | Allowed CORS origins |
+| `COOKIE_SECURE` | `true` | Secure HTTPS cookie flag |
+| `COOKIE_SAME_SITE` | `None` | Cross-site cookie transmission between domains |
+| `SERVER_FORWARD_HEADERS_STRATEGY` | `framework` | Reverse-proxy SSL header detection |
+| `GOOGLE_CLIENT_ID` | `<your-google-client-id>` | Google OAuth ID |
+| `GOOGLE_CLIENT_SECRET` | `<your-google-client-secret>` | Google OAuth Secret |
+| `GITHUB_CLIENT_ID` | `<your-github-client-id>` | GitHub OAuth ID |
+| `GITHUB_CLIENT_SECRET` | `<your-github-client-secret>` | GitHub OAuth Secret |
+| `JWT_SECRET` | `<256-bit-hex-secret>` | Access token signature key |
+| `MONGO_URI` | `mongodb+srv://...` | MongoDB cluster connection |
+| `REDIS_HOST` | `<redis-host>` | Redis caching instance |
 
 ---
 
-## Environment Variables
-
-Configure the following variables in your `.env` or IDE run configuration:
-
-```properties
-# Server
-PORT=8080
-
-# Database
-MONGO_URI=mongodb://localhost:27017/LeetcodeTracker
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-# Security
-JWT_SECRET=your-secure-256-bit-hex-secret-key-goes-here
-JWT_EXPIRATION=86400000
-
-# Mail Service (Optional - for nudges)
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-```
-
----
-
-## Testing & Verification
-
-Run the full backend test suite:
+## Verification & Testing
 
 ```bash
-# Run all unit and integration tests
+# Run all 139 unit and integration tests
 ./mvnw clean test
 
-# Run specific service test
-./mvnw test -Dtest=DailyChallengeServiceTest
-./mvnw test -Dtest=ContestScheduleServiceTest
-./mvnw test -Dtest=CacheWarmingServiceTest
+# Run Spring Boot locally
+./mvnw spring-boot:run
 ```
-
----
-
-## Technical Documentation
-
-- [Redis Caching & Warming Guide](docs/REDIS_CACHING_GUIDE.md)
-- [Resilience4j Circuit Breaker & Rate Limiter Guide](docs/RESILIENCE4J_IMPLEMENTATION_GUIDE.md)
