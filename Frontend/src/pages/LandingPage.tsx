@@ -177,27 +177,6 @@ export function LandingPage() {
 
                     {/* Desktop Navigation */}
                     <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
-                        <button
-                            type="button"
-                            onClick={() => scrollToSection('app-canvas')}
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer min-h-[44px] flex items-center"
-                        >
-                            Live Workstation
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => scrollToSection('verification-engine')}
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer min-h-[44px] flex items-center"
-                        >
-                            Auto-Verification
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => scrollToSection('dual-telemetry')}
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer min-h-[44px] flex items-center"
-                        >
-                            Dual Profiles
-                        </button>
                         <Link 
                             to="/how-to-use" 
                             className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center"
@@ -249,30 +228,6 @@ export function LandingPage() {
                 {/* Mobile Dropdown Panel */}
                 {mobileMenuOpen && (
                     <div className="md:hidden mt-3 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-2">
-                        <button
-                            type="button"
-                            onClick={() => scrollToSection('app-canvas')}
-                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-left transition-colors cursor-pointer min-h-[44px]"
-                        >
-                            <span>Live Workstation</span>
-                            <ChevronRight className="w-4 h-4 text-zinc-400" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => scrollToSection('verification-engine')}
-                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-left transition-colors cursor-pointer min-h-[44px]"
-                        >
-                            <span>Auto-Verification</span>
-                            <ChevronRight className="w-4 h-4 text-zinc-400" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => scrollToSection('dual-telemetry')}
-                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-left transition-colors cursor-pointer min-h-[44px]"
-                        >
-                            <span>Dual Profiles</span>
-                            <ChevronRight className="w-4 h-4 text-zinc-400" />
-                        </button>
                         <Link
                             to="/how-to-use"
                             onClick={() => setMobileMenuOpen(false)}
