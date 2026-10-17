@@ -11,17 +11,17 @@ import {
     FireIcon,
     TrophyIcon,
     FileCsvIcon as FileSpreadsheet,
-    TerminalIcon,
-    ClockIcon,
     BrainIcon,
     ArrowUpRightIcon,
     MagnifyingGlassIcon,
     LightningIcon,
     SparkleIcon,
     ShieldCheckIcon,
-    ArrowsClockwiseIcon,
     PaperPlaneTiltIcon,
-    CheckIcon
+    CheckIcon,
+    TargetIcon,
+    ChartBarIcon,
+    MedalIcon
 } from '@phosphor-icons/react';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
@@ -207,9 +207,8 @@ const STUDENT_PROFILES: Record<string, StudentProfileDetail> = {
 interface TopicMetric {
     id: string;
     name: string;
-    category: string;
     percentage: number;
-    status: 'Critical Weakness' | 'Developing' | 'Proficient' | 'Mastered';
+    status: string;
     statusClass: string;
     barClass: string;
 }
@@ -217,107 +216,35 @@ interface TopicMetric {
 const COHORT_TOPICS: TopicMetric[] = [
     {
         id: 'dp',
-        name: 'Dynamic Programming (Knapsack, 2D Grid, Memoization)',
-        category: 'Algorithms',
+        name: 'Dynamic Programming (Knapsack, 2D Grid)',
         percentage: 42,
-        status: 'Critical Weakness',
+        status: 'Critical Weakness (42%)',
         statusClass: 'text-rose-500 bg-rose-500/10 border-rose-500/20',
         barClass: 'bg-rose-500'
     },
     {
         id: 'graphs',
-        name: 'Graph Traversals (BFS, DFS, Topological Sort, Dijkstra)',
-        category: 'Algorithms',
+        name: 'Graph Traversals (BFS, DFS, Dijkstra)',
         percentage: 58,
-        status: 'Developing',
+        status: 'Developing (58%)',
         statusClass: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
         barClass: 'bg-amber-500'
     },
     {
-        id: 'trees',
-        name: 'Binary Trees & Segment Trees',
-        category: 'Data Structures',
-        percentage: 76,
-        status: 'Developing',
-        statusClass: 'text-sky-500 bg-sky-500/10 border-sky-500/20',
-        barClass: 'bg-sky-500'
-    },
-    {
         id: 'binary-search',
         name: 'Binary Search & Sliding Window',
-        category: 'Techniques',
         percentage: 84,
-        status: 'Proficient',
+        status: 'Proficient (84%)',
         statusClass: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
         barClass: 'bg-emerald-500'
     },
     {
         id: 'arrays',
         name: 'Arrays, Strings & HashMaps',
-        category: 'Data Structures',
         percentage: 92,
-        status: 'Mastered',
+        status: 'Mastered (92%)',
         statusClass: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
         barClass: 'bg-emerald-500'
-    }
-];
-
-interface SampleVerification {
-    id: string;
-    title: string;
-    platform: 'LeetCode' | 'Codeforces';
-    problemId: string;
-    difficulty: 'Easy' | 'Medium' | 'Hard' | '800' | '1400';
-    runtime: string;
-    beats: string;
-    memory: string;
-    timestamp: string;
-}
-
-const SAMPLE_VERIFICATIONS: SampleVerification[] = [
-    {
-        id: 'v1',
-        title: 'Course Schedule II',
-        platform: 'LeetCode',
-        problemId: '210',
-        difficulty: 'Medium',
-        runtime: '12ms',
-        beats: '98.4%',
-        memory: '14.2 MB',
-        timestamp: 'Just now'
-    },
-    {
-        id: 'v2',
-        title: 'Watermelon',
-        platform: 'Codeforces',
-        problemId: '4A',
-        difficulty: '800',
-        runtime: '30ms',
-        beats: '100.0%',
-        memory: '1.8 MB',
-        timestamp: '2m ago'
-    },
-    {
-        id: 'v3',
-        title: 'LRU Cache',
-        platform: 'LeetCode',
-        problemId: '146',
-        difficulty: 'Medium',
-        runtime: '44ms',
-        beats: '94.6%',
-        memory: '22.8 MB',
-        timestamp: '5m ago'
-    },
-    {
-        id: 'v4',
-        title: 'Trapping Rain Water',
-        platform: 'LeetCode',
-        problemId: '42',
-        difficulty: 'Hard',
-        runtime: '4ms',
-        beats: '99.1%',
-        memory: '18.1 MB',
-        timestamp: '8m ago'
     }
 ];
 
@@ -326,8 +253,7 @@ export function LandingPage() {
     const [leaderboardSort, setLeaderboardSort] = useState<'total' | 'lc' | 'cf' | 'streak'>('total');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedStudentId, setSelectedStudentId] = useState<string>('2');
-    const [selectedVerification, setSelectedVerification] = useState<string>('v1');
-    const [isVerifyingSim, setIsVerifyingSim] = useState(false);
+    const [bothSidesTab, setBothSidesTab] = useState<'student' | 'mentor'>('student');
     const [topicFilter, setTopicFilter] = useState<'all' | 'weaknesses'>('all');
     const [dispatchSuccess, setDispatchSuccess] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -352,19 +278,11 @@ export function LandingPage() {
         student.handle.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const activeVerification = SAMPLE_VERIFICATIONS.find(v => v.id === selectedVerification) || SAMPLE_VERIFICATIONS[0];
     const activeStudentProfile = STUDENT_PROFILES[selectedStudentId] || STUDENT_PROFILES['2'];
 
     const filteredTopics = topicFilter === 'all' 
         ? COHORT_TOPICS 
         : COHORT_TOPICS.filter(t => t.percentage < 60);
-
-    const handleRunVerificationSim = () => {
-        setIsVerifyingSim(true);
-        setTimeout(() => {
-            setIsVerifyingSim(false);
-        }, 600);
-    };
 
     const handleDispatchRemedial = () => {
         setDispatchSuccess(true);
@@ -506,13 +424,13 @@ export function LandingPage() {
                         </span>
                     </div>
 
-                    <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 text-balance text-zinc-900 dark:text-white animate-fade-slide-up [animation-delay:100ms]">
-                        The Engineering OS for <br />
-                        <span className="text-[#5b4fff] dark:text-[#968fff]">Coding Bootcamps & Cohorts</span>
+                    <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 sm:mb-8 text-balance text-zinc-900 dark:text-white animate-fade-slide-up [animation-delay:100ms]">
+                        Track LeetCode & Codeforces <br className="hidden sm:block" />
+                        <span className="text-[#5b4fff] dark:text-[#968fff]">Like Never Before.</span>
                     </h1>
 
-                    <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed font-normal animate-fade-slide-up [animation-delay:200ms]">
-                        Automate submission verification, monitor dual-platform contest ratings, and track live student leaderboards across LeetCode and Codeforces without manual spreadsheets.
+                    <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-normal animate-fade-slide-up [animation-delay:200ms]">
+                        A modern engineering OS for coding bootcamps and mentors. Automate submission validation, track dual-platform contest ratings, and foster friendly competition seamlessly.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-6 animate-fade-slide-up [animation-delay:300ms]">
@@ -568,8 +486,11 @@ export function LandingPage() {
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                                    </span>
                                     Live WebSocket Connected
                                 </span>
                             </div>
@@ -595,7 +516,7 @@ export function LandingPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setCanvasTab('leaderboard')}
-                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group active:scale-98 ${
                                                     canvasTab === 'leaderboard'
                                                         ? 'bg-[#5b4fff] text-white shadow-sm'
                                                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
@@ -605,13 +526,13 @@ export function LandingPage() {
                                                     <TrophyIcon className="w-4 h-4" weight="bold" />
                                                     Cohort Leaderboard
                                                 </span>
-                                                <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                                <ChevronRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-0.5 transition-transform" />
                                             </button>
 
                                             <button
                                                 type="button"
                                                 onClick={() => setCanvasTab('profile')}
-                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group active:scale-98 ${
                                                     canvasTab === 'profile'
                                                         ? 'bg-[#5b4fff] text-white shadow-sm'
                                                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
@@ -621,13 +542,13 @@ export function LandingPage() {
                                                     <UsersIcon className="w-4 h-4" weight="bold" />
                                                     Student Profile View
                                                 </span>
-                                                <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                                <ChevronRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-0.5 transition-transform" />
                                             </button>
 
                                             <button
                                                 type="button"
                                                 onClick={() => setCanvasTab('analytics')}
-                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group active:scale-98 ${
                                                     canvasTab === 'analytics'
                                                         ? 'bg-[#5b4fff] text-white shadow-sm'
                                                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
@@ -637,7 +558,7 @@ export function LandingPage() {
                                                     <BrainIcon className="w-4 h-4" weight="bold" />
                                                     Topic Competency
                                                 </span>
-                                                <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                                <ChevronRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-0.5 transition-transform" />
                                             </button>
                                         </div>
                                     </div>
@@ -998,7 +919,7 @@ export function LandingPage() {
                                                     <div className="flex justify-between items-center text-xs mb-1.5">
                                                         <span className="font-bold text-zinc-900 dark:text-white">{topic.name}</span>
                                                         <span className={`font-bold text-[11px] px-2 py-0.5 rounded border ${topic.statusClass}`}>
-                                                            {topic.status} ({topic.percentage}%)
+                                                            {topic.status}
                                                         </span>
                                                     </div>
                                                     <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
@@ -1024,352 +945,293 @@ export function LandingPage() {
                     </div>
                 </div>
 
-                {/* ASYMMETRIC SECTION 1: AUTOMATED SUBMISSION VERIFICATION */}
-                <section id="verification-engine" className="w-full max-w-6xl mx-auto mb-28 sm:mb-36 scroll-mt-28">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-                        
-                        {/* Narrative Column */}
-                        <div className="lg:col-span-5 space-y-6">
-                            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
-                                Zero spreadsheet toil. <br />
-                                Every solution verified live.
-                            </h2>
+                {/* BUILT FOR BOTH SIDES (MENTORS VS STUDENTS SEGMENTED ECOSYSTEM) */}
+                <section className="w-full max-w-5xl mx-auto mb-28 sm:mb-36 scroll-mt-28">
+                    <div className="text-center mb-8 sm:mb-10">
+                        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 text-balance text-zinc-900 dark:text-white">
+                            Built for Both Sides
+                        </h2>
+                        <p className="text-zinc-600 dark:text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">
+                            A unified ecosystem where administrators track with ease and students thrive.
+                        </p>
+                    </div>
 
-                            <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
-                                Students submit their solution URL. MentorSync queries live LeetCode and Codeforces profile endpoints to confirm problem ID, accepted status, runtime percentile, and timestamp. False claims and plagiarism are eliminated instantly.
-                            </p>
+                    {/* Segmented Control Pill Switcher */}
+                    <div className="flex bg-zinc-100 dark:bg-[#141418] p-1.5 rounded-2xl w-max mx-auto mb-10 border border-zinc-200/80 dark:border-white/10 shadow-xs">
+                        <button
+                            type="button"
+                            onClick={() => setBothSidesTab('student')}
+                            className={`px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-semibold rounded-xl cursor-pointer active:scale-95 transition-all duration-200 ${
+                                bothSidesTab === 'student'
+                                    ? 'bg-[#5b4fff] text-white shadow-sm'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                        >
+                            For Students
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setBothSidesTab('mentor')}
+                            className={`px-6 sm:px-8 py-2.5 text-xs sm:text-sm font-semibold rounded-xl cursor-pointer active:scale-95 transition-all duration-200 ${
+                                bothSidesTab === 'mentor'
+                                    ? 'bg-[#5b4fff] text-white shadow-sm'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                        >
+                            For Mentors
+                        </button>
+                    </div>
 
-                            <div className="space-y-3 pt-2 text-xs sm:text-sm">
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Scrapes official public submission feeds directly without student passwords</span>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Validates solution acceptance, runtime beats percentage, and submission recency</span>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Automatically syncs classroom assignment progress bars and grading matrices</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Interactive Verification Terminal Card */}
-                        <div className="lg:col-span-7">
-                            <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl interactive-card">
-                                <div className="flex items-center justify-between pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-5">
-                                    <div>
-                                        <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Interactive Submission Tester</p>
-                                        <p className="text-[11px] text-zinc-500">Select a problem preset and simulate verification engine</p>
-                                    </div>
-                                    <span className="px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-mono">
-                                        POST /api/verify
-                                    </span>
-                                </div>
-
-                                {/* Preset Selector Pills */}
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                                    {SAMPLE_VERIFICATIONS.map((ver) => (
-                                        <button
-                                            key={ver.id}
-                                            type="button"
-                                            onClick={() => setSelectedVerification(ver.id)}
-                                            className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer hover:-translate-y-0.5 active:scale-95 duration-150 ${
-                                                selectedVerification === ver.id
-                                                    ? 'bg-[#5b4fff]/10 border-[#5b4fff] shadow-xs ring-1 ring-[#5b4fff]/40'
-                                                    : 'bg-zinc-50 dark:bg-[#181820] border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
-                                            }`}
-                                        >
-                                            <p className={`text-[10px] font-bold ${ver.platform === 'LeetCode' ? 'text-[#ffa116]' : 'text-sky-500'}`}>
-                                                {ver.platform} #{ver.problemId}
+                    {/* Interactive Persona Card */}
+                    <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-12 shadow-2xl relative overflow-hidden interactive-card">
+                        {bothSidesTab === 'student' ? (
+                            <div key="student-view" className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center animate-tab-enter">
+                                <div className="order-2 md:order-1 rounded-2xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 p-6 sm:p-7 shadow-lg">
+                                    <div className="flex justify-between items-end mb-5">
+                                        <div>
+                                            <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Consistency Streak</p>
+                                            <p className="text-4xl font-black text-zinc-900 dark:text-white tracking-tight flex items-baseline gap-1.5">
+                                                52 <span className="text-base text-zinc-500 font-medium tracking-normal">days active</span>
                                             </p>
-                                            <p className="font-bold text-xs text-zinc-900 dark:text-white truncate">{ver.title}</p>
-                                            <p className="text-[10px] text-zinc-500">{ver.runtime}</p>
-                                        </button>
-                                    ))}
-                                </div>
-
-                                {/* Run Simulation Trigger Bar */}
-                                <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mb-4">
-                                    <div className="min-w-0 font-mono text-[11px] text-zinc-600 dark:text-zinc-400 truncate">
-                                        https://{activeVerification.platform.toLowerCase()}.com/problems/{activeVerification.title.toLowerCase().replace(/\s+/g, '-')}
+                                        </div>
+                                        <div className="p-3 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                                            <MedalIcon className="w-8 h-8" weight="bold" />
+                                        </div>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={handleRunVerificationSim}
-                                        disabled={isVerifyingSim}
-                                        className="px-3.5 py-1.5 rounded-lg bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-60 hover:-translate-y-0.5 active:scale-95 duration-150 shadow-xs hover:shadow-md group"
-                                    >
-                                        <ArrowsClockwiseIcon className={`w-3.5 h-3.5 ${isVerifyingSim ? 'animate-spin' : 'group-hover:rotate-90 transition-transform duration-300'}`} weight="bold" />
-                                        <span>{isVerifyingSim ? 'Checking...' : 'Run Test'}</span>
-                                    </button>
+
+                                    {/* 42-day Contribution Heatmap Grid */}
+                                    <div className="grid grid-cols-7 gap-1.5 rounded-xl overflow-hidden pt-1 mb-4">
+                                        {Array.from({ length: 35 }).map((_, i) => (
+                                            <div 
+                                                key={i} 
+                                                className={`w-full aspect-square rounded-[3px] transition-transform hover:scale-125 cursor-pointer ${
+                                                    i % 3 === 0 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' :
+                                                    i % 5 === 0 ? 'bg-emerald-600/70' :
+                                                    'bg-zinc-200 dark:bg-zinc-800'
+                                                }`}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <div className="flex items-center justify-between text-xs pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80">
+                                        <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] font-semibold text-[11px]">LC Guardian 1940</span>
+                                        <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 font-semibold text-[11px]">CF Specialist 1480</span>
+                                        <span className="text-emerald-500 font-bold text-[11px]">610 Solved</span>
+                                    </div>
                                 </div>
 
-                                {/* Terminal Console Output */}
-                                <div className="p-4 rounded-2xl bg-zinc-950 font-mono text-xs text-emerald-400 border border-zinc-800 space-y-2 relative overflow-hidden">
-                                    <div className="flex items-center justify-between text-zinc-500 pb-2 border-b border-zinc-800/80">
-                                        <span className="flex items-center gap-1.5">
-                                            <TerminalIcon className="w-4 h-4 text-emerald-400" />
-                                            Live Verification Stream
+                                <div className="order-1 md:order-2 space-y-4">
+                                    <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
+                                        <TargetIcon className="w-6 h-6" weight="bold" />
+                                    </div>
+                                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+                                        Compete, Learn, Grow
+                                    </h3>
+                                    <ul className="space-y-3.5 text-sm sm:text-base text-zinc-600 dark:text-zinc-300">
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span>See your progress mapped against classmates on live dual-platform leaderboards.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span>Get a beautiful and dynamic heatmap analyzing your 365-day technical consistency.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span>Submit solutions actively and unlock verified contest achievements along your journey.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        ) : (
+                            <div key="mentor-view" className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center animate-tab-enter">
+                                <div className="space-y-4">
+                                    <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
+                                        <UsersIcon className="w-6 h-6" weight="bold" />
+                                    </div>
+                                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+                                        Manage Entire Cohorts
+                                    </h3>
+                                    <ul className="space-y-3.5 text-sm sm:text-base text-zinc-600 dark:text-zinc-300">
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span>Create scalable classrooms and organize students by batch, tier, or college.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span>Assign targeted LeetCode and Codeforces problem sheets natively to the entire class.</span>
+                                        </li>
+                                        <li className="flex items-start gap-3">
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span>Instantly eliminate manual spreadsheets with automated public submission verification.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div className="rounded-2xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 p-6 sm:p-7 shadow-lg space-y-3">
+                                    <div className="flex justify-between items-center pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                                        <div>
+                                            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Classroom Roster Sync</p>
+                                            <p className="text-lg font-bold text-zinc-900 dark:text-white">Cohort Health: 94.2%</p>
+                                        </div>
+                                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-bold border border-emerald-500/20">
+                                            Real-Time Telemetry
                                         </span>
-                                        <span className={`text-emerald-400 font-bold ${isVerifyingSim ? 'animate-pulse' : 'animate-scale-bounce'}`}>
-                                            {isVerifyingSim ? 'PARSING AST...' : '200 OK (8ms)'}
-                                        </span>
                                     </div>
-                                    <p className="text-zinc-300">
-                                        &gt; Target: https://{activeVerification.platform.toLowerCase()}.com/problems/{activeVerification.title.toLowerCase().replace(/\s+/g, '-')}
-                                    </p>
-                                    <p className="text-zinc-400">
-                                        &gt; Profile Query: Authenticated against public submission endpoint...
-                                    </p>
-                                    <p className="text-emerald-400 font-bold">
-                                        &gt; Match Found: {activeVerification.title} ({activeVerification.difficulty}) • Runtime: {activeVerification.runtime} (Beats {activeVerification.beats})
-                                    </p>
-                                    <p className="text-emerald-300">
-                                        &gt; Memory Allocation: {activeVerification.memory} • Status: Accepted
-                                    </p>
-                                    <p className="text-emerald-400/80">
-                                        &gt; Assignment Verified: Week 4 DSA Sprint (+10 pts awarded)
-                                        <span className="inline-block w-2 h-3.5 bg-emerald-400 animate-live-cursor ml-1.5 align-middle" />
-                                    </p>
+                                    <div className="space-y-2.5">
+                                        <div className="flex justify-between items-center p-3 rounded-xl bg-white dark:bg-[#1c1c24] border border-zinc-200/80 dark:border-zinc-800/80">
+                                            <span className="text-xs font-bold text-zinc-900 dark:text-white">Batch 2024 Placement Track</span>
+                                            <span className="text-xs bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-0.5 rounded-md font-semibold">64 Students Active</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-3 rounded-xl bg-white dark:bg-[#1c1c24] border border-zinc-200/80 dark:border-zinc-800/80">
+                                            <span className="text-xs font-bold text-zinc-900 dark:text-white">DSA Fast Track Sprint</span>
+                                            <span className="text-xs bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-0.5 rounded-md font-semibold">48 Students Synced</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-3 rounded-xl bg-white dark:bg-[#1c1c24] border border-zinc-200/80 dark:border-zinc-800/80 opacity-60">
+                                            <span className="text-xs font-bold text-zinc-900 dark:text-white">System Design & CP Track</span>
+                                            <span className="text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-2.5 py-0.5 rounded-md font-semibold">Draft</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </section>
 
-                {/* ASYMMETRIC SECTION 2: DUAL-PLATFORM INTEGRATION */}
-                <section id="dual-telemetry" className="w-full max-w-6xl mx-auto mb-28 sm:mb-36 scroll-mt-28">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-                        
-                        {/* Dual Platform Visual Card */}
-                        <div className="lg:col-span-7 order-2 lg:order-1">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-6 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg space-y-4 interactive-card group">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <span className="w-3 h-3 rounded-full bg-[#ffa116]" />
-                                            <span className="font-bold text-sm text-zinc-900 dark:text-white">LeetCode Profile</span>
-                                        </div>
-                                        <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] text-[11px] font-bold">Knight 1890</span>
-                                    </div>
-                                    <div>
-                                        <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight group-hover:text-[#ffa116] transition-colors">420 Solved</p>
-                                        <p className="text-xs text-zinc-500 mt-0.5">Top 4.8% Global Contest Rating</p>
-                                    </div>
-                                    <div className="space-y-1.5 text-xs pt-2 border-t border-zinc-200/80 dark:border-zinc-800/80">
-                                        <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
-                                            <span>Easy: 140</span>
-                                            <span>Medium: 220</span>
-                                            <span className="text-rose-500">Hard: 60</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="p-6 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg space-y-4 interactive-card group">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <span className="w-3 h-3 rounded-full bg-sky-500" />
-                                            <span className="font-bold text-sm text-zinc-900 dark:text-white">Codeforces Profile</span>
-                                        </div>
-                                        <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 text-[11px] font-bold">Specialist 1510</span>
-                                    </div>
-                                    <div>
-                                        <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight group-hover:text-sky-500 transition-colors">240 Solved</p>
-                                        <p className="text-xs text-zinc-500 mt-0.5">Rated for Div. 2 Competitions</p>
-                                    </div>
-                                    <div className="space-y-1.5 text-xs pt-2 border-t border-zinc-200/80 dark:border-zinc-800/80">
-                                        <div className="flex justify-between text-zinc-600 dark:text-zinc-400 font-medium">
-                                            <span>Div. 2 Participant</span>
-                                            <span className="text-sky-500 font-bold">Max Rating: 1540</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="sm:col-span-2 p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-200/80 dark:border-zinc-800 interactive-card">
-                                    <div>
-                                        <p className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">Combined Dual Platform Metric</p>
-                                        <p className="text-2xl font-extrabold text-zinc-900 dark:text-white">660 Total Unique Problems Solved</p>
-                                    </div>
-                                    <div className="flex items-center gap-2 bg-white dark:bg-zinc-800/80 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs shadow-xs">
-                                        <FireIcon className="w-4 h-4 text-amber-500 animate-flame" weight="fill" />
-                                        <span className="font-semibold text-zinc-800 dark:text-zinc-200">64 Days Active Streak</span>
-                                    </div>
-                                </div>
-                            </div>
+                {/* POWER TOOLS: 4-CARD BENTO GRID */}
+                <section id="features" className="w-full max-w-6xl mx-auto mb-28 sm:mb-36 scroll-mt-28">
+                    <div className="text-center mb-12 sm:mb-16">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-100/80 dark:bg-[#111111]/80 backdrop-blur-md mb-4 shadow-xs">
+                            <SparkleIcon className="w-4 h-4 text-[#5b4fff]" weight="fill" />
+                            <span className="text-xs font-bold tracking-wider text-zinc-700 dark:text-zinc-300 uppercase">Power Tools</span>
                         </div>
-
-                        {/* Narrative Column */}
-                        <div className="lg:col-span-5 space-y-6 order-1 lg:order-2">
-                            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
-                                One unified profile for <br />
-                                LeetCode and Codeforces.
-                            </h2>
-
-                            <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
-                                Most serious coding students practice on both LeetCode for technical interview rounds and Codeforces for competitive speed. MentorSync bridges the gap, tracking ratings, solve counts, and streaks under one unified profile.
-                            </p>
-
-                            <div className="space-y-3 pt-2 text-xs sm:text-sm">
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Unified solved count prevents duplicated problems across platforms</span>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Live official contest ratings and rank badges (Knight, Guardian, Specialist)</span>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Upcoming contest radar with automated calendar reminders</span>
-                                </div>
-                            </div>
-                        </div>
+                        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 text-balance text-zinc-900 dark:text-white">
+                            Everything You Need
+                        </h2>
+                        <p className="text-zinc-600 dark:text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">
+                            A modern toolkit designed to help you run, track, and scale your coding cohorts efficiently.
+                        </p>
                     </div>
-                </section>
 
-                {/* ASYMMETRIC SECTION 3: TOPIC COMPETENCY ANALYTICS */}
-                <section className="w-full max-w-6xl mx-auto mb-28 sm:mb-36">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-                        
-                        {/* Narrative Column */}
-                        <div className="lg:col-span-5 space-y-6">
-                            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
-                                Spot cohort weaknesses <br />
-                                before placement exams.
-                            </h2>
-
-                            <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
-                                MentorSync analyzes student solve tags across 40+ algorithmic topics. Instantly see when your cohort is struggling with Dynamic Programming, Graphs, or Binary Trees, and assign targeted problem sets with one click.
-                            </p>
-
-                            <div className="space-y-3 pt-2 text-xs sm:text-sm">
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Automated topic proficiency percentages across all enrolled students</span>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Flag critical weaknesses early to prevent placement interview dropouts</span>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircleIcon className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Export 2D student-assignment completion matrix directly to CSV</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Interactive Topic Card */}
-                        <div className="lg:col-span-7">
-                            <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl space-y-4 interactive-card">
-                                <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
-                                    <div>
-                                        <p className="text-xs font-bold text-zinc-900 dark:text-white">Cohort Topic Proficiency Analysis</p>
-                                        <p className="text-[11px] text-zinc-500">Aggregated across Batch 2024 (64 students)</p>
-                                    </div>
-                                    <span className="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-500 font-bold text-xs">
-                                        Analytics Active
-                                    </span>
-                                </div>
-
-                                <div className="space-y-3.5 pt-2">
-                                    <div>
-                                        <div className="flex justify-between text-xs font-bold mb-1 text-zinc-800 dark:text-zinc-200">
-                                            <span>Dynamic Programming (0/1 Knapsack, Memoization)</span>
-                                            <span className="text-rose-500">42% (Critical Weakness)</span>
-                                        </div>
-                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                                            <div className="bg-rose-500 h-full w-[42%] transition-all duration-700 ease-out" />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div className="flex justify-between text-xs font-bold mb-1 text-zinc-800 dark:text-zinc-200">
-                                            <span>Graphs & Trees (BFS, DFS, Dijkstra)</span>
-                                            <span className="text-amber-500">58% (Developing)</span>
-                                        </div>
-                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                                            <div className="bg-amber-500 h-full w-[58%] transition-all duration-700 ease-out" />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div className="flex justify-between text-xs font-bold mb-1 text-zinc-800 dark:text-zinc-200">
-                                            <span>Binary Search & Sliding Window</span>
-                                            <span className="text-emerald-500">84% (Strong)</span>
-                                        </div>
-                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                                            <div className="bg-emerald-500 h-full w-[84%] transition-all duration-700 ease-out" />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div className="flex justify-between text-xs font-bold mb-1 text-zinc-800 dark:text-zinc-200">
-                                            <span>Arrays, Strings & HashMaps</span>
-                                            <span className="text-emerald-500">92% (Mastered)</span>
-                                        </div>
-                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                                            <div className="bg-emerald-500 h-full w-[92%] transition-all duration-700 ease-out" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* ARCHITECTURAL BENTO HIGHLIGHTS */}
-                <section className="w-full max-w-6xl mx-auto mb-28 sm:mb-36">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        
-                        {/* Card 1: Redis Caching */}
-                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card group">
+
+                        {/* Large Card 1 (2 Columns): Live Progress Tracking */}
+                        <div className="md:col-span-2 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-7 sm:p-10 shadow-xl flex flex-col justify-between interactive-card group">
+                            
+                            {/* Live Telemetry KPI Preview Box */}
+                            <div className="p-5 rounded-2xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 mb-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <p className="text-[11px] font-bold text-zinc-400 uppercase">Dual-Platform Solves</p>
+                                    <p className="text-2xl font-extrabold text-zinc-900 dark:text-white mt-1">660 Solved</p>
+                                    <p className="text-[11px] text-emerald-500 font-semibold mt-0.5">LeetCode + Codeforces</p>
+                                </div>
+                                <div>
+                                    <p className="text-[11px] font-bold text-zinc-400 uppercase">Contest Ranks</p>
+                                    <p className="text-2xl font-extrabold text-[#ffa116] mt-1">1,890 / 1,510</p>
+                                    <p className="text-[11px] text-zinc-500 mt-0.5">Knight & Specialist</p>
+                                </div>
+                                <div>
+                                    <p className="text-[11px] font-bold text-zinc-400 uppercase">Consistency</p>
+                                    <p className="text-2xl font-extrabold text-amber-500 mt-1 flex items-center gap-1.5">
+                                        <FireIcon className="w-5 h-5 animate-flame" weight="fill" />
+                                        64 Days
+                                    </p>
+                                    <p className="text-[11px] text-zinc-500 mt-0.5">Continuous Active Streak</p>
+                                </div>
+                            </div>
+
                             <div>
-                                <div className="p-3 w-max rounded-2xl bg-emerald-500/10 text-emerald-500 mb-6 border border-emerald-500/20 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] mb-4 border border-[#5b4fff]/20 group-hover:scale-110 transition-transform">
                                     <DatabaseIcon className="w-6 h-6" weight="bold" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-emerald-500 transition-colors">Redis Telemetry Cluster</h3>
-                                <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
-                                    Equipped with multi-region Redis caching. Protects upstream APIs from rate limits and delivers sub-10ms query times for large cohorts.
+                                <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Live Progress Tracking</h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
+                                    Instantly sync your students&apos; LeetCode and Codeforces profiles. View problem stats, daily heatmaps, and consistency streaks in real-time without manual spreadsheets.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 w-max group-hover:bg-emerald-500/20 transition-colors">
-                                Cache Hit Latency: 4ms
-                            </span>
                         </div>
 
-                        {/* Card 2: 1-Click CSV Imports */}
-                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card group">
+                        {/* Small Card 1 (1 Column): Smart Validation */}
+                        <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-7 sm:p-8 shadow-xl flex flex-col justify-between interactive-card group">
+                            <div className="space-y-2 mb-6">
+                                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs">
+                                    <span className="font-mono text-zinc-600 dark:text-zinc-300">Solution URL</span>
+                                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px]">Auto-Synced</span>
+                                </div>
+                                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs">
+                                    <span className="font-mono text-zinc-600 dark:text-zinc-300">Runtime Check</span>
+                                    <span className="px-2 py-0.5 rounded bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] font-bold text-[10px]">Verified (100%)</span>
+                                </div>
+                                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs">
+                                    <span className="font-mono text-zinc-600 dark:text-zinc-300">AST Validation</span>
+                                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px]">Clean Match</span>
+                                </div>
+                            </div>
+
                             <div>
-                                <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] mb-6 border border-[#5b4fff]/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                <div className="p-3 w-max rounded-2xl bg-emerald-500/10 text-emerald-500 mb-4 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                                    <CheckCircleIcon className="w-6 h-6" weight="bold" />
+                                </div>
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Smart Auto-Verification</h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed">
+                                    Automated submission checking directly from public URLs without student passwords.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Small Card 2 (1 Column): Clear Assignments */}
+                        <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-7 sm:p-8 shadow-xl flex flex-col justify-between interactive-card group">
+                            <div className="space-y-2 mb-6">
+                                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs">
+                                    <span className="font-bold text-zinc-800 dark:text-zinc-200">Arrays & HashMaps</span>
+                                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px]">Active (92%)</span>
+                                </div>
+                                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs">
+                                    <span className="font-bold text-zinc-800 dark:text-zinc-200">Dynamic Programming</span>
+                                    <span className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-500 font-bold text-[10px]">Next Week (42%)</span>
+                                </div>
+                                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#16161d] border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs opacity-70">
+                                    <span className="font-bold text-zinc-800 dark:text-zinc-200">Graph Traversals</span>
+                                    <span className="px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-bold text-[10px]">Sprint Ready</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div className="p-3 w-max rounded-2xl bg-amber-500/10 text-amber-500 mb-4 border border-amber-500/20 group-hover:scale-110 transition-transform">
                                     <FileSpreadsheet className="w-6 h-6" weight="bold" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-[#5b4fff] transition-colors">1-Click CSV Roster Sync</h3>
-                                <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
-                                    Upload CSV files exported from Google Sheets or Google Classroom. URLs and handles are sanitized and mapped into classrooms automatically.
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Clear Assignments</h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed">
+                                    Manage cohort problem sets, diagnostic sheets, and placement milestones effortlessly.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-bold text-[#5b4fff] dark:text-[#968fff] bg-[#5b4fff]/10 px-3 py-1.5 rounded-xl border border-[#5b4fff]/20 w-max group-hover:bg-[#5b4fff]/20 transition-colors">
-                                Auto URL Regex Extraction
-                            </span>
                         </div>
 
-                        {/* Card 3: Live Contest Radar */}
-                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card group">
-                            <div>
-                                <div className="p-3 w-max rounded-2xl bg-amber-500/10 text-amber-500 mb-6 border border-amber-500/20 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                                    <ClockIcon className="w-6 h-6" weight="bold" />
+                        {/* Large Card 2 (2 Columns): Deep Analytics with Illuminated Bar Chart */}
+                        <div className="md:col-span-2 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-7 sm:p-10 shadow-xl flex flex-col justify-between interactive-card group">
+                            
+                            {/* Abstract Illuminated Bar Chart Visual */}
+                            <div className="flex items-end gap-2.5 sm:gap-4 mb-8 sm:mb-10 w-full h-28 border-b border-zinc-200/80 dark:border-zinc-800/80 pb-2">
+                                <div className="h-[35%] flex-1 bg-zinc-200 dark:bg-zinc-800 rounded-t-lg transition-all group-hover:h-[45%]" />
+                                <div className="h-[55%] flex-1 bg-zinc-200 dark:bg-zinc-800 rounded-t-lg transition-all group-hover:h-[60%]" />
+                                <div className="h-[40%] flex-1 bg-zinc-200 dark:bg-zinc-800 rounded-t-lg transition-all group-hover:h-[50%]" />
+                                <div className="h-[75%] flex-1 bg-[#5b4fff]/40 rounded-t-lg transition-all group-hover:h-[80%]" />
+                                <div className="h-full flex-1 bg-linear-to-t from-[#5b4fff] to-[#818cf8] rounded-t-lg shadow-[0_0_24px_rgba(91,79,255,0.5)] relative">
+                                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_10px_white] animate-pulse" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-amber-500 transition-colors">Integrated Contest Radar</h3>
-                                <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
-                                    Never let students miss official LeetCode Weekly contests or Codeforces Div. 2/3 rounds with built-in countdowns and reminders.
+                            </div>
+
+                            <div>
+                                <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] mb-4 border border-[#5b4fff]/20 group-hover:scale-110 transition-transform">
+                                    <ChartBarIcon className="w-6 h-6" weight="bold" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Deep Algorithmic Analytics</h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
+                                    Drill down into individual student performance. Identify pain points across 40+ topic tags, review problem categories, and offer targeted remediation.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-bold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 w-max group-hover:bg-amber-500/20 transition-colors">
-                                Synchronized Calendars
-                            </span>
                         </div>
+
                     </div>
                 </section>
 
