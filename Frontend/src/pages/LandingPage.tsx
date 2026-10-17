@@ -10,7 +10,6 @@ import {
     DatabaseIcon,
     FireIcon,
     TrophyIcon,
-    ArrowSquareOutIcon,
     FileCsvIcon as FileSpreadsheet,
     TerminalIcon,
     ClockIcon,
@@ -958,24 +957,24 @@ export function LandingPage() {
                 </section>
             </main>
 
-            {/* Footer */}
-            <footer className="relative w-full z-10 pt-16 pb-10 border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/90 dark:bg-[#080808]/90 backdrop-blur-sm transition-colors duration-200">
-                <div className="w-full max-w-7xl px-4 sm:px-6 mx-auto flex flex-col md:flex-row justify-between items-start gap-10 mb-16">
+            {/* Footer matching HowToUsePage with MENTORSYNC Watermark */}
+            <footer className="relative w-full overflow-hidden flex flex-col items-center justify-end z-10 pt-20 pb-8 sm:pb-10 border-t border-zinc-200 dark:border-zinc-800/60 bg-zinc-100/90 dark:bg-[#080808]/90 backdrop-blur-sm transition-colors duration-200">
+                <div className="w-full max-w-7xl px-4 sm:px-6 flex flex-col md:flex-row justify-between items-start gap-12 mb-24 relative z-20 pointer-events-auto">
                     <div className="max-w-xs">
-                        <div className="mb-4">
+                        <div className="mb-6">
                             <BrandLogo size="md" theme="auto" asLink={false} />
                         </div>
-                        <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed">
-                            The educational operating system for coding bootcamps. Automated progress and contest tracking for LeetCode and Codeforces.
+                        <p className="text-zinc-600 dark:text-zinc-500 text-sm leading-relaxed">
+                            The operating system for modern coding bootcamps. Empowering educators to track Scalable cohorts natively.
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-10 sm:gap-14">
+                    <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
                         <div>
-                            <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 text-sm tracking-tight">Platform</h4>
-                            <ul className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400">
+                            <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 tracking-tight text-sm">Resources</h4>
+                            <ul className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
                                 <li>
-                                    <Link to="/how-to-use" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Documentation</Link>
+                                    <Link to="/how-to-use" className="hover:text-zinc-900 dark:hover:text-white transition-colors">How to Use & Docs</Link>
                                 </li>
                                 <li>
                                     <Link to="/contact" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Support & Contact</Link>
@@ -983,34 +982,28 @@ export function LandingPage() {
                                 <li>
                                     <Link to="/login" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Sign In</Link>
                                 </li>
-                                <li>
-                                    <Link to="/register" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Create Account</Link>
-                                </li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 text-sm tracking-tight">Repository</h4>
-                            <a 
-                                href="https://github.com/varunkushwah31/Leetcode-Tracker-Frontend" 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm hover:-translate-y-0.5 text-zinc-800 dark:text-zinc-200 min-h-[44px]"
-                            >
-                                <Code2Icon className="w-4 h-4 text-zinc-500" />
-                                <span>Star on GitHub</span>
-                                <ArrowSquareOutIcon className="w-3.5 h-3.5 text-zinc-400" />
+                            <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 tracking-tight text-sm">Open Source</h4>
+                            <a href="https://github.com/varunkushwah31/Leetcode-Tracker-Frontend" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 px-4 py-2 rounded-xl text-sm font-medium transition-all group outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] shadow-xs">
+                                <Code2Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
+                                <span className="text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Star on GitHub</span>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div className="w-full max-w-7xl px-4 sm:px-6 mx-auto pt-6 border-t border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 dark:text-zinc-500 gap-3">
-                    <span>(C) {new Date().getFullYear()} MentorSync. All rights reserved.</span>
-                    <span className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        All systems operational
-                    </span>
+                <div className="absolute bottom-5 sm:bottom-7.5 left-1/2 -translate-x-1/2 w-[200%] sm:w-[120%] text-center whitespace-nowrap pointer-events-none">
+                    <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-zinc-900 dark:text-white opacity-[0.06] dark:opacity-[0.02] select-none uppercase leading-none">
+                        MENTORSYNC
+                    </h1>
+                </div>
+
+                <div className="relative z-20 text-zinc-500 dark:text-zinc-600 text-xs sm:text-sm font-medium tracking-wide mt-auto pointer-events-auto flex flex-col sm:flex-row items-center justify-between w-full max-w-7xl px-4 sm:px-6">
+                    <span>(C) {new Date().getFullYear()} MentorSync. Built for educators • Crafted in India.</span>
+                    <span className="mt-2 sm:mt-0 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> All systems operational</span>
                 </div>
             </footer>
         </div>
