@@ -903,7 +903,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                     return (
                                         <div key={cName} className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors">
                                             <div className="min-w-0">
-                                                <p className="font-mono text-xs font-semibold text-zinc-900 dark:text-white truncate">{cName}</p>
+                                                <p className="font-bold text-sm text-zinc-900 dark:text-white truncate tracking-tight">{cName}</p>
                                                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Spring Cache Region</p>
                                             </div>
 
