@@ -21,7 +21,10 @@ import {
     ShieldCheckIcon,
     ArrowsClockwiseIcon,
     PaperPlaneTiltIcon,
-    CheckIcon
+    CheckIcon,
+    TrendUpIcon,
+    CopyIcon,
+    CalendarBlankIcon
 } from '@phosphor-icons/react';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
@@ -212,6 +215,7 @@ interface TopicMetric {
     status: 'Critical Weakness' | 'Developing' | 'Proficient' | 'Mastered';
     statusClass: string;
     barClass: string;
+    needReviewCount: number;
 }
 
 const COHORT_TOPICS: TopicMetric[] = [
@@ -222,7 +226,8 @@ const COHORT_TOPICS: TopicMetric[] = [
         percentage: 42,
         status: 'Critical Weakness',
         statusClass: 'text-rose-500 bg-rose-500/10 border-rose-500/20',
-        barClass: 'bg-rose-500'
+        barClass: 'bg-rose-500',
+        needReviewCount: 18
     },
     {
         id: 'graphs',
@@ -231,7 +236,8 @@ const COHORT_TOPICS: TopicMetric[] = [
         percentage: 58,
         status: 'Developing',
         statusClass: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
-        barClass: 'bg-amber-500'
+        barClass: 'bg-amber-500',
+        needReviewCount: 14
     },
     {
         id: 'trees',
@@ -240,7 +246,8 @@ const COHORT_TOPICS: TopicMetric[] = [
         percentage: 76,
         status: 'Developing',
         statusClass: 'text-sky-500 bg-sky-500/10 border-sky-500/20',
-        barClass: 'bg-sky-500'
+        barClass: 'bg-sky-500',
+        needReviewCount: 7
     },
     {
         id: 'binary-search',
@@ -249,7 +256,8 @@ const COHORT_TOPICS: TopicMetric[] = [
         percentage: 84,
         status: 'Proficient',
         statusClass: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
-        barClass: 'bg-emerald-500'
+        barClass: 'bg-emerald-500',
+        needReviewCount: 4
     },
     {
         id: 'arrays',
@@ -258,7 +266,8 @@ const COHORT_TOPICS: TopicMetric[] = [
         percentage: 92,
         status: 'Mastered',
         statusClass: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
-        barClass: 'bg-emerald-500'
+        barClass: 'bg-emerald-500',
+        needReviewCount: 2
     }
 ];
 
@@ -331,6 +340,8 @@ export function LandingPage() {
     const [topicFilter, setTopicFilter] = useState<'all' | 'weaknesses'>('all');
     const [dispatchSuccess, setDispatchSuccess] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [hoveredHeatmapDay, setHoveredHeatmapDay] = useState<number | null>(null);
+    const [copiedPayload, setCopiedPayload] = useState(false);
 
     const scrollToSection = (id: string) => {
         setMobileMenuOpen(false);
@@ -363,7 +374,22 @@ export function LandingPage() {
         setIsVerifyingSim(true);
         setTimeout(() => {
             setIsVerifyingSim(false);
-        }, 600);
+        }, 700);
+    };
+
+    const handleCopyPayload = () => {
+        const payload = JSON.stringify({
+            target: `https://${activeVerification.platform.toLowerCase()}.com/problems/${activeVerification.title.toLowerCase().replace(/\s+/g, '-')}`,
+            platform: activeVerification.platform,
+            problemId: activeVerification.problemId,
+            status: "Accepted",
+            runtime: activeVerification.runtime,
+            memory: activeVerification.memory,
+            verified: true
+        }, null, 2);
+        navigator.clipboard?.writeText(payload);
+        setCopiedPayload(true);
+        setTimeout(() => setCopiedPayload(false), 2000);
     };
 
     const handleDispatchRemedial = () => {
@@ -383,7 +409,7 @@ export function LandingPage() {
 
             {/* Background Base matching Signup / Signin */}
             <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-200 pointer-events-none" aria-hidden="true">
-                <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed opacity-100 pointer-events-none" />
             </div>
 
             {/* Mobile Backdrop */}
@@ -508,17 +534,19 @@ export function LandingPage() {
 
                     <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 text-balance text-zinc-900 dark:text-white animate-fade-slide-up [animation-delay:100ms]">
                         The Engineering OS for <br />
-                        <span className="text-[#5b4fff] dark:text-[#968fff]">Coding Bootcamps & Cohorts</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5b4fff] via-[#7c3aed] to-[#3b82f6] dark:from-[#968fff] dark:via-[#b4aeff] dark:to-[#60a5fa]">
+                            Coding Bootcamps & Cohorts
+                        </span>
                     </h1>
 
-                    <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed font-normal animate-fade-slide-up [animation-delay:200ms]">
+                    <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed font-normal animate-fade-slide-up [animation-delay:200ms] text-pretty">
                         Automate submission verification, monitor dual-platform contest ratings, and track live student leaderboards across LeetCode and Codeforces without manual spreadsheets.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-6 animate-fade-slide-up [animation-delay:300ms]">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-8 animate-fade-slide-up [animation-delay:300ms]">
                         <Link 
                             to="/login" 
-                            className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_28px_rgba(91,79,255,0.35)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] min-h-[48px] shimmer-sweep interactive-press group"
+                            className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_28px_rgba(91,79,255,0.35)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] min-h-[48px] shimmer-sweep interactive-press group"
                         >
                             <span>Start Free Cohort</span>
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -527,25 +555,23 @@ export function LandingPage() {
                         <button
                             type="button"
                             onClick={() => scrollToSection('app-canvas')}
-                            className="w-full sm:w-auto bg-white dark:bg-[#111116] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-semibold px-8 py-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 min-h-[48px] interactive-press"
+                            className="w-full sm:w-auto bg-white dark:bg-[#111116] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-semibold px-8 py-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] min-h-[48px] interactive-press"
                         >
                             View Live Sandbox
                         </button>
                     </div>
 
                     {/* Trust and Velocity Strip */}
-                    <div className="flex flex-wrap items-center justify-center gap-y-2.5 gap-x-6 text-xs font-medium text-zinc-500 dark:text-zinc-400 animate-fade-slide-up [animation-delay:400ms]">
-                        <div className="flex items-center gap-2 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-default group">
+                    <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-medium text-zinc-600 dark:text-zinc-300 animate-fade-slide-up [animation-delay:400ms]">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs hover:border-amber-500/40 transition-colors cursor-default group">
                             <LightningIcon className="w-4 h-4 text-amber-500 shrink-0 group-hover:scale-110 transition-transform" weight="fill" />
-                            <span>Sub-minute background polling</span>
+                            <span>Sub-100ms background polling</span>
                         </div>
-                        <div className="hidden sm:inline-block w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                        <div className="flex items-center gap-2 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-default group">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs hover:border-emerald-500/40 transition-colors cursor-default group">
                             <ShieldCheckIcon className="w-4 h-4 text-emerald-500 shrink-0 group-hover:scale-110 transition-transform" weight="bold" />
                             <span>Zero student credentials required</span>
                         </div>
-                        <div className="hidden sm:inline-block w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                        <div className="flex items-center gap-2 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-default group">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs hover:border-[#5b4fff]/40 transition-colors cursor-default group">
                             <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 group-hover:scale-110 transition-transform" weight="fill" />
                             <span>Free for bootcamps & universities</span>
                         </div>
@@ -559,9 +585,9 @@ export function LandingPage() {
                         {/* OS Window Header Bar */}
                         <div className="px-4 sm:px-6 py-3.5 border-b border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between bg-zinc-100/70 dark:bg-[#15151b]/80">
                             <div className="flex items-center gap-2">
-                                <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block" />
-                                <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-                                <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+                                <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block hover:opacity-100 transition-opacity" />
+                                <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block hover:opacity-100 transition-opacity" />
+                                <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block hover:opacity-100 transition-opacity" />
                                 <span className="ml-3 font-mono text-[11px] text-zinc-500 dark:text-zinc-400 hidden sm:inline">
                                     app.mentorsync.com/cohort/batch-24/leaderboard
                                 </span>
@@ -585,7 +611,10 @@ export function LandingPage() {
                                         <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Classroom Cohort</p>
                                         <div className="p-3 rounded-xl bg-white dark:bg-[#18181f] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs">
                                             <p className="font-bold text-xs text-zinc-900 dark:text-white">Batch 2024 Placement Track</p>
-                                            <p className="text-[11px] text-zinc-500 mt-0.5">64 Enrolled Students</p>
+                                            <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-1">
+                                                <span>64 Enrolled Students</span>
+                                                <span className="font-semibold text-emerald-500">Sprint 4 Active</span>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -645,7 +674,7 @@ export function LandingPage() {
 
                                 <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 text-[11px] text-zinc-500">
                                     <span>Redis Cache Hit Rate: </span>
-                                    <strong className="text-emerald-500">98.6% (4ms)</strong>
+                                    <strong className="text-emerald-500">99.4% (sub-10ms)</strong>
                                 </div>
                             </div>
 
@@ -749,10 +778,14 @@ export function LandingPage() {
                                                         title="Click to view detailed profile"
                                                     >
                                                         <div className="flex items-center gap-3 min-w-0">
-                                                            <span className={`w-5 text-center font-bold text-xs transition-transform group-hover:scale-110 ${idx === 0 ? 'text-amber-500' : 'text-zinc-400'}`}>
+                                                            <span className={`w-6 text-center font-bold text-xs transition-transform group-hover:scale-110 ${
+                                                                idx === 0 ? 'text-amber-500 font-extrabold' : 
+                                                                idx === 1 ? 'text-zinc-400 font-bold' : 
+                                                                idx === 2 ? 'text-amber-700 font-bold' : 'text-zinc-500'
+                                                            }`}>
                                                                 #{idx + 1}
                                                             </span>
-                                                            <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-[#5b4fff] group-hover:text-white transition-all duration-200">
+                                                            <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-[#5b4fff] group-hover:text-white transition-all duration-200 shadow-2xs">
                                                                 {student.name.substring(0, 2).toUpperCase()}
                                                             </div>
                                                             <div className="min-w-0">
@@ -765,18 +798,18 @@ export function LandingPage() {
                                                             <span className="font-bold text-zinc-900 dark:text-white">
                                                                 {student.lcSolved + student.cfSolved} Solved
                                                             </span>
-                                                            <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] font-semibold text-[11px]">
+                                                            <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] font-semibold text-[11px] border border-[#ffa116]/20">
                                                                 LC {student.lcRating} ({student.lcRank})
                                                             </span>
-                                                            <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 font-semibold text-[11px]">
+                                                            <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 font-semibold text-[11px] border border-sky-500/20">
                                                                 CF {student.cfRating} ({student.cfRank})
                                                             </span>
-                                                            <span className="flex items-center gap-1 font-semibold text-amber-500 text-[11px]">
+                                                            <span className="flex items-center gap-1 font-semibold text-amber-500 text-[11px] bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
                                                                 <FireIcon className="w-3.5 h-3.5 animate-flame" weight="fill" />
                                                                 {student.streak}d
                                                             </span>
                                                             <span className="text-[11px] font-semibold text-[#5b4fff] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 hidden md:inline">
-                                                                View Profile &rarr;
+                                                                Inspect &rarr;
                                                             </span>
                                                         </div>
                                                     </div>
@@ -787,7 +820,7 @@ export function LandingPage() {
                                                     <button
                                                         type="button"
                                                         onClick={() => setSearchQuery('')}
-                                                        className="ml-2 text-[#5b4fff] underline font-semibold"
+                                                        className="ml-2 text-[#5b4fff] underline font-semibold cursor-pointer"
                                                     >
                                                         Clear filter
                                                     </button>
@@ -900,13 +933,18 @@ export function LandingPage() {
                                                     {activeStudentProfile.streak}-Day Technical Consistency Heatmap
                                                 </span>
                                                 <span className="text-emerald-500 font-bold">
-                                                    {activeStudentProfile.annualSubmissions} Submissions This Year
+                                                    {hoveredHeatmapDay !== null 
+                                                        ? `Day ${hoveredHeatmapDay + 1}: ${activeStudentProfile.heatmapDensity[hoveredHeatmapDay] * 3} solves` 
+                                                        : `${activeStudentProfile.annualSubmissions} Submissions This Year`
+                                                    }
                                                 </span>
                                             </div>
                                             <div className="grid grid-cols-14 gap-1.5 pt-1">
                                                 {activeStudentProfile.heatmapDensity.map((density, i) => (
                                                     <div 
                                                         key={i} 
+                                                        onMouseEnter={() => setHoveredHeatmapDay(i)}
+                                                        onMouseLeave={() => setHoveredHeatmapDay(null)}
                                                         className={`h-4 rounded-[3px] hover:scale-135 hover:z-10 transition-transform duration-150 cursor-pointer relative ${
                                                             density === 3 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' :
                                                             density === 2 ? 'bg-emerald-600/70' :
@@ -964,7 +1002,7 @@ export function LandingPage() {
                                                     Targeted Remediation Recommendation
                                                 </p>
                                                 <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                                                    14 students are falling behind on Dynamic Programming and Graphs.
+                                                    18 students need remedial practice on Dynamic Programming and Graphs.
                                                 </p>
                                             </div>
                                             <button
@@ -997,9 +1035,14 @@ export function LandingPage() {
                                                 <div key={topic.id} className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
                                                     <div className="flex justify-between items-center text-xs mb-1.5">
                                                         <span className="font-bold text-zinc-900 dark:text-white">{topic.name}</span>
-                                                        <span className={`font-bold text-[11px] px-2 py-0.5 rounded border ${topic.statusClass}`}>
-                                                            {topic.status} ({topic.percentage}%)
-                                                        </span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[10px] text-zinc-400 font-medium">
+                                                                {topic.needReviewCount} need review
+                                                            </span>
+                                                            <span className={`font-bold text-[11px] px-2 py-0.5 rounded border ${topic.statusClass}`}>
+                                                                {topic.status} ({topic.percentage}%)
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                     <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
                                                         <div 
@@ -1063,7 +1106,7 @@ export function LandingPage() {
                                         <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Interactive Submission Tester</p>
                                         <p className="text-[11px] text-zinc-500">Select a problem preset and simulate verification engine</p>
                                     </div>
-                                    <span className="px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-mono">
+                                    <span className="px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-mono border border-zinc-200 dark:border-zinc-700/60">
                                         POST /api/verify
                                     </span>
                                 </div>
@@ -1113,9 +1156,20 @@ export function LandingPage() {
                                             <TerminalIcon className="w-4 h-4 text-emerald-400" />
                                             Live Verification Stream
                                         </span>
-                                        <span className={`text-emerald-400 font-bold ${isVerifyingSim ? 'animate-pulse' : 'animate-scale-bounce'}`}>
-                                            {isVerifyingSim ? 'PARSING AST...' : '200 OK (8ms)'}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={handleCopyPayload}
+                                                className="text-[10px] text-zinc-400 hover:text-white transition-colors flex items-center gap-1 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800 cursor-pointer"
+                                                title="Copy payload"
+                                            >
+                                                {copiedPayload ? <CheckIcon className="w-3 h-3 text-emerald-400" /> : <CopyIcon className="w-3 h-3" />}
+                                                <span>{copiedPayload ? 'Copied' : 'JSON'}</span>
+                                            </button>
+                                            <span className={`text-emerald-400 font-bold ${isVerifyingSim ? 'animate-pulse' : 'animate-scale-bounce'}`}>
+                                                {isVerifyingSim ? 'PARSING AST...' : '200 OK (8ms)'}
+                                            </span>
+                                        </div>
                                     </div>
                                     <p className="text-zinc-300">
                                         &gt; Target: https://{activeVerification.platform.toLowerCase()}.com/problems/{activeVerification.title.toLowerCase().replace(/\s+/g, '-')}
@@ -1143,7 +1197,7 @@ export function LandingPage() {
                 <section id="dual-telemetry" className="w-full max-w-6xl mx-auto mb-28 sm:mb-36 scroll-mt-28">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                         
-                        {/* Dual Platform Visual Card */}
+                        {/* Dual Platform Visual Card with SVG Sparklines */}
                         <div className="lg:col-span-7 order-2 lg:order-1">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="p-6 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg space-y-4 interactive-card group">
@@ -1152,16 +1206,48 @@ export function LandingPage() {
                                             <span className="w-3 h-3 rounded-full bg-[#ffa116]" />
                                             <span className="font-bold text-sm text-zinc-900 dark:text-white">LeetCode Profile</span>
                                         </div>
-                                        <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] text-[11px] font-bold">Knight 1890</span>
+                                        <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] text-[11px] font-bold border border-[#ffa116]/20">Knight 1890</span>
                                     </div>
                                     <div>
                                         <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight group-hover:text-[#ffa116] transition-colors">420 Solved</p>
                                         <p className="text-xs text-zinc-500 mt-0.5">Top 4.8% Global Contest Rating</p>
                                     </div>
+
+                                    {/* SVG Sparkline for LeetCode Rating Trend */}
+                                    <div className="pt-2">
+                                        <div className="flex justify-between items-center text-[10px] text-zinc-400 mb-1">
+                                            <span>Contest Progression</span>
+                                            <span className="text-[#ffa116] font-semibold flex items-center gap-0.5">
+                                                <TrendUpIcon className="w-3 h-3" />
+                                                +270 pts
+                                            </span>
+                                        </div>
+                                        <svg className="w-full h-12 overflow-visible" viewBox="0 0 200 48" fill="none">
+                                            <defs>
+                                                <linearGradient id="lcGrad" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor="#ffa116" stopOpacity="0.3" />
+                                                    <stop offset="100%" stopColor="#ffa116" stopOpacity="0" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path 
+                                                d="M0,40 Q30,36 60,30 T120,20 T170,12 T200,6" 
+                                                fill="none" 
+                                                stroke="#ffa116" 
+                                                strokeWidth="2.5" 
+                                                strokeLinecap="round" 
+                                            />
+                                            <path 
+                                                d="M0,40 Q30,36 60,30 T120,20 T170,12 T200,6 L200,48 L0,48 Z" 
+                                                fill="url(#lcGrad)" 
+                                            />
+                                            <circle cx="200" cy="6" r="3.5" fill="#ffa116" className="animate-pulse" />
+                                        </svg>
+                                    </div>
+
                                     <div className="space-y-1.5 text-xs pt-2 border-t border-zinc-200/80 dark:border-zinc-800/80">
                                         <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
                                             <span>Easy: 140</span>
-                                            <span>Medium: 220</span>
+                                            <span className="text-amber-500">Medium: 220</span>
                                             <span className="text-rose-500">Hard: 60</span>
                                         </div>
                                     </div>
@@ -1173,12 +1259,44 @@ export function LandingPage() {
                                             <span className="w-3 h-3 rounded-full bg-sky-500" />
                                             <span className="font-bold text-sm text-zinc-900 dark:text-white">Codeforces Profile</span>
                                         </div>
-                                        <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 text-[11px] font-bold">Specialist 1510</span>
+                                        <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 text-[11px] font-bold border border-sky-500/20">Specialist 1510</span>
                                     </div>
                                     <div>
                                         <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight group-hover:text-sky-500 transition-colors">240 Solved</p>
                                         <p className="text-xs text-zinc-500 mt-0.5">Rated for Div. 2 Competitions</p>
                                     </div>
+
+                                    {/* SVG Sparkline for Codeforces Rating Trend */}
+                                    <div className="pt-2">
+                                        <div className="flex justify-between items-center text-[10px] text-zinc-400 mb-1">
+                                            <span>Rating Trajectory</span>
+                                            <span className="text-sky-500 font-semibold flex items-center gap-0.5">
+                                                <TrendUpIcon className="w-3 h-3" />
+                                                +230 pts
+                                            </span>
+                                        </div>
+                                        <svg className="w-full h-12 overflow-visible" viewBox="0 0 200 48" fill="none">
+                                            <defs>
+                                                <linearGradient id="cfGrad" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.3" />
+                                                    <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path 
+                                                d="M0,42 Q40,38 70,32 T130,22 T170,14 T200,8" 
+                                                fill="none" 
+                                                stroke="#0ea5e9" 
+                                                strokeWidth="2.5" 
+                                                strokeLinecap="round" 
+                                            />
+                                            <path 
+                                                d="M0,42 Q40,38 70,32 T130,22 T170,14 T200,8 L200,48 L0,48 Z" 
+                                                fill="url(#cfGrad)" 
+                                            />
+                                            <circle cx="200" cy="8" r="3.5" fill="#0ea5e9" className="animate-pulse" />
+                                        </svg>
+                                    </div>
+
                                     <div className="space-y-1.5 text-xs pt-2 border-t border-zinc-200/80 dark:border-zinc-800/80">
                                         <div className="flex justify-between text-zinc-600 dark:text-zinc-400 font-medium">
                                             <span>Div. 2 Participant</span>
@@ -1192,7 +1310,7 @@ export function LandingPage() {
                                         <p className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">Combined Dual Platform Metric</p>
                                         <p className="text-2xl font-extrabold text-zinc-900 dark:text-white">660 Total Unique Problems Solved</p>
                                     </div>
-                                    <div className="flex items-center gap-2 bg-white dark:bg-zinc-800/80 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs shadow-xs">
+                                    <div className="flex items-center gap-2 bg-white dark:bg-zinc-800/80 px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs shadow-xs">
                                         <FireIcon className="w-4 h-4 text-amber-500 animate-flame" weight="fill" />
                                         <span className="font-semibold text-zinc-800 dark:text-zinc-200">64 Days Active Streak</span>
                                     </div>
@@ -1260,15 +1378,15 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Interactive Topic Card */}
+                        {/* Interactive Topic Card with Benchmark Guideline */}
                         <div className="lg:col-span-7">
                             <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl space-y-4 interactive-card">
                                 <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                                     <div>
                                         <p className="text-xs font-bold text-zinc-900 dark:text-white">Cohort Topic Proficiency Analysis</p>
-                                        <p className="text-[11px] text-zinc-500">Aggregated across Batch 2024 (64 students)</p>
+                                        <p className="text-[11px] text-zinc-500">Aggregated across Batch 2024 (64 students) • 75% Benchmark Target</p>
                                     </div>
-                                    <span className="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-500 font-bold text-xs">
+                                    <span className="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-500 font-bold text-xs border border-indigo-500/20">
                                         Analytics Active
                                     </span>
                                 </div>
@@ -1279,7 +1397,7 @@ export function LandingPage() {
                                             <span>Dynamic Programming (0/1 Knapsack, Memoization)</span>
                                             <span className="text-rose-500">42% (Critical Weakness)</span>
                                         </div>
-                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
+                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden relative">
                                             <div className="bg-rose-500 h-full w-[42%] transition-all duration-700 ease-out" />
                                         </div>
                                     </div>
@@ -1289,7 +1407,7 @@ export function LandingPage() {
                                             <span>Graphs & Trees (BFS, DFS, Dijkstra)</span>
                                             <span className="text-amber-500">58% (Developing)</span>
                                         </div>
-                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
+                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden relative">
                                             <div className="bg-amber-500 h-full w-[58%] transition-all duration-700 ease-out" />
                                         </div>
                                     </div>
@@ -1299,7 +1417,7 @@ export function LandingPage() {
                                             <span>Binary Search & Sliding Window</span>
                                             <span className="text-emerald-500">84% (Strong)</span>
                                         </div>
-                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
+                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden relative">
                                             <div className="bg-emerald-500 h-full w-[84%] transition-all duration-700 ease-out" />
                                         </div>
                                     </div>
@@ -1309,10 +1427,18 @@ export function LandingPage() {
                                             <span>Arrays, Strings & HashMaps</span>
                                             <span className="text-emerald-500">92% (Mastered)</span>
                                         </div>
-                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
+                                        <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden relative">
                                             <div className="bg-emerald-500 h-full w-[92%] transition-all duration-700 ease-out" />
                                         </div>
                                     </div>
+                                </div>
+
+                                <div className="pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500">
+                                    <span className="flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-rose-500" />
+                                        <span>Target threshold: 75% for campus placement</span>
+                                    </span>
+                                    <span className="text-[#5b4fff] font-semibold">18 students flagged for 1:1 mentorship</span>
                                 </div>
                             </div>
                         </div>
@@ -1362,9 +1488,25 @@ export function LandingPage() {
                                     <ClockIcon className="w-6 h-6" weight="bold" />
                                 </div>
                                 <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-amber-500 transition-colors">Integrated Contest Radar</h3>
-                                <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
+                                <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4">
                                     Never let students miss official LeetCode Weekly contests or Codeforces Div. 2/3 rounds with built-in countdowns and reminders.
                                 </p>
+                                <div className="space-y-1.5 mb-4 text-xs">
+                                    <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                                        <span className="flex items-center gap-1.5">
+                                            <CalendarBlankIcon className="w-3.5 h-3.5 text-amber-500" />
+                                            <span>LC Weekly 440</span>
+                                        </span>
+                                        <span className="font-mono font-semibold text-amber-500">in 2d 14h</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                                        <span className="flex items-center gap-1.5">
+                                            <CalendarBlankIcon className="w-3.5 h-3.5 text-sky-500" />
+                                            <span>CF Div. 2 Round</span>
+                                        </span>
+                                        <span className="font-mono font-semibold text-sky-500">in 4d 08h</span>
+                                    </div>
+                                </div>
                             </div>
                             <span className="font-mono text-xs font-bold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 w-max group-hover:bg-amber-500/20 transition-colors">
                                 Synchronized Calendars
@@ -1386,7 +1528,7 @@ export function LandingPage() {
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link 
                                 to="/login" 
-                                className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_24px_rgba(91,79,255,0.3)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:translate-y-0 min-h-[48px] flex items-center justify-center shimmer-sweep interactive-press"
+                                className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_24px_rgba(91,79,255,0.3)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] min-h-[48px] flex items-center justify-center shimmer-sweep interactive-press"
                             >
                                 Start for Free
                             </Link>
