@@ -232,7 +232,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
         }
     };
 
-    const inputClasses = "bg-zinc-100/90 dark:bg-[#1a1b2e]/60 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10";
+    const inputClasses = "bg-zinc-100/90 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-1 focus-visible:ring-[#5b4fff] rounded-xl transition-all h-10";
     const dialogContentClasses = "bg-white dark:bg-[#111111] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white sm:rounded-2xl shadow-2xl";
 
     return (
@@ -254,7 +254,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                     <div className="space-y-4 py-2">
 
                         {/* 1. Add Single Student */}
-                        <div className="p-4 bg-zinc-50/80 dark:bg-[#161726]/50 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-2.5">
+                        <div className="p-4 bg-zinc-50/80 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-2.5">
                             <Label className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <span className="w-5 h-5 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-black flex items-center justify-center">1</span>
                                 Add Single Student
@@ -307,7 +307,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         </div>
 
                         {/* 2. Bulk Import via CSV */}
-                        <div className="p-4 bg-zinc-50/80 dark:bg-[#161726]/50 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-3">
+                        <div className="p-4 bg-zinc-50/80 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-3">
                             <div className="flex items-center justify-between">
                                 <Label className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                     <span className="w-5 h-5 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-black flex items-center justify-center">2</span>
@@ -331,7 +331,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />
 
-                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-[#5b4fff]/50 dark:hover:border-[#5b4fff]/50 rounded-xl p-4 cursor-pointer bg-white/60 dark:bg-[#12131e]/50 hover:bg-[#5b4fff]/5 transition-all group">
+                            <label className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-[#5b4fff]/50 dark:hover:border-[#5b4fff]/50 rounded-xl p-4 cursor-pointer bg-white/60 dark:bg-[#18181b]/50 hover:bg-[#5b4fff]/5 transition-all group">
                                 <UploadCloud className="w-7 h-7 text-zinc-400 group-hover:text-[#5b4fff] transition-colors mb-1.5" />
                                 {uploadFile ? (
                                     <div className="text-center">
@@ -591,7 +591,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                     <div className="space-y-4 py-4">
                         {learningPaths.length === 0 ? (
-                            <div className="text-center p-6 bg-zinc-50 dark:bg-[#1a1b2e]/30 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700">
+                            <div className="text-center p-6 bg-zinc-50 dark:bg-zinc-900/40 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700">
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">You haven't built any roadmaps yet.</p>
                                 <Button onClick={openCreateFromAssign} className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl">
                                     <PlusIcon className="w-4 h-4 mr-2" /> Create Your First Path
@@ -603,7 +603,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                     <Label className="text-zinc-700 dark:text-zinc-300">Select an existing Path</Label>
                                     <Select value={selectedPathId} onValueChange={(v) => { setSelectedPathId(v); if(assignPathError) setAssignPathError(null); }}>
                                         <SelectTrigger className={inputClasses}><SelectValue placeholder="Choose a roadmap..." /></SelectTrigger>
-                                        <SelectContent className="bg-white dark:bg-[#1a1b2e] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl">
+                                        <SelectContent className="bg-white dark:bg-[#111111] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl">
                                             {learningPaths.map(path => <SelectItem key={path.id} value={path.id || ''} className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white">{path.title}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
@@ -682,7 +682,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                             <div className="space-y-3">
                                 {pathQuestions.map((q, idx) => (
-                                    <div key={q.tempId} className="bg-zinc-50/80 dark:bg-[#161726]/60 p-4 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-3 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
+                                    <div key={q.tempId} className="bg-zinc-50/80 dark:bg-zinc-900/40 p-4 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-3 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
                                         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
                                             {/* Question Badge */}
                                             <span className="text-xs font-bold px-2 py-1 rounded-lg bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 shrink-0">
@@ -701,7 +701,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                     className={`px-3 py-2 transition-all text-xs font-bold cursor-pointer ${
                                                         (q.platform ?? 'LEETCODE') === 'LEETCODE'
                                                             ? 'bg-amber-500/20 text-amber-600 dark:text-[#ffa116]'
-                                                            : 'bg-zinc-100 dark:bg-[#1c1d2d] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+                                                            : 'bg-zinc-100 dark:bg-[#18181b] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                                                     }`}
                                                 >
                                                     LC
@@ -716,7 +716,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                     className={`px-3 py-2 transition-all text-xs font-bold cursor-pointer ${
                                                         q.platform === 'CODEFORCES'
                                                             ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400'
-                                                            : 'bg-zinc-100 dark:bg-[#1c1d2d] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+                                                            : 'bg-zinc-100 dark:bg-[#18181b] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                                                     }`}
                                                 >
                                                     CF
@@ -750,7 +750,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                             </div>
 
                                             {/* Days with clear badge */}
-                                            <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#1c1d2d] px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 h-10 shrink-0">
+                                            <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-[#18181b] px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 h-10 shrink-0">
                                                 <ClockIcon className="w-3.5 h-3.5 text-zinc-400" />
                                                 <input
                                                     type="number"

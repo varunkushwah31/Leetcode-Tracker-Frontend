@@ -46,7 +46,7 @@ export function UpcomingContestsCard() {
     }, []);
 
     const formatCountdown = (startSec?: number, durationSec = 7200, phase = 'BEFORE') => {
-        if (!startSec || isNaN(startSec)) {
+        if (!startSec || Number.isNaN(startSec)) {
             return { text: 'Upcoming', isLive: false };
         }
         const diff = startSec - nowSeconds;
@@ -71,7 +71,7 @@ export function UpcomingContestsCard() {
     };
 
     const formatStartTime = (sec?: number) => {
-        if (!sec || isNaN(sec)) return 'TBA';
+        if (!sec || Number.isNaN(sec)) return 'TBA';
         try {
             const date = new Date(sec * 1000);
             return date.toLocaleDateString(undefined, {
@@ -87,7 +87,7 @@ export function UpcomingContestsCard() {
     };
 
     const formatDuration = (sec?: number) => {
-        if (!sec || isNaN(sec) || sec <= 0) return 'TBA';
+        if (!sec || Number.isNaN(sec) || sec <= 0) return 'TBA';
         const hours = Math.floor(sec / 3600);
         const mins = Math.floor((sec % 3600) / 60);
         if (mins === 0) return `${hours}h`;
@@ -183,7 +183,7 @@ export function UpcomingContestsCard() {
                                         href={contest.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-between p-3 bg-zinc-50/80 dark:bg-[#1a1a1a]/40 hover:bg-zinc-100/90 dark:hover:bg-[#222228] border border-zinc-200/80 dark:border-zinc-800/50 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 rounded-xl transition-all cursor-pointer group no-underline text-inherit"
+                                        className="flex items-center justify-between p-3 bg-zinc-50/80 dark:bg-[#18181b]/60 hover:bg-zinc-100/90 dark:hover:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/60 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 rounded-xl transition-all cursor-pointer group no-underline text-inherit"
                                     >
                                         <div className="min-w-0 flex-1 pr-3">
                                             <div className="flex items-center gap-1.5 mb-1 min-w-0">

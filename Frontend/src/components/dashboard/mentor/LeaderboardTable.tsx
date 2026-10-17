@@ -339,7 +339,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 <SelectTrigger className="flex-1 sm:w-48 bg-zinc-100 dark:bg-[#222] border border-zinc-200 dark:border-transparent text-zinc-900 dark:text-white h-10 rounded-xl focus:ring-1 focus:ring-[#5b4fff] text-xs font-semibold">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white dark:bg-[#1a1b2e] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl shadow-xl">
+                                <SelectContent className="bg-white dark:bg-[#111111] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white rounded-xl shadow-xl">
                                     <SelectItem value="solved" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Total Solved (Combined)</SelectItem>
                                     <SelectItem value="lc_solved" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">LeetCode Solved</SelectItem>
                                     <SelectItem value="cf_solved" className="focus:bg-[#5b4fff]/10 dark:focus:bg-[#5b4fff]/20 focus:text-zinc-900 dark:focus:text-white text-xs">Codeforces Solved</SelectItem>
@@ -377,7 +377,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
             <CardContent className="p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full sm:min-w-180">
-                        <thead className="bg-zinc-50/80 dark:bg-[#1a1b2e]/50 border-b border-zinc-200/80 dark:border-zinc-800/60 select-none">
+                        <thead className="bg-zinc-50/80 dark:bg-zinc-900/60 border-b border-zinc-200/80 dark:border-zinc-800/60 select-none">
                         <tr>
                             <th
                                 onClick={() => handleSortChange('rank')}
@@ -465,7 +465,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                     <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
                                         <Avatar className="w-8 h-8 sm:w-10 sm:h-10 border border-zinc-200 dark:border-zinc-800 shrink-0">
                                             <AvatarImage src={student.avatarUrl} />
-                                            <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] font-bold text-xs sm:text-sm">{student.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] font-bold text-xs sm:text-sm">{student.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                         <div className="min-w-0 flex-1">
                                             <p className="font-semibold text-xs sm:text-sm text-zinc-900 dark:text-white group-hover:text-[#5b4fff] dark:group-hover:text-[#b4afff] transition-colors truncate">{student.name}</p>

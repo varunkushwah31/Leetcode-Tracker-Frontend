@@ -168,7 +168,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                 <Button
                     variant="outline"
                     onClick={onBack}
-                    className="bg-white dark:bg-[#1a1b2e] border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all rounded-xl shadow-sm dark:shadow-md flex items-center gap-2 px-4 py-2 text-sm font-medium hover:-translate-x-0.5 cursor-pointer"
+                    className="bg-white dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all rounded-xl shadow-sm dark:shadow-md flex items-center gap-2 px-4 py-2 text-sm font-medium hover:-translate-x-0.5 cursor-pointer"
                 >
                     <ArrowLeftIcon className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                     <span>Back to {classroomName || 'Classroom'}</span>
@@ -179,7 +179,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                         size="sm"
                         onClick={handleExportReport}
                         disabled={isExporting}
-                        className="bg-white dark:bg-[#1a1b2e] border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl text-xs font-semibold h-9 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5"
+                        className="bg-white dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl text-xs font-semibold h-9 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5"
                     >
                         {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Download className="w-3.5 h-3.5 text-[#5b4fff] dark:text-[#968fff] mr-1" />}
                         Export Report (CSV)
@@ -189,7 +189,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                             variant="outline"
                             size="sm"
                             onClick={() => { setConfirmRemoveOpen(true); setRemoveError(null); }}
-                            className="bg-white dark:bg-[#1a1b2e] border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl text-xs font-semibold h-9 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5"
+                            className="bg-white dark:bg-[#18181b] border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl text-xs font-semibold h-9 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5"
                         >
                             <Trash2 className="w-3.5 h-3.5 mr-1" />
                             Remove from Class
@@ -215,7 +215,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                         <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
                             <Avatar className="w-16 h-16 sm:w-24 sm:h-24 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-full shrink-0">
                                 <AvatarImage src={data.avatarUrl} />
-                                <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] text-xl sm:text-3xl font-bold">
+                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] text-xl sm:text-3xl font-bold">
                                     {data.name?.substring(0, 2).toUpperCase() || 'ST'}
                                 </AvatarFallback>
                             </Avatar>
@@ -223,7 +223,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                                 <h1 className="text-xl sm:text-3xl font-extrabold mb-1 text-zinc-900 dark:text-white tracking-tight">{data.name}</h1>
                                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-3">
                                     {data.leetcodeUsername && (
-                                        <a href={`https://leetcode.com/${data.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-[#5b4fff] dark:hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-[#1a1b2e]/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                                        <a href={`https://leetcode.com/${data.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-[#5b4fff] dark:hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-zinc-900/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
                                             LC: @{data.leetcodeUsername} <ExternalLink className="h-3 w-3 ml-1.5" />
                                         </a>
                                     )}
@@ -236,7 +236,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-8 bg-zinc-50/80 dark:bg-[#1a1b2e]/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-8 bg-zinc-50/80 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rank</p>
                                 <p className="text-2xl font-bold text-zinc-900 dark:text-white">{data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : (data.codeforcesRank || 'N/A')}</p>
@@ -280,7 +280,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                                 <div className="flex flex-wrap gap-2.5">
                                     {data.skills && data.skills.length > 0 ? (
                                         data.skills.toSorted((a, b) => b.problemsSolved - a.problemsSolved).slice(0, 15).map((skill) => (
-                                            <div key={skill.tagName} className="flex items-center bg-zinc-100/70 dark:bg-[#1a1b2e]/30 rounded-xl px-3 py-1.5 border border-zinc-200 dark:border-zinc-800/60 shadow-xs">
+                                            <div key={skill.tagName} className="flex items-center bg-zinc-100/70 dark:bg-zinc-900/40 rounded-xl px-3 py-1.5 border border-zinc-200 dark:border-zinc-800/60 shadow-xs">
                                                 <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mr-2.5">{skill.tagName}</span>
                                                 <span className="text-[11px] font-bold bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#b4afff] px-2 py-0.5 rounded-md">{skill.problemsSolved}</span>
                                             </div>
@@ -343,15 +343,15 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                             <CardContent className="space-y-5 pt-6">
                                 <div>
                                     <div className="flex justify-between text-sm mb-2"><span className="text-emerald-600 dark:text-emerald-400 font-bold tracking-wide">Easy</span><span className="font-bold text-zinc-900 dark:text-white">{easyCount}</span></div>
-                                    <Progress value={(easyCount / progressTotal) * 100} className="h-2.5 bg-emerald-100 dark:bg-[#1a1b2e] border border-emerald-200 dark:border-zinc-800/60 [&>div]:bg-emerald-500 shadow-inner" />
+                                    <Progress value={(easyCount / progressTotal) * 100} className="h-2.5 bg-emerald-100 dark:bg-zinc-900 border border-emerald-200 dark:border-zinc-800/60 [&>div]:bg-emerald-500 shadow-inner" />
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-2"><span className="text-amber-600 dark:text-amber-400 font-bold tracking-wide">Medium</span><span className="font-bold text-zinc-900 dark:text-white">{medCount}</span></div>
-                                    <Progress value={(medCount / progressTotal) * 100} className="h-2.5 bg-amber-100 dark:bg-[#1a1b2e] border border-amber-200 dark:border-zinc-800/60 [&>div]:bg-amber-500 shadow-inner" />
+                                    <Progress value={(medCount / progressTotal) * 100} className="h-2.5 bg-amber-100 dark:bg-zinc-900 border border-amber-200 dark:border-zinc-800/60 [&>div]:bg-amber-500 shadow-inner" />
                                 </div>
                                 <div>
                                     <div className="flex justify-between text-sm mb-2"><span className="text-rose-600 dark:text-rose-400 font-bold tracking-wide">Hard</span><span className="font-bold text-zinc-900 dark:text-white">{hardCount}</span></div>
-                                    <Progress value={(hardCount / progressTotal) * 100} className="h-2.5 bg-rose-100 dark:bg-[#1a1b2e] border border-rose-200 dark:border-zinc-800/60 [&>div]:bg-rose-500 shadow-inner" />
+                                    <Progress value={(hardCount / progressTotal) * 100} className="h-2.5 bg-rose-100 dark:bg-zinc-900 border border-rose-200 dark:border-zinc-800/60 [&>div]:bg-rose-500 shadow-inner" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -392,7 +392,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                                 <CardContent className="pt-6">
                                     <div className="grid grid-cols-3 gap-3">
                                         {data.badges.slice(0, 6).map((badge) => (
-                                            <div key={`${badge.title}-${badge.icon}`} className="aspect-square bg-zinc-100/80 dark:bg-[#1a1b2e]/40 rounded-xl flex items-center justify-center border border-zinc-200 dark:border-zinc-800/60 p-2 shadow-sm" title={badge.title}>
+                                            <div key={`${badge.title}-${badge.icon}`} className="aspect-square bg-zinc-100/80 dark:bg-zinc-900/40 rounded-xl flex items-center justify-center border border-zinc-200 dark:border-zinc-800/60 p-2 shadow-sm" title={badge.title}>
                                                 <img src={badge.icon.startsWith('http') ? badge.icon : `https://leetcode.com${badge.icon}`} alt="badge" className="w-10 h-10 object-contain" />
                                             </div>
                                         ))}

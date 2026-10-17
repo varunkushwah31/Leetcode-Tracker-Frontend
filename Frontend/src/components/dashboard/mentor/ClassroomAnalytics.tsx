@@ -231,7 +231,7 @@ export function ClassroomAnalytics({
         return (
             <Card className="shadow-sm dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-zinc-200/90 dark:border-zinc-800/60 bg-white dark:bg-[#111111]/85 backdrop-blur-2xl rounded-2xl overflow-hidden">
                 <CardContent className="flex flex-col items-center justify-center py-16">
-                    <div className="w-16 h-16 bg-zinc-100 dark:bg-[#1a1b2e] rounded-2xl flex items-center justify-center mb-6 shadow-xs">
+                    <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-900 rounded-2xl flex items-center justify-center mb-6 shadow-xs border border-zinc-200 dark:border-zinc-800">
                         <Activity className="w-8 h-8 text-[#5b4fff] dark:text-[#968fff]" />
                     </div>
                     <p className="text-zinc-900 dark:text-white text-lg font-bold tracking-tight mb-2">No data available to generate analytics.</p>
@@ -377,7 +377,7 @@ export function ClassroomAnalytics({
             </div>
 
             {/* Sub-Navigation Tabs */}
-            <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs w-full overflow-x-auto no-scrollbar sm:custom-scrollbar gap-1">
+            <div className="flex bg-white dark:bg-[#18181b] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs w-full overflow-x-auto no-scrollbar sm:custom-scrollbar gap-1">
                 <button
                     type="button"
                     onClick={() => setActiveTab('overview')}
@@ -495,7 +495,7 @@ export function ClassroomAnalytics({
                                 {data.recommendedActionItems.map((item) => {
                                     if (typeof item === 'string') {
                                         return (
-                                            <div key={item} className="flex items-start gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-[#16161f] p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
+                                            <div key={item} className="flex items-start gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181b] p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
                                                 <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <span className="leading-relaxed">{item}</span>
                                             </div>
@@ -504,7 +504,7 @@ export function ClassroomAnalytics({
                                     const prob = item as CuratedProblemDTO;
                                     const actionKey = prob.slug || prob.titleSlug || prob.title || prob.link || 'action-problem';
                                     return (
-                                        <div key={actionKey} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-[#16161f] p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
+                                        <div key={actionKey} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-[#18181b] p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
                                             <div className="flex items-start gap-2.5 min-w-0">
                                                 <CheckCircleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <div className="min-w-0">
@@ -595,17 +595,17 @@ export function ClassroomAnalytics({
                             </CardHeader>
                             <CardContent className="space-y-5 pt-6">
                                 <div className="grid grid-cols-3 gap-3 text-center">
-                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80">
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80">
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-[#968fff] mb-1">Dual Platform</p>
                                         <h4 className="text-2xl font-black text-zinc-900 dark:text-white">{data.dualPlatformStudents ?? 0}</h4>
                                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC + CF Active</p>
                                     </div>
-                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80">
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80">
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">LeetCode Only</p>
                                         <h4 className="text-2xl font-black text-zinc-900 dark:text-white">{data.leetcodeOnlyStudents ?? data.totalStudents}</h4>
                                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Profiles</p>
                                     </div>
-                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80">
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80">
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1">Codeforces Only</p>
                                         <h4 className="text-2xl font-black text-zinc-900 dark:text-white">{data.codeforcesOnlyStudents ?? 0}</h4>
                                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Profiles</p>
@@ -613,13 +613,13 @@ export function ClassroomAnalytics({
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3 pt-2">
-                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/60 dark:border-zinc-800/60">
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/60 dark:border-zinc-800/60">
                                         <p className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Avg LC Contest Rating</p>
                                         <h4 className="text-xl font-bold text-zinc-900 dark:text-white">
                                             {data.averageLeetcodeRating ? Math.round(data.averageLeetcodeRating) : '—'}
                                         </h4>
                                     </div>
-                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/60 dark:border-zinc-800/60">
+                                    <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/60 dark:border-zinc-800/60">
                                         <p className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Avg CF Contest Rating</p>
                                         <h4 className="text-xl font-bold text-zinc-900 dark:text-white">
                                             {data.averageCodeforcesRating ? Math.round(data.averageCodeforcesRating) : '—'}
@@ -627,7 +627,7 @@ export function ClassroomAnalytics({
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
+                                <div className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
                                     <span className="font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
                                         <FlameIcon className="w-4 h-4 text-amber-500" /> Cohort Streak Average
                                     </span>
@@ -653,7 +653,7 @@ export function ClassroomAnalytics({
                                 <div className="flex flex-wrap gap-2">
                                     {data.topStrengths && data.topStrengths.length > 0 ? (
                                         data.topStrengths.map((skill) => (
-                                            <div key={skill.tagName} className="px-3 py-1.5 bg-zinc-50 dark:bg-[#16161f] border border-emerald-500/30 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
+                                            <div key={skill.tagName} className="px-3 py-1.5 bg-zinc-50 dark:bg-[#18181b] border border-emerald-500/30 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
                                                 <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{formatTagName(skill.tagName)}</span>
                                                 <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-md">
                                                     {skill.problemsSolved}
@@ -689,7 +689,7 @@ export function ClassroomAnalytics({
                                 <div className="flex flex-wrap gap-2">
                                     {criticalWeaknessTopics.length > 0 ? (
                                         criticalWeaknessTopics.map((skill) => (
-                                            <div key={skill.tagName} className="px-3 py-1.5 bg-zinc-50 dark:bg-[#16161f] border border-rose-500/30 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
+                                            <div key={skill.tagName} className="px-3 py-1.5 bg-zinc-50 dark:bg-[#18181b] border border-rose-500/30 rounded-xl flex items-center gap-2 shadow-xs cursor-default">
                                                 <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">{formatTagName(skill.tagName)}</span>
                                                 <span className="text-[11px] font-black text-rose-600 dark:text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded-md">
                                                     {skill.problemsSolved ?? skill.cohortTotalSolved ?? 0}
@@ -722,11 +722,11 @@ export function ClassroomAnalytics({
                             </p>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                            <div className="px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-center shadow-xs">
+                            <div className="px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80 text-center shadow-xs">
                                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Gap Topics</p>
                                 <p className="text-lg font-black text-rose-600 dark:text-rose-400">{normalizedWeaknessTopics.length}</p>
                             </div>
-                            <div className="px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 text-center shadow-xs">
+                            <div className="px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80 text-center shadow-xs">
                                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Curated Problems</p>
                                 <p className="text-lg font-black text-[#5b4fff] dark:text-[#968fff]">
                                     {normalizedWeaknessTopics.reduce((acc, t) => acc + (t.suggestedProblems?.length || 0), 0)}
@@ -751,7 +751,7 @@ export function ClassroomAnalytics({
                             <span className="text-xs text-zinc-500 font-medium mr-1 flex items-center gap-1">
                                 <FunnelIcon className="w-3.5 h-3.5" /> Filter:
                             </span>
-                            <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
+                            <div className="flex bg-white dark:bg-[#18181b] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
                                 <button
                                     type="button"
                                     onClick={() => setWeaknessFilter('ALL')}
@@ -817,7 +817,7 @@ export function ClassroomAnalytics({
                                         <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60 bg-transparent">
                                             <div className="flex items-start justify-between gap-3">
                                                 <div className="flex items-center gap-3 min-w-0">
-                                                    <div className="p-2 rounded-xl bg-zinc-100 dark:bg-[#1a1b2e] text-rose-600 dark:text-rose-400 border border-zinc-200 dark:border-zinc-800 font-bold shrink-0">
+                                                    <div className="p-2 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20 font-bold shrink-0">
                                                         <TargetIcon className="w-5 h-5" />
                                                     </div>
                                                     <div className="min-w-0">
@@ -843,7 +843,7 @@ export function ClassroomAnalytics({
 
                                         <CardContent className="pt-4 space-y-4">
                                             {/* Diagnostic Recommendation */}
-                                            <div className="p-3 bg-zinc-50 dark:bg-[#16161f] rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2.5">
+                                            <div className="p-3 bg-zinc-50 dark:bg-[#18181b] rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2.5">
                                                 <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <div className="min-w-0">
                                                     <span className="font-bold text-zinc-900 dark:text-white mr-1.5">Diagnostic Recommendation:</span>
@@ -864,7 +864,7 @@ export function ClassroomAnalytics({
                                                             return (
                                                             <div
                                                                 key={probKey}
-                                                                className="p-3 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/50 transition-all flex flex-col justify-between group shadow-2xs"
+                                                                className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/50 transition-all flex flex-col justify-between group shadow-2xs"
                                                             >
                                                                 <div className="flex items-start justify-between gap-2 mb-2">
                                                                     <div className="min-w-0">
@@ -947,7 +947,7 @@ export function ClassroomAnalytics({
                             <span className="text-xs text-zinc-500 font-medium mr-1 flex items-center gap-1">
                                 <FunnelIcon className="w-3.5 h-3.5" /> Filter:
                             </span>
-                            <div className="flex bg-white dark:bg-[#121217] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
+                            <div className="flex bg-white dark:bg-[#18181b] p-1.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
                                 <button
                                     onClick={() => setSelectedMasteryFilter('ALL')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
@@ -1146,17 +1146,17 @@ export function ClassroomAnalytics({
 
                                     <CardContent className="pt-3 space-y-3">
                                         {/* Risk Reason Banner */}
-                                        <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-700 dark:text-zinc-300">
+                                        <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-700 dark:text-zinc-300">
                                             <p className="font-semibold text-zinc-900 dark:text-white mb-0.5">Alert Trigger:</p>
                                             <p className="leading-snug text-zinc-600 dark:text-zinc-400">{reason}</p>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-2 text-xs">
-                                            <div className="p-2 rounded-lg bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/50 dark:border-zinc-800/50">
+                                            <div className="p-2 rounded-lg bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/50 dark:border-zinc-800/50">
                                                 <p className="text-[10px] text-zinc-500 font-semibold">Total Solved</p>
                                                 <p className="text-sm font-extrabold text-zinc-900 dark:text-white">{student.totalSolved ?? 0}</p>
                                             </div>
-                                            <div className="p-2 rounded-lg bg-zinc-50 dark:bg-[#16161f] border border-zinc-200/50 dark:border-zinc-800/50">
+                                            <div className="p-2 rounded-lg bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/50 dark:border-zinc-800/50">
                                                 <p className="text-[10px] text-zinc-500 font-semibold">Activity Status</p>
                                                 <p className={`text-sm font-extrabold ${student.activeThisWeek ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                                     {student.daysInactive !== undefined ? `${student.daysInactive}d Inactive` : student.activeThisWeek ? 'Active this wk' : 'Inactive'}
@@ -1347,7 +1347,7 @@ export function ClassroomAnalytics({
                                 value={assignmentTitle}
                                 onChange={(e) => setAssignmentTitle(e.target.value)}
                                 placeholder="e.g. Coin Change"
-                                className="h-9 text-xs rounded-xl bg-zinc-50 dark:bg-[#16161a] border-zinc-200 dark:border-zinc-800"
+                                className="h-9 text-xs rounded-xl bg-zinc-50 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800"
                             />
                         </div>
 
@@ -1376,7 +1376,7 @@ export function ClassroomAnalytics({
                                         }
                                     }}
                                     placeholder="e.g. coin-change or problem URL"
-                                    className="h-9 text-xs rounded-xl flex-1 bg-zinc-50 dark:bg-[#16161a] border-zinc-200 dark:border-zinc-800"
+                                    className="h-9 text-xs rounded-xl flex-1 bg-zinc-50 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800"
                                 />
                             </div>
                         </div>
@@ -1407,7 +1407,7 @@ export function ClassroomAnalytics({
                                     type="datetime-local"
                                     value={assignmentDeadline}
                                     onChange={(e) => setAssignmentDeadline(e.target.value)}
-                                    className="pl-9 h-9 text-xs rounded-xl bg-zinc-50 dark:bg-[#16161a] border-zinc-200 dark:border-zinc-800"
+                                    className="pl-9 h-9 text-xs rounded-xl bg-zinc-50 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800"
                                 />
                             </div>
                         </div>

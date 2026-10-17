@@ -250,7 +250,7 @@ export function AuthPage() {
   return (
       <div className="min-h-screen flex bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white font-sans selection:bg-[#5b4fff] selection:text-white relative transition-colors duration-200">
         {/* Left Panel - Visuals & Branding */}
-        <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-50 dark:bg-[#09090e] border-r border-zinc-200 dark:border-zinc-900 flex-col justify-center p-10 xl:p-16 transition-colors duration-200">
+        <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-50 dark:bg-[#0a0a0a] border-r border-zinc-200 dark:border-zinc-900 flex-col justify-center p-10 xl:p-16 transition-colors duration-200">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(91,79,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.04)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
           <div className="relative z-10 w-full max-w-lg mx-auto">
             <div className="flex items-center justify-between mb-8 xl:mb-12">
@@ -274,29 +274,29 @@ export function AuthPage() {
               Track, assign, and validate your students' LeetCode & Codeforces progress through an automated, data-rich dashboard.
             </p>
             <div className="grid grid-cols-2 gap-3 xl:gap-4">
-              <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
-                <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+              <div className="bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
+                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                   <Activity className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Live Tracking</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Real-time sync with LeetCode & Codeforces</p>
               </div>
-              <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
-                <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+              <div className="bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
+                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                   <AlertCircle className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Smart Assignments</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Automated validation & scoring</p>
               </div>
-              <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
-                <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+              <div className="bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
+                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                   <UsersIcon className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Leaderboards</h3>
                 <p className="text-[13px] text-zinc-500 leading-snug pr-2">Gamified cohort rankings</p>
               </div>
-              <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
-                <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
+              <div className="bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all shadow-sm">
+                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 border border-indigo-100 dark:border-[#5b4fff]/20 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                   <LayoutDashboard className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                 </div>
                 <h3 className="text-zinc-900 dark:text-white font-semibold text-[14px] mb-1 tracking-tight">Analytics</h3>
@@ -313,7 +313,7 @@ export function AuthPage() {
             <AmbientGlow variant="center" />
           </div>
 
-          <div className="w-full max-w-lg relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto">
+          <div className="w-full max-w-lg relative z-10 bg-white dark:bg-[#111111] p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto">
             {/* Mobile Header with Logo & Navigation */}
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60 lg:hidden">
               <BrandLogo size="sm" theme="auto" />
@@ -437,7 +437,7 @@ export function AuthPage() {
                               onChange={(e) => handleLeetcodeChange(e.target.value)}
                               onBlur={handleLeetcodeBlur}
                               onPaste={handleLeetcodePaste}
-                              className="bg-white dark:bg-[#141416] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-9 h-10 rounded-xl w-full transition-all text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
+                              className="bg-zinc-50 dark:bg-[#18181b] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-9 h-10 rounded-xl w-full transition-all text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
                           />
                         </div>
                         {isLeetCodeUrl(formData.leetcodeUsername) && (
@@ -467,7 +467,7 @@ export function AuthPage() {
                               onChange={(e) => handleCodeforcesChange(e.target.value)}
                               onBlur={handleCodeforcesBlur}
                               onPaste={handleCodeforcesPaste}
-                              className="bg-white dark:bg-[#141416] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-9 h-10 rounded-xl w-full transition-all text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
+                              className="bg-zinc-50 dark:bg-[#18181b] border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] pl-9 h-10 rounded-xl w-full transition-all text-sm hover:border-zinc-400 dark:hover:border-zinc-700"
                           />
                         </div>
                         {isCodeforcesUrl(formData.codeforcesHandle) && (

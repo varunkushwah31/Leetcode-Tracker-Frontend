@@ -135,7 +135,7 @@ function EmptyClassroomState({
     return (
         <div className="h-full flex items-center justify-center p-4 sm:p-8 my-auto">
             <div className="text-center max-w-xl w-full relative z-10 bg-white/95 dark:bg-[#111111]/85 backdrop-blur-2xl p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-xl dark:shadow-[0_8px_40px_rgb(0,0,0,0.5)]">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 dark:bg-[#1a1b2e] rounded-2xl mb-6 shadow-sm border border-[#5b4fff]/20">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 dark:bg-[#5b4fff]/10 rounded-2xl mb-6 shadow-sm border border-[#5b4fff]/20">
                     <BookOpenIcon className="w-8 h-8 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                 </div>
                 <h2 className="text-2xl sm:text-[28px] font-bold text-zinc-900 dark:text-white tracking-tight mb-3">
@@ -154,7 +154,7 @@ function EmptyClassroomState({
                                 <button
                                     key={c.classroomId}
                                     onClick={() => onSelectClassroom(c)}
-                                    className="p-4 bg-zinc-50 dark:bg-[#16161a] hover:bg-zinc-100 dark:hover:bg-[#1f2038] border border-zinc-200 dark:border-zinc-800 hover:border-[#5b4fff]/50 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between hover:-translate-y-0.5"
+                                    className="p-4 bg-zinc-50 dark:bg-[#18181b] hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 hover:border-[#5b4fff]/50 rounded-2xl text-left transition-all duration-200 group flex flex-col justify-between hover:-translate-y-0.5"
                                 >
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="font-semibold text-zinc-900 dark:text-white group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors truncate">
@@ -347,7 +347,7 @@ export function MentorDashboard() {
 
     if (isLoading && classrooms.length === 0) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#09090e] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
+            <div className="flex h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
                 <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
             </div>
         );
@@ -421,7 +421,7 @@ export function MentorDashboard() {
                             }}
                             className={`w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 flex justify-between items-center group ${
                                 selectedClassroom?.classroomId === c.classroomId && !showAdminOverview
-                                    ? 'bg-zinc-100 dark:bg-[#1a1b2e] border border-[#5b4fff]/40 text-[#5b4fff] dark:text-white font-medium shadow-sm ring-1 ring-[#5b4fff]/30'
+                                    ? 'bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 border border-[#5b4fff]/40 text-[#5b4fff] dark:text-white font-medium shadow-sm ring-1 ring-[#5b4fff]/30'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-white border border-transparent'
                             }`}
                         >
@@ -439,10 +439,10 @@ export function MentorDashboard() {
                 </div>
             </ScrollArea>
 
-            <div className="p-4 border-t border-zinc-200 dark:border-zinc-900 space-y-2 bg-white dark:bg-[#09090e]">
+            <div className="p-4 border-t border-zinc-200 dark:border-zinc-900 space-y-2 bg-white dark:bg-[#0a0a0a]">
                 <div className="flex items-center gap-3 px-3 py-2 mb-2">
                     <Avatar className="border border-zinc-200 dark:border-zinc-800 w-9 h-9">
-                        <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] font-bold">{(user?.name || 'ME').substring(0, 2).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] font-bold">{(user?.name || 'ME').substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate">{user?.name}</p>
@@ -492,7 +492,7 @@ export function MentorDashboard() {
     );
 
     return (
-        <div className="h-screen bg-[#f1f3f7] dark:bg-[#09090e] text-zinc-900 dark:text-white flex overflow-hidden selection:bg-[#5b4fff] selection:text-white">
+        <div className="h-screen bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white flex overflow-hidden selection:bg-[#5b4fff] selection:text-white">
             {/* Mobile Drawer Backdrop */}
             {mobileSidebarOpen && (
                 <div
@@ -503,7 +503,7 @@ export function MentorDashboard() {
             )}
 
             {/* Mobile Drawer */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-[#09090e] border-r border-zinc-200 dark:border-zinc-900 flex flex-col transition-transform duration-300 lg:hidden ${
+            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-[#0a0a0a] border-r border-zinc-200 dark:border-zinc-900 flex flex-col transition-transform duration-300 lg:hidden ${
                 mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
             }`}>
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(91,79,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.04)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
@@ -511,7 +511,7 @@ export function MentorDashboard() {
             </div>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-72 relative bg-white dark:bg-[#09090e] border-r border-zinc-200 dark:border-zinc-900 flex-col z-20 shrink-0">
+            <aside className="hidden lg:flex w-72 relative bg-white dark:bg-[#0a0a0a] border-r border-zinc-200 dark:border-zinc-900 flex-col z-20 shrink-0">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(91,79,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.04)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
                 {renderSidebarContent(false)}
             </aside>
@@ -602,7 +602,7 @@ export function MentorDashboard() {
                                             setError(null);
                                         }
                                     }}
-                                    className="bg-white dark:bg-[#1a1b2e] border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-800 dark:text-zinc-200 rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-[#5b4fff] focus:outline-none transition-colors cursor-pointer"
+                                    className="bg-white dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-800 dark:text-zinc-200 rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-[#5b4fff] focus:outline-none transition-colors cursor-pointer"
                                 >
                                     <option value="" disabled>Switch Classroom...</option>
                                     {classrooms.map(c => (
@@ -639,7 +639,7 @@ export function MentorDashboard() {
                                 }
                             />
                             <Avatar className="w-8 h-8 border border-zinc-200 dark:border-zinc-800">
-                                <AvatarFallback className="bg-zinc-100 dark:bg-[#1a1b2e] text-[#5b4fff] dark:text-[#968fff] text-xs font-bold">
+                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold">
                                     {(user?.name || 'ME').substring(0, 2).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
@@ -715,7 +715,7 @@ export function MentorDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-3 sm:flex bg-white dark:bg-[#121217] p-1.5 rounded-xl w-full sm:w-max mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
+                                <div className="grid grid-cols-3 sm:flex bg-white dark:bg-[#18181b] p-1.5 rounded-xl w-full sm:w-max mb-8 border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs gap-1">
                                     <button
                                         className={`px-2 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-[14px] font-medium rounded-lg transition-all duration-200 text-center justify-center shrink-0 ${activeTab === 'leaderboard' ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
                                         onClick={() => setActiveTab('leaderboard')}

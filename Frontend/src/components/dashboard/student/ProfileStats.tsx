@@ -132,9 +132,9 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                         {/* Avatar with pulsing glow */}
                         <div className="relative group shrink-0">
                             <div className="absolute inset-0 bg-[#5b4fff] rounded-full blur-2xl opacity-10 dark:opacity-20 group-hover:opacity-30 dark:group-hover:opacity-40 transition-opacity duration-700"></div>
-                            <Avatar className="w-20 h-20 sm:w-28 sm:h-28 border-[3px] border-white dark:border-[#1a1b2e] ring-4 ring-[#5b4fff]/10 dark:ring-[#5b4fff]/20 shadow-xl dark:shadow-2xl relative z-10">
+                            <Avatar className="w-20 h-20 sm:w-28 sm:h-28 border-[3px] border-white dark:border-zinc-800 ring-4 ring-[#5b4fff]/10 dark:ring-[#5b4fff]/20 shadow-xl dark:shadow-2xl relative z-10">
                                 <AvatarImage src={data.avatarUrl} className="object-cover" />
-                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-[#1a1b2e] dark:to-[#2a2b4e] text-[#5b4fff] dark:text-[#968fff] text-2xl sm:text-3xl font-bold">
+                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] dark:text-[#968fff] text-2xl sm:text-3xl font-bold">
                                     {data.name?.substring(0, 2) || 'ST'}
                                 </AvatarFallback>
                             </Avatar>
@@ -162,7 +162,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 mt-1">
                                         {/* LeetCode Pill */}
                                         {data.leetcodeUsername ? (
-                                            <div className="flex items-center gap-1.5 bg-amber-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-amber-500/20 dark:border-zinc-800 text-xs interactive-press">
+                                            <div className="flex items-center gap-1.5 bg-amber-500/10 dark:bg-zinc-900/60 px-2.5 py-1 rounded-md border border-amber-500/20 dark:border-zinc-800 text-xs interactive-press">
                                                 <span className="text-[#ffa116] font-semibold">LC:</span>
                                                 <span className="text-zinc-700 dark:text-zinc-300 font-medium">@{data.leetcodeUsername}</span>
                                                 <a
@@ -186,7 +186,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
 
                                         {/* Codeforces Pill */}
                                         {data.codeforcesHandle ? (
-                                            <div className="flex items-center gap-1.5 bg-cyan-500/10 dark:bg-[#1a1a1a] px-2.5 py-1 rounded-md border border-cyan-500/20 dark:border-zinc-800 text-xs interactive-press">
+                                            <div className="flex items-center gap-1.5 bg-cyan-500/10 dark:bg-zinc-900/60 px-2.5 py-1 rounded-md border border-cyan-500/20 dark:border-zinc-800 text-xs interactive-press">
                                                 <span className="text-cyan-600 dark:text-cyan-400 font-semibold">CF:</span>
                                                 <span className="text-zinc-700 dark:text-zinc-300 font-medium">@{data.codeforcesHandle}</span>
                                                 <a
@@ -210,7 +210,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     </div>
                                 </div>
 
-                                <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-[#1a1b2e]/60 border border-amber-500/20 dark:border-[#5b4fff]/20 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full self-center md:self-auto shadow-xs dark:shadow-none hover:scale-105 transition-transform duration-200 cursor-default">
+                                <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/20 dark:border-amber-500/20 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full self-center md:self-auto shadow-xs dark:shadow-none hover:scale-105 transition-transform duration-200 cursor-default">
                                     <FlameIcon className="w-4 h-4 text-orange-500 animate-flame" />
                                     <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white"><span className="text-orange-500 dark:text-orange-400 mr-1.5">{data.consistencyStreak || 0}</span>Day Combined Streak</span>
                                 </div>
@@ -320,7 +320,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 value={lcUsername}
                                 onChange={(e) => setLcUsername(e.target.value)}
                                 placeholder="neetcode123"
-                                className="bg-zinc-50 dark:bg-[#1a1a1a] border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white"
+                                className="bg-zinc-50 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white"
                             />
                         </div>
                         <div className="space-y-1.5">
@@ -330,7 +330,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 value={cfHandle}
                                 onChange={(e) => setCfHandle(e.target.value)}
                                 placeholder="tourist"
-                                className="bg-zinc-50 dark:bg-[#1a1a1a] border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white"
+                                className="bg-zinc-50 dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white"
                             />
                             <p className="text-xs text-zinc-500">
                                 Link either LeetCode, Codeforces, or both. You need at least one platform linked to your account.

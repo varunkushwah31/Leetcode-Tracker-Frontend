@@ -171,7 +171,7 @@ export function LandingPage() {
                         <button
                             type="button"
                             onClick={scrollToFeatures}
-                            className="w-full sm:w-auto bg-white dark:bg-[#0a0a0a] border border-zinc-300 dark:border-white/8 text-zinc-800 dark:text-white text-[15px] font-medium px-8 py-4 hover:bg-zinc-50 dark:hover:bg-[#111111] hover:border-zinc-400 dark:hover:border-white/15 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 hover:shadow-md interactive-press"
+                            className="w-full sm:w-auto bg-white dark:bg-[#0a0a0a] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-medium px-8 py-4 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 hover:shadow-md interactive-press"
                         >
                             Explore Features
                         </button>
@@ -187,27 +187,27 @@ export function LandingPage() {
                         <p className="text-zinc-600 dark:text-zinc-400 text-lg max-w-2xl mx-auto">A unified ecosystem where administrators track with ease and students thrive.</p>
                     </div>
 
-                    <div className="flex bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-1.5 rounded-2xl w-max mx-auto mb-10 border border-zinc-200/80 dark:border-white/5 shadow-md transition-all">
+                    <div className="flex bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-1.5 rounded-2xl w-max mx-auto mb-10 border border-zinc-200/90 dark:border-zinc-800/60 shadow-md transition-all">
                         <button
                             onClick={() => setActiveTab('mentor')}
-                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer interactive-press ${activeTab === 'mentor' ? 'bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-white/5 scale-[1.02]' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
+                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer interactive-press ${activeTab === 'mentor' ? 'bg-zinc-100 dark:bg-[#18181b] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-800/60 scale-[1.02]' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
                         >
                             For Mentors
                         </button>
                         <button
                             onClick={() => setActiveTab('student')}
-                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer interactive-press ${activeTab === 'student' ? 'bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-white/5 scale-[1.02]' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
+                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer interactive-press ${activeTab === 'student' ? 'bg-zinc-100 dark:bg-[#18181b] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-800/60 scale-[1.02]' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
                         >
                             For Students
                         </button>
                     </div>
 
-                    <div className="max-w-5xl mx-auto bg-white/90 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl border border-zinc-200/80 dark:border-white/5 rounded-3xl p-6 sm:p-12 min-h-95 shadow-xl overflow-hidden relative group/tab">
+                    <div className="max-w-5xl mx-auto bg-white/90 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-12 min-h-95 shadow-xl overflow-hidden relative group/tab">
                         <div className="absolute inset-0 bg-linear-to-b from-black/[0.01] dark:from-white/2 to-transparent pointer-events-none"></div>
                         {activeTab === 'mentor' ? (
                             <div className="grid md:grid-cols-2 gap-10 items-center animate-in fade-in slide-in-from-right-4 duration-500">
                                 <div>
-                                    <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl mb-6 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                    <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl mb-6 border border-indigo-100 dark:border-[#5b4fff]/20">
                                         <UsersIcon className="h-6 w-6 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                     </div>
                                     <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-zinc-900 dark:text-white">Manage Entire Cohorts</h3>
@@ -226,18 +226,18 @@ export function LandingPage() {
                                         </li>
                                     </ul>
                                 </div>
-                                <div className="bg-zinc-50 dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 relative overflow-hidden shadow-md">
+                                <div className="bg-zinc-50 dark:bg-[#111111]/85 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl p-6 relative overflow-hidden shadow-md">
                                     <div className="absolute top-0 right-0 w-37.5 h-37.5 bg-[#5b4fff]/15 blur-[60px] rounded-full pointer-events-none"></div>
                                     <div className="space-y-3 relative z-10 w-full">
-                                        <div className="flex justify-between items-center bg-white dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 shadow-xs">
+                                        <div className="flex justify-between items-center bg-white dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
                                             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Batch '24 Placement</span>
                                             <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">80 Students</span>
                                         </div>
-                                        <div className="flex justify-between items-center bg-white dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 shadow-xs">
+                                        <div className="flex justify-between items-center bg-white dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
                                             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">DSA Fast Track</span>
                                             <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">120 Students</span>
                                         </div>
-                                        <div className="flex justify-between items-center bg-white dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 opacity-40 shadow-xs">
+                                        <div className="flex justify-between items-center bg-white dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 opacity-40 shadow-xs">
                                             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">System Design</span>
                                             <span className="text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1 rounded-md font-semibold">Draft</span>
                                         </div>
@@ -246,7 +246,7 @@ export function LandingPage() {
                             </div>
                         ) : (
                             <div className="grid md:grid-cols-2 gap-10 items-center animate-in fade-in slide-in-from-left-4 duration-500">
-                                <div className="order-2 md:order-1 bg-zinc-50 dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-md">
+                                <div className="order-2 md:order-1 bg-zinc-50 dark:bg-[#111111]/85 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-md">
                                     <div className="absolute top-0 left-0 w-37.5 h-37.5 bg-emerald-500/10 blur-[60px] rounded-full pointer-events-none"></div>
                                     <div className="flex justify-between items-end mb-6 relative z-10">
                                         <div>
@@ -262,7 +262,7 @@ export function LandingPage() {
                                     </div>
                                 </div>
                                 <div className="order-1 md:order-2">
-                                    <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl mb-6 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                    <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl mb-6 border border-indigo-100 dark:border-[#5b4fff]/20">
                                         <TargetIcon className="h-6 w-6 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                     </div>
                                     <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-zinc-900 dark:text-white">Compete, Learn, Grow</h3>
@@ -300,9 +300,9 @@ export function LandingPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:auto-rows-[minmax(300px,auto)]">
-                        <div className="md:col-span-2 bg-white dark:bg-[#0c0c11] p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#101016]">
+                        <div className="md:col-span-2 bg-white dark:bg-[#111111]/85 p-8 sm:p-10 rounded-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-xl flex flex-col justify-end relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-white dark:hover:bg-[#18181b]">
                             <div className="absolute top-0 right-0 p-8 sm:p-10">
-                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
                                     <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                 </div>
                             </div>
@@ -316,26 +316,26 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-[#0c0c11] p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#101016]">
+                        <div className="bg-white dark:bg-[#111111]/85 p-8 rounded-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-white dark:hover:bg-[#18181b]">
                             {/* Ambient Purple Glow */}
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
 
                             {/* Top Icon */}
-                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
+                            <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
                                 <CheckCircleIcon className="h-7 w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                             </div>
 
                             {/* Sleek Abstract Verification Graphic */}
                             <div className="my-6 space-y-3 relative z-10 w-full">
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 shadow-xs">
+                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
                                     <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Solution Submission</span>
                                     <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Auto-Synced</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 shadow-xs">
+                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
                                     <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">LeetCode Status</span>
                                     <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Verified (100%)</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 opacity-40 shadow-xs">
+                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 opacity-40 shadow-xs">
                                     <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Plagiarism Check</span>
                                     <span className="text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1 rounded-md font-semibold">Draft</span>
                                 </div>
@@ -348,26 +348,26 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-[#0c0c11] p-8 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#101016]">
+                        <div className="bg-white dark:bg-[#111111]/85 p-8 rounded-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-white dark:hover:bg-[#18181b]">
                             {/* Ambient Purple Glow */}
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
 
                             {/* Top Icon */}
-                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
+                            <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
                                 <LayoutDashboard className="h-7 w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                             </div>
 
                             {/* Sleek Problem Set Graphic */}
                             <div className="my-6 space-y-3 relative z-10 w-full">
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 shadow-xs">
+                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
                                     <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Arrays & Two Pointers</span>
                                     <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Active Cohort</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 shadow-xs">
+                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
                                     <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Dynamic Programming</span>
                                     <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Next Week</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#141414] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/50 opacity-40 shadow-xs">
+                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 opacity-40 shadow-xs">
                                     <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Graphs & Trees</span>
                                     <span className="text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1 rounded-md font-semibold">Draft</span>
                                 </div>
@@ -380,23 +380,23 @@ export function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="md:col-span-2 bg-white dark:bg-[#0c0c11] p-8 sm:p-10 rounded-3xl border border-zinc-200/80 dark:border-white/5 shadow-xl flex flex-col justify-end gap-6 relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-white/10 hover:bg-white dark:hover:bg-[#101016]">
+                        <div className="md:col-span-2 bg-white dark:bg-[#111111]/85 p-8 sm:p-10 rounded-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-xl flex flex-col justify-end gap-6 relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-white dark:hover:bg-[#18181b]">
                             <div className="flex items-end gap-2 sm:gap-3 relative z-10 w-full h-28 sm:h-32 shrink-0 overflow-visible pt-5 opacity-70 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
-                                <div className="h-[40%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[60%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-75 group-hover:scale-y-110 origin-bottom"></div>
-                                <div className="h-[30%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-100 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[70%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-150 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[50%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-200 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[40%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[60%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-75 group-hover:scale-y-110 origin-bottom"></div>
+                                <div className="h-[30%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-100 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[70%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-150 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[50%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-200 group-hover:scale-y-105 origin-bottom"></div>
                                 <div className="h-[80%] min-h-8 flex-1 bg-[#5b4fff]/40 rounded-t-lg backdrop-blur-md transition-transform duration-300 delay-250 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[55%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-300 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[65%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#1a1a1a] border border-zinc-300/60 dark:border-zinc-800/50 rounded-t-lg transition-transform duration-300 delay-350 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[55%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-300 group-hover:scale-y-105 origin-bottom"></div>
+                                <div className="h-[65%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-350 group-hover:scale-y-105 origin-bottom"></div>
                                 <div className="h-full flex-1 bg-[#5b4fff] rounded-t-lg shadow-[0_0_30px_rgba(91,79,255,0.6)] relative transition-transform duration-300 delay-400 group-hover:scale-y-105 origin-bottom">
                                     <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white] animate-pulse"></div>
                                 </div>
                             </div>
 
                             <div className="relative z-10 w-full md:max-w-[75%] flex flex-col justify-end">
-                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
                                     <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                 </div>
                                 <h3 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight text-zinc-900 dark:text-white">Deep Analytics</h3>
@@ -409,7 +409,7 @@ export function LandingPage() {
                 </section>
             </main>
 
-            <footer className="relative w-full overflow-hidden flex flex-col items-center justify-end z-10 pt-20 pb-8 sm:pb-10 border-t border-zinc-200 dark:border-zinc-900 bg-zinc-100/90 dark:bg-[#050508]/80 backdrop-blur-sm transition-colors duration-200">
+            <footer className="relative w-full overflow-hidden flex flex-col items-center justify-end z-10 pt-20 pb-8 sm:pb-10 border-t border-zinc-200 dark:border-zinc-800/60 bg-zinc-100/90 dark:bg-[#080808]/90 backdrop-blur-sm transition-colors duration-200">
                 <div className="w-full max-w-7xl px-4 sm:px-6 flex flex-col md:flex-row justify-between items-start gap-12 mb-24 relative z-20 pointer-events-auto">
                     <div className="max-w-xs">
                         <div className="mb-6">

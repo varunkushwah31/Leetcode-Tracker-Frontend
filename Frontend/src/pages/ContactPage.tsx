@@ -39,7 +39,7 @@ export function ContactPage() {
         <div className="min-h-screen lg:h-screen overflow-y-auto lg:overflow-hidden flex flex-col lg:flex-row bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white font-sans selection:bg-[#5b4fff] selection:text-white transition-colors duration-200">
 
             {/* Left Panel - Visuals & Info */}
-            <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-50 dark:bg-[#09090e] border-r border-zinc-200 dark:border-zinc-900 flex-col justify-center p-10 xl:p-16 transition-colors duration-200">
+            <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-50 dark:bg-[#0a0a0a] border-r border-zinc-200 dark:border-zinc-900 flex-col justify-center p-10 xl:p-16 transition-colors duration-200">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(91,79,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.04)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none"></div>
 
                 <div className="relative z-10 w-full max-w-lg mx-auto">
@@ -66,8 +66,8 @@ export function ContactPage() {
                     </p>
 
                     <div className="grid gap-4">
-                        <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
-                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
+                        <div className="bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
+                            <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
                                 <Mail className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
                             <div>
@@ -75,8 +75,8 @@ export function ContactPage() {
                                 <p className="text-[13px] text-zinc-500 leading-snug">hello@mentorsync.in</p>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
-                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
+                        <div className="bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
+                            <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
                                 <PhoneIcon className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
                             <div>
@@ -84,8 +84,8 @@ export function ContactPage() {
                                 <p className="text-[13px] text-zinc-500 leading-snug">+91 98765 43210</p>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-[#111118] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#161622] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
-                            <div className="bg-indigo-50 dark:bg-[#1a1b2e] border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
+                        <div className="bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-zinc-800/90 p-4 xl:p-5 rounded-2xl hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all flex items-center gap-4 shadow-sm">
+                            <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 border border-indigo-100 dark:border-[#5b4fff]/20 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm dark:shadow-none">
                                 <MapPinIcon className="h-5 w-5 text-[#5b4fff] dark:text-[#968fff]" />
                             </div>
                             <div>
@@ -104,7 +104,7 @@ export function ContactPage() {
                     <AmbientGlow variant="center" />
                 </div>
 
-                <div className="w-full max-w-120 relative z-10 bg-white dark:bg-[#111116] p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto">
+                <div className="w-full max-w-120 relative z-10 bg-white dark:bg-[#111111] p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl my-auto">
 
                     <div className="lg:hidden flex items-center justify-between mb-5 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60">
                         <BrandLogo size="sm" theme="auto" />
@@ -157,7 +157,7 @@ export function ContactPage() {
                                         placeholder="John Doe"
                                         value={formData.name}
                                         onChange={(e) => { setFormData({...formData, name: e.target.value}); clearError(); }}
-                                        className="bg-zinc-50 dark:bg-[#18181c] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
+                                        className="bg-zinc-50 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -168,7 +168,7 @@ export function ContactPage() {
                                         placeholder="john@example.com"
                                         value={formData.email}
                                         onChange={(e) => { setFormData({...formData, email: e.target.value}); clearError(); }}
-                                        className="bg-zinc-50 dark:bg-[#18181c] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
+                                        className="bg-zinc-50 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
                                     />
                                 </div>
                             </div>
@@ -180,7 +180,7 @@ export function ContactPage() {
                                     placeholder="How can we help you?"
                                     value={formData.subject}
                                     onChange={(e) => { setFormData({...formData, subject: e.target.value}); clearError(); }}
-                                    className="bg-zinc-50 dark:bg-[#18181c] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
+                                    className="bg-zinc-50 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#5b4fff] h-11 sm:h-12 rounded-xl w-full transition-all px-4 text-sm"
                                 />
                             </div>
 
@@ -191,7 +191,7 @@ export function ContactPage() {
                                     placeholder="Tell us more about your inquiry..."
                                     value={formData.message}
                                     onChange={(e) => { setFormData({...formData, message: e.target.value}); clearError(); }}
-                                    className="flex min-h-32 sm:min-h-35 w-full rounded-xl bg-zinc-50 dark:bg-[#18181c] border border-zinc-200 dark:border-zinc-800 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5b4fff] disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-y custom-scrollbar"
+                                    className="flex min-h-32 sm:min-h-35 w-full rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5b4fff] disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-y custom-scrollbar"
                                 />
                             </div>
 
@@ -216,9 +216,9 @@ export function ContactPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             <a
                                 href="mailto:hello@mentorsync.in"
-                                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-[#18181c] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 transition-colors"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 transition-colors"
                             >
-                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+                                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
                                     <Mail className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                                 </div>
                                 <div className="min-w-0">
@@ -228,9 +228,9 @@ export function ContactPage() {
                             </a>
                             <a
                                 href="tel:+919876543210"
-                                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-[#18181c] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 transition-colors"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 transition-colors"
                             >
-                                <div className="bg-indigo-50 dark:bg-[#1a1b2e] w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+                                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
                                     <PhoneIcon className="h-4 w-4 text-[#5b4fff] dark:text-[#968fff]" />
                                 </div>
                                 <div className="min-w-0">
