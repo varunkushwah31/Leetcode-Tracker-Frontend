@@ -454,7 +454,14 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-200/80 dark:divide-zinc-800/60">
-                        {sortedAndFilteredStudents?.map((student, index) => (
+                        {sortedAndFilteredStudents?.map((student, index) => {
+                            const lcSolved = student.leetcodeSolvedCount ?? Math.max(0, (student.totalSolved || 0) - (student.codeforcesSolvedCount || 0));
+                            const cfSolved = student.codeforcesSolvedCount ?? 0;
+                            const lcRating = Math.round(student.currentContestRating || student.contestRating || 0);
+                            const cfRating = (student.codeforcesRating && student.codeforcesRating > 0) ? student.codeforcesRating : 0;
+                            const maxRating = Math.max(lcRating, cfRating);
+
+                            return (
                             <tr key={student.id} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer group" onClick={() => onStudentClick(student.leetcodeUsername || student.codeforcesHandle || student.id || '')}>
                                 <td className="py-3 px-1.5 sm:py-4 sm:px-6 w-10 sm:w-auto">
                                     <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full font-bold text-xs sm:text-sm mx-auto transition-transform duration-200 group-hover:scale-115 ${getRankBadgeClass(index)}`}>
@@ -482,10 +489,16 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                             <div className="flex sm:hidden flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 pt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
                                                 <span className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
                                                     <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold">Solved:</span> {student.totalSolved || 0}
+                                                    <span className="text-[10px] text-zinc-500 font-normal">
+                                                        (LC: {lcSolved} • CF: {cfSolved})
+                                                    </span>
                                                 </span>
                                                 <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                                                <span className="font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                                                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold">Rating:</span> {Math.round(Math.max(student.currentContestRating ?? 0, student.codeforcesRating ?? 0)) || '—'}
+                                                <span className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
+                                                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold">Rating:</span>
+                                                    <span className="text-[10px] text-zinc-500 font-normal">
+                                                        LC: {lcRating > 0 ? lcRating : 'Unrated'} • CF: {cfRating > 0 ? cfRating : 'Unrated'}
+                                                    </span>
                                                 </span>
                                                 {Boolean(student.consistencyStreak && student.consistencyStreak > 0) && (
                                                     <>
@@ -508,33 +521,25 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 </td>
                                 <td className="hidden sm:table-cell py-3 px-3 sm:py-4 sm:px-6 text-center">
                                     <span className="font-bold text-zinc-800 dark:text-zinc-200 text-base">{student.totalSolved || 0}</span>
-                                    {Boolean(student.codeforcesSolvedCount && student.codeforcesSolvedCount > 0) && (
-                                        <div className="text-[10px] text-zinc-500 font-medium">
-                                            LC: {student.leetcodeSolvedCount ?? ((student.totalSolved || 0) - (student.codeforcesSolvedCount || 0))} • CF: {student.codeforcesSolvedCount}
-                                        </div>
-                                    )}
+                                    <div className="text-[10px] text-zinc-500 font-medium">
+                                        LC: {lcSolved} • CF: {cfSolved}
+                                    </div>
                                 </td>
                                 <td className="hidden sm:table-cell py-3 px-3 sm:py-4 sm:px-6 text-center">
-                                    {(student.currentContestRating ?? 0) > 0 || ((student.codeforcesRating ?? 0) > 0) ? (
-                                        <div className="flex flex-col items-center">
-                                            <span className="font-bold text-zinc-800 dark:text-zinc-200 text-sm">
-                                                {Math.round(Math.max(student.currentContestRating ?? 0, student.codeforcesRating ?? 0)).toLocaleString()}
+                                    <div className="flex flex-col items-center">
+                                        <span className="font-bold text-zinc-800 dark:text-zinc-200 text-sm">
+                                            {maxRating > 0 ? maxRating.toLocaleString() : 'Unrated'}
+                                        </span>
+                                        <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-medium mt-0.5">
+                                            <span className={lcRating > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-600'}>
+                                                LC: {lcRating > 0 ? lcRating : 'Unrated'}
                                             </span>
-                                            <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-medium mt-0.5">
-                                                {(student.currentContestRating ?? 0) > 0 && (
-                                                    <span>LC: {Math.round(student.currentContestRating ?? 0)}</span>
-                                                )}
-                                                {Boolean((student.currentContestRating ?? 0) > 0 && (student.codeforcesRating ?? 0) > 0) && (
-                                                    <span>•</span>
-                                                )}
-                                                {Boolean((student.codeforcesRating ?? 0) > 0) && (
-                                                    <span className="text-blue-600 dark:text-blue-400">CF: {student.codeforcesRating}</span>
-                                                )}
-                                            </div>
+                                            <span>•</span>
+                                            <span className={cfRating > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-400 dark:text-zinc-600'}>
+                                                CF: {cfRating > 0 ? cfRating : 'Unrated'}
+                                            </span>
                                         </div>
-                                    ) : (
-                                        <span className="text-xs text-zinc-400 dark:text-zinc-600 italic">Unrated</span>
-                                    )}
+                                    </div>
                                 </td>
                                 <td className="py-3 px-2 sm:py-4 sm:px-6">
                                     <div className="flex flex-col items-end gap-1 sm:gap-1.5 shrink-0">
@@ -594,7 +599,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                     </div>
                                 </td>
                             </tr>
-                        ))}
+                        );})}
                         {(!sortedAndFilteredStudents || sortedAndFilteredStudents.length === 0) && (
                             <tr><td colSpan={6} className="py-16 text-center text-zinc-500 text-[15px]">No students found matching your criteria.</td></tr>
                         )}
