@@ -281,7 +281,7 @@ export function LandingPage() {
 
                     <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 text-balance text-zinc-900 dark:text-white">
                         The Engineering OS for <br />
-                        <span className="text-[#5b4fff] dark:text-[#968fff]">Coding Bootcamps & Cohorts.</span>
+                        <span className="text-[#5b4fff] dark:text-[#968fff]">Coding Bootcamps & Cohorts</span>
                     </h1>
 
                     <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed font-normal">
@@ -743,14 +743,14 @@ export function LandingPage() {
                                     </div>
                                 </div>
 
-                                <div className="sm:col-span-2 p-5 rounded-2xl bg-zinc-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-800">
+                                <div className="sm:col-span-2 p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-200/80 dark:border-zinc-800">
                                     <div>
-                                        <p className="text-xs font-bold uppercase text-zinc-400">Combined Dual Platform Metric</p>
-                                        <p className="text-2xl font-extrabold text-white">660 Total Unique Problems Solved</p>
+                                        <p className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">Combined Dual Platform Metric</p>
+                                        <p className="text-2xl font-extrabold text-zinc-900 dark:text-white">660 Total Unique Problems Solved</p>
                                     </div>
-                                    <div className="flex items-center gap-2 bg-zinc-800/80 px-3 py-2 rounded-xl border border-zinc-700 text-xs">
+                                    <div className="flex items-center gap-2 bg-white dark:bg-zinc-800/80 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs shadow-xs">
                                         <FireIcon className="w-4 h-4 text-amber-500" weight="fill" />
-                                        <span>64 Days Active Streak</span>
+                                        <span className="font-semibold text-zinc-800 dark:text-zinc-200">64 Days Active Streak</span>
                                     </div>
                                 </div>
                             </div>
@@ -930,13 +930,13 @@ export function LandingPage() {
                 </section>
 
                 {/* PRE-FOOTER CALL TO ACTION */}
-                <section className="w-full max-w-5xl mx-auto rounded-3xl bg-linear-to-b from-zinc-900 to-zinc-950 dark:from-[#141418] dark:to-[#0a0a0c] text-white p-8 sm:p-14 text-center border border-zinc-800 shadow-2xl relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.22),transparent)] pointer-events-none" />
+                <section className="w-full max-w-5xl mx-auto rounded-3xl bg-white dark:bg-linear-to-b dark:from-[#141418] dark:to-[#0a0a0c] text-zinc-900 dark:text-white p-8 sm:p-14 text-center border border-zinc-200/90 dark:border-zinc-800 shadow-2xl relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.08),transparent)] dark:bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.22),transparent)] pointer-events-none" />
                     <div className="relative z-10">
                         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-balance">
                             Ready to Streamline Your Coding Cohorts?
                         </h2>
-                        <p className="text-zinc-300 text-base sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+                        <p className="text-zinc-600 dark:text-zinc-300 text-base sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
                             Join educators and competitive programmers using MentorSync to automate submission verification and track growth natively.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -948,7 +948,7 @@ export function LandingPage() {
                             </Link>
                             <Link 
                                 to="/how-to-use"
-                                className="w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white border border-white/20 text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all min-h-[48px] flex items-center justify-center interactive-press"
+                                className="w-full sm:w-auto bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-800 dark:text-white border border-zinc-300 dark:border-white/20 text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all min-h-[48px] flex items-center justify-center interactive-press"
                             >
                                 Read Documentation
                             </Link>
