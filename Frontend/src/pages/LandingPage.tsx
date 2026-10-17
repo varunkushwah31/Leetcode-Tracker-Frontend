@@ -16,7 +16,6 @@ import {
     BrainIcon,
     ArrowUpRightIcon
 } from '@phosphor-icons/react';
-import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 
@@ -157,9 +156,6 @@ export function LandingPage() {
             {/* Background Base matching Signup / Signin */}
             <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-200 pointer-events-none" aria-hidden="true">
                 <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed pointer-events-none" />
-                <div className="hidden dark:block">
-                    <AmbientGlow />
-                </div>
             </div>
 
             {/* Mobile Backdrop */}
