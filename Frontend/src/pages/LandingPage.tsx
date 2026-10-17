@@ -496,53 +496,57 @@ export function LandingPage() {
                 <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-12 sm:mb-16">
                     
                     {/* Live Tech Badge */}
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-200/80 dark:border-indigo-500/30 bg-indigo-50/90 dark:bg-indigo-950/40 backdrop-blur-md mb-6 shadow-xs">
-                        <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-200/80 dark:border-indigo-500/30 bg-indigo-50/90 dark:bg-indigo-950/40 backdrop-blur-md mb-6 shadow-xs animate-fade-slide-up">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                        </span>
                         <span className="text-xs font-bold tracking-wider text-indigo-700 dark:text-indigo-300 uppercase">
                             Dual-Platform Engine • LeetCode & Codeforces
                         </span>
                     </div>
 
-                    <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 text-balance text-zinc-900 dark:text-white">
+                    <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 text-balance text-zinc-900 dark:text-white animate-fade-slide-up [animation-delay:100ms]">
                         The Engineering OS for <br />
                         <span className="text-[#5b4fff] dark:text-[#968fff]">Coding Bootcamps & Cohorts</span>
                     </h1>
 
-                    <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed font-normal">
+                    <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed font-normal animate-fade-slide-up [animation-delay:200ms]">
                         Automate submission verification, monitor dual-platform contest ratings, and track live student leaderboards across LeetCode and Codeforces without manual spreadsheets.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-6">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-6 animate-fade-slide-up [animation-delay:300ms]">
                         <Link 
                             to="/login" 
-                            className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_28px_rgba(91,79,255,0.35)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] min-h-[48px] shimmer-sweep interactive-press"
+                            className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_28px_rgba(91,79,255,0.35)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] min-h-[48px] shimmer-sweep interactive-press group"
                         >
-                            Start Free Cohort <ChevronRight className="w-4 h-4" />
+                            <span>Start Free Cohort</span>
+                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
 
                         <button
                             type="button"
                             onClick={() => scrollToSection('app-canvas')}
-                            className="w-full sm:w-auto bg-white dark:bg-[#111111] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-semibold px-8 py-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 min-h-[48px] interactive-press"
+                            className="w-full sm:w-auto bg-white dark:bg-[#111116] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-semibold px-8 py-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 min-h-[48px] interactive-press"
                         >
                             View Live Sandbox
                         </button>
                     </div>
 
                     {/* Trust and Velocity Strip */}
-                    <div className="flex flex-wrap items-center justify-center gap-y-2.5 gap-x-6 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                        <div className="flex items-center gap-2">
-                            <LightningIcon className="w-4 h-4 text-amber-500 shrink-0" weight="fill" />
+                    <div className="flex flex-wrap items-center justify-center gap-y-2.5 gap-x-6 text-xs font-medium text-zinc-500 dark:text-zinc-400 animate-fade-slide-up [animation-delay:400ms]">
+                        <div className="flex items-center gap-2 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-default group">
+                            <LightningIcon className="w-4 h-4 text-amber-500 shrink-0 group-hover:scale-110 transition-transform" weight="fill" />
                             <span>Sub-minute background polling</span>
                         </div>
                         <div className="hidden sm:inline-block w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                        <div className="flex items-center gap-2">
-                            <ShieldCheckIcon className="w-4 h-4 text-emerald-500 shrink-0" weight="bold" />
+                        <div className="flex items-center gap-2 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-default group">
+                            <ShieldCheckIcon className="w-4 h-4 text-emerald-500 shrink-0 group-hover:scale-110 transition-transform" weight="bold" />
                             <span>Zero student credentials required</span>
                         </div>
                         <div className="hidden sm:inline-block w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                        <div className="flex items-center gap-2">
-                            <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0" weight="fill" />
+                        <div className="flex items-center gap-2 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-default group">
+                            <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 group-hover:scale-110 transition-transform" weight="fill" />
                             <span>Free for bootcamps & universities</span>
                         </div>
                     </div>
@@ -650,7 +654,7 @@ export function LandingPage() {
                                 
                                 {/* TAB 1: COHORT LEADERBOARD */}
                                 {canvasTab === 'leaderboard' && (
-                                    <div className="space-y-4">
+                                    <div key="leaderboard" className="animate-tab-enter space-y-4">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                                             <div>
                                                 <h3 className="text-base font-bold text-zinc-900 dark:text-white">Active Cohort Standings</h3>
@@ -690,7 +694,7 @@ export function LandingPage() {
                                                 <button
                                                     type="button"
                                                     onClick={() => setLeaderboardSort('total')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
                                                         leaderboardSort === 'total' 
                                                             ? 'bg-[#5b4fff] text-white shadow-xs' 
                                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
@@ -701,7 +705,7 @@ export function LandingPage() {
                                                 <button
                                                     type="button"
                                                     onClick={() => setLeaderboardSort('lc')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
                                                         leaderboardSort === 'lc' 
                                                             ? 'bg-[#ffa116] text-white shadow-xs' 
                                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
@@ -712,7 +716,7 @@ export function LandingPage() {
                                                 <button
                                                     type="button"
                                                     onClick={() => setLeaderboardSort('cf')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
                                                         leaderboardSort === 'cf' 
                                                             ? 'bg-sky-500 text-white shadow-xs' 
                                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
@@ -723,7 +727,7 @@ export function LandingPage() {
                                                 <button
                                                     type="button"
                                                     onClick={() => setLeaderboardSort('streak')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
                                                         leaderboardSort === 'streak' 
                                                             ? 'bg-amber-500 text-white shadow-xs' 
                                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
@@ -741,18 +745,18 @@ export function LandingPage() {
                                                     <div 
                                                         key={student.id} 
                                                         onClick={() => handleSelectStudentForProfile(student.id)}
-                                                        className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-[#1c1c24]/50 transition-colors cursor-pointer group"
+                                                        className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-[#1c1c24]/50 transition-all duration-200 cursor-pointer group"
                                                         title="Click to view detailed profile"
                                                     >
                                                         <div className="flex items-center gap-3 min-w-0">
-                                                            <span className={`w-5 text-center font-bold text-xs ${idx === 0 ? 'text-amber-500' : 'text-zinc-400'}`}>
+                                                            <span className={`w-5 text-center font-bold text-xs transition-transform group-hover:scale-110 ${idx === 0 ? 'text-amber-500' : 'text-zinc-400'}`}>
                                                                 #{idx + 1}
                                                             </span>
-                                                            <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center shrink-0 group-hover:bg-[#5b4fff] group-hover:text-white transition-colors">
+                                                            <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-[#5b4fff] group-hover:text-white transition-all duration-200">
                                                                 {student.name.substring(0, 2).toUpperCase()}
                                                             </div>
                                                             <div className="min-w-0">
-                                                                <p className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] transition-colors">{student.name}</p>
+                                                                <p className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] group-hover:translate-x-0.5 transition-all duration-200">{student.name}</p>
                                                                 <p className="text-[11px] text-zinc-500">@{student.handle}</p>
                                                             </div>
                                                         </div>
@@ -768,10 +772,10 @@ export function LandingPage() {
                                                                 CF {student.cfRating} ({student.cfRank})
                                                             </span>
                                                             <span className="flex items-center gap-1 font-semibold text-amber-500 text-[11px]">
-                                                                <FireIcon className="w-3.5 h-3.5" weight="fill" />
+                                                                <FireIcon className="w-3.5 h-3.5 animate-flame" weight="fill" />
                                                                 {student.streak}d
                                                             </span>
-                                                            <span className="text-[11px] font-semibold text-[#5b4fff] opacity-0 group-hover:opacity-100 transition-opacity hidden md:inline">
+                                                            <span className="text-[11px] font-semibold text-[#5b4fff] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 hidden md:inline">
                                                                 View Profile &rarr;
                                                             </span>
                                                         </div>
@@ -795,7 +799,7 @@ export function LandingPage() {
 
                                 {/* TAB 2: STUDENT PROFILE VIEW */}
                                 {canvasTab === 'profile' && (
-                                    <div className="space-y-4">
+                                    <div key={`profile-${selectedStudentId}`} className="animate-tab-enter space-y-4">
                                         
                                         {/* Dynamic Student Selector Pills */}
                                         <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
@@ -806,7 +810,7 @@ export function LandingPage() {
                                                         key={student.id}
                                                         type="button"
                                                         onClick={() => setSelectedStudentId(student.id)}
-                                                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+                                                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all duration-150 ${
                                                             selectedStudentId === student.id
                                                                 ? 'bg-[#5b4fff] text-white shadow-xs'
                                                                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
@@ -825,7 +829,7 @@ export function LandingPage() {
 
                                         {/* Active Student Header Bar */}
                                         <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
-                                            <div className={`w-11 h-11 rounded-xl ${activeStudentProfile.avatarBg} text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-xs`}>
+                                            <div className={`w-11 h-11 rounded-xl ${activeStudentProfile.avatarBg} text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-xs hover:rotate-6 transition-transform duration-300`}>
                                                 {activeStudentProfile.initials}
                                             </div>
                                             <div className="min-w-0 flex-1">
@@ -837,14 +841,14 @@ export function LandingPage() {
                                                 </p>
                                             </div>
                                             <div className="hidden sm:flex items-center gap-2 bg-amber-500/10 text-amber-500 border border-amber-500/20 px-3 py-1.5 rounded-xl text-xs font-bold">
-                                                <FireIcon className="w-4 h-4" weight="fill" />
+                                                <FireIcon className="w-4 h-4 animate-flame" weight="fill" />
                                                 <span>{activeStudentProfile.streak} Day Streak</span>
                                             </div>
                                         </div>
 
                                         {/* Solved Distribution & Stats */}
                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
+                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
                                                 <div className="flex justify-between items-center text-[11px]">
                                                     <span className="font-semibold text-zinc-500">Solved Distribution</span>
                                                     <span className="text-emerald-500 font-bold">{activeStudentProfile.easySolved + activeStudentProfile.mediumSolved + activeStudentProfile.hardSolved} Total</span>
@@ -854,17 +858,17 @@ export function LandingPage() {
                                                 </p>
                                                 <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full mt-2.5 overflow-hidden flex">
                                                     <div 
-                                                        className="bg-emerald-500 h-full" 
+                                                        className="bg-emerald-500 h-full transition-all duration-700 ease-out" 
                                                         style={{ width: `${(activeStudentProfile.easySolved / activeStudentProfile.totalSolved) * 100}%` }}
                                                         title={`Easy: ${activeStudentProfile.easySolved}`} 
                                                     />
                                                     <div 
-                                                        className="bg-amber-500 h-full" 
+                                                        className="bg-amber-500 h-full transition-all duration-700 ease-out" 
                                                         style={{ width: `${(activeStudentProfile.mediumSolved / activeStudentProfile.totalSolved) * 100}%` }}
                                                         title={`Medium: ${activeStudentProfile.mediumSolved}`} 
                                                     />
                                                     <div 
-                                                        className="bg-rose-500 h-full" 
+                                                        className="bg-rose-500 h-full transition-all duration-700 ease-out" 
                                                         style={{ width: `${(activeStudentProfile.hardSolved / activeStudentProfile.totalSolved) * 100}%` }}
                                                         title={`Hard: ${activeStudentProfile.hardSolved}`} 
                                                     />
@@ -876,13 +880,13 @@ export function LandingPage() {
                                                 </div>
                                             </div>
 
-                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
+                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
                                                 <p className="text-[11px] font-semibold text-zinc-500">LeetCode Contest</p>
                                                 <p className="text-xl font-bold text-[#ffa116] mt-1">{activeStudentProfile.lcRating.toLocaleString()}</p>
                                                 <p className="text-[11px] text-zinc-400 mt-0.5">{activeStudentProfile.lcPercentile} • {activeStudentProfile.lcRank} Rank</p>
                                             </div>
 
-                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
+                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
                                                 <p className="text-[11px] font-semibold text-zinc-500">Codeforces Rating</p>
                                                 <p className="text-xl font-bold text-sky-500 mt-1">{activeStudentProfile.cfRating.toLocaleString()}</p>
                                                 <p className="text-[11px] text-zinc-400 mt-0.5">{activeStudentProfile.cfRank} • {activeStudentProfile.cfDivision}</p>
@@ -903,8 +907,8 @@ export function LandingPage() {
                                                 {activeStudentProfile.heatmapDensity.map((density, i) => (
                                                     <div 
                                                         key={i} 
-                                                        className={`h-4 rounded-[3px] transition-colors ${
-                                                            density === 3 ? 'bg-emerald-500' :
+                                                        className={`h-4 rounded-[3px] hover:scale-135 hover:z-10 transition-transform duration-150 cursor-pointer relative ${
+                                                            density === 3 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' :
                                                             density === 2 ? 'bg-emerald-600/70' :
                                                             density === 1 ? 'bg-emerald-700/40' :
                                                             'bg-zinc-200 dark:bg-zinc-800'
@@ -919,7 +923,7 @@ export function LandingPage() {
 
                                 {/* TAB 3: CLASSROOM ANALYTICS */}
                                 {canvasTab === 'analytics' && (
-                                    <div className="space-y-4">
+                                    <div key="analytics" className="animate-tab-enter space-y-4">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                                             <div>
                                                 <h3 className="text-base font-bold text-zinc-900 dark:text-white">Cohort Topic Competency Matrix</h3>
@@ -930,10 +934,10 @@ export function LandingPage() {
                                                 <button
                                                     type="button"
                                                     onClick={() => setTopicFilter('all')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
                                                         topicFilter === 'all'
                                                             ? 'bg-[#5b4fff] text-white shadow-xs'
-                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                                                     }`}
                                                 >
                                                     All Topics ({COHORT_TOPICS.length})
@@ -941,10 +945,10 @@ export function LandingPage() {
                                                 <button
                                                     type="button"
                                                     onClick={() => setTopicFilter('weaknesses')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
                                                         topicFilter === 'weaknesses'
                                                             ? 'bg-rose-500 text-white shadow-xs'
-                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                                                     }`}
                                                 >
                                                     Weaknesses Only (&lt;60%)
@@ -967,10 +971,10 @@ export function LandingPage() {
                                                 type="button"
                                                 onClick={handleDispatchRemedial}
                                                 disabled={dispatchSuccess}
-                                                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
+                                                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 hover:-translate-y-0.5 active:scale-95 duration-150 ${
                                                     dispatchSuccess
-                                                        ? 'bg-emerald-600 text-white'
-                                                        : 'bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs'
+                                                        ? 'bg-emerald-600 text-white shadow-md animate-scale-bounce'
+                                                        : 'bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs hover:shadow-md'
                                                 }`}
                                             >
                                                 {dispatchSuccess ? (
@@ -990,7 +994,7 @@ export function LandingPage() {
                                         {/* Topic Competency Bars */}
                                         <div className="space-y-3">
                                             {filteredTopics.map(topic => (
-                                                <div key={topic.id} className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
+                                                <div key={topic.id} className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
                                                     <div className="flex justify-between items-center text-xs mb-1.5">
                                                         <span className="font-bold text-zinc-900 dark:text-white">{topic.name}</span>
                                                         <span className={`font-bold text-[11px] px-2 py-0.5 rounded border ${topic.statusClass}`}>
@@ -999,7 +1003,7 @@ export function LandingPage() {
                                                     </div>
                                                     <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
                                                         <div 
-                                                            className={`h-full ${topic.barClass}`}
+                                                            className={`h-full ${topic.barClass} transition-all duration-700 ease-out`}
                                                             style={{ width: `${topic.percentage}%` }}
                                                         />
                                                     </div>
@@ -1053,7 +1057,7 @@ export function LandingPage() {
 
                         {/* Interactive Verification Terminal Card */}
                         <div className="lg:col-span-7">
-                            <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl">
+                            <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl interactive-card">
                                 <div className="flex items-center justify-between pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-5">
                                     <div>
                                         <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Interactive Submission Tester</p>
@@ -1071,9 +1075,9 @@ export function LandingPage() {
                                             key={ver.id}
                                             type="button"
                                             onClick={() => setSelectedVerification(ver.id)}
-                                            className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                                            className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer hover:-translate-y-0.5 active:scale-95 duration-150 ${
                                                 selectedVerification === ver.id
-                                                    ? 'bg-[#5b4fff]/10 border-[#5b4fff]'
+                                                    ? 'bg-[#5b4fff]/10 border-[#5b4fff] shadow-xs ring-1 ring-[#5b4fff]/40'
                                                     : 'bg-zinc-50 dark:bg-[#181820] border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                                             }`}
                                         >
@@ -1095,21 +1099,21 @@ export function LandingPage() {
                                         type="button"
                                         onClick={handleRunVerificationSim}
                                         disabled={isVerifyingSim}
-                                        className="px-3 py-1.5 rounded-lg bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-60"
+                                        className="px-3.5 py-1.5 rounded-lg bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-60 hover:-translate-y-0.5 active:scale-95 duration-150 shadow-xs hover:shadow-md group"
                                     >
-                                        <ArrowsClockwiseIcon className={`w-3.5 h-3.5 ${isVerifyingSim ? 'animate-spin' : ''}`} weight="bold" />
+                                        <ArrowsClockwiseIcon className={`w-3.5 h-3.5 ${isVerifyingSim ? 'animate-spin' : 'group-hover:rotate-90 transition-transform duration-300'}`} weight="bold" />
                                         <span>{isVerifyingSim ? 'Checking...' : 'Run Test'}</span>
                                     </button>
                                 </div>
 
                                 {/* Terminal Console Output */}
-                                <div className="p-4 rounded-2xl bg-zinc-950 font-mono text-xs text-emerald-400 border border-zinc-800 space-y-2">
+                                <div className="p-4 rounded-2xl bg-zinc-950 font-mono text-xs text-emerald-400 border border-zinc-800 space-y-2 relative overflow-hidden">
                                     <div className="flex items-center justify-between text-zinc-500 pb-2 border-b border-zinc-800/80">
                                         <span className="flex items-center gap-1.5">
                                             <TerminalIcon className="w-4 h-4 text-emerald-400" />
                                             Live Verification Stream
                                         </span>
-                                        <span className="text-emerald-400 font-bold">
+                                        <span className={`text-emerald-400 font-bold ${isVerifyingSim ? 'animate-pulse' : 'animate-scale-bounce'}`}>
                                             {isVerifyingSim ? 'PARSING AST...' : '200 OK (8ms)'}
                                         </span>
                                     </div>
@@ -1127,6 +1131,7 @@ export function LandingPage() {
                                     </p>
                                     <p className="text-emerald-400/80">
                                         &gt; Assignment Verified: Week 4 DSA Sprint (+10 pts awarded)
+                                        <span className="inline-block w-2 h-3.5 bg-emerald-400 animate-live-cursor ml-1.5 align-middle" />
                                     </p>
                                 </div>
                             </div>
@@ -1141,7 +1146,7 @@ export function LandingPage() {
                         {/* Dual Platform Visual Card */}
                         <div className="lg:col-span-7 order-2 lg:order-1">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-6 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg space-y-4">
+                                <div className="p-6 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg space-y-4 interactive-card group">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <span className="w-3 h-3 rounded-full bg-[#ffa116]" />
@@ -1150,7 +1155,7 @@ export function LandingPage() {
                                         <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] text-[11px] font-bold">Knight 1890</span>
                                     </div>
                                     <div>
-                                        <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">420 Solved</p>
+                                        <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight group-hover:text-[#ffa116] transition-colors">420 Solved</p>
                                         <p className="text-xs text-zinc-500 mt-0.5">Top 4.8% Global Contest Rating</p>
                                     </div>
                                     <div className="space-y-1.5 text-xs pt-2 border-t border-zinc-200/80 dark:border-zinc-800/80">
@@ -1162,7 +1167,7 @@ export function LandingPage() {
                                     </div>
                                 </div>
 
-                                <div className="p-6 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg space-y-4">
+                                <div className="p-6 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg space-y-4 interactive-card group">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <span className="w-3 h-3 rounded-full bg-sky-500" />
@@ -1171,7 +1176,7 @@ export function LandingPage() {
                                         <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 text-[11px] font-bold">Specialist 1510</span>
                                     </div>
                                     <div>
-                                        <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">240 Solved</p>
+                                        <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight group-hover:text-sky-500 transition-colors">240 Solved</p>
                                         <p className="text-xs text-zinc-500 mt-0.5">Rated for Div. 2 Competitions</p>
                                     </div>
                                     <div className="space-y-1.5 text-xs pt-2 border-t border-zinc-200/80 dark:border-zinc-800/80">
@@ -1182,13 +1187,13 @@ export function LandingPage() {
                                     </div>
                                 </div>
 
-                                <div className="sm:col-span-2 p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-200/80 dark:border-zinc-800">
+                                <div className="sm:col-span-2 p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-zinc-200/80 dark:border-zinc-800 interactive-card">
                                     <div>
                                         <p className="text-xs font-bold uppercase text-zinc-500 dark:text-zinc-400">Combined Dual Platform Metric</p>
                                         <p className="text-2xl font-extrabold text-zinc-900 dark:text-white">660 Total Unique Problems Solved</p>
                                     </div>
                                     <div className="flex items-center gap-2 bg-white dark:bg-zinc-800/80 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs shadow-xs">
-                                        <FireIcon className="w-4 h-4 text-amber-500" weight="fill" />
+                                        <FireIcon className="w-4 h-4 text-amber-500 animate-flame" weight="fill" />
                                         <span className="font-semibold text-zinc-800 dark:text-zinc-200">64 Days Active Streak</span>
                                     </div>
                                 </div>
@@ -1257,7 +1262,7 @@ export function LandingPage() {
 
                         {/* Interactive Topic Card */}
                         <div className="lg:col-span-7">
-                            <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl space-y-4">
+                            <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl space-y-4 interactive-card">
                                 <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                                     <div>
                                         <p className="text-xs font-bold text-zinc-900 dark:text-white">Cohort Topic Proficiency Analysis</p>
@@ -1275,7 +1280,7 @@ export function LandingPage() {
                                             <span className="text-rose-500">42% (Critical Weakness)</span>
                                         </div>
                                         <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                                            <div className="bg-rose-500 h-full w-[42%]" />
+                                            <div className="bg-rose-500 h-full w-[42%] transition-all duration-700 ease-out" />
                                         </div>
                                     </div>
 
@@ -1285,7 +1290,7 @@ export function LandingPage() {
                                             <span className="text-amber-500">58% (Developing)</span>
                                         </div>
                                         <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                                            <div className="bg-amber-500 h-full w-[58%]" />
+                                            <div className="bg-amber-500 h-full w-[58%] transition-all duration-700 ease-out" />
                                         </div>
                                     </div>
 
@@ -1295,7 +1300,7 @@ export function LandingPage() {
                                             <span className="text-emerald-500">84% (Strong)</span>
                                         </div>
                                         <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                                            <div className="bg-emerald-500 h-full w-[84%]" />
+                                            <div className="bg-emerald-500 h-full w-[84%] transition-all duration-700 ease-out" />
                                         </div>
                                     </div>
 
@@ -1305,7 +1310,7 @@ export function LandingPage() {
                                             <span className="text-emerald-500">92% (Mastered)</span>
                                         </div>
                                         <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                                            <div className="bg-emerald-500 h-full w-[92%]" />
+                                            <div className="bg-emerald-500 h-full w-[92%] transition-all duration-700 ease-out" />
                                         </div>
                                     </div>
                                 </div>
@@ -1319,49 +1324,49 @@ export function LandingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         
                         {/* Card 1: Redis Caching */}
-                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card">
+                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card group">
                             <div>
-                                <div className="p-3 w-max rounded-2xl bg-emerald-500/10 text-emerald-500 mb-6 border border-emerald-500/20">
+                                <div className="p-3 w-max rounded-2xl bg-emerald-500/10 text-emerald-500 mb-6 border border-emerald-500/20 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                                     <DatabaseIcon className="w-6 h-6" weight="bold" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Redis Telemetry Cluster</h3>
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-emerald-500 transition-colors">Redis Telemetry Cluster</h3>
                                 <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
                                     Equipped with multi-region Redis caching. Protects upstream APIs from rate limits and delivers sub-10ms query times for large cohorts.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 w-max">
+                            <span className="font-mono text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 w-max group-hover:bg-emerald-500/20 transition-colors">
                                 Cache Hit Latency: 4ms
                             </span>
                         </div>
 
                         {/* Card 2: 1-Click CSV Imports */}
-                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card">
+                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card group">
                             <div>
-                                <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] mb-6 border border-[#5b4fff]/20">
+                                <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] mb-6 border border-[#5b4fff]/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                     <FileSpreadsheet className="w-6 h-6" weight="bold" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">1-Click CSV Roster Sync</h3>
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-[#5b4fff] transition-colors">1-Click CSV Roster Sync</h3>
                                 <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
                                     Upload CSV files exported from Google Sheets or Google Classroom. URLs and handles are sanitized and mapped into classrooms automatically.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-bold text-[#5b4fff] dark:text-[#968fff] bg-[#5b4fff]/10 px-3 py-1.5 rounded-xl border border-[#5b4fff]/20 w-max">
+                            <span className="font-mono text-xs font-bold text-[#5b4fff] dark:text-[#968fff] bg-[#5b4fff]/10 px-3 py-1.5 rounded-xl border border-[#5b4fff]/20 w-max group-hover:bg-[#5b4fff]/20 transition-colors">
                                 Auto URL Regex Extraction
                             </span>
                         </div>
 
                         {/* Card 3: Live Contest Radar */}
-                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card">
+                        <div className="p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between interactive-card group">
                             <div>
-                                <div className="p-3 w-max rounded-2xl bg-amber-500/10 text-amber-500 mb-6 border border-amber-500/20">
+                                <div className="p-3 w-max rounded-2xl bg-amber-500/10 text-amber-500 mb-6 border border-amber-500/20 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                                     <ClockIcon className="w-6 h-6" weight="bold" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Integrated Contest Radar</h3>
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-amber-500 transition-colors">Integrated Contest Radar</h3>
                                 <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
                                     Never let students miss official LeetCode Weekly contests or Codeforces Div. 2/3 rounds with built-in countdowns and reminders.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-bold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 w-max">
+                            <span className="font-mono text-xs font-bold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 w-max group-hover:bg-amber-500/20 transition-colors">
                                 Synchronized Calendars
                             </span>
                         </div>
@@ -1369,8 +1374,8 @@ export function LandingPage() {
                 </section>
 
                 {/* PRE-FOOTER CALL TO ACTION */}
-                <section className="w-full max-w-5xl mx-auto rounded-3xl bg-white dark:bg-linear-to-b dark:from-[#141418] dark:to-[#0a0a0c] text-zinc-900 dark:text-white p-8 sm:p-14 text-center border border-zinc-200/90 dark:border-zinc-800 shadow-2xl relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.08),transparent)] dark:bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.22),transparent)] pointer-events-none" />
+                <section className="w-full max-w-5xl mx-auto rounded-3xl bg-white dark:bg-linear-to-b dark:from-[#141418] dark:to-[#0a0a0c] text-zinc-900 dark:text-white p-8 sm:p-14 text-center border border-zinc-200/90 dark:border-zinc-800 shadow-2xl relative overflow-hidden interactive-card">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.08),transparent)] dark:bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.22),transparent)] pointer-events-none animate-pulse-slow" />
                     <div className="relative z-10">
                         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-balance">
                             Ready to Streamline Your Coding Cohorts?
