@@ -17,7 +17,8 @@ import type {
     MentorDTO,
     CacheStatsResponse,
     DailyChallengeDTO,
-    UpcomingContestDTO
+    UpcomingContestDTO,
+    ContactRequest
 } from '@/types';
 
 export const AuthService = {
@@ -206,6 +207,11 @@ export const DailyChallengeService = {
 export const ContestScheduleService = {
     getUpcomingContests: (platform?: 'ALL' | 'LEETCODE' | 'CODEFORCES') =>
         api.get<UpcomingContestDTO[]>('/contests/upcoming', { params: platform && platform !== 'ALL' ? { platform } : {} })
+};
+
+export const ContactService = {
+    sendMessage: (data: ContactRequest) =>
+        api.post<{ message: string }>('/v1/contact', data)
 };
 
 

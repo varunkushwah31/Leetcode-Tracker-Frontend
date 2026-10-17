@@ -192,8 +192,8 @@ export interface CuratedProblemDTO {
     title: string;
     slug?: string;
     titleSlug?: string;
-    difficulty?: 'EASY' | 'MEDIUM' | 'HARD' | string;
-    platform?: 'LEETCODE' | 'CODEFORCES' | string;
+    difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+    platform?: Platform;
     topic?: string;
     link?: string;
 }
@@ -204,8 +204,8 @@ export interface TopicProficiencyDTO {
     cohortTotalSolved?: number;
     averageSolved?: number;
     averageSolvedPerStudent?: number;
-    masteryLevel: 'STRONG' | 'DEVELOPING' | 'CRITICAL_WEAKNESS' | string;
-    severity: 'HIGH' | 'MEDIUM' | 'LOW' | string;
+    masteryLevel: 'STRONG' | 'DEVELOPING' | 'CRITICAL_WEAKNESS';
+    severity: 'HIGH' | 'MEDIUM' | 'LOW';
     recommendation?: string;
     suggestedProblems?: CuratedProblemDTO[];
 }
@@ -222,7 +222,7 @@ export interface AtRiskStudentDTO {
     activeThisWeek?: boolean;
     lastSubmissionDate?: string;
     daysInactive?: number;
-    riskLevel?: 'CRITICAL' | 'WARNING' | 'MODERATE' | 'HIGH' | 'MEDIUM' | string;
+    riskLevel?: 'CRITICAL' | 'WARNING' | 'MODERATE' | 'HIGH' | 'MEDIUM';
     primaryRiskReason?: string;
     riskReason?: string;
 }
@@ -361,4 +361,12 @@ export interface UpcomingContestDTO {
     durationSeconds: number;
     url: string;
     phase: 'BEFORE' | 'CODING';
+}
+
+export interface ContactRequest {
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+    phone?: string;
 }
