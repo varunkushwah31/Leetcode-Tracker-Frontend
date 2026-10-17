@@ -1,27 +1,30 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-    PulseIcon as Activity,
     UsersIcon,
-    SquaresFourIcon as LayoutDashboard,
     CaretRightIcon as ChevronRight,
     CheckCircleIcon,
-    SparkleIcon as Sparkles,
     TargetIcon,
     MedalIcon as Award,
     CodeIcon as Code2Icon,
     ListIcon as MenuIcon,
-    XIcon
+    XIcon,
+    ShieldCheckIcon,
+    ChartLineUpIcon,
+    DatabaseIcon,
+    FireIcon,
+    TrophyIcon,
+    CheckIcon,
+    ArrowSquareOutIcon
 } from '@phosphor-icons/react';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 
 export function LandingPage() {
-    const [activeTab, setActiveTab] = useState<'mentor' | 'student'>('student');
+    const [activeTab, setActiveTab] = useState<'mentor' | 'student'>('mentor');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    // 1. Create a custom scroll handler
     const scrollToFeatures = () => {
         setMobileMenuOpen(false);
         const featuresSection = document.getElementById('features');
@@ -31,11 +34,11 @@ export function LandingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f1f3f7] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
 
             {/* Background Base with Theme Adaptation */}
-            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-200 pointer-events-none">
-                <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed opacity-25 dark:opacity-100 pointer-events-none" />
+            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-200 pointer-events-none" aria-hidden="true">
+                <div className="absolute inset-0 bg-[radial-gradient(rgba(0,0,0,0.04)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed opacity-70 dark:opacity-100 pointer-events-none" />
                 <AmbientGlow />
             </div>
 
@@ -48,49 +51,62 @@ export function LandingPage() {
                 />
             )}
 
-            {/* Floating Header */}
-            <header className="fixed top-4 sm:top-6 left-3 right-3 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-white/90 dark:bg-[#0a0a0a]/85 backdrop-blur-2xl border border-zinc-200/80 dark:border-white/10 shadow-xl px-3.5 sm:px-6 py-2.5 sm:py-3 flex flex-col transition-all">
+            {/* Floating Navigation Dock */}
+            <header className="fixed top-4 sm:top-6 left-3 right-3 sm:left-1/2 sm:-translate-x-1/2 sm:w-[90%] max-w-5xl z-50 rounded-2xl bg-white/95 dark:bg-[#0d0d0f]/90 backdrop-blur-xl border border-zinc-200/90 dark:border-white/10 shadow-lg px-4 sm:px-6 py-2.5 sm:py-3 flex flex-col transition-all">
                 <div className="flex items-center justify-between w-full">
                     <BrandLogo size="responsive" theme="auto" />
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center gap-5">
+                    <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
                         <button
                             type="button"
                             onClick={scrollToFeatures}
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer"
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer min-h-[44px] flex items-center"
                         >
                             Features
                         </button>
-                        <Link to="/how-to-use" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors">
-                            How to Use
+                        <Link 
+                            to="/how-to-use" 
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center"
+                        >
+                            Documentation
                         </Link>
-                        <Link to="/contact" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors">
-                            Contact
+                        <Link 
+                            to="/contact" 
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center"
+                        >
+                            Support
                         </Link>
-                        <Link to="/login" className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff]">
+                        <Link 
+                            to="/login" 
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] rounded-lg px-2 min-h-[44px] flex items-center"
+                        >
                             Sign In
                         </Link>
-                        <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10" />
-                        <Link to="/login" className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-5 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 shimmer-sweep interactive-press">
+                        <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10 min-h-[44px] min-w-[44px]" />
+                        <Link 
+                            to="/login" 
+                            className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-[14px] font-semibold px-5 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 min-h-[44px] flex items-center"
+                        >
                             Get Started
                         </Link>
                     </nav>
 
                     {/* Mobile Controls */}
-                    <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
-                        <ThemeToggle className="bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 h-8.5 w-8.5 sm:h-9 sm:w-9" />
+                    <div className="flex md:hidden items-center gap-2 shrink-0">
+                        <ThemeToggle className="bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 min-h-[44px] min-w-[44px]" />
                         <Link
                             to="/login"
-                            className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-xl whitespace-nowrap shrink-0 transition-colors"
+                            className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-xs font-semibold px-3 py-2.5 rounded-xl whitespace-nowrap shrink-0 transition-colors min-h-[44px] flex items-center"
                         >
                             Get Started
                         </Link>
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(prev => !prev)}
-                            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-                            className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 focus:outline-none cursor-pointer shrink-0"
+                            aria-expanded={mobileMenuOpen}
+                            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                            className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
                         >
                             {mobileMenuOpen ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
                         </button>
@@ -99,11 +115,11 @@ export function LandingPage() {
 
                 {/* Mobile Dropdown Panel */}
                 {mobileMenuOpen && (
-                    <div className="md:hidden mt-3 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="md:hidden mt-3 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-2">
                         <button
                             type="button"
                             onClick={scrollToFeatures}
-                            className="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-left transition-colors cursor-pointer"
+                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-left transition-colors cursor-pointer min-h-[44px]"
                         >
                             <span>Features</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
@@ -111,33 +127,33 @@ export function LandingPage() {
                         <Link
                             to="/how-to-use"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px]"
                         >
-                            <span>How to Use & Docs</span>
+                            <span>Documentation</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
                         </Link>
                         <Link
                             to="/contact"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px]"
                         >
-                            <span>Contact & Support</span>
+                            <span>Support</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
                         </Link>
                         <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2">
                             <Link
                                 to="/login"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                                className="flex-1 py-3 text-center text-sm font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px] flex items-center justify-center"
                             >
                                 Sign In
                             </Link>
                             <Link
                                 to="/register"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl bg-[#5b4fff] text-white hover:bg-[#4d40ef] transition-colors shadow-sm"
+                                className="flex-1 py-3 text-center text-sm font-semibold rounded-xl bg-[#5b4fff] text-white hover:bg-[#4d40ef] transition-colors shadow-sm min-h-[44px] flex items-center justify-center"
                             >
-                                Create Account
+                                Register
                             </Link>
                         </div>
                     </div>
@@ -145,139 +161,304 @@ export function LandingPage() {
             </header>
 
             {/* Main Content */}
-            <main className="relative z-10 pt-36 sm:pt-48 pb-20 sm:pb-32 px-4 sm:px-6 max-w-7xl mx-auto flex flex-col items-center">
+            <main className="relative z-10 pt-32 sm:pt-44 pb-20 sm:pb-32 px-4 sm:px-6 max-w-7xl mx-auto flex flex-col items-center">
 
                 {/* Hero Section */}
-                <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-28 sm:mb-40">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-800 bg-white/90 dark:bg-[#111111]/80 backdrop-blur-md mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm animate-float-subtle">
-                        <span className="flex h-2 w-2 rounded-full bg-[#5b4fff] animate-pulse"></span>
-                        <span className="text-[11px] sm:text-xs font-semibold tracking-wider text-zinc-700 dark:text-zinc-300 uppercase">The Ultimate Classroom Tool</span>
-                    </div>
-
-                    <h1 className="text-[11vw] leading-[1.1] sm:text-7xl md:text-8xl font-extrabold tracking-tight mb-6 sm:mb-8 sm:leading-[1.05] animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 text-balance text-zinc-900 dark:text-white">
-                        Track LeetCode <br className="hidden sm:block"/>
-                        <span className="text-transparent bg-clip-text bg-linear-to-br from-[#4338ca] via-[#5b4fff] to-[#7c3aed] dark:from-white dark:via-white dark:to-[#5b4fff]">Like Never Before</span>
+                <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16 sm:mb-24">
+                    <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 sm:mb-8 text-balance text-zinc-900 dark:text-white">
+                        Automate Coding Cohorts. <br />
+                        <span className="text-[#5b4fff] dark:text-[#968fff]">Track LeetCode and Codeforces.</span>
                     </h1>
 
-                    <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-                        A modern OS for coding bootcamps and mentors. Automate tracking, validate submissions, and foster friendly competition seamlessly.
+                    <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+                        The all-in-one platform for bootcamps, academies, and mentors. Automate submission validation, track dual-platform contest ratings, and run real-time cohort leaderboards without spreadsheets.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
-                        <Link to="/login" className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_30px_rgba(91,79,255,0.3)] text-white text-[15px] font-medium px-8 py-4 rounded-xl transition-all hover:-translate-y-1 hover:shadow-xl active:translate-y-0 flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] group shimmer-sweep interactive-press">
-                            Start for Free <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1.5" />
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                        <Link 
+                            to="/login" 
+                            className="w-full sm:w-auto bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] min-h-[48px]"
+                        >
+                            Get Started Free <ChevronRight className="w-4 h-4" />
                         </Link>
 
                         <button
                             type="button"
                             onClick={scrollToFeatures}
-                            className="w-full sm:w-auto bg-white dark:bg-[#0a0a0a] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-medium px-8 py-4 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 hover:shadow-md interactive-press"
+                            className="w-full sm:w-auto bg-white dark:bg-[#111111] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-semibold px-8 py-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 min-h-[48px]"
                         >
-                            Explore Features
+                            Explore Platform
                         </button>
                     </div>
                 </div>
 
-                <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 dark:via-zinc-800 to-transparent mb-16 sm:mb-24"></div>
+                {/* Hero Product Deck: Live Telemetry & Verification Preview */}
+                <div className="w-full max-w-5xl mx-auto mb-20 sm:mb-28">
+                    <div className="rounded-3xl bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-white/10 shadow-xl overflow-hidden">
+                        {/* Top Control Bar */}
+                        <div className="px-5 sm:px-6 py-4 border-b border-zinc-200/80 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-3 bg-zinc-50/70 dark:bg-[#18181b]/50">
+                            <div className="flex items-center gap-2.5">
+                                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-xs font-bold text-zinc-900 dark:text-white">Batch 2024 Placement Cohort</span>
+                                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 hidden sm:inline">• Live Sync Active</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs">
+                                <span className="px-2.5 py-1 rounded-lg bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium">
+                                    64 Students
+                                </span>
+                                <span className="px-2.5 py-1 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] font-medium border border-[#5b4fff]/20">
+                                    Dual-Platform Sync
+                                </span>
+                            </div>
+                        </div>
 
-                {/* Two-Sided Ecosystem Tabs Section */}
-                <section className="w-full relative z-10 scroll-mt-32">
+                        {/* Interactive Data Matrix Preview */}
+                        <div className="p-5 sm:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Metric 1: Dual Solves */}
+                            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50 dark:bg-[#18181b]/70 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Total Problems Solved</span>
+                                    <div className="p-2 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff]">
+                                        <Code2Icon className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">14,820</p>
+                                <div className="flex items-center gap-3 mt-3 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60 text-xs">
+                                    <span className="text-[#ffa116] font-semibold">LeetCode: 9,210</span>
+                                    <span className="text-zinc-400">•</span>
+                                    <span className="text-sky-500 font-semibold">Codeforces: 5,610</span>
+                                </div>
+                            </div>
+
+                            {/* Metric 2: Live Verification */}
+                            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50 dark:bg-[#18181b]/70 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Submissions Verified</span>
+                                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                                        <ShieldCheckIcon className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">99.4%</p>
+                                <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                    <CheckIcon className="w-3.5 h-3.5" /> Direct platform URL verification
+                                </div>
+                            </div>
+
+                            {/* Metric 3: Active Streaks */}
+                            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50 dark:bg-[#18181b]/70 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Streak Leader</span>
+                                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
+                                        <FireIcon className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <p className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">64 <span className="text-base font-normal text-zinc-500">days</span></p>
+                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-500 dark:text-zinc-400">
+                                    <span>Continuous daily solving active</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Verified Activity Feed */}
+                        <div className="border-t border-zinc-200/80 dark:border-zinc-800/80 px-5 sm:px-8 py-4 bg-white dark:bg-[#111111]">
+                            <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-3">Live Verification Feed</p>
+                            <div className="divide-y divide-zinc-200/70 dark:divide-zinc-800/60">
+                                <div className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                                        <span className="font-semibold text-zinc-900 dark:text-white truncate">Alex Rivera</span>
+                                        <span className="text-zinc-500 truncate">Course Schedule II</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-medium">LeetCode #210</span>
+                                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Verified</span>
+                                    </div>
+                                </div>
+                                <div className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                                        <span className="font-semibold text-zinc-900 dark:text-white truncate">Sarah Chen</span>
+                                        <span className="text-zinc-500 truncate">Watermelon</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-medium">Codeforces 4A</span>
+                                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Verified</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="w-full h-px bg-zinc-200 dark:bg-zinc-800/80 mb-20 sm:mb-28" />
+
+                {/* Ecosystem Section: For Mentors & For Students */}
+                <section className="w-full relative z-10 scroll-mt-28 mb-24 sm:mb-32">
                     <div className="text-center mb-10">
-                        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight mb-4 text-balance text-zinc-900 dark:text-white">Built for Both Sides</h2>
-                        <p className="text-zinc-600 dark:text-zinc-400 text-lg max-w-2xl mx-auto">A unified ecosystem where administrators track with ease and students thrive.</p>
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-balance text-zinc-900 dark:text-white">
+                            Purpose-Built for Instructors and Students
+                        </h2>
+                        <p className="text-zinc-600 dark:text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">
+                            A unified platform aligning educator supervision with student progress and technical competition.
+                        </p>
                     </div>
 
-                    <div className="flex bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl p-1.5 rounded-2xl w-max mx-auto mb-10 border border-zinc-200/90 dark:border-zinc-800/60 shadow-md transition-all">
+                    {/* Role Switcher Pill Bar */}
+                    <div 
+                        role="tablist" 
+                        aria-label="Target audience views"
+                        className="flex bg-zinc-100 dark:bg-[#18181b] p-1.5 rounded-2xl w-max mx-auto mb-10 border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm"
+                    >
                         <button
+                            role="tab"
+                            id="tab-mentor"
+                            aria-selected={activeTab === 'mentor'}
+                            aria-controls="panel-mentor"
                             onClick={() => setActiveTab('mentor')}
-                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer interactive-press ${activeTab === 'mentor' ? 'bg-zinc-100 dark:bg-[#18181b] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-800/60 scale-[1.02]' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
+                            className={`px-6 sm:px-8 py-3 text-sm font-semibold rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer min-h-[44px] flex items-center ${
+                                activeTab === 'mentor' 
+                                    ? 'bg-white dark:bg-[#111111] text-zinc-900 dark:text-white shadow-sm border border-zinc-200/80 dark:border-white/10' 
+                                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
                         >
-                            For Mentors
+                            For Instructors & Mentors
                         </button>
                         <button
+                            role="tab"
+                            id="tab-student"
+                            aria-selected={activeTab === 'student'}
+                            aria-controls="panel-student"
                             onClick={() => setActiveTab('student')}
-                            className={`px-6 sm:px-8 py-3 text-[14px] sm:text-[15px] font-medium rounded-xl transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer interactive-press ${activeTab === 'student' ? 'bg-zinc-100 dark:bg-[#18181b] text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-800/60 scale-[1.02]' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/2'}`}
+                            className={`px-6 sm:px-8 py-3 text-sm font-semibold rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer min-h-[44px] flex items-center ${
+                                activeTab === 'student' 
+                                    ? 'bg-white dark:bg-[#111111] text-zinc-900 dark:text-white shadow-sm border border-zinc-200/80 dark:border-white/10' 
+                                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
                         >
-                            For Students
+                            For Competitive Students
                         </button>
                     </div>
 
-                    <div className="max-w-5xl mx-auto bg-white/90 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-12 min-h-95 shadow-xl overflow-hidden relative group/tab">
-                        <div className="absolute inset-0 bg-linear-to-b from-black/[0.01] dark:from-white/2 to-transparent pointer-events-none"></div>
+                    {/* Tab Panes */}
+                    <div className="max-w-5xl mx-auto bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-white/10 rounded-3xl p-6 sm:p-12 shadow-xl">
                         {activeTab === 'mentor' ? (
-                            <div className="grid md:grid-cols-2 gap-10 items-center animate-in fade-in slide-in-from-right-4 duration-500">
+                            <div 
+                                id="panel-mentor" 
+                                role="tabpanel" 
+                                aria-labelledby="tab-mentor"
+                                className="grid md:grid-cols-2 gap-10 items-center"
+                            >
                                 <div>
-                                    <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl mb-6 border border-indigo-100 dark:border-[#5b4fff]/20">
+                                    <div className="bg-[#5b4fff]/10 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border border-[#5b4fff]/20">
                                         <UsersIcon className="h-6 w-6 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                     </div>
-                                    <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-zinc-900 dark:text-white">Manage Entire Cohorts</h3>
+                                    <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-zinc-900 dark:text-white">
+                                        Total Control Over Cohort Progress
+                                    </h3>
                                     <ul className="space-y-4">
                                         <li className="flex items-start gap-3">
-                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
-                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-[15px]">Create boundless classrooms and organize your students effectively.</span>
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base">
+                                                Create distinct classrooms with access codes and auto-sync student rosters via CSV or handle imports.
+                                            </span>
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
-                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-[15px]">Assign lists of target LeetCode problems natively to the entire class.</span>
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base">
+                                                Assign problem lists from LeetCode and Codeforces with strict deadlines and automated validation.
+                                            </span>
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
-                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-[15px]">Instantly flag plagiarized or invalid URL submissions with automated 1-click validation.</span>
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base">
+                                                Export 2D student-assignment completion matrices directly to CSV for streamlined grading and review.
+                                            </span>
                                         </li>
                                     </ul>
                                 </div>
-                                <div className="bg-zinc-50 dark:bg-[#111111]/85 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl p-6 relative overflow-hidden shadow-md">
-                                    <div className="absolute top-0 right-0 w-37.5 h-37.5 bg-[#5b4fff]/15 blur-[60px] rounded-full pointer-events-none"></div>
-                                    <div className="space-y-3 relative z-10 w-full">
-                                        <div className="flex justify-between items-center bg-white dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
-                                            <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Batch '24 Placement</span>
-                                            <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">80 Students</span>
+
+                                <div className="p-6 rounded-2xl bg-zinc-50 dark:bg-[#18181b]/80 border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                                    <div className="flex justify-between items-center p-3.5 rounded-xl bg-white dark:bg-[#111111] border border-zinc-200/80 dark:border-zinc-800/80">
+                                        <div>
+                                            <p className="text-sm font-semibold text-zinc-900 dark:text-white">Batch 2024 Placement Track</p>
+                                            <p className="text-xs text-zinc-500">64 Enrolled • 94% on pace</p>
                                         </div>
-                                        <div className="flex justify-between items-center bg-white dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
-                                            <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">DSA Fast Track</span>
-                                            <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">120 Students</span>
+                                        <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff]">Active</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3.5 rounded-xl bg-white dark:bg-[#111111] border border-zinc-200/80 dark:border-zinc-800/80">
+                                        <div>
+                                            <p className="text-sm font-semibold text-zinc-900 dark:text-white">Competitive Programming Sprint</p>
+                                            <p className="text-xs text-zinc-500">48 Enrolled • Div. 2 Prep</p>
                                         </div>
-                                        <div className="flex justify-between items-center bg-white dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 opacity-40 shadow-xs">
-                                            <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">System Design</span>
-                                            <span className="text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1 rounded-md font-semibold">Draft</span>
+                                        <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff]">Active</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3.5 rounded-xl bg-white dark:bg-[#111111] border border-zinc-200/80 dark:border-zinc-800/80 opacity-60">
+                                        <div>
+                                            <p className="text-sm font-semibold text-zinc-900 dark:text-white">System Design Cohort</p>
+                                            <p className="text-xs text-zinc-500">Curriculum Drafting</p>
                                         </div>
+                                        <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Draft</span>
                                     </div>
                                 </div>
                             </div>
                         ) : (
-                            <div className="grid md:grid-cols-2 gap-10 items-center animate-in fade-in slide-in-from-left-4 duration-500">
-                                <div className="order-2 md:order-1 bg-zinc-50 dark:bg-[#111111]/85 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-md">
-                                    <div className="absolute top-0 left-0 w-37.5 h-37.5 bg-emerald-500/10 blur-[60px] rounded-full pointer-events-none"></div>
-                                    <div className="flex justify-between items-end mb-6 relative z-10">
+                            <div 
+                                id="panel-student" 
+                                role="tabpanel" 
+                                aria-labelledby="tab-student"
+                                className="grid md:grid-cols-2 gap-10 items-center"
+                            >
+                                <div className="p-6 sm:p-8 rounded-2xl bg-zinc-50 dark:bg-[#18181b]/80 border border-zinc-200/80 dark:border-zinc-800/80">
+                                    <div className="flex justify-between items-end mb-6">
                                         <div>
-                                            <p className="text-[11px] text-zinc-500 font-bold mb-1 uppercase tracking-widest">Consistency Streak</p>
-                                            <p className="text-4xl font-black text-zinc-900 dark:text-white tracking-tight">42<span className="text-lg text-zinc-500 font-medium tracking-normal ml-1">days</span></p>
+                                            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Consistency Streak</p>
+                                            <p className="text-4xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                                                54 <span className="text-base font-normal text-zinc-500">days active</span>
+                                            </p>
                                         </div>
-                                        <Award className="w-12 h-12 text-emerald-500 dark:text-emerald-400 opacity-90" />
+                                        <Award className="w-10 h-10 text-emerald-500" weight="bold" />
                                     </div>
-                                    <div className="grid grid-cols-7 gap-1.5 relative z-10 w-full rounded-lg overflow-hidden">
-                                        {Array.from({length: 28}).map((_, i) => (
-                                            <div key={i} className={`w-full aspect-square rounded-[3px] shadow-xs transition-transform duration-200 hover:scale-135 hover:z-20 cursor-pointer ${i % 5 === 0 || i % 7 === 0 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-zinc-200 dark:bg-zinc-800/80 hover:bg-zinc-300 dark:hover:bg-zinc-700'}`}></div>
+
+                                    {/* 28-Day Consistency Preview Grid */}
+                                    <div className="grid grid-cols-7 gap-2">
+                                        {Array.from({ length: 28 }).map((_, i) => (
+                                            <div 
+                                                key={i} 
+                                                className={`aspect-square rounded-md transition-colors ${
+                                                    i % 4 === 0 || i % 7 === 0 || i % 9 === 0 
+                                                        ? 'bg-emerald-500' 
+                                                        : 'bg-zinc-200 dark:bg-zinc-800'
+                                                }`}
+                                            />
                                         ))}
                                     </div>
                                 </div>
-                                <div className="order-1 md:order-2">
-                                    <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl mb-6 border border-indigo-100 dark:border-[#5b4fff]/20">
+
+                                <div>
+                                    <div className="bg-[#5b4fff]/10 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border border-[#5b4fff]/20">
                                         <TargetIcon className="h-6 w-6 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
                                     </div>
-                                    <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-zinc-900 dark:text-white">Compete, Learn, Grow</h3>
+                                    <h3 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-zinc-900 dark:text-white">
+                                        Track Personal Growth and Rankings
+                                    </h3>
                                     <ul className="space-y-4">
                                         <li className="flex items-start gap-3">
-                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
-                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-[15px]">See your progress mapped against your classmates on live cohort leaderboards.</span>
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base">
+                                                Compare your standing against classmates on live cohort leaderboards updated in real time.
+                                            </span>
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
-                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-[15px]">Get a beautiful and dynamic heatmap analyzing your 365-day technical consistency.</span>
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base">
+                                                Visualize your year-round discipline with a 365-day technical activity heatmap.
+                                            </span>
                                         </li>
                                         <li className="flex items-start gap-3">
-                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" />
-                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-[15px]">Submit answers actively and unlock profile achievements along your journey.</span>
+                                            <CheckCircleIcon className="w-5 h-5 text-[#5b4fff] shrink-0 mt-0.5" weight="bold" />
+                                            <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base">
+                                                Monitor upcoming LeetCode and Codeforces contests with live countdowns to never miss a round.
+                                            </span>
                                         </li>
                                     </ul>
                                 </div>
@@ -286,146 +467,168 @@ export function LandingPage() {
                     </div>
                 </section>
 
-                <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 dark:via-zinc-800 to-transparent my-24 sm:my-24"></div>
+                <div className="w-full h-px bg-zinc-200 dark:bg-zinc-800/80 mb-20 sm:mb-28" />
 
-                {/* Features Section */}
-                <section id="features" className="w-full scroll-mt-32 relative z-10">
+                {/* Core Architecture Pillars */}
+                <section id="features" className="w-full scroll-mt-28 relative z-10 mb-24 sm:mb-32">
                     <div className="text-center mb-12 sm:mb-16">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-800 bg-white/90 dark:bg-[#111111]/80 backdrop-blur-md mb-6 shadow-xs">
-                            <Sparkles className="w-4 h-4 text-[#5b4fff]" />
-                            <span className="text-xs font-semibold tracking-wider text-zinc-700 dark:text-zinc-300 uppercase">Power Tools</span>
-                        </div>
-                        <h2 className="text-3xl sm:text-5xl font-bold tracking-tight mb-4 text-balance text-zinc-900 dark:text-white">Everything You Need</h2>
-                        <p className="text-zinc-600 dark:text-zinc-400 text-lg max-w-2xl mx-auto">A modern toolkit designed to help you run, track, and scale your coding cohorts efficiently.</p>
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-balance text-zinc-900 dark:text-white">
+                            Engineered for High-Velocity Coding Cohorts
+                        </h2>
+                        <p className="text-zinc-600 dark:text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">
+                            Purpose-built infrastructure to eliminate spreadsheet toil and foster technical rigor.
+                        </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:auto-rows-[minmax(300px,auto)]">
-                        <div className="md:col-span-2 bg-white dark:bg-[#111111]/85 p-8 sm:p-10 rounded-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-xl flex flex-col justify-end relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-white dark:hover:bg-[#18181b]">
-                            <div className="absolute top-0 right-0 p-8 sm:p-10">
-                                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
-                                    <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Pillar 1: Automated Verification (Spans 2 cols on desktop) */}
+                        <div className="md:col-span-2 p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between">
+                            <div>
+                                <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] mb-6 border border-[#5b4fff]/20">
+                                    <ShieldCheckIcon className="w-7 h-7" weight="bold" />
                                 </div>
-                            </div>
-                            <div className="absolute top-[10%] right-[10%] w-50 h-50 bg-[#5b4fff]/15 blur-[90px] rounded-full pointer-events-none"></div>
-
-                            <div className="relative z-10 w-full md:max-w-[70%]">
-                                <h3 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight text-zinc-900 dark:text-white">Live Progress Tracking</h3>
-                                <p className="text-zinc-600 dark:text-zinc-400 text-[15px] sm:text-base leading-relaxed">
-                                    Instantly sync your students' LeetCode profiles. View problem stats, daily heatmaps, and consistency streaks in real-time without manual spreadsheets.
+                                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white mb-3">
+                                    Automated Dual-Platform Verification
+                                </h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed max-w-xl mb-6">
+                                    Submissions are checked directly against LeetCode and Codeforces profile feeds. The scraper verifies problem slug, accepted status, and timestamp to eliminate false reporting.
                                 </p>
                             </div>
-                        </div>
 
-                        <div className="bg-white dark:bg-[#111111]/85 p-8 rounded-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-white dark:hover:bg-[#18181b]">
-                            {/* Ambient Purple Glow */}
-                            <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
-
-                            {/* Top Icon */}
-                            <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
-                                <CheckCircleIcon className="h-7 w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
-                            </div>
-
-                            {/* Sleek Abstract Verification Graphic */}
-                            <div className="my-6 space-y-3 relative z-10 w-full">
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
-                                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Solution Submission</span>
-                                    <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Auto-Synced</span>
+                            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/80 dark:border-zinc-800/80 font-mono text-xs text-zinc-700 dark:text-zinc-300 space-y-1.5">
+                                <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                                    <span>POST /api/submissions/verify</span>
+                                    <span className="text-emerald-500 font-semibold">200 OK (8ms)</span>
                                 </div>
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
-                                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">LeetCode Status</span>
-                                    <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Verified (100%)</span>
+                                <div className="text-zinc-900 dark:text-zinc-200 truncate">
+                                    Payload: https://leetcode.com/problems/course-schedule-ii/ -&gt; VERIFIED
                                 </div>
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 opacity-40 shadow-xs">
-                                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Plagiarism Check</span>
-                                    <span className="text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1 rounded-md font-semibold">Draft</span>
-                                </div>
-                            </div>
-
-                            {/* Bottom Title & Description */}
-                            <div className="relative z-10">
-                                <h3 className="text-xl sm:text-2xl font-bold mb-2 tracking-tight text-zinc-900 dark:text-white">Smart Validation</h3>
-                                <p className="text-[14px] sm:text-[15px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Automated submission checking directly from URLs.</p>
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-[#111111]/85 p-8 rounded-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-xl flex flex-col justify-between group interactive-card relative overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-white dark:hover:bg-[#18181b]">
-                            {/* Ambient Purple Glow */}
-                            <div className="absolute top-0 right-0 w-40 h-40 bg-[#5b4fff]/10 blur-[70px] rounded-full pointer-events-none"></div>
-
-                            {/* Top Icon */}
-                            <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm dark:shadow-xl transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20 relative z-10">
-                                <LayoutDashboard className="h-7 w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
-                            </div>
-
-                            {/* Sleek Problem Set Graphic */}
-                            <div className="my-6 space-y-3 relative z-10 w-full">
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
-                                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Arrays & Two Pointers</span>
-                                    <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Active Cohort</span>
+                        {/* Pillar 2: Real-Time Leaderboard */}
+                        <div className="p-8 rounded-3xl bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between">
+                            <div>
+                                <div className="p-3 w-max rounded-2xl bg-amber-500/10 text-amber-500 mb-6 border border-amber-500/20">
+                                    <TrophyIcon className="w-7 h-7" weight="bold" />
                                 </div>
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 shadow-xs">
-                                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Dynamic Programming</span>
-                                    <span className="text-xs bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] px-2.5 py-1 rounded-md font-semibold">Next Week</span>
-                                </div>
-                                <div className="flex justify-between items-center bg-zinc-50 dark:bg-[#18181b] p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/60 opacity-40 shadow-xs">
-                                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Graphs & Trees</span>
-                                    <span className="text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1 rounded-md font-semibold">Draft</span>
-                                </div>
-                            </div>
-
-                            {/* Bottom Title & Description */}
-                            <div className="relative z-10">
-                                <h3 className="text-xl sm:text-2xl font-bold mb-2 tracking-tight text-zinc-900 dark:text-white">Clear Assignments</h3>
-                                <p className="text-[14px] sm:text-[15px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Manage cohort problem-sets effortlessly.</p>
-                            </div>
-                        </div>
-
-                        <div className="md:col-span-2 bg-white dark:bg-[#111111]/85 p-8 sm:p-10 rounded-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-xl flex flex-col justify-end gap-6 relative overflow-hidden group interactive-card hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-white dark:hover:bg-[#18181b]">
-                            <div className="flex items-end gap-2 sm:gap-3 relative z-10 w-full h-28 sm:h-32 shrink-0 overflow-visible pt-5 opacity-70 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
-                                <div className="h-[40%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[60%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-75 group-hover:scale-y-110 origin-bottom"></div>
-                                <div className="h-[30%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-100 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[70%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-150 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[50%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-200 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[80%] min-h-8 flex-1 bg-[#5b4fff]/40 rounded-t-lg backdrop-blur-md transition-transform duration-300 delay-250 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[55%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-300 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-[65%] min-h-8 flex-1 bg-zinc-200 dark:bg-[#18181b] border border-zinc-300/60 dark:border-zinc-800/60 rounded-t-lg transition-transform duration-300 delay-350 group-hover:scale-y-105 origin-bottom"></div>
-                                <div className="h-full flex-1 bg-[#5b4fff] rounded-t-lg shadow-[0_0_30px_rgba(91,79,255,0.6)] relative transition-transform duration-300 delay-400 group-hover:scale-y-105 origin-bottom">
-                                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white] animate-pulse"></div>
-                                </div>
-                            </div>
-
-                            <div className="relative z-10 w-full md:max-w-[75%] flex flex-col justify-end">
-                                <div className="bg-indigo-50 dark:bg-[#5b4fff]/10 w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shadow-sm dark:shadow-xl mb-4 sm:mb-5 transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 border border-indigo-100 dark:border-[#5b4fff]/20">
-                                    <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
-                                </div>
-                                <h3 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight text-zinc-900 dark:text-white">Deep Analytics</h3>
-                                <p className="text-zinc-600 dark:text-zinc-400 text-[15px] sm:text-base leading-relaxed relative z-10">
-                                    Drill down into individual student performance. Identify pain points, review problem categories, and offer targeted mentorship.
+                                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white mb-3">
+                                    Cohort Leaderboards
+                                </h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed mb-6">
+                                    Rank students by aggregate solves, peak ratings, or consistency streaks. Instantly sort by LeetCode or Codeforces independently.
                                 </p>
+                            </div>
+
+                            <div className="space-y-2 text-xs">
+                                <div className="flex items-center justify-between p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/70 dark:border-zinc-800/70">
+                                    <span className="font-bold text-zinc-900 dark:text-white">#1 Alex Rivera</span>
+                                    <span className="font-semibold text-[#5b4fff]">420 Solves</span>
+                                </div>
+                                <div className="flex items-center justify-between p-2.5 rounded-lg bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/70 dark:border-zinc-800/70">
+                                    <span className="font-bold text-zinc-900 dark:text-white">#2 Sarah Chen</span>
+                                    <span className="font-semibold text-[#5b4fff]">395 Solves</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Pillar 3: Educational Analytics */}
+                        <div className="p-8 rounded-3xl bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between">
+                            <div>
+                                <div className="p-3 w-max rounded-2xl bg-indigo-500/10 text-indigo-500 mb-6 border border-indigo-500/20">
+                                    <ChartLineUpIcon className="w-7 h-7" weight="bold" />
+                                </div>
+                                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white mb-3">
+                                    Skill Analytics
+                                </h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed mb-6">
+                                    Identify critical student weaknesses across topic competencies like Dynamic Programming, Graphs, and Tree structures.
+                                </p>
+                            </div>
+
+                            <div className="p-3 rounded-xl bg-zinc-50 dark:bg-[#18181b] border border-zinc-200/70 dark:border-zinc-800/70 text-xs space-y-2">
+                                <div className="flex justify-between text-zinc-700 dark:text-zinc-300">
+                                    <span>Dynamic Programming</span>
+                                    <span className="font-semibold">78%</span>
+                                </div>
+                                <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+                                    <div className="bg-[#5b4fff] h-full w-[78%]" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Pillar 4: Redis Cluster Telemetry (Spans 2 cols on desktop) */}
+                        <div className="md:col-span-2 p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#111111] border border-zinc-200/90 dark:border-white/10 shadow-lg flex flex-col justify-between">
+                            <div>
+                                <div className="p-3 w-max rounded-2xl bg-emerald-500/10 text-emerald-500 mb-6 border border-emerald-500/20">
+                                    <DatabaseIcon className="w-7 h-7" weight="bold" />
+                                </div>
+                                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white mb-3">
+                                    Redis-Backed Cache Infrastructure
+                                </h3>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed max-w-xl mb-6">
+                                    Equipped with multi-tier Redis caching to protect against third-party rate limits. Delivers sub-10ms response times for classroom analytics, profile statistics, and live leaderboards.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-3 text-xs">
+                                <span className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold border border-zinc-200/80 dark:border-zinc-700/80">
+                                    Redis Cluster: Connected
+                                </span>
+                                <span className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold border border-zinc-200/80 dark:border-zinc-700/80">
+                                    Namespace Eviction: Supported
+                                </span>
+                                <span className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold border border-zinc-200/80 dark:border-zinc-700/80">
+                                    Cache Hit Ratio: 98.6%
+                                </span>
                             </div>
                         </div>
                     </div>
                 </section>
+
+                {/* Pre-Footer Call to Action */}
+                <section className="w-full max-w-5xl mx-auto rounded-3xl bg-zinc-900 dark:bg-[#141416] text-white p-8 sm:p-12 text-center border border-zinc-800 shadow-2xl relative overflow-hidden">
+                    <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-balance">
+                        Ready to Streamline Your Coding Cohorts?
+                    </h2>
+                    <p className="text-zinc-300 text-base sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+                        Join educators and competitive programmers using MentorSync to automate submission verification and track growth natively.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <Link 
+                            to="/login"
+                            className="w-full sm:w-auto bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 min-h-[48px] flex items-center justify-center"
+                        >
+                            Start for Free
+                        </Link>
+                        <Link 
+                            to="/how-to-use"
+                            className="w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white border border-white/20 text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all min-h-[48px] flex items-center justify-center"
+                        >
+                            Read Documentation
+                        </Link>
+                    </div>
+                </section>
             </main>
 
-            <footer className="relative w-full overflow-hidden flex flex-col items-center justify-end z-10 pt-20 pb-8 sm:pb-10 border-t border-zinc-200 dark:border-zinc-800/60 bg-zinc-100/90 dark:bg-[#080808]/90 backdrop-blur-sm transition-colors duration-200">
-                <div className="w-full max-w-7xl px-4 sm:px-6 flex flex-col md:flex-row justify-between items-start gap-12 mb-24 relative z-20 pointer-events-auto">
+            {/* Footer */}
+            <footer className="relative w-full z-10 pt-16 pb-10 border-t border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/90 dark:bg-[#080808]/90 backdrop-blur-sm transition-colors duration-200">
+                <div className="w-full max-w-7xl px-4 sm:px-6 mx-auto flex flex-col md:flex-row justify-between items-start gap-10 mb-16">
                     <div className="max-w-xs">
-                        <div className="mb-6">
+                        <div className="mb-4">
                             <BrandLogo size="md" theme="auto" asLink={false} />
                         </div>
-                        <p className="text-zinc-600 dark:text-zinc-500 text-sm leading-relaxed">
-                            The operating system for modern coding bootcamps. Empowering educators to track Scalable cohorts natively.
+                        <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed">
+                            The educational operating system for coding bootcamps. Automated progress and contest tracking for LeetCode and Codeforces.
                         </p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
+                    <div className="flex flex-wrap gap-10 sm:gap-14">
                         <div>
-                            <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 tracking-tight text-sm">Resources</h4>
-                            <ul className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+                            <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 text-sm tracking-tight">Platform</h4>
+                            <ul className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400">
                                 <li>
-                                    <Link to="/how-to-use" className="hover:text-zinc-900 dark:hover:text-white transition-colors">How to Use & Docs</Link>
+                                    <Link to="/how-to-use" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Documentation</Link>
                                 </li>
                                 <li>
                                     <Link to="/contact" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Support & Contact</Link>
@@ -433,28 +636,34 @@ export function LandingPage() {
                                 <li>
                                     <Link to="/login" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Sign In</Link>
                                 </li>
+                                <li>
+                                    <Link to="/register" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Create Account</Link>
+                                </li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 tracking-tight text-sm">Open Source</h4>
-                            <a href="https://github.com/varunkushwah31/Leetcode-Tracker-Frontend" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 px-4 py-2 rounded-xl text-sm font-medium transition-all group outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] shadow-xs interactive-press hover:-translate-y-0.5">
-                                <Code2Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-all duration-300 group-hover:rotate-12 group-hover:scale-110" />
-                                <span className="text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">Star on GitHub</span>
+                            <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 text-sm tracking-tight">Repository</h4>
+                            <a 
+                                href="https://github.com/varunkushwah31/Leetcode-Tracker-Frontend" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm hover:-translate-y-0.5 text-zinc-800 dark:text-zinc-200 min-h-[44px]"
+                            >
+                                <Code2Icon className="w-4 h-4 text-zinc-500" />
+                                <span>Star on GitHub</span>
+                                <ArrowSquareOutIcon className="w-3.5 h-3.5 text-zinc-400" />
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div className="absolute bottom-5 sm:bottom-7.5 left-1/2 -translate-x-1/2 w-[200%] sm:w-[120%] text-center whitespace-nowrap pointer-events-none">
-                    <h1 className="text-[20vw] sm:text-[14vw] font-black tracking-tighter text-zinc-900 dark:text-white opacity-[0.06] dark:opacity-[0.02] select-none uppercase leading-none">
-                        MENTORSYNC
-                    </h1>
-                </div>
-
-                <div className="relative z-20 text-zinc-500 dark:text-zinc-600 text-xs sm:text-sm font-medium tracking-wide mt-auto pointer-events-auto flex flex-col sm:flex-row items-center justify-between w-full max-w-7xl px-4 sm:px-6">
-                    <span>© {new Date().getFullYear()} MentorSync. Built for educators • Crafted in India.</span>
-                    <span className="mt-2 sm:mt-0 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> All systems operational</span>
+                <div className="w-full max-w-7xl px-4 sm:px-6 mx-auto pt-6 border-t border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 dark:text-zinc-500 gap-3">
+                    <span>(C) {new Date().getFullYear()} MentorSync. All rights reserved.</span>
+                    <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        All systems operational
+                    </span>
                 </div>
             </footer>
         </div>
