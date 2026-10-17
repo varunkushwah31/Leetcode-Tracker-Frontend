@@ -12,6 +12,7 @@ import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { ForgotPasswordModal } from '../components/common/ForgotPasswordModal';
 import { StudentEmailVerificationModal } from '../components/common/StudentEmailVerificationModal';
 import { AuthService } from '../services/endpoints';
+import { OAuthButtons } from '../components/common/OAuthButtons';
 import {
   extractLeetcodeUsername,
   extractCodeforcesHandle,
@@ -59,7 +60,11 @@ export function AuthPage() {
   // Keep isLogin aligned if route changes via browser history or navigation
   useEffect(() => {
     setIsLogin(location.pathname !== '/register');
-  }, [location.pathname]);
+    if (location.state && typeof location.state === 'object' && 'error' in location.state) {
+      const err = (location.state as { error?: string }).error;
+      if (err) setError(err);
+    }
+  }, [location.pathname, location.state]);
 
   const toggleAuthMode = (newIsLogin: boolean) => {
     setIsLogin(newIsLogin);
@@ -540,6 +545,20 @@ export function AuthPage() {
                 {isLogin ? 'Sign In' : 'Create Account'}
               </Button>
             </form>
+
+            {/* Social Authentication */}
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-zinc-200 dark:border-zinc-800" />
+              </div>
+              <div className="relative flex justify-center text-[11px] uppercase">
+                <span className="bg-white dark:bg-[#111111] px-3 text-zinc-500 font-semibold tracking-wider">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <OAuthButtons disabled={isLoading} />
 
             <div className="mt-5 flex items-center justify-center gap-2.5">
               <p className="text-zinc-500 text-xs sm:text-sm">

@@ -22,6 +22,9 @@ const ContactPage = React.lazy(() =>
 const HowToUsePage = React.lazy(() =>
     import('./pages/HowToUsePage').then((m) => ({ default: m.HowToUsePage }))
 );
+const OAuth2RedirectHandler = React.lazy(() =>
+    import('./pages/OAuth2RedirectHandler').then((m) => ({ default: m.OAuth2RedirectHandler }))
+);
 
 const FullPageLoader = () => (
     <div className="flex h-screen items-center justify-center bg-slate-50" role="status" aria-live="polite" aria-label="Loading">
@@ -79,6 +82,10 @@ function App() {
                         {/* 3. Added Contact and How to Use routes */}
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/how-to-use" element={<HowToUsePage />} />
+
+                        {/* OAuth 2.0 Callbacks */}
+                        <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+                        <Route path="/oauth2/callback" element={<OAuth2RedirectHandler />} />
 
                         <Route
                             path="/dashboard"
