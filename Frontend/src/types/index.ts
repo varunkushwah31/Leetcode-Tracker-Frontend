@@ -109,6 +109,7 @@ export interface StudentSummaryDTO {
     pendingAssignments?: number;
     avatarUrl?: string;
     manuallyCompletedAssignments?: string[];
+    authProvider?: 'LOCAL' | 'GOOGLE' | 'GITHUB';
 }
 
 export interface StudentExtendedDTO extends StudentSummaryDTO {

@@ -150,6 +150,16 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-zinc-900 dark:text-transparent dark:bg-clip-text dark:bg-linear-to-r dark:from-white dark:to-zinc-400 tracking-tight mb-1">
                                             {data.name || 'Student'}
                                         </h2>
+                                        {data.authProvider === 'GOOGLE' && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/60" title="Signed in with Google">
+                                                Google
+                                            </span>
+                                        )}
+                                        {data.authProvider === 'GITHUB' && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700" title="Signed in with GitHub">
+                                                GitHub
+                                            </span>
+                                        )}
                                         <button
                                             type="button"
                                             onClick={handleOpenEdit}

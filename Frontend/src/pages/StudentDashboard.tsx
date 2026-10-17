@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { SpinnerIcon as Loader2, SignOutIcon as LogOut, PulseIcon as Activity, DownloadSimpleIcon as Download, KeyIcon } from '@phosphor-icons/react';
+import { SpinnerIcon as Loader2, SignOutIcon as LogOut, PulseIcon as Activity, DownloadSimpleIcon as Download, KeyIcon, CodeIcon } from '@phosphor-icons/react';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ChangePasswordModal } from '../components/common/ChangePasswordModal';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -235,6 +235,23 @@ export function StudentDashboard() {
                 {/* 5. Render any global errors (like an initial 500 error, or a failed sync) */}
                 <ErrorBanner message={pageError} className="mb-6" />
                 <ErrorBanner message={syncError} className="mb-6" />
+
+                {/* Onboarding Banner for students registering via OAuth without handles */}
+                {dashboardData && !dashboardData.leetcodeUsername && !dashboardData.codeforcesHandle && (
+                    <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-indigo-50/90 dark:bg-[#5b4fff]/10 border border-indigo-200/80 dark:border-[#5b4fff]/20 text-zinc-900 dark:text-zinc-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="flex items-start sm:items-center gap-3">
+                            <div className="p-2.5 rounded-xl bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] shrink-0 mt-0.5 sm:mt-0">
+                                <CodeIcon className="w-5 h-5" weight="bold" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Welcome! Connect your coding profiles</h3>
+                                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+                                    Link your LeetCode or Codeforces account in your profile below to start syncing solved problems, contest ratings, and classroom assignments.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} onProfileUpdated={fetchDashboard} />
 
