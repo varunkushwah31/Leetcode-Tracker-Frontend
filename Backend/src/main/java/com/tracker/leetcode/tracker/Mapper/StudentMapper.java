@@ -76,6 +76,7 @@ public class StudentMapper {
                 .completedAssignments(completed)
                 .pendingAssignments(pending)
                 .avatarUrl(student.getAvatarUrl())
+                .authProvider(student.getAuthProvider())
                 .build();
     }
 
@@ -132,6 +133,7 @@ public class StudentMapper {
                 .recentSubmissions(student.getRecentSubmissions())
                 .progressHistory(student.getProgressHistory())
                 .avatarUrl(student.getAvatarUrl())
+                .authProvider(student.getAuthProvider())
                 .build();
     }
 

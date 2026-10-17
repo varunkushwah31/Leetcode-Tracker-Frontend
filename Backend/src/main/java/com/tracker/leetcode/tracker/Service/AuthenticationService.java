@@ -299,10 +299,6 @@ public class AuthenticationService {
             throw new UserAuthenticationException("User is not authenticated.");
         }
 
-        if (request.currentPassword() == null || request.currentPassword().isBlank()) {
-            throw new ValidationFailedException("Current password is required.");
-        }
-
         if (request.newPassword() == null || request.newPassword().isBlank()) {
             throw new ValidationFailedException("New password is required.");
         }
@@ -322,11 +318,16 @@ public class AuthenticationService {
                 .or(() -> studentRepository.findByEmailIgnoreCase(userEmail));
         if (studentOpt.isPresent()) {
             Student student = studentOpt.get();
-            if (!passwordEncoder.matches(request.currentPassword(), student.getPassword())) {
-                throw new ValidationFailedException("Current password is incorrect.");
-            }
-            if (passwordEncoder.matches(request.newPassword(), student.getPassword())) {
-                throw new ValidationFailedException("New password cannot be the same as your current password.");
+            if (student.getPassword() != null && !student.getPassword().isBlank()) {
+                if (request.currentPassword() == null || request.currentPassword().isBlank()) {
+                    throw new ValidationFailedException("Current password is required.");
+                }
+                if (!passwordEncoder.matches(request.currentPassword(), student.getPassword())) {
+                    throw new ValidationFailedException("Current password is incorrect.");
+                }
+                if (passwordEncoder.matches(request.newPassword(), student.getPassword())) {
+                    throw new ValidationFailedException("New password cannot be the same as your current password.");
+                }
             }
             student.setPassword(passwordEncoder.encode(request.newPassword()));
             studentRepository.save(student);
@@ -338,11 +339,16 @@ public class AuthenticationService {
         var mentorOpt = mentorRepository.findByEmail(userEmail);
         if (mentorOpt.isPresent()) {
             Mentor mentor = mentorOpt.get();
-            if (!passwordEncoder.matches(request.currentPassword(), mentor.getPassword())) {
-                throw new ValidationFailedException("Current password is incorrect.");
-            }
-            if (passwordEncoder.matches(request.newPassword(), mentor.getPassword())) {
-                throw new ValidationFailedException("New password cannot be the same as your current password.");
+            if (mentor.getPassword() != null && !mentor.getPassword().isBlank()) {
+                if (request.currentPassword() == null || request.currentPassword().isBlank()) {
+                    throw new ValidationFailedException("Current password is required.");
+                }
+                if (!passwordEncoder.matches(request.currentPassword(), mentor.getPassword())) {
+                    throw new ValidationFailedException("Current password is incorrect.");
+                }
+                if (passwordEncoder.matches(request.newPassword(), mentor.getPassword())) {
+                    throw new ValidationFailedException("New password cannot be the same as your current password.");
+                }
             }
             mentor.setPassword(passwordEncoder.encode(request.newPassword()));
             mentorRepository.save(mentor);

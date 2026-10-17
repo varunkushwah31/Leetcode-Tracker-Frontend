@@ -1,15 +1,14 @@
 import { defineConfig } from 'vite'
-import path from "node:path"
+import { fileURLToPath, URL } from "node:url"
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   server: {
@@ -22,6 +21,14 @@ export default defineConfig({
       '/ws-endpoint': {
         target: 'http://localhost:8080',
         ws: true,
+        changeOrigin: true,
+      },
+      '/oauth2': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/login/oauth2': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
     },

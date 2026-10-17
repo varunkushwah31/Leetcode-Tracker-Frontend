@@ -30,6 +30,10 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final com.tracker.leetcode.tracker.Service.RateLimitingService rateLimitingService;
     private final tools.jackson.databind.ObjectMapper objectMapper;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    @Value("${application.oauth2.redirect-uri:${APP_OAUTH2_REDIRECT_URI:http://localhost:5173/oauth2/redirect}}")
+    private String frontendRedirectUri;
 
     @Value("${application.cors.allowed-origins:http://localhost:5173,http://localhost:3000,http://localhost:80}")
     private List<String> configuredAllowedOrigins;
@@ -73,6 +77,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/students/me/**").hasRole("STUDENT")
 
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler((request, response, exception) -> {
+                            org.slf4j.LoggerFactory.getLogger(SecurityConfig.class).error("OAuth2 authentication failure: {}", exception.getMessage());
+                            String redirectUrl = org.springframework.web.util.UriComponentsBuilder.fromUriString(frontendRedirectUri)
+                                    .queryParam("error", "Social login failed: " + exception.getMessage())
+                                    .build().toUriString();
+                            response.sendRedirect(redirectUrl);
+                        })
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)

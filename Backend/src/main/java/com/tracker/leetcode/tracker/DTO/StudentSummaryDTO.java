@@ -1,5 +1,6 @@
 package com.tracker.leetcode.tracker.DTO;
 
+import com.tracker.leetcode.tracker.Models.AuthProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,4 +28,5 @@ public class StudentSummaryDTO {
     private int pendingAssignments;
     private String email;
     private String avatarUrl;
+    private AuthProvider authProvider;
 }

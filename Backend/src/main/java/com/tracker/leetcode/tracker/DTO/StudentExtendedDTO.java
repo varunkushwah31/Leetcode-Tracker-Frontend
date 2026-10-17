@@ -42,4 +42,5 @@ public class StudentExtendedDTO {
     private List<String> manuallyCompletedAssignments;
     private List<Classroom> classrooms;
     private List<SkillStat> skills;
+    private AuthProvider authProvider;
 }
