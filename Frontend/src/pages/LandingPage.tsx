@@ -7,7 +7,6 @@ import {
     CodeIcon as Code2Icon,
     ListIcon as MenuIcon,
     XIcon,
-    ShieldCheckIcon,
     DatabaseIcon,
     FireIcon,
     TrophyIcon,
@@ -154,12 +153,11 @@ export function LandingPage() {
     const activeVerification = SAMPLE_VERIFICATIONS.find(v => v.id === selectedVerification) || SAMPLE_VERIFICATIONS[0];
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#08080a] text-zinc-900 dark:text-zinc-100 selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
 
-            {/* Atmosphere & Subtle Tech Grid */}
-            <div className="fixed inset-0 z-0 pointer-events-none transition-colors duration-200" aria-hidden="true">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(91,79,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(91,79,255,0.04)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(150,143,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(150,143,255,0.03)_1px,transparent_1px)] bg-size-[44px_44px]" />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-120 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.18),transparent)] pointer-events-none" />
+            {/* Background Base with Theme Adaptation (Previous Dotted Pattern) */}
+            <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-200 pointer-events-none" aria-hidden="true">
+                <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed opacity-25 dark:opacity-100 pointer-events-none" />
                 <AmbientGlow />
             </div>
 
@@ -656,11 +654,6 @@ export function LandingPage() {
                         
                         {/* Narrative Column */}
                         <div className="lg:col-span-5 space-y-6">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs border border-emerald-500/20">
-                                <ShieldCheckIcon className="w-4 h-4" weight="bold" />
-                                Automated Verification Scraper
-                            </div>
-
                             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
                                 Zero spreadsheet toil. <br />
                                 Every solution verified live.
@@ -809,11 +802,6 @@ export function LandingPage() {
 
                         {/* Narrative Column */}
                         <div className="lg:col-span-5 space-y-6 order-1 lg:order-2">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold text-xs border border-sky-500/20">
-                                <Code2Icon className="w-4 h-4" weight="bold" />
-                                Dual-Platform Synchronization
-                            </div>
-
                             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
                                 One unified profile for <br />
                                 LeetCode and Codeforces.
@@ -847,11 +835,6 @@ export function LandingPage() {
                         
                         {/* Narrative Column */}
                         <div className="lg:col-span-5 space-y-6">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs border border-indigo-500/20">
-                                <BrainIcon className="w-4 h-4" weight="bold" />
-                                Topic Competency Intelligence
-                            </div>
-
                             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
                                 Spot cohort weaknesses <br />
                                 before placement exams.
