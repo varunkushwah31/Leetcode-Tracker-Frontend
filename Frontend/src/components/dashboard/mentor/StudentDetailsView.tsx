@@ -104,7 +104,11 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
     const totalSolved = actualSolved;
     const progressTotal = Math.max(actualSolved, 1);
 
-    const rating = Math.round(data?.currentContestRating || 0);
+    const lcSolved = data?.leetcodeSolvedCount ?? (easyCount + medCount + hardCount);
+    const cfSolved = data?.codeforcesSolvedCount ?? 0;
+    const lcRating = Math.round(data?.currentContestRating || data?.contestRating || 0);
+    const cfRating = (data?.codeforcesRating && data.codeforcesRating > 0) ? data.codeforcesRating : 0;
+    const maxRating = Math.max(lcRating, cfRating);
 
     const formatDate = (ts: number | string) => {
         if (!ts) return 'Unknown Date';
@@ -222,15 +226,23 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                             <div>
                                 <h1 className="text-xl sm:text-3xl font-extrabold mb-1 text-zinc-900 dark:text-white tracking-tight">{data.name}</h1>
                                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-3">
-                                    {data.leetcodeUsername && (
+                                    {data.leetcodeUsername ? (
                                         <a href={`https://leetcode.com/${data.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-[#5b4fff] dark:hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-zinc-900/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                                            LC: @{data.leetcodeUsername} <ExternalLink className="h-3 w-3 ml-1.5" />
+                                            LC: @{data.leetcodeUsername} ({lcSolved} solved • {lcRating > 0 ? `${lcRating} rating` : 'Unrated'}) <ExternalLink className="h-3 w-3 ml-1.5" />
                                         </a>
+                                    ) : (
+                                        <span className="text-zinc-400 dark:text-zinc-500 inline-flex items-center text-xs font-medium bg-zinc-100/60 dark:bg-zinc-900/30 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                                            LC: Not linked
+                                        </span>
                                     )}
-                                    {data.codeforcesHandle && (
+                                    {data.codeforcesHandle ? (
                                         <a href={`https://codeforces.com/profile/${data.codeforcesHandle}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors inline-flex items-center text-xs font-medium bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-500/20">
-                                            CF: @{data.codeforcesHandle} <ExternalLink className="h-3 w-3 ml-1.5" />
+                                            CF: @{data.codeforcesHandle} ({cfSolved} solved • {cfRating > 0 ? `${cfRating} rating` : 'Unrated'}) <ExternalLink className="h-3 w-3 ml-1.5" />
                                         </a>
+                                    ) : (
+                                        <span className="text-zinc-400 dark:text-zinc-500 inline-flex items-center text-xs font-medium bg-zinc-100/60 dark:bg-zinc-900/30 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                                            CF: Not linked
+                                        </span>
                                     )}
                                 </div>
                             </div>
@@ -244,16 +256,12 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Solved</p>
                                 <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{totalSolved}</p>
-                                {Boolean(data.codeforcesSolvedCount && data.codeforcesSolvedCount > 0) && (
-                                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {data.leetcodeSolvedCount ?? (easyCount + medCount + hardCount)} | CF: {data.codeforcesSolvedCount}</p>
-                                )}
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcSolved} • CF: {cfSolved}</p>
                             </div>
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rating</p>
-                                <p className="text-2xl font-bold text-[#5b4fff] dark:text-[#b4afff]">{rating}</p>
-                                {Boolean(data.codeforcesRating && data.codeforcesRating > 0) && (
-                                    <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-0.5">CF: {data.codeforcesRating}</p>
-                                )}
+                                <p className="text-2xl font-bold text-[#5b4fff] dark:text-[#b4afff]">{maxRating > 0 ? maxRating : 'Unrated'}</p>
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcRating > 0 ? lcRating : 'Unrated'} • CF: {cfRating > 0 ? cfRating : 'Unrated'}</p>
                             </div>
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Streak</p>

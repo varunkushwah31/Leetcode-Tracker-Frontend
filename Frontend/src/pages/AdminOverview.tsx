@@ -775,6 +775,11 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                         .substring(0, 2)
                                         .toUpperCase();
                                     const studentDisplayName = student.name || student.email || student.leetcodeUsername || student.codeforcesHandle || 'Unnamed Student';
+                                    const lcSolved = student.leetcodeSolvedCount ?? Math.max(0, (student.totalSolved || 0) - (student.codeforcesSolvedCount || 0));
+                                    const lcRating = Math.round(student.currentContestRating || student.contestRating || 0);
+                                    const cfSolved = student.codeforcesSolvedCount ?? 0;
+                                    const cfRating = (student.codeforcesRating && student.codeforcesRating > 0) ? `${student.codeforcesRating} rating` : 'Unrated';
+                                    const lcRatingText = lcRating > 0 ? `${lcRating} rating` : 'Unrated';
 
                                     return (
                                         <div key={student.id || student.leetcodeUsername || student.email || `st-${idx}`} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50 transition-colors group">
@@ -791,14 +796,22 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
                                                         {student.email && <span className="text-xs text-zinc-400 truncate max-w-full">({student.email})</span>}
                                                     </div>
                                                 <div className="flex flex-wrap items-center gap-2 mt-1">
-                                                    {student.leetcodeUsername && (
+                                                    {student.leetcodeUsername ? (
                                                         <span className="text-[11px] font-medium px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
-                                                            LC: @{student.leetcodeUsername} ({student.leetcodeSolvedCount || 0} solved)
+                                                            LC: @{student.leetcodeUsername} ({lcSolved} solved • {lcRatingText})
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700">
+                                                            LC: Not linked
                                                         </span>
                                                     )}
-                                                    {student.codeforcesHandle && (
+                                                    {student.codeforcesHandle ? (
                                                         <span className="text-[11px] font-medium px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
-                                                            CF: @{student.codeforcesHandle} ({student.codeforcesRating || 'Unrated'})
+                                                            CF: @{student.codeforcesHandle} ({cfSolved} solved • {cfRating})
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700">
+                                                            CF: Not linked
                                                         </span>
                                                     )}
                                                     <span className="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
