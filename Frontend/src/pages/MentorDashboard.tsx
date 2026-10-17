@@ -149,7 +149,7 @@ function EmptyClassroomState({
 
                 {hasClassrooms ? (
                     <div className="space-y-4 mb-2">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
                             {classrooms.map((c) => (
                                 <button
                                     key={c.classroomId}
@@ -517,7 +517,7 @@ export function MentorDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col w-full min-w-0">
+            <main className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col w-full min-w-0">
                 {/* Luminous Multi-Layer Ambient Glow */}
                 <div className="hidden dark:block">
                     <AmbientGlow />
