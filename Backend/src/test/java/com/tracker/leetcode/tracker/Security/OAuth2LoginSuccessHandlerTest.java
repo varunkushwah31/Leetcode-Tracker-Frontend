@@ -230,8 +230,9 @@ class OAuth2LoginSuccessHandlerTest {
         verify(response).sendRedirect(redirectCaptor.capture());
         String redirectUrl = redirectCaptor.getValue();
 
-        assertThat(redirectUrl).contains("error=");
-        assertThat(redirectUrl).contains("Could not retrieve email");
+        assertThat(redirectUrl)
+                .contains("error=")
+                .contains("Could not retrieve email");
     }
 
     @Test
@@ -252,7 +253,8 @@ class OAuth2LoginSuccessHandlerTest {
         verify(response).sendRedirect(redirectCaptor.capture());
         String redirectUrl = redirectCaptor.getValue();
 
-        assertThat(redirectUrl).contains("error=");
-        assertThat(redirectUrl).contains("account has been disabled");
+        assertThat(redirectUrl)
+                .contains("error=")
+                .contains("account has been disabled");
     }
 }

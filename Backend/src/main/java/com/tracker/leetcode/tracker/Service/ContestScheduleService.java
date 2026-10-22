@@ -24,33 +24,40 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ContestScheduleService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
     private final CacheManager cacheManager;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Autowired(required = false)
-    @Qualifier("virtualThreadExecutor")
-    private Executor virtualThreadExecutor;
+    private final Executor virtualThreadExecutor;
 
     @Autowired
-    public ContestScheduleService(RedisTemplate<String, Object> redisTemplate,
-                                  CacheManager cacheManager,
-                                  @Autowired(required = false) RestTemplate restTemplate) {
-        this.redisTemplate = redisTemplate;
+    public ContestScheduleService(
+            CacheManager cacheManager,
+            @Autowired(required = false) RestTemplate restTemplate,
+            @Autowired(required = false) @Qualifier("virtualThreadExecutor") Executor virtualThreadExecutor) {
         this.cacheManager = cacheManager;
         this.restTemplate = restTemplate != null ? restTemplate : new RestTemplate();
+        this.virtualThreadExecutor = virtualThreadExecutor;
+    }
+
+    public ContestScheduleService(
+            RedisTemplate<String, Object> redisTemplate,
+            CacheManager cacheManager,
+            RestTemplate restTemplate) {
+        this(cacheManager, restTemplate, null);
     }
 
     public ContestScheduleService(RedisTemplate<String, Object> redisTemplate, CacheManager cacheManager) {
-        this(redisTemplate, cacheManager, null);
+        this(cacheManager, null, null);
+    }
+
+    public ContestScheduleService(CacheManager cacheManager) {
+        this(cacheManager, null, null);
     }
 
     private Executor getExecutor() {
@@ -317,7 +324,7 @@ public class ContestScheduleService {
             }
 
             JsonNode root = objectMapper.readTree(response.getBody());
-            String status = root.path("status").asText();
+            String status = root.path("status").asString();
             if (!"OK".equalsIgnoreCase(status)) {
                 return list;
             }
@@ -325,10 +332,10 @@ public class ContestScheduleService {
             JsonNode contests = root.path("result");
             if (contests.isArray()) {
                 for (JsonNode c : contests) {
-                    String phase = c.path("phase").asText("");
+                    String phase = c.path("phase").asString("");
                     if ("BEFORE".equalsIgnoreCase(phase) || "CODING".equalsIgnoreCase(phase)) {
                         int id = c.path("id").asInt();
-                        String name = c.path("name").asText("Codeforces Contest " + id);
+                        String name = c.path("name").asString("Codeforces Contest " + id);
                         long duration = c.path("durationSeconds").asLong(7200);
                         long startTime = c.path("startTimeSeconds").asLong(0);
 

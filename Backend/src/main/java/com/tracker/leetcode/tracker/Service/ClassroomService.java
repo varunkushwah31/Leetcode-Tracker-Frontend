@@ -14,9 +14,7 @@ import com.tracker.leetcode.tracker.Models.*;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,8 +34,15 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ClassroomService {
+
+    private static final String CLASSROOM_NOT_FOUND_PREFIX = "Classroom not found with ID: ";
+    private static final String WS_ACTION_UPDATE = "UPDATE";
+    private static final String WS_TOPIC_CLASSROOMS_PREFIX = "/topic/classrooms/";
+    private static final String WS_KEY_ACTION = "action";
+    private static final String WS_KEY_MESSAGE = "message";
+    private static final String PROBLEM_PREFIX = "Problem ";
+    private static final String DIFFICULTY_MEDIUM = "MEDIUM";
 
     private final ClassroomRepository classroomRepository;
     private final MentorRepository mentorRepository;
@@ -48,27 +53,61 @@ public class ClassroomService {
     private final SimpMessagingTemplate messagingTemplate;
     private final RedisLeaderboardService redisLeaderboardService;
     private final RedisWebSocketBridge webSocketBridge;
+    private final CuratedTopicCatalog curatedTopicCatalog;
+    private final ClassroomService self;
+    private final StudentService studentService;
+    private final org.springframework.cache.CacheManager cacheManager;
+    private final java.util.concurrent.Executor virtualThreadExecutor;
 
-    @Lazy
-    @Autowired
-    private CuratedTopicCatalog curatedTopicCatalog;
+    @org.springframework.beans.factory.annotation.Autowired
+    public ClassroomService(
+            ClassroomRepository classroomRepository,
+            MentorRepository mentorRepository,
+            StudentRepository studentRepository,
+            StudentMapper studentMapper,
+            LeetCodeApiClient leetCodeApiClient,
+            CodeforcesApiClient codeforcesApiClient,
+            SimpMessagingTemplate messagingTemplate,
+            RedisLeaderboardService redisLeaderboardService,
+            RedisWebSocketBridge webSocketBridge,
+            @Lazy CuratedTopicCatalog curatedTopicCatalog,
+            @Lazy ClassroomService self,
+            @Lazy StudentService studentService,
+            @Lazy org.springframework.cache.CacheManager cacheManager,
+            @Lazy @org.springframework.beans.factory.annotation.Qualifier("virtualThreadExecutor")
+            java.util.concurrent.Executor virtualThreadExecutor
+    ) {
+        this.classroomRepository = classroomRepository;
+        this.mentorRepository = mentorRepository;
+        this.studentRepository = studentRepository;
+        this.studentMapper = studentMapper;
+        this.leetCodeApiClient = leetCodeApiClient;
+        this.codeforcesApiClient = codeforcesApiClient;
+        this.messagingTemplate = messagingTemplate;
+        this.redisLeaderboardService = redisLeaderboardService;
+        this.webSocketBridge = webSocketBridge;
+        this.curatedTopicCatalog = curatedTopicCatalog;
+        this.self = self;
+        this.studentService = studentService;
+        this.cacheManager = cacheManager;
+        this.virtualThreadExecutor = virtualThreadExecutor;
+    }
 
-    @Lazy
-    @Autowired
-    private ClassroomService self;
-
-    @Lazy
-    @Autowired
-    private StudentService studentService;
-
-    @Lazy
-    @Autowired
-    private org.springframework.cache.CacheManager cacheManager;
-
-    @Lazy
-    @Autowired
-    @org.springframework.beans.factory.annotation.Qualifier("virtualThreadExecutor")
-    private java.util.concurrent.Executor virtualThreadExecutor;
+    public ClassroomService(
+            ClassroomRepository classroomRepository,
+            MentorRepository mentorRepository,
+            StudentRepository studentRepository,
+            StudentMapper studentMapper,
+            LeetCodeApiClient leetCodeApiClient,
+            CodeforcesApiClient codeforcesApiClient,
+            SimpMessagingTemplate messagingTemplate,
+            RedisLeaderboardService redisLeaderboardService,
+            RedisWebSocketBridge webSocketBridge
+    ) {
+        this(classroomRepository, mentorRepository, studentRepository, studentMapper,
+                leetCodeApiClient, codeforcesApiClient, messagingTemplate, redisLeaderboardService,
+                webSocketBridge, null, null, null, null, null);
+    }
 
     // 1. Create Classroom
     @CacheEvict(value = {"classroom-dashboard", "classroom-analytics", "mentors-all", "mentor"}, allEntries = true)
@@ -98,7 +137,8 @@ public class ClassroomService {
         if (student == null) {
             return false;
         }
-        boolean hasPassword = student.getPassword() != null && !student.getPassword().isBlank();
+        String pwd = student.getPassword();
+        boolean hasPassword = pwd != null && !pwd.isBlank();
         boolean hasValidEmail = student.getEmail() != null
                 && !student.getEmail().isBlank()
                 && !student.getEmail().toLowerCase().endsWith("@student.mentorsync.local");
@@ -150,7 +190,7 @@ public class ClassroomService {
     public Classroom addStudentToClassroom(String classroomId, String identifier) {
         log.info("Adding student {} to classroom ID: {}", identifier, classroomId);
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         String trimmed = identifier != null ? identifier.trim() : "";
         if (trimmed.isEmpty()) {
@@ -211,10 +251,10 @@ public class ClassroomService {
 
         classroom.getStudentIds().add(student.getId());
         Classroom saved = classroomRepository.save(classroom);
-        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Student added: " + student.getName());
+        webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "Student added: " + student.getName());
         messagingTemplate.convertAndSend(
-                "/topic/classrooms/" + classroomId,
-                (Object) Map.of("action", "UPDATE", "message", "Student added: " + student.getName())
+                WS_TOPIC_CLASSROOMS_PREFIX + classroomId,
+                (Object) Map.of(WS_KEY_ACTION, WS_ACTION_UPDATE, WS_KEY_MESSAGE, "Student added: " + student.getName())
         );
 
         final Student studentToSync = student;
@@ -236,7 +276,7 @@ public class ClassroomService {
     public Classroom addStudentToClassroom(String classroomId, String identifier, String mentorId) {
         if (mentorId != null && !mentorId.isBlank()) {
             Classroom classroom = classroomRepository.findById(classroomId)
-                    .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                    .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
             if (!classroom.getMentorId().equals(mentorId)) {
                 log.warn("Security Alert: Mentor {} attempted to add student to classroom {} which they do not own.", mentorId, classroomId);
                 throw new AccessDeniedException("You are not authorized to modify this classroom.");
@@ -250,7 +290,7 @@ public class ClassroomService {
     public Classroom removeStudentFromClassroom(String classroomId, String studentIdentifier, String mentorId) {
         log.info("Removing student '{}' from classroom ID: {} by mentor {}", studentIdentifier, classroomId, mentorId);
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         if (mentorId != null && !mentorId.isBlank() && !classroom.getMentorId().equals(mentorId)) {
             log.warn("Security Alert: Mentor {} attempted to remove student from classroom {} which they do not own.", mentorId, classroomId);
@@ -319,10 +359,10 @@ public class ClassroomService {
 
         // 4. Broadcast WebSocket & STOMP updates
         String displayName = studentName != null ? studentName : targetStudentId;
-        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Student removed: " + displayName);
+        webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "Student removed: " + displayName);
         messagingTemplate.convertAndSend(
-                "/topic/classrooms/" + classroomId,
-                (Object) Map.of("action", "UPDATE", "message", "Student removed: " + displayName)
+                WS_TOPIC_CLASSROOMS_PREFIX + classroomId,
+                (Object) Map.of(WS_KEY_ACTION, WS_ACTION_UPDATE, WS_KEY_MESSAGE, "Student removed: " + displayName)
         );
 
         return saved;
@@ -339,7 +379,7 @@ public class ClassroomService {
 
         // 1. Fetch the data we need from MongoDB
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         Mentor mentor = mentorRepository.findById(classroom.getMentorId())
                 .orElseThrow(() -> new MentorNotFoundException("Mentor not found for this classroom."));
@@ -360,8 +400,7 @@ public class ClassroomService {
 
             Comparator<StudentSummaryDTO> comparator;
             switch (field) {
-                case "consistency":
-                case "streak":
+                case "consistency", "streak":
                     comparator = Comparator.comparingInt(StudentSummaryDTO::getConsistencyStreak);
                     if (!isAscending) comparator = comparator.reversed();
                     break;
@@ -375,32 +414,27 @@ public class ClassroomService {
                     if (!isAscending) comparator = comparator.reversed();
                     break;
 
-                case "lc_rating":
-                case "leetcoderating":
+                case "lc_rating", "leetcoderating":
                     comparator = Comparator.comparingDouble(StudentSummaryDTO::getCurrentContestRating);
                     if (!isAscending) comparator = comparator.reversed();
                     break;
 
-                case "cf_rating":
-                case "codeforcesrating":
+                case "cf_rating", "codeforcesrating":
                     comparator = Comparator.comparingDouble(s -> s.getCodeforcesRating() != null ? s.getCodeforcesRating().doubleValue() : 0.0);
                     if (!isAscending) comparator = comparator.reversed();
                     break;
 
-                case "solved":
-                case "totalsolved":
+                case "solved", "totalsolved":
                     comparator = Comparator.comparingInt(StudentSummaryDTO::getTotalSolved);
                     if (!isAscending) comparator = comparator.reversed();
                     break;
 
-                case "lc_solved":
-                case "leetcodesolved":
+                case "lc_solved", "leetcodesolved":
                     comparator = Comparator.comparingInt(StudentSummaryDTO::getLeetcodeSolvedCount);
                     if (!isAscending) comparator = comparator.reversed();
                     break;
 
-                case "cf_solved":
-                case "codeforcessolved":
+                case "cf_solved", "codeforcessolved":
                     comparator = Comparator.comparingInt(StudentSummaryDTO::getCodeforcesSolvedCount);
                     if (!isAscending) comparator = comparator.reversed();
                     break;
@@ -462,7 +496,7 @@ public class ClassroomService {
     public ClassroomDashboardDTO syncClassroom(String classroomId, String sortBy) {
         log.info("Starting complete sync for classroom ID: {}", classroomId);
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         List<Student> students = studentRepository.findAllById(classroom.getStudentIds());
         if (studentService != null && !students.isEmpty()) {
@@ -483,7 +517,7 @@ public class ClassroomService {
         Cache dashCache = cacheManager.getCache("classroom-dashboard");
         if (dashCache != null) dashCache.clear();
 
-        return getClassroomDashboard(classroomId, sortBy);
+        return (self != null ? self : this).getClassroomDashboard(classroomId, sortBy);
     }
 
     // 4. Assign a question to the classroom
@@ -493,7 +527,7 @@ public class ClassroomService {
                 assignment.getTitleSlug(), assignment.getPlatform(), classroomId);
 
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         if (assignment.getId() == null) {
             assignment.setId(UUID.randomUUID().toString());
@@ -508,10 +542,10 @@ public class ClassroomService {
 
         // Broadcast assignment update to all connected students and mentors
         messagingTemplate.convertAndSend(
-                "/topic/classrooms/" + classroomId,
-                (Object) Map.of("action", "UPDATE", "message", "New assignment added!")
+                WS_TOPIC_CLASSROOMS_PREFIX + classroomId,
+                (Object) Map.of(WS_KEY_ACTION, WS_ACTION_UPDATE, WS_KEY_MESSAGE, "New assignment added!")
         );
-        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "New assignment added!");
+        webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "New assignment added!");
 
         return savedClassroom;
     }
@@ -525,7 +559,7 @@ public class ClassroomService {
         // 2. Extract and enrich problem info & problem number for both platforms
         if (assignment.getPlatform() == Platform.CODEFORCES) {
             // Parse contest ID and problem index from titleSlug or questionLink
-            Pattern cfPattern = Pattern.compile("^(\\d+)([A-Za-z0-9]+)$");
+            Pattern cfPattern = Pattern.compile("^(\\d++)([A-Za-z0-9]+)$");
             Matcher matcher = cfPattern.matcher(assignment.getTitleSlug() != null ? assignment.getTitleSlug().trim().toUpperCase() : "");
             if (matcher.find()) {
                 int contestId = Integer.parseInt(matcher.group(1));
@@ -537,17 +571,17 @@ public class ClassroomService {
                 // If title is missing or default, fetch real problem title from Codeforces
                 if (assignment.getTitle() == null || assignment.getTitle().isBlank() ||
                         assignment.getTitle().equalsIgnoreCase(assignment.getTitleSlug()) ||
-                        assignment.getTitle().equalsIgnoreCase("Problem " + contestId + index)) {
+                        assignment.getTitle().equalsIgnoreCase(PROBLEM_PREFIX + contestId + index)) {
                     try {
                         CodeforcesApiClient.CodeforcesProblemInfo cfInfo = codeforcesApiClient.fetchProblemDetails(contestId, index);
                         if (cfInfo != null && cfInfo.title() != null && !cfInfo.title().isBlank()) {
                             assignment.setTitle(cfInfo.title());
                         } else if (assignment.getTitle() == null || assignment.getTitle().isBlank()) {
-                            assignment.setTitle("Problem " + contestId + index);
+                            assignment.setTitle(PROBLEM_PREFIX + contestId + index);
                         }
                     } catch (Exception e) {
                         if (assignment.getTitle() == null || assignment.getTitle().isBlank()) {
-                            assignment.setTitle("Problem " + contestId + index);
+                            assignment.setTitle(PROBLEM_PREFIX + contestId + index);
                         }
                     }
                 }
@@ -673,7 +707,7 @@ public class ClassroomService {
         updateStudentInRedisLeaderboards(savedStudent, classroomId);
 
         // Broadcast the update via Redis Pub/Sub WebSocket bridge
-        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Leaderboard changed!");
+        webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "Leaderboard changed!");
 
         return savedStudent;
     }
@@ -715,7 +749,7 @@ public class ClassroomService {
 
         // Broadcast the update to anyone listening to this classroom via Redis Pub/Sub
         log.info("Broadcasting leaderboard update for classroom: {}", classroomId);
-        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Leaderboard changed!");
+        webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "Leaderboard changed!");
 
         return savedStudent;
     }
@@ -725,15 +759,35 @@ public class ClassroomService {
         return validateSubmissionAsStudent(student, classroomId, assignmentId, null);
     }
 
+    private void fetchAndMergeRecentSubmissions(Student student, List<Assignment> pending, boolean isRecentlySynced) {
+        boolean hasLCPending = pending.stream().anyMatch(a -> a.getPlatform() == Platform.LEETCODE || a.getPlatform() == null);
+        if (!isRecentlySynced && hasLCPending && student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
+            try {
+                List<RecentSubmission> fresh = leetCodeApiClient.fetchRecentSubmissions(student.getLeetcodeUsername(), 20);
+                if (fresh != null && !fresh.isEmpty()) {
+                    List<RecentSubmission> existing = student.getRecentSubmissions() != null
+                            ? new ArrayList<>(student.getRecentSubmissions())
+                            : new ArrayList<>();
+                    for (RecentSubmission r : fresh) {
+                        if (existing.stream().noneMatch(e -> e.getTitleSlug() != null && e.getTitleSlug().equalsIgnoreCase(r.getTitleSlug()) && e.getTimestamp() == r.getTimestamp())) {
+                            existing.add(0, r);
+                        }
+                    }
+                    student.setRecentSubmissions(existing);
+                }
+            } catch (Exception e) {
+                log.debug("Auto-validation: LC fetch skipped: {}", e.getMessage());
+            }
+        }
+    }
+
     private boolean verifyAssignmentSubmission(Student student, Assignment assignment, String submissionUrl) {
         if (assignment.getPlatform() == Platform.CODEFORCES) {
             if (student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank()) {
                 throw new ValidationFailedException("You must link a Codeforces handle to your profile to validate Codeforces assignments.");
             }
-            if (submissionUrl != null && !submissionUrl.isBlank()) {
-                if (submissionUrl.toLowerCase().contains("leetcode.com")) {
-                    throw new ValidationFailedException("You provided a LeetCode URL, but this assignment is on Codeforces.");
-                }
+            if (submissionUrl != null && !submissionUrl.isBlank() && submissionUrl.toLowerCase().contains("leetcode.com")) {
+                throw new ValidationFailedException("You provided a LeetCode URL, but this assignment is on Codeforces.");
             }
             return codeforcesApiClient.verifySubmission(student.getCodeforcesHandle(), assignment.getTitleSlug(), submissionUrl);
         } else {
@@ -744,7 +798,7 @@ public class ClassroomService {
 
             if (submissionUrl != null && !submissionUrl.isBlank()) {
                 // Check if problem slug in the URL mismatches assignment
-                Pattern slugPattern = Pattern.compile("(?i)problems/([a-zA-Z0-9_-]+)/submissions");
+                Pattern slugPattern = Pattern.compile("problems/([a-z0-9_-]+)/submissions", Pattern.CASE_INSENSITIVE);
                 Matcher slugMatcher = slugPattern.matcher(submissionUrl);
                 if (slugMatcher.find()) {
                     String urlSlug = slugMatcher.group(1);
@@ -800,10 +854,6 @@ public class ClassroomService {
 
     /**
      * Automatically validates all pending assignments across all classrooms for a student.
-     * Called whenever a student visits their dashboard, so they never need to do manual validation.
-     */
-    /**
-     * Automatically validates all pending assignments across all classrooms for a student.
      * Called whenever a student visits their dashboard.
      * Selectively evicts only the student's enrolled classroom caches when an assignment status actually changes.
      */
@@ -832,26 +882,7 @@ public class ClassroomService {
             boolean isRecentlySynced = student.getLastSyncedAt() != null
                     && java.time.Duration.between(student.getLastSyncedAt(), java.time.Instant.now()).toSeconds() < 60;
 
-            // Fetch fresh LeetCode submissions only if there are pending LeetCode assignments and profile hasn't been synced in the last 60s
-            boolean hasLCPending = pending.stream().anyMatch(a -> a.getPlatform() == Platform.LEETCODE || a.getPlatform() == null);
-            if (!isRecentlySynced && hasLCPending && student.getLeetcodeUsername() != null && !student.getLeetcodeUsername().isBlank()) {
-                try {
-                    List<RecentSubmission> fresh = leetCodeApiClient.fetchRecentSubmissions(student.getLeetcodeUsername(), 20);
-                    if (fresh != null && !fresh.isEmpty()) {
-                        List<RecentSubmission> existing = student.getRecentSubmissions() != null
-                                ? new ArrayList<>(student.getRecentSubmissions())
-                                : new ArrayList<>();
-                        for (RecentSubmission r : fresh) {
-                            if (existing.stream().noneMatch(e -> e.getTitleSlug() != null && e.getTitleSlug().equalsIgnoreCase(r.getTitleSlug()) && e.getTimestamp() == r.getTimestamp())) {
-                                existing.add(0, r);
-                            }
-                        }
-                        student.setRecentSubmissions(existing);
-                    }
-                } catch (Exception e) {
-                    log.debug("Auto-validation: LC fetch skipped: {}", e.getMessage());
-                }
-            }
+            fetchAndMergeRecentSubmissions(student, pending, isRecentlySynced);
 
             boolean updated = false;
 
@@ -904,7 +935,7 @@ public class ClassroomService {
                 }
 
                 for (Classroom classroom : classrooms) {
-                    webSocketBridge.broadcastClassroomUpdate(classroom.getId(), "UPDATE", "Assignment auto-validated!");
+                    webSocketBridge.broadcastClassroomUpdate(classroom.getId(), WS_ACTION_UPDATE, "Assignment auto-validated!");
                 }
             }
         } catch (Exception e) {
@@ -918,7 +949,7 @@ public class ClassroomService {
     public BulkImportResponseDTO bulkAddStudents(String classroomId, MultipartFile file) {
         log.info("Starting bulk CSV student import for classroom ID: {}", classroomId);
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         if (file == null || file.isEmpty()) {
             throw new ValidationFailedException("Uploaded CSV file is empty.");
@@ -946,7 +977,11 @@ public class ClassroomService {
 
             // Parse header if present
             List<String> firstRow = parseCsvLine(rawLines.get(0), delimiter);
-            int nameIdx = -1, emailIdx = -1, lcIdx = -1, cfIdx = -1, genericIdx = -1;
+            int nameIdx = -1;
+            int emailIdx = -1;
+            int lcIdx = -1;
+            int cfIdx = -1;
+            int genericIdx = -1;
             boolean hasHeader = false;
 
             for (int i = 0; i < firstRow.size(); i++) {
@@ -967,6 +1002,10 @@ public class ClassroomService {
             int startIndex = hasHeader ? 1 : 0;
             result.setTotalProcessed(rawLines.size() - startIndex);
 
+            CsvImportContext context = new CsvImportContext(
+                    classroom, result, studentsToSync, nameIdx, emailIdx, lcIdx, cfIdx, genericIdx, hasHeader
+            );
+
             for (int lineNum = startIndex; lineNum < rawLines.size(); lineNum++) {
                 String currentLine = rawLines.get(lineNum);
                 List<String> cols = parseCsvLine(currentLine, delimiter);
@@ -974,146 +1013,15 @@ public class ClassroomService {
                     continue;
                 }
 
-                String name = "";
-                String email = "";
-                String lcUsername = "";
-                String cfHandle = "";
-                String genericId = "";
-
-                if (hasHeader) {
-                    if (nameIdx >= 0 && nameIdx < cols.size()) name = cols.get(nameIdx).trim();
-                    if (emailIdx >= 0 && emailIdx < cols.size()) email = cols.get(emailIdx).trim();
-                    if (lcIdx >= 0 && lcIdx < cols.size()) lcUsername = cols.get(lcIdx).trim();
-                    if (cfIdx >= 0 && cfIdx < cols.size()) cfHandle = cols.get(cfIdx).trim();
-                    if (genericIdx >= 0 && genericIdx < cols.size()) genericId = cols.get(genericIdx).trim();
-                } else {
-                    // Positional mapping
-                    if (cols.size() == 1) {
-                        genericId = cols.get(0).trim();
-                    } else if (cols.size() == 2) {
-                        lcUsername = cols.get(0).trim();
-                        cfHandle = cols.get(1).trim();
-                    } else if (cols.size() == 3) {
-                        name = cols.get(0).trim();
-                        lcUsername = cols.get(1).trim();
-                        cfHandle = cols.get(2).trim();
-                    } else {
-                        name = cols.get(0).trim();
-                        email = cols.get(1).trim();
-                        lcUsername = cols.get(2).trim();
-                        cfHandle = cols.get(3).trim();
-                    }
-                }
-
-                // Cross-platform URL detection and correction
-                boolean lcHasCf = isCodeforcesUrl(lcUsername);
-                boolean cfHasLc = isLeetCodeUrl(cfHandle);
-
-                if (lcHasCf && cfHasLc) {
-                    // Both columns were swapped
-                    String temp = lcUsername;
-                    lcUsername = cfHandle;
-                    cfHandle = temp;
-                } else if (lcHasCf && (cfHandle.isBlank() || isCodeforcesUrl(cfHandle))) {
-                    if (cfHandle.isBlank()) {
-                        cfHandle = lcUsername;
-                        lcUsername = "";
-                    }
-                } else if (cfHasLc && (lcUsername.isBlank() || isLeetCodeUrl(lcUsername))) {
-                    if (lcUsername.isBlank()) {
-                        lcUsername = cfHandle;
-                        cfHandle = "";
-                    }
-                }
-
-                // If generic identifier provided, resolve type
-                if (lcUsername.isBlank() && cfHandle.isBlank() && !genericId.isBlank()) {
-                    if (isCodeforcesUrl(genericId)) {
-                        cfHandle = extractCodeforcesHandle(genericId);
-                    } else if (isLeetCodeUrl(genericId)) {
-                        lcUsername = extractLeetcodeUsername(genericId);
-                    } else if (genericId.contains("@") && !genericId.startsWith("@")) {
-                        email = genericId;
-                    } else {
-                        String cleaned = genericId.startsWith("@") ? genericId.substring(1).trim() : genericId.trim();
-                        lcUsername = cleaned;
-                    }
-                }
-
-                // Clean handles and auto-extract usernames/handles from profile URLs
-                if (!lcUsername.isBlank()) {
-                    lcUsername = extractLeetcodeUsername(lcUsername);
-                }
-                if (!cfHandle.isBlank()) {
-                    cfHandle = extractCodeforcesHandle(cfHandle);
-                }
-
-                if (name.isBlank() && email.isBlank() && lcUsername.isBlank() && cfHandle.isBlank()) {
-                    result.setFailedCount(result.getFailedCount() + 1);
-                    result.getFailures().add("Row " + (lineNum + 1) + ": Empty or invalid student data");
-                    continue;
-                }
-
-                try {
-                    // Look up existing registered student in MentorSync database
-                    Optional<Student> registeredOpt = findRegisteredStudent(email, lcUsername, cfHandle, genericId);
-
-                    if (registeredOpt.isPresent()) {
-                        Student student = registeredOpt.get();
-                        boolean studentModified = false;
-                        if ((student.getName() == null || student.getName().isBlank()) && !name.isBlank()) {
-                            student.setName(name);
-                            studentModified = true;
-                        }
-                        if ((student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank()) && !cfHandle.isBlank()) {
-                            student.setCodeforcesHandle(cfHandle);
-                            studentModified = true;
-                        }
-                        if ((student.getLeetcodeUsername() == null || student.getLeetcodeUsername().isBlank()) && !lcUsername.isBlank()) {
-                            student.setLeetcodeUsername(lcUsername);
-                            studentModified = true;
-                        }
-                        if (studentModified) {
-                            Student savedStudent = studentRepository.save(student);
-                            if (savedStudent != null) {
-                                student = savedStudent;
-                            }
-                        }
-
-                        // Check enrollment
-                        if (classroom.getStudentIds().contains(student.getId())) {
-                            result.setAlreadyEnrolledCount(result.getAlreadyEnrolledCount() + 1);
-                            result.getAlreadyEnrolledStudents().add(student.getName() != null ? student.getName() : student.getId());
-                        } else {
-                            classroom.getStudentIds().add(student.getId());
-                            classroomUpdated = true;
-                            result.setAddedCount(result.getAddedCount() + 1);
-                            result.getAddedStudents().add(student.getName() != null ? student.getName() : student.getId());
-                            studentsToSync.add(student);
-                        }
-                    } else {
-                        // The student has not created an account on MentorSync through signup!
-                        // Do NOT provision a dummy account.
-                        result.setFailedCount(result.getFailedCount() + 1);
-                        String idDisplay = !name.isBlank() ? name
-                                : !lcUsername.isBlank() ? lcUsername
-                                : !cfHandle.isBlank() ? cfHandle
-                                : !email.isBlank() ? email
-                                : !genericId.isBlank() ? genericId
-                                : "Row " + (lineNum + 1);
-                        result.getFailures().add(idDisplay + ": Student has not created an account on MentorSync yet. Students must sign up on MentorSync before they can be added to a classroom.");
-                    }
-                } catch (Exception ex) {
-                    log.warn("Error importing row {}: {}", lineNum + 1, ex.getMessage());
-                    result.setFailedCount(result.getFailedCount() + 1);
-                    String idDisplay = !lcUsername.isBlank() ? lcUsername : !cfHandle.isBlank() ? cfHandle : !email.isBlank() ? email : "Row " + (lineNum + 1);
-                    result.getFailures().add(idDisplay + ": " + ex.getMessage());
+                boolean added = processSingleCsvRow(cols, context, lineNum);
+                if (added) {
+                    classroomUpdated = true;
                 }
             }
 
             if (classroomUpdated) {
                 classroomRepository.save(classroom);
-                webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Bulk students imported successfully");
+                webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "Bulk students imported successfully");
             }
 
             // Background parallel sync newly provisioned profiles using Virtual Threads
@@ -1144,7 +1052,7 @@ public class ClassroomService {
 
                     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
                     log.info("Completed virtual thread parallel sync for {} students in classroom [{}]", studentsCopy.size(), classroomId);
-                    webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "All imported student profiles synced successfully!");
+                    webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "All imported student profiles synced successfully!");
                 });
             }
 
@@ -1185,10 +1093,170 @@ public class ClassroomService {
         return csv.toString();
     }
 
+    private record CsvImportContext(
+            Classroom classroom,
+            BulkImportResponseDTO result,
+            List<Student> studentsToSync,
+            int nameIdx,
+            int emailIdx,
+            int lcIdx,
+            int cfIdx,
+            int genericIdx,
+            boolean hasHeader
+    ) {}
+
+    private record CsvStudentRow(
+            String name,
+            String email,
+            String lcUsername,
+            String cfHandle,
+            String genericId
+    ) {}
+
+    private boolean processSingleCsvRow(List<String> cols, CsvImportContext context, int lineNum) {
+        String name = "";
+        String email = "";
+        String lcUsername = "";
+        String cfHandle = "";
+        String genericId = "";
+
+        if (context.hasHeader()) {
+            if (context.nameIdx() >= 0 && context.nameIdx() < cols.size()) name = cols.get(context.nameIdx()).trim();
+            if (context.emailIdx() >= 0 && context.emailIdx() < cols.size()) email = cols.get(context.emailIdx()).trim();
+            if (context.lcIdx() >= 0 && context.lcIdx() < cols.size()) lcUsername = cols.get(context.lcIdx()).trim();
+            if (context.cfIdx() >= 0 && context.cfIdx() < cols.size()) cfHandle = cols.get(context.cfIdx()).trim();
+            if (context.genericIdx() >= 0 && context.genericIdx() < cols.size()) genericId = cols.get(context.genericIdx()).trim();
+        } else {
+            // Positional mapping
+            if (cols.size() == 1) {
+                genericId = cols.get(0).trim();
+            } else if (cols.size() == 2) {
+                lcUsername = cols.get(0).trim();
+                cfHandle = cols.get(1).trim();
+            } else if (cols.size() == 3) {
+                name = cols.get(0).trim();
+                lcUsername = cols.get(1).trim();
+                cfHandle = cols.get(2).trim();
+            } else {
+                name = cols.get(0).trim();
+                email = cols.get(1).trim();
+                lcUsername = cols.get(2).trim();
+                cfHandle = cols.get(3).trim();
+            }
+        }
+
+        // Cross-platform URL detection and correction
+        boolean lcHasCf = isCodeforcesUrl(lcUsername);
+        boolean cfHasLc = isLeetCodeUrl(cfHandle);
+
+        if (lcHasCf && cfHasLc) {
+            String temp = lcUsername;
+            lcUsername = cfHandle;
+            cfHandle = temp;
+        } else if (lcHasCf && cfHandle.isBlank()) {
+            cfHandle = lcUsername;
+            lcUsername = "";
+        } else if (cfHasLc && lcUsername.isBlank()) {
+            lcUsername = cfHandle;
+            cfHandle = "";
+        }
+
+        // If generic identifier provided, resolve type
+        if (lcUsername.isBlank() && cfHandle.isBlank() && !genericId.isBlank()) {
+            if (isCodeforcesUrl(genericId)) {
+                cfHandle = extractCodeforcesHandle(genericId);
+            } else if (isLeetCodeUrl(genericId)) {
+                lcUsername = extractLeetcodeUsername(genericId);
+            } else if (genericId.contains("@") && !genericId.startsWith("@")) {
+                email = genericId;
+            } else {
+                lcUsername = genericId.startsWith("@") ? genericId.substring(1).trim() : genericId.trim();
+            }
+        }
+
+        if (!lcUsername.isBlank()) {
+            lcUsername = extractLeetcodeUsername(lcUsername);
+        }
+        if (!cfHandle.isBlank()) {
+            cfHandle = extractCodeforcesHandle(cfHandle);
+        }
+
+        if (name.isBlank() && email.isBlank() && lcUsername.isBlank() && cfHandle.isBlank()) {
+            context.result().setFailedCount(context.result().getFailedCount() + 1);
+            context.result().getFailures().add("Row " + (lineNum + 1) + ": Empty or invalid student data");
+            return false;
+        }
+
+        CsvStudentRow studentRow = new CsvStudentRow(name, email, lcUsername, cfHandle, genericId);
+        return enrollStudentFromCsvRow(studentRow, context, lineNum);
+    }
+
+    private boolean enrollStudentFromCsvRow(CsvStudentRow row, CsvImportContext context, int lineNum) {
+        try {
+            Optional<Student> registeredOpt = findRegisteredStudent(row.email(), row.lcUsername(), row.cfHandle(), row.genericId());
+
+            if (registeredOpt.isPresent()) {
+                Student student = registeredOpt.get();
+                boolean studentModified = false;
+                if ((student.getName() == null || student.getName().isBlank()) && !row.name().isBlank()) {
+                    student.setName(row.name());
+                    studentModified = true;
+                }
+                if ((student.getCodeforcesHandle() == null || student.getCodeforcesHandle().isBlank()) && !row.cfHandle().isBlank()) {
+                    student.setCodeforcesHandle(row.cfHandle());
+                    studentModified = true;
+                }
+                if ((student.getLeetcodeUsername() == null || student.getLeetcodeUsername().isBlank()) && !row.lcUsername().isBlank()) {
+                    student.setLeetcodeUsername(row.lcUsername());
+                    studentModified = true;
+                }
+                if (studentModified) {
+                    Student savedStudent = studentRepository.save(student);
+                    if (savedStudent != null) {
+                        student = savedStudent;
+                    }
+                }
+
+                // Check enrollment
+                if (context.classroom().getStudentIds().contains(student.getId())) {
+                    context.result().setAlreadyEnrolledCount(context.result().getAlreadyEnrolledCount() + 1);
+                    context.result().getAlreadyEnrolledStudents().add(student.getName() != null ? student.getName() : student.getId());
+                    return false;
+                } else {
+                    context.classroom().getStudentIds().add(student.getId());
+                    context.result().setAddedCount(context.result().getAddedCount() + 1);
+                    context.result().getAddedStudents().add(student.getName() != null ? student.getName() : student.getId());
+                    context.studentsToSync().add(student);
+                    return true;
+                }
+            } else {
+                context.result().setFailedCount(context.result().getFailedCount() + 1);
+                String idDisplay = determineRowIdentifier(row.name(), row.lcUsername(), row.cfHandle(), row.email(), row.genericId(), lineNum);
+                context.result().getFailures().add(idDisplay + ": Student has not created an account on MentorSync yet. Students must sign up on MentorSync before they can be added to a classroom.");
+                return false;
+            }
+        } catch (Exception ex) {
+            log.warn("Error importing row {}: {}", lineNum + 1, ex.getMessage());
+            context.result().setFailedCount(context.result().getFailedCount() + 1);
+            String idDisplay = determineRowIdentifier(row.name(), row.lcUsername(), row.cfHandle(), row.email(), row.genericId(), lineNum);
+            context.result().getFailures().add(idDisplay + ": " + ex.getMessage());
+            return false;
+        }
+    }
+
+    private String determineRowIdentifier(String name, String lcUsername, String cfHandle, String email, String genericId, int lineNum) {
+        if (!name.isBlank()) return name;
+        if (!lcUsername.isBlank()) return lcUsername;
+        if (!cfHandle.isBlank()) return cfHandle;
+        if (!email.isBlank()) return email;
+        if (!genericId.isBlank()) return genericId;
+        return "Row " + (lineNum + 1);
+    }
+
     // 2b. EXPORT: Generate Assignment Completion Matrix CSV for classroom
     public String generateClassroomAssignmentMatrixCsv(String classroomId) {
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
         List<Student> students = studentRepository.findAllById(classroom.getStudentIds());
         List<Assignment> assignments = classroom.getAssignments() != null ? classroom.getAssignments() : Collections.emptyList();
 
@@ -1235,7 +1303,7 @@ public class ClassroomService {
                 row.append(",").append(status);
             }
             return row.toString();
-        }).collect(Collectors.toList());
+        }).toList();
 
         for (String row : rows) {
             csv.append(row).append("\n");
@@ -1246,10 +1314,12 @@ public class ClassroomService {
 
     // 2c. Sample CSV Template for Mentors
     public String generateStudentTemplateCsv() {
-        return "Name,Email,LeetCode Username,Codeforces Handle\n" +
-                "Alex Turner,alex@example.com,https://leetcode.com/u/alex_turner,https://codeforces.com/profile/alex_cf\n" +
-                "Sarah Connor,sarah@example.com,https://leetcode.com/sarah_c,\n" +
-                "David Miller,david@example.com,,david_cf\n";
+        return """
+                Name,Email,LeetCode Username,Codeforces Handle
+                Alex Turner,alex@example.com,https://leetcode.com/u/alex_turner,https://codeforces.com/profile/alex_cf
+                Sarah Connor,sarah@example.com,https://leetcode.com/sarah_c,
+                David Miller,david@example.com,,david_cf
+                """;
     }
 
     public static boolean isLeetCodeUrl(String input) {
@@ -1280,7 +1350,7 @@ public class ClassroomService {
                 return "";
             }
 
-            Pattern lcPattern = Pattern.compile("(?:leetcode\\.(?:com|cn))/(?:u/)?([a-zA-Z0-9_-]+)/?", Pattern.CASE_INSENSITIVE);
+            Pattern lcPattern = Pattern.compile("leetcode\\.(?:com|cn)/(?:u/)?([a-z0-9_-]+)/?", Pattern.CASE_INSENSITIVE);
             Matcher m = lcPattern.matcher(s);
             if (m.find()) {
                 String candidate = m.group(1);
@@ -1333,7 +1403,7 @@ public class ClassroomService {
                 return "";
             }
 
-            Pattern cfPattern = Pattern.compile("(?:codeforces\\.(?:com|net|org))/(?:profile/)?([a-zA-Z0-9_.-]+)/?", Pattern.CASE_INSENSITIVE);
+            Pattern cfPattern = Pattern.compile("codeforces\\.(?:com|net|org)/(?:profile/)?([a-z0-9_.-]+)/?", Pattern.CASE_INSENSITIVE);
             Matcher m = cfPattern.matcher(s);
             if (m.find()) {
                 String candidate = m.group(1);
@@ -1392,12 +1462,14 @@ public class ClassroomService {
         List<String> tokens = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         boolean inQuotes = false;
-        for (int i = 0; i < line.length(); i++) {
+        int i = 0;
+        while (i < line.length()) {
             char c = line.charAt(i);
             if (c == '"') {
                 if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
                     sb.append('"');
-                    i++;
+                    i += 2;
+                    continue;
                 } else {
                     inQuotes = !inQuotes;
                 }
@@ -1407,6 +1479,7 @@ public class ClassroomService {
             } else {
                 sb.append(c);
             }
+            i++;
         }
         tokens.add(sb.toString().trim());
         return tokens;
@@ -1422,7 +1495,7 @@ public class ClassroomService {
                 titleSlug, platform, classroomId, startTimestamp, endTimestamp);
 
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         Assignment assignment = new Assignment();
         assignment.setId(UUID.randomUUID().toString());
@@ -1489,11 +1562,20 @@ public class ClassroomService {
                     .build();
         }
 
-        int totalSolved = 0, totalEasy = 0, totalMed = 0, totalHard = 0, activeCount = 0;
-        int dualPlatformCount = 0, lcOnlyCount = 0, cfOnlyCount = 0;
-        double totalLcRating = 0.0, totalCfRating = 0.0;
-        int lcRatedCount = 0, cfRatedCount = 0;
-        int totalStreak = 0, maxStreak = 0;
+        int totalSolved = 0;
+        int totalEasy = 0;
+        int totalMed = 0;
+        int totalHard = 0;
+        int activeCount = 0;
+        int dualPlatformCount = 0;
+        int lcOnlyCount = 0;
+        int cfOnlyCount = 0;
+        double totalLcRating = 0.0;
+        double totalCfRating = 0.0;
+        int lcRatedCount = 0;
+        int cfRatedCount = 0;
+        int totalStreak = 0;
+        int maxStreak = 0;
         String streakChampion = "N/A";
 
         Map<String, Integer> studentTotalSolvedMap = new HashMap<>();
@@ -1505,7 +1587,9 @@ public class ClassroomService {
         for (Student s : students) {
             // 1. Calculate Difficulties and Total Solved across platforms
             int studentLcSolved = 0;
-            int sEasy = 0, sMed = 0, sHard = 0;
+            int sEasy = 0;
+            int sMed = 0;
+            int sHard = 0;
             if (s.getProblemStats() != null) {
                 for (var stat : s.getProblemStats()) {
                     if (stat.getDifficulty() == null) continue;
@@ -1514,6 +1598,7 @@ public class ClassroomService {
                         case "easy" -> sEasy += stat.getCount();
                         case "medium" -> sMed += stat.getCount();
                         case "hard" -> sHard += stat.getCount();
+                        default -> { /* ignore other difficulty classifications */ }
                     }
                 }
             }
@@ -1594,11 +1679,11 @@ public class ClassroomService {
                     riskLevel = "HIGH";
                     riskReason = "Inactive in the last 7 days and solve count is below 50% of class average.";
                 } else {
-                    riskLevel = "MEDIUM";
+                    riskLevel = DIFFICULTY_MEDIUM;
                     riskReason = "No submissions recorded in the last 7 days.";
                 }
             } else if (totalStudents > 1 && sSolved < (avgSolved * 0.35)) {
-                riskLevel = "MEDIUM";
+                riskLevel = DIFFICULTY_MEDIUM;
                 riskReason = "Total problems solved is significantly below cohort pace.";
             }
 
@@ -1693,11 +1778,11 @@ public class ClassroomService {
                 recommendation = "Cohort demonstrates high proficiency. Ready for hard-tier problem variants.";
             } else if (avgSolvedForTopic >= 4.0) {
                 level = "DEVELOPING";
-                severity = isCore ? "MEDIUM" : "LOW";
+                severity = isCore ? DIFFICULTY_MEDIUM : "LOW";
                 recommendation = "Solid foundation developing. Reinforce with intermediate pattern practice.";
             } else {
                 level = "CRITICAL_WEAKNESS";
-                severity = isCore ? "HIGH" : "MEDIUM";
+                severity = isCore ? "HIGH" : DIFFICULTY_MEDIUM;
                 recommendation = isCore
                         ? "High-priority interview topic with low practice! Schedule dedicated cohort assignment."
                         : "Low solve volume across students. Encourage practice to build breadth.";
@@ -1761,7 +1846,7 @@ public class ClassroomService {
         double breadthScore = Math.min(20.0, (coreMastered / 8.0) * 20.0);
         double assignmentScore = (classAssignmentCompRate / 100.0) * 15.0;
 
-        int readinessScore = (int) Math.round(Math.min(100.0, Math.max(0.0, difficultyScore + engagementScore + breadthScore + assignmentScore)));
+        int readinessScore = (int) Math.round(Math.clamp(difficultyScore + engagementScore + breadthScore + assignmentScore, 0.0, 100.0));
 
         String readinessAssessment;
         if (readinessScore >= 75) {
@@ -1809,7 +1894,7 @@ public class ClassroomService {
 
     private int getSeverityOrder(String severity) {
         if ("HIGH".equalsIgnoreCase(severity)) return 1;
-        if ("MEDIUM".equalsIgnoreCase(severity)) return 2;
+        if (DIFFICULTY_MEDIUM.equalsIgnoreCase(severity)) return 2;
         return 3;
     }
 
@@ -1819,7 +1904,7 @@ public class ClassroomService {
 
         // 1. Find the classroom
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         // 2. Security Check: Ensure the mentor deleting it actually owns it
         if (!classroom.getMentorId().equals(mentorId)) {
@@ -1847,7 +1932,7 @@ public class ClassroomService {
         log.info("Deleting assignment {} from classroom {} by mentor {}", assignmentId, classroomId, mentorId);
 
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         if (!classroom.getMentorId().equals(mentorId)) {
             log.warn("Security Alert: Mentor {} attempted to delete assignment {} in classroom {} which they do not own.", mentorId, assignmentId, classroomId);
@@ -1866,10 +1951,10 @@ public class ClassroomService {
 
         // Broadcast the update via local messagingTemplate and Redis Pub/Sub WebSocket bridge
         messagingTemplate.convertAndSend(
-                "/topic/classrooms/" + classroomId,
-                (Object) Map.of("action", "UPDATE", "message", "Assignment deleted!")
+                WS_TOPIC_CLASSROOMS_PREFIX + classroomId,
+                (Object) Map.of(WS_KEY_ACTION, WS_ACTION_UPDATE, WS_KEY_MESSAGE, "Assignment deleted!")
         );
-        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Assignment deleted!");
+        webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "Assignment deleted!");
         log.info("Successfully deleted assignment {} from classroom {}", assignmentId, classroomId);
     }
 
@@ -1879,7 +1964,7 @@ public class ClassroomService {
                 assignmentId, classroomId, newEndTimestamp, mentorId);
 
         Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found with ID: " + classroomId));
+                .orElseThrow(() -> new ClassroomNotFoundException(CLASSROOM_NOT_FOUND_PREFIX + classroomId));
 
         if (!classroom.getMentorId().equals(mentorId)) {
             log.warn("Security Alert: Mentor {} attempted to update assignment {} in classroom {} which they do not own.",
@@ -1905,10 +1990,10 @@ public class ClassroomService {
 
         // Broadcast the update via local messagingTemplate and Redis Pub/Sub WebSocket bridge
         messagingTemplate.convertAndSend(
-                "/topic/classrooms/" + classroomId,
-                (Object) Map.of("action", "UPDATE", "message", "Assignment deadline updated!")
+                WS_TOPIC_CLASSROOMS_PREFIX + classroomId,
+                (Object) Map.of(WS_KEY_ACTION, WS_ACTION_UPDATE, WS_KEY_MESSAGE, "Assignment deadline updated!")
         );
-        webSocketBridge.broadcastClassroomUpdate(classroomId, "UPDATE", "Assignment deadline updated!");
+        webSocketBridge.broadcastClassroomUpdate(classroomId, WS_ACTION_UPDATE, "Assignment deadline updated!");
 
         log.info("Successfully updated deadline for assignment {} to {}", assignmentId, newEndTimestamp);
         return saved;
@@ -1957,7 +2042,7 @@ public class ClassroomService {
             return Integer.MAX_VALUE;
         }
         try {
-            String digits = rankStr.replaceAll("[^0-9]", "");
+            String digits = rankStr.replaceAll("\\D", "");
             return digits.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(digits);
         } catch (NumberFormatException e) {
             return Integer.MAX_VALUE;

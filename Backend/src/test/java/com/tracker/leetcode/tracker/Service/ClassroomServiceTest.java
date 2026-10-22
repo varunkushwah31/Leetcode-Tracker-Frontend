@@ -93,7 +93,7 @@ class ClassroomServiceTest {
         assertTrue(mockClassroom.getAssignments().isEmpty());
         verify(classroomRepository, times(1)).save(mockClassroom);
         verify(messagingTemplate, times(1)).convertAndSend(eq("/topic/classrooms/class-1"), (Object) any());
-        verify(webSocketBridge, times(1)).broadcastClassroomUpdate(eq("class-1"), eq("UPDATE"), eq("Assignment deleted!"));
+        verify(webSocketBridge, times(1)).broadcastClassroomUpdate("class-1", "UPDATE", "Assignment deleted!");
     }
 
     @Test
@@ -252,9 +252,11 @@ class ClassroomServiceTest {
         when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
         when(classroomRepository.save(any(Classroom.class))).thenReturn(mockClassroom);
 
-        String csvContent = "Name,Email,LeetCode Username,Codeforces Handle\n" +
-                "Alice,alice@test.com,https://leetcode.com/u/alice_lc/?ref=1,https://codeforces.com/profile/alice_cf\n" +
-                "Bob,bob@test.com,https://codeforces.com/profile/bob_cf,https://leetcode.com/u/bob_lc\n";
+        String csvContent = """
+                Name,Email,LeetCode Username,Codeforces Handle
+                Alice,alice@test.com,https://leetcode.com/u/alice_lc/?ref=1,https://codeforces.com/profile/alice_cf
+                Bob,bob@test.com,https://codeforces.com/profile/bob_cf,https://leetcode.com/u/bob_lc
+                """;
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -293,9 +295,11 @@ class ClassroomServiceTest {
     void bulkAddStudents_WhenStudentsNotRegistered_ShouldRecordFailuresAndNotEnroll() {
         when(classroomRepository.findById("class-1")).thenReturn(Optional.of(mockClassroom));
 
-        String csvContent = "Name,Email,LeetCode Username,Codeforces Handle\n" +
-                "Unregistered One,unreg1@test.com,unreg_lc,unreg_cf\n" +
-                "Unregistered Two,unreg2@test.com,unreg2_lc,unreg2_cf\n";
+        String csvContent = """
+                Name,Email,LeetCode Username,Codeforces Handle
+                Unregistered One,unreg1@test.com,unreg_lc,unreg_cf
+                Unregistered Two,unreg2@test.com,unreg2_lc,unreg2_cf
+                """;
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",

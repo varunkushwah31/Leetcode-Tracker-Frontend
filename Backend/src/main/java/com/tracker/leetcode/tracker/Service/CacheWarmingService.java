@@ -3,7 +3,6 @@ package com.tracker.leetcode.tracker.Service;
 import com.tracker.leetcode.tracker.DTO.MentorDTO;
 import com.tracker.leetcode.tracker.Models.Classroom;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
-import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,7 +19,6 @@ import java.util.Map;
 public class CacheWarmingService {
 
     private final ClassroomRepository classroomRepository;
-    private final MentorRepository mentorRepository;
     private final ClassroomService classroomService;
     private final MentorService mentorService;
     private final DailyChallengeService dailyChallengeService;

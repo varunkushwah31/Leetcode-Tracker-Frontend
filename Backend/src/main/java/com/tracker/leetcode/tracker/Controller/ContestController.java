@@ -15,13 +15,13 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/contests")
+@RequestMapping("/api/contests/upcoming")
 @RequiredArgsConstructor
 public class ContestController {
 
     private final ContestScheduleService contestScheduleService;
 
-    @GetMapping("/upcoming")
+    @GetMapping
     public ResponseEntity<List<UpcomingContestDTO>> getUpcomingContests(
             @RequestParam(required = false, defaultValue = "ALL") String platform
     ) {
@@ -30,7 +30,7 @@ public class ContestController {
         return ResponseEntity.ok(contests);
     }
 
-    @PostMapping("/upcoming/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<List<UpcomingContestDTO>> refreshUpcomingContests() {
         log.info("Request to force refresh upcoming contests cache.");
         List<UpcomingContestDTO> contests = contestScheduleService.refreshUpcomingContests();

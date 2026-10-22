@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
     UsersIcon,
@@ -331,6 +331,461 @@ const SAMPLE_VERIFICATIONS: SampleVerification[] = [
     }
 ];
 
+
+function getRankBadgeClass(idx: number): string {
+    if (idx === 0) return 'text-amber-500 font-extrabold';
+    if (idx === 1) return 'text-zinc-400 font-bold';
+    if (idx === 2) return 'text-amber-700 font-bold';
+    return 'text-zinc-500';
+}
+
+function getHeatmapDensityClass(density: number): string {
+    if (density === 3) return 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]';
+    if (density === 2) return 'bg-emerald-600/70';
+    if (density === 1) return 'bg-emerald-700/40';
+    return 'bg-zinc-200 dark:bg-zinc-800';
+}
+
+interface HeatmapCellData {
+    cellId: string;
+    dayIndex: number;
+    density: number;
+}
+
+function getStudentHeatmapCells(profile: StudentProfileDetail): HeatmapCellData[] {
+    return profile.heatmapDensity.map((density, idx) => ({
+        cellId: `profile-${profile.id}-day-${idx + 1}`,
+        dayIndex: idx,
+        density
+    }));
+}
+
+function getSortedLeaderboardStudents(sort: 'total' | 'lc' | 'cf' | 'streak') {
+    return [...SAMPLE_LEADERBOARD].sort((a, b) => {
+        switch (sort) {
+            case 'lc': return b.lcRating - a.lcRating;
+            case 'cf': return b.cfRating - a.cfRating;
+            case 'streak': return b.streak - a.streak;
+            default: return (b.lcSolved + b.cfSolved) - (a.lcSolved + a.cfSolved);
+        }
+    });
+}
+
+function filterLeaderboardStudents(students: typeof SAMPLE_LEADERBOARD, query: string) {
+    const q = query.trim().toLowerCase();
+    if (!q) return students;
+    return students.filter(student => 
+        student.name.toLowerCase().includes(q) ||
+        student.handle.toLowerCase().includes(q)
+    );
+}
+
+interface LeaderboardTabContentProps {
+    filteredStudents: typeof SAMPLE_LEADERBOARD;
+    leaderboardSort: 'total' | 'lc' | 'cf' | 'streak';
+    setLeaderboardSort: (sort: 'total' | 'lc' | 'cf' | 'streak') => void;
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
+    onSelectStudent: (id: string) => void;
+}
+
+function LeaderboardTabContent({
+    filteredStudents,
+    leaderboardSort,
+    setLeaderboardSort,
+    searchQuery,
+    setSearchQuery,
+    onSelectStudent
+}: LeaderboardTabContentProps) {
+    return (
+        <div key="leaderboard" className="animate-tab-enter space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                <div>
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">Active Cohort Standings</h3>
+                    <p className="text-xs text-zinc-500">Real-time rank recalculation combining LeetCode and Codeforces</p>
+                </div>
+
+                <div className="relative w-full sm:w-60">
+                    <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Filter student or handle..."
+                        className="w-full pl-9 pr-8 py-1.5 text-xs rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-zinc-900 dark:text-white placeholder-zinc-400 outline-none focus:border-[#5b4fff] focus:ring-1 focus:ring-[#5b4fff] transition-all"
+                    />
+                    {searchQuery && (
+                        <button 
+                            type="button" 
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                            aria-label="Clear search"
+                        >
+                            <XIcon className="w-3.5 h-3.5" />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="text-zinc-500 text-[11px] font-medium">
+                    Showing {filteredStudents.length} of {SAMPLE_LEADERBOARD.length} sample records
+                </span>
+                <div className="flex items-center gap-1.5">
+                    <span className="text-zinc-500 font-medium mr-1">Sort:</span>
+                    <button
+                        type="button"
+                        onClick={() => setLeaderboardSort('total')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
+                            leaderboardSort === 'total' 
+                                ? 'bg-[#5b4fff] text-white shadow-xs' 
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        Total Solves
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setLeaderboardSort('lc')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
+                            leaderboardSort === 'lc' 
+                                ? 'bg-[#ffa116] text-white shadow-xs' 
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        LC Rating
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setLeaderboardSort('cf')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
+                            leaderboardSort === 'cf' 
+                                ? 'bg-sky-500 text-white shadow-xs' 
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        CF Rating
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setLeaderboardSort('streak')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
+                            leaderboardSort === 'streak' 
+                                ? 'bg-amber-500 text-white shadow-xs' 
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        Streak
+                    </button>
+                </div>
+            </div>
+
+            <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800/70 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl overflow-hidden bg-white dark:bg-[#14141a]">
+                {filteredStudents.length > 0 ? (
+                    filteredStudents.map((student, idx) => (
+                        <button 
+                            key={student.id} 
+                            type="button"
+                            onClick={() => onSelectStudent(student.id)}
+                            className="w-full text-left p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-[#1c1c24]/50 transition-all duration-200 cursor-pointer group"
+                            title="Click to view detailed profile"
+                        >
+                            <div className="flex items-center gap-3 min-w-0">
+                                <span className={`w-6 text-center font-bold text-xs transition-transform group-hover:scale-110 ${getRankBadgeClass(idx)}`}>
+                                    #{idx + 1}
+                                </span>
+                                <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-[#5b4fff] group-hover:text-white transition-all duration-200 shadow-2xs">
+                                    {student.name.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] group-hover:translate-x-0.5 transition-all duration-200">{student.name}</p>
+                                    <p className="text-[11px] text-zinc-500">@{student.handle}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
+                                <span className="font-bold text-zinc-900 dark:text-white">
+                                    {student.lcSolved + student.cfSolved} Solved
+                                </span>
+                                <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] font-semibold text-[11px] border border-[#ffa116]/20">
+                                    LC {student.lcRating} ({student.lcRank})
+                                </span>
+                                <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 font-semibold text-[11px] border border-sky-500/20">
+                                    CF {student.cfRating} ({student.cfRank})
+                                </span>
+                                <span className="flex items-center gap-1 font-semibold text-amber-500 text-[11px] bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                                    <FireIcon className="w-3.5 h-3.5 animate-flame" weight="fill" />
+                                    {student.streak}d
+                                </span>
+                                <span className="text-[11px] font-semibold text-[#5b4fff] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 hidden md:inline">
+                                    Inspect &rarr;
+                                </span>
+                            </div>
+                        </button>
+                    ))
+                ) : (
+                    <div className="p-8 text-center text-zinc-500 text-xs">
+                        No students found matching &quot;{searchQuery}&quot;.
+                        <button
+                            type="button"
+                            onClick={() => setSearchQuery('')}
+                            className="ml-2 text-[#5b4fff] underline font-semibold cursor-pointer"
+                        >
+                            Clear filter
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+interface ProfileTabContentProps {
+    selectedStudentId: string;
+    setSelectedStudentId: (id: string) => void;
+    profile: StudentProfileDetail;
+    hoveredHeatmapDay: number | null;
+    setHoveredHeatmapDay: (day: number | null) => void;
+}
+
+function ProfileTabContent({
+    selectedStudentId,
+    setSelectedStudentId,
+    profile,
+    hoveredHeatmapDay,
+    setHoveredHeatmapDay
+}: ProfileTabContentProps) {
+    const heatmapCells = getStudentHeatmapCells(profile);
+
+    return (
+        <div key={`profile-${selectedStudentId}`} className="animate-tab-enter space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-zinc-500 font-medium mr-1 text-[11px]">Select Student:</span>
+                    {SAMPLE_LEADERBOARD.map(student => (
+                        <button
+                            key={student.id}
+                            type="button"
+                            onClick={() => setSelectedStudentId(student.id)}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all duration-150 ${
+                                selectedStudentId === student.id
+                                    ? 'bg-[#5b4fff] text-white shadow-xs'
+                                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                            }`}
+                        >
+                            {student.name}
+                        </button>
+                    ))}
+                </div>
+
+                <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 text-[11px] font-bold border border-emerald-500/20 flex items-center gap-1.5">
+                    <CheckCircleIcon className="w-3.5 h-3.5" weight="bold" />
+                    Verified Student Profile
+                </span>
+            </div>
+
+            <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
+                <div className={`w-11 h-11 rounded-xl ${profile.avatarBg} text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-xs hover:rotate-6 transition-transform duration-300`}>
+                    {profile.initials}
+                </div>
+                <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-white leading-tight">
+                        {profile.name}
+                    </h3>
+                    <p className="text-xs text-zinc-500 mt-0.5 truncate">
+                        LeetCode: @{profile.lcHandle} • Codeforces: @{profile.cfHandle}
+                    </p>
+                </div>
+                <div className="hidden sm:flex items-center gap-2 bg-amber-500/10 text-amber-500 border border-amber-500/20 px-3 py-1.5 rounded-xl text-xs font-bold">
+                    <FireIcon className="w-4 h-4 animate-flame" weight="fill" />
+                    <span>{profile.streak} Day Streak</span>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
+                    <div className="flex justify-between items-center text-[11px]">
+                        <span className="font-semibold text-zinc-500">Solved Distribution</span>
+                        <span className="text-emerald-500 font-bold">{profile.easySolved + profile.mediumSolved + profile.hardSolved} Total</span>
+                    </div>
+                    <p className="text-xl font-bold text-zinc-900 dark:text-white mt-1">
+                        {profile.totalSolved} Problems
+                    </p>
+                    <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full mt-2.5 overflow-hidden flex">
+                        <div 
+                            className="bg-emerald-500 h-full transition-all duration-700 ease-out" 
+                            style={{ width: `${(profile.easySolved / profile.totalSolved) * 100}%` }}
+                            title={`Easy: ${profile.easySolved}`} 
+                        />
+                        <div 
+                            className="bg-amber-500 h-full transition-all duration-700 ease-out" 
+                            style={{ width: `${(profile.mediumSolved / profile.totalSolved) * 100}%` }}
+                            title={`Medium: ${profile.mediumSolved}`} 
+                        />
+                        <div 
+                            className="bg-rose-500 h-full transition-all duration-700 ease-out" 
+                            style={{ width: `${(profile.hardSolved / profile.totalSolved) * 100}%` }}
+                            title={`Hard: ${profile.hardSolved}`} 
+                        />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-zinc-500 mt-1.5">
+                        <span className="text-emerald-600 dark:text-emerald-400">Easy {profile.easySolved}</span>
+                        <span className="text-amber-600 dark:text-amber-400">Med {profile.mediumSolved}</span>
+                        <span className="text-rose-500">Hard {profile.hardSolved}</span>
+                    </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
+                    <p className="text-[11px] font-semibold text-zinc-500">LeetCode Contest</p>
+                    <p className="text-xl font-bold text-[#ffa116] mt-1">{profile.lcRating.toLocaleString()}</p>
+                    <p className="text-[11px] text-zinc-400 mt-0.5">{profile.lcPercentile} • {profile.lcRank} Rank</p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
+                    <p className="text-[11px] font-semibold text-zinc-500">Codeforces Rating</p>
+                    <p className="text-xl font-bold text-sky-500 mt-1">{profile.cfRating.toLocaleString()}</p>
+                    <p className="text-[11px] text-zinc-400 mt-0.5">{profile.cfRank} • {profile.cfDivision}</p>
+                </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
+                <div className="flex items-center justify-between mb-2 text-xs">
+                    <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                        {profile.streak}-Day Technical Consistency Heatmap
+                    </span>
+                    <span className="text-emerald-500 font-bold">
+                        {hoveredHeatmapDay !== null 
+                            ? `Day ${hoveredHeatmapDay + 1}: ${profile.heatmapDensity[hoveredHeatmapDay] * 3} solves` 
+                            : `${profile.annualSubmissions} Submissions This Year`
+                        }
+                    </span>
+                </div>
+                <div className="grid grid-cols-14 gap-1.5 pt-1">
+                    {heatmapCells.map((cell) => (
+                        <div 
+                            key={cell.cellId} 
+                            onMouseEnter={() => setHoveredHeatmapDay(cell.dayIndex)}
+                            onMouseLeave={() => setHoveredHeatmapDay(null)}
+                            className={`h-4 rounded-[3px] hover:scale-135 hover:z-10 transition-transform duration-150 cursor-pointer relative ${getHeatmapDensityClass(cell.density)}`}
+                            title={`Day ${cell.dayIndex + 1}: ${cell.density * 3} solves recorded`}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+interface AnalyticsTabContentProps {
+    topicFilter: 'all' | 'weaknesses';
+    setTopicFilter: (filter: 'all' | 'weaknesses') => void;
+    filteredTopics: typeof COHORT_TOPICS;
+    dispatchSuccess: boolean;
+    onDispatchRemedial: () => void;
+}
+
+function AnalyticsTabContent({
+    topicFilter,
+    setTopicFilter,
+    filteredTopics,
+    dispatchSuccess,
+    onDispatchRemedial
+}: AnalyticsTabContentProps) {
+    return (
+        <div key="analytics" className="animate-tab-enter space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                <div>
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">Cohort Topic Competency Matrix</h3>
+                    <p className="text-xs text-zinc-500">Identifies algorithmic weakness areas across all 42 enrolled students in Super 42</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={() => setTopicFilter('all')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
+                            topicFilter === 'all'
+                                ? 'bg-[#5b4fff] text-white shadow-xs'
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        All Topics ({COHORT_TOPICS.length})
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setTopicFilter('weaknesses')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
+                            topicFilter === 'weaknesses'
+                                ? 'bg-rose-500 text-white shadow-xs'
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        Weaknesses Only (&lt;60%)
+                    </button>
+                </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                    <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5">
+                        <SparkleIcon className="w-4 h-4 text-[#5b4fff]" weight="fill" />
+                        Targeted Remediation Recommendation
+                    </p>
+                    <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                        18 students need remedial practice on Dynamic Programming and Graphs.
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onClick={onDispatchRemedial}
+                    disabled={dispatchSuccess}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 hover:-translate-y-0.5 active:scale-95 duration-150 ${
+                        dispatchSuccess
+                            ? 'bg-emerald-600 text-white shadow-md animate-scale-bounce'
+                            : 'bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs hover:shadow-md'
+                    }`}
+                >
+                    {dispatchSuccess ? (
+                        <>
+                            <CheckIcon className="w-4 h-4" weight="bold" />
+                            Remedial Sheet Dispatched!
+                        </>
+                    ) : (
+                        <>
+                            <PaperPlaneTiltIcon className="w-4 h-4" weight="bold" />
+                            Dispatch Remedial Problem Set
+                        </>
+                    )}
+                </button>
+            </div>
+
+            <div className="space-y-3">
+                {filteredTopics.map(topic => (
+                    <div key={topic.id} className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
+                        <div className="flex justify-between items-center text-xs mb-1.5">
+                            <span className="font-bold text-zinc-900 dark:text-white">{topic.name}</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-zinc-400 font-medium">
+                                    {topic.needReviewCount} need review
+                                </span>
+                                <span className={`font-bold text-[11px] px-2 py-0.5 rounded border ${topic.statusClass}`}>
+                                    {topic.status} ({topic.percentage}%)
+                                </span>
+                            </div>
+                        </div>
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+                            <div 
+                                className={`h-full ${topic.barClass} transition-all duration-700 ease-out`}
+                                style={{ width: `${topic.percentage}%` }}
+                            />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export function LandingPage() {
     const [canvasTab, setCanvasTab] = useState<'leaderboard' | 'profile' | 'analytics'>('leaderboard');
     const [leaderboardSort, setLeaderboardSort] = useState<'total' | 'lc' | 'cf' | 'streak'>('total');
@@ -364,24 +819,17 @@ export function LandingPage() {
         }
     };
 
-    const sortedStudents = [...SAMPLE_LEADERBOARD].sort((a, b) => {
-        if (leaderboardSort === 'lc') return b.lcRating - a.lcRating;
-        if (leaderboardSort === 'cf') return b.cfRating - a.cfRating;
-        if (leaderboardSort === 'streak') return b.streak - a.streak;
-        return (b.lcSolved + b.cfSolved) - (a.lcSolved + a.cfSolved);
-    });
-
-    const filteredStudents = sortedStudents.filter(student => 
-        student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.handle.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const sortedStudents = useMemo(() => getSortedLeaderboardStudents(leaderboardSort), [leaderboardSort]);
+    const filteredStudents = useMemo(() => filterLeaderboardStudents(sortedStudents, searchQuery), [sortedStudents, searchQuery]);
 
     const activeVerification = SAMPLE_VERIFICATIONS.find(v => v.id === selectedVerification) || SAMPLE_VERIFICATIONS[0];
     const activeStudentProfile = STUDENT_PROFILES[selectedStudentId] || STUDENT_PROFILES['2'];
 
-    const filteredTopics = topicFilter === 'all' 
-        ? COHORT_TOPICS 
-        : COHORT_TOPICS.filter(t => t.percentage < 60);
+    const filteredTopics = useMemo(() => {
+        return topicFilter === 'all' 
+            ? COHORT_TOPICS 
+            : COHORT_TOPICS.filter(t => t.percentage < 60);
+    }, [topicFilter]);
 
     const handleRunVerificationSim = () => {
         setIsVerifyingSim(true);
@@ -400,7 +848,7 @@ export function LandingPage() {
             memory: activeVerification.memory,
             verified: true
         }, null, 2);
-        navigator.clipboard?.writeText(payload);
+        void navigator.clipboard?.writeText(payload);
         setCopiedPayload(true);
         setTimeout(() => setCopiedPayload(false), 2000);
     };
@@ -447,32 +895,32 @@ export function LandingPage() {
                         <button 
                             type="button"
                             onClick={() => scrollToSection('verification-engine')} 
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center cursor-pointer"
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-11 flex items-center cursor-pointer"
                         >
                             Features
                         </button>
                         <Link 
                             to="/how-to-use" 
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center"
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-11 flex items-center"
                         >
                             How to Use
                         </Link>
                         <Link 
                             to="/contact" 
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center"
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-11 flex items-center"
                         >
                             Contact
                         </Link>
                         <Link 
                             to="/login" 
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] rounded-lg px-2 min-h-[44px] flex items-center"
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] rounded-lg px-2 min-h-11 flex items-center"
                         >
                             Sign In
                         </Link>
-                        <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10 min-h-[44px] min-w-[44px]" />
+                        <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10 min-h-11 min-w-11" />
                         <Link 
                             to="/login" 
-                            className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_24px_rgba(91,79,255,0.3)] text-white text-[14px] font-semibold px-5 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 min-h-[44px] flex items-center shimmer-sweep interactive-press"
+                            className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_24px_rgba(91,79,255,0.3)] text-white text-[14px] font-semibold px-5 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 min-h-11 flex items-center shimmer-sweep interactive-press"
                         >
                             Get Started
                         </Link>
@@ -480,10 +928,10 @@ export function LandingPage() {
 
                     {/* Mobile Controls */}
                     <div className="flex md:hidden items-center gap-2 shrink-0">
-                        <ThemeToggle className="bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 min-h-[44px] min-w-[44px]" />
+                        <ThemeToggle className="bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 min-h-11 min-w-11" />
                         <Link
                             to="/login"
-                            className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-xs font-semibold px-3 py-2.5 rounded-xl whitespace-nowrap shrink-0 transition-colors min-h-[44px] flex items-center"
+                            className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-xs font-semibold px-3 py-2.5 rounded-xl whitespace-nowrap shrink-0 transition-colors min-h-11 flex items-center"
                         >
                             Get Started
                         </Link>
@@ -492,7 +940,7 @@ export function LandingPage() {
                             onClick={() => setMobileMenuOpen(prev => !prev)}
                             aria-expanded={mobileMenuOpen}
                             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-                            className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                            className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer shrink-0 min-h-11 min-w-11 flex items-center justify-center"
                         >
                             {mobileMenuOpen ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
                         </button>
@@ -508,7 +956,7 @@ export function LandingPage() {
                                 setMobileMenuOpen(false);
                                 scrollToSection('verification-engine');
                             }}
-                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px] text-left w-full cursor-pointer"
+                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-11 text-left w-full cursor-pointer"
                         >
                             <span>Features</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
@@ -516,7 +964,7 @@ export function LandingPage() {
                         <Link
                             to="/how-to-use"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px]"
+                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-11"
                         >
                             <span>How to Use</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
@@ -524,7 +972,7 @@ export function LandingPage() {
                         <Link
                             to="/contact"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px]"
+                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-11"
                         >
                             <span>Contact</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
@@ -533,14 +981,14 @@ export function LandingPage() {
                             <Link
                                 to="/login"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="flex-1 py-3 text-center text-sm font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px] flex items-center justify-center"
+                                className="flex-1 py-3 text-center text-sm font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-11 flex items-center justify-center"
                             >
                                 Sign In
                             </Link>
                             <Link
                                 to="/register"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="flex-1 py-3 text-center text-sm font-semibold rounded-xl bg-[#5b4fff] text-white hover:bg-[#4d40ef] transition-colors shadow-sm min-h-[44px] flex items-center justify-center"
+                                className="flex-1 py-3 text-center text-sm font-semibold rounded-xl bg-[#5b4fff] text-white hover:bg-[#4d40ef] transition-colors shadow-sm min-h-11 flex items-center justify-center"
                             >
                                 Register
                             </Link>
@@ -580,7 +1028,7 @@ export function LandingPage() {
                     <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-8 animate-fade-slide-up [animation-delay:300ms]">
                         <Link 
                             to="/login" 
-                            className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_28px_rgba(91,79,255,0.35)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] min-h-[48px] shimmer-sweep interactive-press group"
+                            className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_28px_rgba(91,79,255,0.35)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] min-h-12 shimmer-sweep interactive-press group"
                         >
                             <span>Start Free Cohort</span>
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -589,7 +1037,7 @@ export function LandingPage() {
                         <button
                             type="button"
                             onClick={() => scrollToSection('app-canvas')}
-                            className="w-full sm:w-auto bg-white dark:bg-[#111116] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-semibold px-8 py-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] min-h-[48px] interactive-press"
+                            className="w-full sm:w-auto bg-white dark:bg-[#111116] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-semibold px-8 py-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] min-h-12 interactive-press"
                         >
                             View Live Sandbox
                         </button>
@@ -629,8 +1077,8 @@ export function LandingPage() {
 
                             <div className="flex items-center gap-3">
                                 <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                    Live WebSocket Connected
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+                                    <span>Live WebSocket Connected</span>
                                 </span>
                             </div>
                         </div>
@@ -717,377 +1165,36 @@ export function LandingPage() {
                                 
                                 {/* TAB 1: COHORT LEADERBOARD */}
                                 {canvasTab === 'leaderboard' && (
-                                    <div key="leaderboard" className="animate-tab-enter space-y-4">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
-                                            <div>
-                                                <h3 className="text-base font-bold text-zinc-900 dark:text-white">Active Cohort Standings</h3>
-                                                <p className="text-xs text-zinc-500">Real-time rank recalculation combining LeetCode and Codeforces</p>
-                                            </div>
-
-                                            {/* Interactive Search Bar */}
-                                            <div className="relative w-full sm:w-60">
-                                                <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
-                                                <input
-                                                    type="text"
-                                                    value={searchQuery}
-                                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                                    placeholder="Filter student or handle..."
-                                                    className="w-full pl-9 pr-8 py-1.5 text-xs rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-zinc-900 dark:text-white placeholder-zinc-400 outline-none focus:border-[#5b4fff] focus:ring-1 focus:ring-[#5b4fff] transition-all"
-                                                />
-                                                {searchQuery && (
-                                                    <button 
-                                                        type="button" 
-                                                        onClick={() => setSearchQuery('')}
-                                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
-                                                        aria-label="Clear search"
-                                                    >
-                                                        <XIcon className="w-3.5 h-3.5" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Sort Strip */}
-                                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                                            <span className="text-zinc-500 text-[11px] font-medium">
-                                                Showing {filteredStudents.length} of {SAMPLE_LEADERBOARD.length} sample records
-                                            </span>
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="text-zinc-500 font-medium mr-1">Sort:</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setLeaderboardSort('total')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
-                                                        leaderboardSort === 'total' 
-                                                            ? 'bg-[#5b4fff] text-white shadow-xs' 
-                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                                                    }`}
-                                                >
-                                                    Total Solves
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setLeaderboardSort('lc')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
-                                                        leaderboardSort === 'lc' 
-                                                            ? 'bg-[#ffa116] text-white shadow-xs' 
-                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                                                    }`}
-                                                >
-                                                    LC Rating
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setLeaderboardSort('cf')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
-                                                        leaderboardSort === 'cf' 
-                                                            ? 'bg-sky-500 text-white shadow-xs' 
-                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                                                    }`}
-                                                >
-                                                    CF Rating
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setLeaderboardSort('streak')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
-                                                        leaderboardSort === 'streak' 
-                                                            ? 'bg-amber-500 text-white shadow-xs' 
-                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                                                    }`}
-                                                >
-                                                    Streak
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Leaderboard Table / Rows */}
-                                        <div className="divide-y divide-zinc-200/80 dark:divide-zinc-800/70 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl overflow-hidden bg-white dark:bg-[#14141a]">
-                                            {filteredStudents.length > 0 ? (
-                                                filteredStudents.map((student, idx) => (
-                                                    <div 
-                                                        key={student.id} 
-                                                        onClick={() => handleSelectStudentForProfile(student.id)}
-                                                        className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 dark:hover:bg-[#1c1c24]/50 transition-all duration-200 cursor-pointer group"
-                                                        title="Click to view detailed profile"
-                                                    >
-                                                        <div className="flex items-center gap-3 min-w-0">
-                                                            <span className={`w-6 text-center font-bold text-xs transition-transform group-hover:scale-110 ${
-                                                                idx === 0 ? 'text-amber-500 font-extrabold' : 
-                                                                idx === 1 ? 'text-zinc-400 font-bold' : 
-                                                                idx === 2 ? 'text-amber-700 font-bold' : 'text-zinc-500'
-                                                            }`}>
-                                                                #{idx + 1}
-                                                            </span>
-                                                            <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-[#5b4fff] group-hover:text-white transition-all duration-200 shadow-2xs">
-                                                                {student.name.substring(0, 2).toUpperCase()}
-                                                            </div>
-                                                            <div className="min-w-0">
-                                                                <p className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] group-hover:translate-x-0.5 transition-all duration-200">{student.name}</p>
-                                                                <p className="text-[11px] text-zinc-500">@{student.handle}</p>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
-                                                            <span className="font-bold text-zinc-900 dark:text-white">
-                                                                {student.lcSolved + student.cfSolved} Solved
-                                                            </span>
-                                                            <span className="px-2 py-0.5 rounded bg-[#ffa116]/10 text-[#ffa116] font-semibold text-[11px] border border-[#ffa116]/20">
-                                                                LC {student.lcRating} ({student.lcRank})
-                                                            </span>
-                                                            <span className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-500 font-semibold text-[11px] border border-sky-500/20">
-                                                                CF {student.cfRating} ({student.cfRank})
-                                                            </span>
-                                                            <span className="flex items-center gap-1 font-semibold text-amber-500 text-[11px] bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                                                                <FireIcon className="w-3.5 h-3.5 animate-flame" weight="fill" />
-                                                                {student.streak}d
-                                                            </span>
-                                                            <span className="text-[11px] font-semibold text-[#5b4fff] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 hidden md:inline">
-                                                                Inspect &rarr;
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="p-8 text-center text-zinc-500 text-xs">
-                                                    No students found matching &quot;{searchQuery}&quot;.
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setSearchQuery('')}
-                                                        className="ml-2 text-[#5b4fff] underline font-semibold cursor-pointer"
-                                                    >
-                                                        Clear filter
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                    <LeaderboardTabContent
+                                        filteredStudents={filteredStudents}
+                                        leaderboardSort={leaderboardSort}
+                                        setLeaderboardSort={setLeaderboardSort}
+                                        searchQuery={searchQuery}
+                                        setSearchQuery={setSearchQuery}
+                                        onSelectStudent={handleSelectStudentForProfile}
+                                    />
                                 )}
 
                                 {/* TAB 2: STUDENT PROFILE VIEW */}
                                 {canvasTab === 'profile' && (
-                                    <div key={`profile-${selectedStudentId}`} className="animate-tab-enter space-y-4">
-                                        
-                                        {/* Dynamic Student Selector Pills */}
-                                        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
-                                            <div className="flex items-center gap-1.5 text-xs">
-                                                <span className="text-zinc-500 font-medium mr-1 text-[11px]">Select Student:</span>
-                                                {SAMPLE_LEADERBOARD.map(student => (
-                                                    <button
-                                                        key={student.id}
-                                                        type="button"
-                                                        onClick={() => setSelectedStudentId(student.id)}
-                                                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all duration-150 ${
-                                                            selectedStudentId === student.id
-                                                                ? 'bg-[#5b4fff] text-white shadow-xs'
-                                                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                                                        }`}
-                                                    >
-                                                        {student.name}
-                                                    </button>
-                                                ))}
-                                            </div>
-
-                                            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 text-[11px] font-bold border border-emerald-500/20 flex items-center gap-1.5">
-                                                <CheckCircleIcon className="w-3.5 h-3.5" weight="bold" />
-                                                Verified Student Profile
-                                            </span>
-                                        </div>
-
-                                        {/* Active Student Header Bar */}
-                                        <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
-                                            <div className={`w-11 h-11 rounded-xl ${activeStudentProfile.avatarBg} text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-xs hover:rotate-6 transition-transform duration-300`}>
-                                                {activeStudentProfile.initials}
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <h3 className="text-base font-bold text-zinc-900 dark:text-white leading-tight">
-                                                    {activeStudentProfile.name}
-                                                </h3>
-                                                <p className="text-xs text-zinc-500 mt-0.5 truncate">
-                                                    LeetCode: @{activeStudentProfile.lcHandle} • Codeforces: @{activeStudentProfile.cfHandle}
-                                                </p>
-                                            </div>
-                                            <div className="hidden sm:flex items-center gap-2 bg-amber-500/10 text-amber-500 border border-amber-500/20 px-3 py-1.5 rounded-xl text-xs font-bold">
-                                                <FireIcon className="w-4 h-4 animate-flame" weight="fill" />
-                                                <span>{activeStudentProfile.streak} Day Streak</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Solved Distribution & Stats */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
-                                                <div className="flex justify-between items-center text-[11px]">
-                                                    <span className="font-semibold text-zinc-500">Solved Distribution</span>
-                                                    <span className="text-emerald-500 font-bold">{activeStudentProfile.easySolved + activeStudentProfile.mediumSolved + activeStudentProfile.hardSolved} Total</span>
-                                                </div>
-                                                <p className="text-xl font-bold text-zinc-900 dark:text-white mt-1">
-                                                    {activeStudentProfile.totalSolved} Problems
-                                                </p>
-                                                <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full mt-2.5 overflow-hidden flex">
-                                                    <div 
-                                                        className="bg-emerald-500 h-full transition-all duration-700 ease-out" 
-                                                        style={{ width: `${(activeStudentProfile.easySolved / activeStudentProfile.totalSolved) * 100}%` }}
-                                                        title={`Easy: ${activeStudentProfile.easySolved}`} 
-                                                    />
-                                                    <div 
-                                                        className="bg-amber-500 h-full transition-all duration-700 ease-out" 
-                                                        style={{ width: `${(activeStudentProfile.mediumSolved / activeStudentProfile.totalSolved) * 100}%` }}
-                                                        title={`Medium: ${activeStudentProfile.mediumSolved}`} 
-                                                    />
-                                                    <div 
-                                                        className="bg-rose-500 h-full transition-all duration-700 ease-out" 
-                                                        style={{ width: `${(activeStudentProfile.hardSolved / activeStudentProfile.totalSolved) * 100}%` }}
-                                                        title={`Hard: ${activeStudentProfile.hardSolved}`} 
-                                                    />
-                                                </div>
-                                                <div className="flex justify-between text-[10px] text-zinc-500 mt-1.5">
-                                                    <span className="text-emerald-600 dark:text-emerald-400">Easy {activeStudentProfile.easySolved}</span>
-                                                    <span className="text-amber-600 dark:text-amber-400">Med {activeStudentProfile.mediumSolved}</span>
-                                                    <span className="text-rose-500">Hard {activeStudentProfile.hardSolved}</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
-                                                <p className="text-[11px] font-semibold text-zinc-500">LeetCode Contest</p>
-                                                <p className="text-xl font-bold text-[#ffa116] mt-1">{activeStudentProfile.lcRating.toLocaleString()}</p>
-                                                <p className="text-[11px] text-zinc-400 mt-0.5">{activeStudentProfile.lcPercentile} • {activeStudentProfile.lcRank} Rank</p>
-                                            </div>
-
-                                            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
-                                                <p className="text-[11px] font-semibold text-zinc-500">Codeforces Rating</p>
-                                                <p className="text-xl font-bold text-sky-500 mt-1">{activeStudentProfile.cfRating.toLocaleString()}</p>
-                                                <p className="text-[11px] text-zinc-400 mt-0.5">{activeStudentProfile.cfRank} • {activeStudentProfile.cfDivision}</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Technical Consistency Heatmap */}
-                                        <div className="p-4 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80">
-                                            <div className="flex items-center justify-between mb-2 text-xs">
-                                                <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                                                    {activeStudentProfile.streak}-Day Technical Consistency Heatmap
-                                                </span>
-                                                <span className="text-emerald-500 font-bold">
-                                                    {hoveredHeatmapDay !== null 
-                                                        ? `Day ${hoveredHeatmapDay + 1}: ${activeStudentProfile.heatmapDensity[hoveredHeatmapDay] * 3} solves` 
-                                                        : `${activeStudentProfile.annualSubmissions} Submissions This Year`
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div className="grid grid-cols-14 gap-1.5 pt-1">
-                                                {activeStudentProfile.heatmapDensity.map((density, i) => (
-                                                    <div 
-                                                        key={i} 
-                                                        onMouseEnter={() => setHoveredHeatmapDay(i)}
-                                                        onMouseLeave={() => setHoveredHeatmapDay(null)}
-                                                        className={`h-4 rounded-[3px] hover:scale-135 hover:z-10 transition-transform duration-150 cursor-pointer relative ${
-                                                            density === 3 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' :
-                                                            density === 2 ? 'bg-emerald-600/70' :
-                                                            density === 1 ? 'bg-emerald-700/40' :
-                                                            'bg-zinc-200 dark:bg-zinc-800'
-                                                        }`}
-                                                        title={`Day ${i + 1}: ${density * 3} solves recorded`}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <ProfileTabContent
+                                        selectedStudentId={selectedStudentId}
+                                        setSelectedStudentId={setSelectedStudentId}
+                                        profile={activeStudentProfile}
+                                        hoveredHeatmapDay={hoveredHeatmapDay}
+                                        setHoveredHeatmapDay={setHoveredHeatmapDay}
+                                    />
                                 )}
 
                                 {/* TAB 3: CLASSROOM ANALYTICS */}
                                 {canvasTab === 'analytics' && (
-                                    <div key="analytics" className="animate-tab-enter space-y-4">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
-                                            <div>
-                                                <h3 className="text-base font-bold text-zinc-900 dark:text-white">Cohort Topic Competency Matrix</h3>
-                                                <p className="text-xs text-zinc-500">Identifies algorithmic weakness areas across all 42 enrolled students in Super 42</p>
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setTopicFilter('all')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
-                                                        topicFilter === 'all'
-                                                            ? 'bg-[#5b4fff] text-white shadow-xs'
-                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                                                    }`}
-                                                >
-                                                    All Topics ({COHORT_TOPICS.length})
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setTopicFilter('weaknesses')}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
-                                                        topicFilter === 'weaknesses'
-                                                            ? 'bg-rose-500 text-white shadow-xs'
-                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                                                    }`}
-                                                >
-                                                    Weaknesses Only (&lt;60%)
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Actionable Dispatch Banner */}
-                                        <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                            <div className="space-y-0.5">
-                                                <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5">
-                                                    <SparkleIcon className="w-4 h-4 text-[#5b4fff]" weight="fill" />
-                                                    Targeted Remediation Recommendation
-                                                </p>
-                                                <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                                                    18 students need remedial practice on Dynamic Programming and Graphs.
-                                                </p>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={handleDispatchRemedial}
-                                                disabled={dispatchSuccess}
-                                                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 hover:-translate-y-0.5 active:scale-95 duration-150 ${
-                                                    dispatchSuccess
-                                                        ? 'bg-emerald-600 text-white shadow-md animate-scale-bounce'
-                                                        : 'bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs hover:shadow-md'
-                                                }`}
-                                            >
-                                                {dispatchSuccess ? (
-                                                    <>
-                                                        <CheckIcon className="w-4 h-4" weight="bold" />
-                                                        Remedial Sheet Dispatched!
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <PaperPlaneTiltIcon className="w-4 h-4" weight="bold" />
-                                                        Dispatch Remedial Problem Set
-                                                    </>
-                                                )}
-                                            </button>
-                                        </div>
-
-                                        {/* Topic Competency Bars */}
-                                        <div className="space-y-3">
-                                            {filteredTopics.map(topic => (
-                                                <div key={topic.id} className="p-3.5 rounded-xl bg-zinc-50 dark:bg-[#14141a] border border-zinc-200/80 dark:border-zinc-800/80 interactive-card">
-                                                    <div className="flex justify-between items-center text-xs mb-1.5">
-                                                        <span className="font-bold text-zinc-900 dark:text-white">{topic.name}</span>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-[10px] text-zinc-400 font-medium">
-                                                                {topic.needReviewCount} need review
-                                                            </span>
-                                                            <span className={`font-bold text-[11px] px-2 py-0.5 rounded border ${topic.statusClass}`}>
-                                                                {topic.status} ({topic.percentage}%)
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
-                                                        <div 
-                                                            className={`h-full ${topic.barClass} transition-all duration-700 ease-out`}
-                                                            style={{ width: `${topic.percentage}%` }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    <AnalyticsTabContent
+                                        topicFilter={topicFilter}
+                                        setTopicFilter={setTopicFilter}
+                                        filteredTopics={filteredTopics}
+                                        dispatchSuccess={dispatchSuccess}
+                                        onDispatchRemedial={handleDispatchRemedial}
+                                    />
                                 )}
 
                                 <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
@@ -1219,8 +1326,8 @@ export function LandingPage() {
                                         &gt; Memory Allocation: {activeVerification.memory} • Status: Accepted
                                     </p>
                                     <p className="text-emerald-400/80">
-                                        &gt; Assignment Verified: Week 4 DSA Sprint (+10 pts awarded)
-                                        <span className="inline-block w-2 h-3.5 bg-emerald-400 animate-live-cursor ml-1.5 align-middle" />
+                                        <span>&gt; Assignment Verified: Week 4 DSA Sprint (+10 pts awarded)</span>
+                                        <span aria-hidden="true" className="inline-block w-2 h-3.5 bg-emerald-400 animate-live-cursor ml-1.5 align-middle" />
                                     </p>
                                 </div>
                             </div>
@@ -1257,7 +1364,7 @@ export function LandingPage() {
                                                 +270 pts
                                             </span>
                                         </div>
-                                        <svg className="w-full h-12 overflow-visible" viewBox="0 0 200 48" fill="none">
+                                        <svg className="w-full h-12 overflow-visible" viewBox="0 0 200 48" fill="none" aria-hidden="true" role="presentation">
                                             <defs>
                                                 <linearGradient id="lcGrad" x1="0" y1="0" x2="0" y2="1">
                                                     <stop offset="0%" stopColor="#ffa116" stopOpacity="0.3" />
@@ -1310,7 +1417,7 @@ export function LandingPage() {
                                                 +230 pts
                                             </span>
                                         </div>
-                                        <svg className="w-full h-12 overflow-visible" viewBox="0 0 200 48" fill="none">
+                                        <svg className="w-full h-12 overflow-visible" viewBox="0 0 200 48" fill="none" aria-hidden="true" role="presentation">
                                             <defs>
                                                 <linearGradient id="cfGrad" x1="0" y1="0" x2="0" y2="1">
                                                     <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.3" />
@@ -1563,13 +1670,13 @@ export function LandingPage() {
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link 
                                 to="/login" 
-                                className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_24px_rgba(91,79,255,0.3)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] min-h-[48px] flex items-center justify-center shimmer-sweep interactive-press"
+                                className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_24px_rgba(91,79,255,0.3)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] min-h-12 flex items-center justify-center shimmer-sweep interactive-press"
                             >
                                 Start for Free
                             </Link>
                             <Link 
                                 to="/how-to-use" 
-                                className="w-full sm:w-auto bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-800 dark:text-white border border-zinc-300 dark:border-white/20 text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all min-h-[48px] flex items-center justify-center interactive-press"
+                                className="w-full sm:w-auto bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-800 dark:text-white border border-zinc-300 dark:border-white/20 text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all min-h-12 flex items-center justify-center interactive-press"
                             >
                                 How to Use Guide
                             </Link>

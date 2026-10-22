@@ -344,44 +344,46 @@ class AuthenticationServiceTest {
         when(mentorRepository.findByEmailIgnoreCase("ghost@example.com")).thenReturn(Optional.empty());
         when(mentorRepository.findByEmail("ghost@example.com")).thenReturn(Optional.empty());
 
+        ForgotPasswordRequest forgotReq = new ForgotPasswordRequest("ghost@example.com");
         assertThrows(
                 ValidationFailedException.class,
-                () -> authenticationService.sendPasswordResetOtp(new ForgotPasswordRequest("ghost@example.com"))
+                () -> authenticationService.sendPasswordResetOtp(forgotReq)
         );
         verify(resendEmailService, never()).sendOtpEmail(any(), any(), any());
     }
 
     @Test
     void verifyPasswordResetOtp_WithValidOtp_ShouldReturnResetToken() {
-        PasswordResetOtp record = PasswordResetOtp.builder()
+        PasswordResetOtp otpRecord = PasswordResetOtp.builder()
                 .email("student@example.com")
                 .otp("123456")
                 .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
                 .build();
 
-        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(record));
+        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(otpRecord));
 
         VerifyOtpResponse response = authenticationService.verifyPasswordResetOtp(new VerifyOtpRequest("student@example.com", "123456"));
 
         assertNotNull(response);
         assertNotNull(response.resetToken());
-        assertTrue(record.isVerified());
-        verify(passwordResetOtpRepository).save(record);
+        assertTrue(otpRecord.isVerified());
+        verify(passwordResetOtpRepository).save(otpRecord);
     }
 
     @Test
     void verifyPasswordResetOtp_WithIncorrectOtp_ShouldThrowValidationFailedException() {
-        PasswordResetOtp record = PasswordResetOtp.builder()
+        PasswordResetOtp otpRecord = PasswordResetOtp.builder()
                 .email("student@example.com")
                 .otp("123456")
                 .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
                 .build();
 
-        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(record));
+        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(otpRecord));
 
+        VerifyOtpRequest verifyReq = new VerifyOtpRequest("student@example.com", "999999");
         ValidationFailedException ex = assertThrows(
                 ValidationFailedException.class,
-                () -> authenticationService.verifyPasswordResetOtp(new VerifyOtpRequest("student@example.com", "999999"))
+                () -> authenticationService.verifyPasswordResetOtp(verifyReq)
         );
 
         assertTrue(ex.getMessage().contains("Invalid verification code"));
@@ -389,7 +391,7 @@ class AuthenticationServiceTest {
 
     @Test
     void resetPasswordWithOtp_WithValidResetToken_ShouldUpdatePassword() {
-        PasswordResetOtp record = PasswordResetOtp.builder()
+        PasswordResetOtp otpRecord = PasswordResetOtp.builder()
                 .email("student@example.com")
                 .resetToken("token-123")
                 .verified(true)
@@ -400,7 +402,7 @@ class AuthenticationServiceTest {
         student.setId("s1");
         student.setEmail("student@example.com");
 
-        when(passwordResetOtpRepository.findByEmailAndResetToken("student@example.com", "token-123")).thenReturn(Optional.of(record));
+        when(passwordResetOtpRepository.findByEmailAndResetToken("student@example.com", "token-123")).thenReturn(Optional.of(otpRecord));
         when(studentRepository.findByEmailIgnoreCase("student@example.com")).thenReturn(Optional.of(student));
         when(passwordEncoder.encode("brandNewPass123")).thenReturn("encodedNewPass");
 
@@ -417,7 +419,7 @@ class AuthenticationServiceTest {
         assertNotNull(response);
         assertEquals("encodedNewPass", student.getPassword());
         verify(studentRepository).save(student);
-        verify(passwordResetOtpRepository).delete(record);
+        verify(passwordResetOtpRepository).delete(otpRecord);
         verify(refreshTokenService).deleteByMentorId("s1");
     }
 
@@ -548,9 +550,10 @@ class AuthenticationServiceTest {
         when(mentorRepository.findByEmail("student@example.com")).thenReturn(Optional.empty());
         when(studentRegistrationOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(recent));
 
+        SendStudentOtpRequest otpReq = new SendStudentOtpRequest("student@example.com", "Student");
         ValidationFailedException ex = assertThrows(
                 ValidationFailedException.class,
-                () -> authenticationService.sendStudentRegistrationOtp(new SendStudentOtpRequest("student@example.com", "Student"))
+                () -> authenticationService.sendStudentRegistrationOtp(otpReq)
         );
 
         assertTrue(ex.getMessage().contains("Please wait"));
@@ -559,21 +562,22 @@ class AuthenticationServiceTest {
 
     @Test
     void verifyPasswordResetOtp_WhenFiveAttemptsExceeded_ShouldInvalidateAndThrow() {
-        PasswordResetOtp record = PasswordResetOtp.builder()
+        PasswordResetOtp otpRecord = PasswordResetOtp.builder()
                 .email("student@example.com")
                 .otp("123456")
                 .failedAttempts(4)
                 .expiryDate(Instant.now().plus(Duration.ofMinutes(5)))
                 .build();
 
-        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(record));
+        when(passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc("student@example.com")).thenReturn(Optional.of(otpRecord));
 
+        VerifyOtpRequest verifyReq = new VerifyOtpRequest("student@example.com", "999999");
         ValidationFailedException ex = assertThrows(
                 ValidationFailedException.class,
-                () -> authenticationService.verifyPasswordResetOtp(new VerifyOtpRequest("student@example.com", "999999"))
+                () -> authenticationService.verifyPasswordResetOtp(verifyReq)
         );
 
         assertTrue(ex.getMessage().contains("Too many incorrect attempts"));
-        verify(passwordResetOtpRepository).delete(record);
+        verify(passwordResetOtpRepository).delete(otpRecord);
     }
 }

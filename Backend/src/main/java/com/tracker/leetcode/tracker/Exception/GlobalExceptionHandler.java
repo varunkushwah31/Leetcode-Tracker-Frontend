@@ -24,12 +24,16 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String ERROR_UNAUTHORIZED = "Unauthorized";
+    private static final String ERROR_BAD_REQUEST = "Bad Request";
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,
@@ -42,7 +46,7 @@ public class GlobalExceptionHandler {
         String path = request != null ? request.getRequestURI() : null;
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .time(LocalDateTime.now())
+                .time(LocalDateTime.now(ZoneOffset.UTC))
                 .status(status.value())
                 .error(error)
                 .message(message)
@@ -58,25 +62,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
         log.warn("Failed login attempt on path [{}]: {}", request.getRequestURI(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", "Invalid email or password.", request, null);
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ERROR_UNAUTHORIZED, "Invalid email or password.", request, null);
     }
 
     @ExceptionHandler(UserAuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleUserAuthenticationException(UserAuthenticationException ex, HttpServletRequest request) {
         log.warn("Authentication error on path [{}]: {}", request.getRequestURI(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage(), request, null);
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ERROR_UNAUTHORIZED, ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUsernameNotFound(UsernameNotFoundException ex, HttpServletRequest request) {
         log.warn("User not found during authentication on path [{}]", request.getRequestURI());
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", "Invalid email or password.", request, null);
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ERROR_UNAUTHORIZED, "Invalid email or password.", request, null);
     }
 
     @ExceptionHandler({TokenRefreshException.class, RefreshTokenException.class})
     public ResponseEntity<ErrorResponse> handleTokenRefreshException(RuntimeException ex, HttpServletRequest request) {
         log.warn("Refresh token failure on path [{}]: {}", request.getRequestURI(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage(), request, null);
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ERROR_UNAUTHORIZED, ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -125,13 +129,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationFailedException.class)
     public ResponseEntity<ErrorResponse> handleValidationFailed(ValidationFailedException ex, HttpServletRequest request) {
         log.warn("Validation failed on path [{}]: {}", request.getRequestURI(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), request, null);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ERROR_BAD_REQUEST, ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request) {
         log.warn("Illegal argument on path [{}]: {}", request.getRequestURI(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), request, null);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ERROR_BAD_REQUEST, ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -143,13 +147,13 @@ public class GlobalExceptionHandler {
 
         String summary = "Validation failed for field(s): " + String.join(", ", fieldErrors.keySet());
         log.warn("DTO Validation Failed on path [{}]: {}", request.getRequestURI(), fieldErrors);
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", summary, request, fieldErrors);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ERROR_BAD_REQUEST, summary, request, fieldErrors);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
         log.warn("Malformed JSON request body on path [{}]: {}", request.getRequestURI(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", "Malformed or unreadable JSON request body.", request, null);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ERROR_BAD_REQUEST, "Malformed or unreadable JSON request body.", request, null);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -157,14 +161,14 @@ public class GlobalExceptionHandler {
         String expectedType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "valid type";
         String message = "Parameter '" + ex.getName() + "' must be of type " + expectedType;
         log.warn("Type mismatch on path [{}]: {}", request.getRequestURI(), message);
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", message, request, null);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ERROR_BAD_REQUEST, message, request, null);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpServletRequest request) {
         String message = "Required request parameter '" + ex.getParameterName() + "' is missing.";
         log.warn("Missing parameter on path [{}]: {}", request.getRequestURI(), message);
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", message, request, null);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ERROR_BAD_REQUEST, message, request, null);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -184,7 +188,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException ex, HttpServletRequest request) {
         log.warn("Max upload size exceeded on path [{}]: {}", request.getRequestURI(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.PAYLOAD_TOO_LARGE, "Payload Too Large", "Uploaded file exceeds the maximum allowed size.", request, null);
+        return buildErrorResponse(HttpStatus.CONTENT_TOO_LARGE, "Payload Too Large", "Uploaded file exceeds the maximum allowed size.", request, null);
     }
 
     // 5. External API & Rate Limiting / Circuit Breaker Errors

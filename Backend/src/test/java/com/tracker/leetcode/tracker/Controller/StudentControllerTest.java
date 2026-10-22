@@ -1,6 +1,5 @@
 package com.tracker.leetcode.tracker.Controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tracker.leetcode.tracker.DTO.StudentSummaryDTO;
 import com.tracker.leetcode.tracker.Mapper.StudentMapper;
 import com.tracker.leetcode.tracker.Models.Student;
@@ -30,10 +29,6 @@ class   StudentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-
-    // ADD THIS INSTEAD
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // We must mock ALL dependencies injected into the Controller
     @MockitoBean

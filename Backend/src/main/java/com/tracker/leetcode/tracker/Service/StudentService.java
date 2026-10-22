@@ -5,14 +5,12 @@ import com.tracker.leetcode.tracker.Exception.StudentNotFoundException;
 import com.tracker.leetcode.tracker.Models.*;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
 import com.tracker.leetcode.tracker.Repository.StudentRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.tracker.leetcode.tracker.Mapper.StudentMapper;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -25,23 +23,60 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class StudentService {
 
     private final StudentRepository studentRepository;
     private final ClassroomRepository classroomRepository;
     private final LeetCodeApiClient leetCodeApiClient;
     private final CodeforcesApiClient codeforcesApiClient;
-    private final SimpMessagingTemplate messagingTemplate;
     private final RedisDistributedLockService lockService;
     private final RedisLeaderboardService leaderboardService;
     private final CacheManager cacheManager;
     private final StudentMapper studentMapper;
     private final RedisWebSocketBridge webSocketBridge;
+    private final java.util.concurrent.Executor virtualThreadExecutor;
 
-    @org.springframework.beans.factory.annotation.Autowired(required = false)
-    @org.springframework.beans.factory.annotation.Qualifier("virtualThreadExecutor")
-    private java.util.concurrent.Executor virtualThreadExecutor;
+    @org.springframework.beans.factory.annotation.Autowired
+    public StudentService(
+            StudentRepository studentRepository,
+            ClassroomRepository classroomRepository,
+            LeetCodeApiClient leetCodeApiClient,
+            CodeforcesApiClient codeforcesApiClient,
+            RedisDistributedLockService lockService,
+            RedisLeaderboardService leaderboardService,
+            CacheManager cacheManager,
+            StudentMapper studentMapper,
+            RedisWebSocketBridge webSocketBridge,
+            @org.springframework.beans.factory.annotation.Autowired(required = false)
+            @org.springframework.beans.factory.annotation.Qualifier("virtualThreadExecutor")
+            java.util.concurrent.Executor virtualThreadExecutor
+    ) {
+        this.studentRepository = studentRepository;
+        this.classroomRepository = classroomRepository;
+        this.leetCodeApiClient = leetCodeApiClient;
+        this.codeforcesApiClient = codeforcesApiClient;
+        this.lockService = lockService;
+        this.leaderboardService = leaderboardService;
+        this.cacheManager = cacheManager;
+        this.studentMapper = studentMapper;
+        this.webSocketBridge = webSocketBridge;
+        this.virtualThreadExecutor = virtualThreadExecutor;
+    }
+
+    public StudentService(
+            StudentRepository studentRepository,
+            ClassroomRepository classroomRepository,
+            LeetCodeApiClient leetCodeApiClient,
+            CodeforcesApiClient codeforcesApiClient,
+            RedisDistributedLockService lockService,
+            RedisLeaderboardService leaderboardService,
+            CacheManager cacheManager,
+            StudentMapper studentMapper,
+            RedisWebSocketBridge webSocketBridge
+    ) {
+        this(studentRepository, classroomRepository, leetCodeApiClient, codeforcesApiClient,
+                lockService, leaderboardService, cacheManager, studentMapper, webSocketBridge, null);
+    }
 
     // Helper method to keep code DRY - supports ID, email, LeetCode username, or Codeforces handle
     public Student getStudentOrThrow(String identifier) {
@@ -538,7 +573,7 @@ public class StudentService {
         return merged.entrySet().stream()
                 .map(e -> new DailyProgress(e.getKey(), e.getValue()))
                 .sorted(Comparator.comparing(DailyProgress::getDate))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<SkillStat> mergeSkills(List<SkillStat> existing, List<SkillStat> cfSkills) {
@@ -556,7 +591,7 @@ public class StudentService {
         return skillMap.entrySet().stream()
                 .map(e -> new SkillStat(e.getKey(), e.getValue()))
                 .sorted((a, b) -> Integer.compare(b.getProblemsSolved(), a.getProblemsSolved()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private void autoValidateAssignmentsForStudent(Student student) {
@@ -680,7 +715,7 @@ public class StudentService {
         csv.append("Email,").append(escapeCsv(student.getEmail())).append("\n");
         csv.append("LeetCode Username,").append(escapeCsv(student.getLeetcodeUsername())).append("\n");
         csv.append("Codeforces Handle,").append(escapeCsv(student.getCodeforcesHandle())).append("\n");
-        csv.append("Report Generated At,").append(java.time.LocalDateTime.now()).append("\n");
+        csv.append("Report Generated At,").append(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC)).append("\n");
 
         List<Classroom> classrooms = classroomRepository.findByStudentIdsContaining(student.getId());
         String classroomNames = classrooms != null ? classrooms.stream().map(Classroom::getClassName).collect(Collectors.joining("; ")) : "";
@@ -688,7 +723,9 @@ public class StudentService {
 
         // Section 1: Summary Statistics
         csv.append("--- SUMMARY STATISTICS ---\n");
-        int easyCount = 0, medCount = 0, hardCount = 0;
+        int easyCount = 0;
+        int medCount = 0;
+        int hardCount = 0;
         if (student.getProblemStats() != null) {
             for (var stat : student.getProblemStats()) {
                 if ("Easy".equalsIgnoreCase(stat.getDifficulty())) easyCount = stat.getCount();

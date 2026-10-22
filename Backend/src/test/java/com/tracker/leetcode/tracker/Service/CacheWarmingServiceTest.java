@@ -3,7 +3,6 @@ package com.tracker.leetcode.tracker.Service;
 import com.tracker.leetcode.tracker.DTO.MentorDTO;
 import com.tracker.leetcode.tracker.Models.Classroom;
 import com.tracker.leetcode.tracker.Repository.ClassroomRepository;
-import com.tracker.leetcode.tracker.Repository.MentorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,8 +24,6 @@ class CacheWarmingServiceTest {
     @Mock
     private ClassroomRepository classroomRepository;
 
-    @Mock
-    private MentorRepository mentorRepository;
 
     @Mock
     private ClassroomService classroomService;
@@ -49,7 +46,6 @@ class CacheWarmingServiceTest {
     void setUp() {
         cacheWarmingService = new CacheWarmingService(
                 classroomRepository,
-                mentorRepository,
                 classroomService,
                 mentorService,
                 dailyChallengeService,

@@ -29,7 +29,16 @@ import java.util.concurrent.TimeUnit;
 @Component // Tells Spring to manage this class as a reusable tool
 public class LeetCodeApiClient {
 
-    private final String LEETCODE_API_URL = "https://leetcode.com/graphql";
+    private static final String LEETCODE_API_URL = "https://leetcode.com/graphql";
+    private static final String FIELD_MATCHED_USER = "matchedUser";
+    private static final String FIELD_DIFFICULTY = "difficulty";
+    private static final String FIELD_TITLE = "title";
+    private static final String FIELD_TITLE_SLUG = "titleSlug";
+    private static final String TOPIC_ARRAY = "Array";
+    private static final String TOPIC_DP = "Dynamic Programming";
+    private static final String DIFFICULTY_EASY = "Easy";
+    private static final String DIFFICULTY_MEDIUM = "Medium";
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpHeaders headers;
@@ -90,7 +99,7 @@ public class LeetCodeApiClient {
             Object cached = redisTemplate.opsForValue().get(key);
             if (cached != null) {
                 log.info("Using fallback data from Redis cache: {}", key);
-                return (T) cached;
+                return type.cast(cached);
             }
         } catch (Exception e) {
             log.warn("Failed to retrieve fallback data from cache: {}", e.getMessage());
@@ -110,7 +119,7 @@ public class LeetCodeApiClient {
                 """.formatted(username);
 
         JsonNode root = executeGraphQLQuery(query, username);
-        JsonNode matchedUser = root.path("data").path("matchedUser");
+        JsonNode matchedUser = root.path("data").path(FIELD_MATCHED_USER);
         if (matchedUser.isMissingNode() || matchedUser.isNull()) {
             throw new LeetCodeApiException("LeetCode user not found: " + username);
         }
@@ -148,6 +157,7 @@ public class LeetCodeApiClient {
     /**
      * Fallback method when circuit is OPEN - serves stale data from Redis
      */
+    @SuppressWarnings("unchecked")
     public List<DailyProgress> fetchCalendarDataFallback(String username, Exception ex) {
         log.warn("Circuit breaker OPEN for calendar data of {}. Serving stale data from cache. Error: {}",
                 username, ex.getMessage());
@@ -168,7 +178,7 @@ public class LeetCodeApiClient {
                 """.formatted(username);
 
         JsonNode root = executeGraphQLQuery(query, username);
-        JsonNode matchedUser = root.path("data").path("matchedUser");
+        JsonNode matchedUser = root.path("data").path(FIELD_MATCHED_USER);
 
         if (matchedUser.isMissingNode() || matchedUser.isNull()) {
             throw new LeetCodeApiException("LeetCode returned no stats data for user: " + username);
@@ -180,18 +190,9 @@ public class LeetCodeApiClient {
 
         if (submissionStats != null && submissionStats.isArray()) {
             for (JsonNode statNode : submissionStats) {
-                String difficulty = statNode.path("difficulty").asString();
+                String difficulty = statNode.path(FIELD_DIFFICULTY).asString();
                 int count = statNode.path("count").asInt();
-                double percentage = 0.0;
-
-                if (beatsStats != null && beatsStats.isArray()) {
-                    for (JsonNode beatNode : beatsStats) {
-                        if (beatNode.path("difficulty").asString().equals(difficulty) && !beatNode.path("percentage").isNull()) {
-                            percentage = beatNode.path("percentage").asDouble();
-                            break;
-                        }
-                    }
-                }
+                double percentage = extractBeatsPercentage(beatsStats, difficulty);
                 statsList.add(new ProblemStats(difficulty, count, percentage));
             }
         }
@@ -201,9 +202,22 @@ public class LeetCodeApiClient {
         return statsList;
     }
 
+    private double extractBeatsPercentage(JsonNode beatsStats, String difficulty) {
+        if (beatsStats == null || !beatsStats.isArray()) {
+            return 0.0;
+        }
+        for (JsonNode beatNode : beatsStats) {
+            if (beatNode.path(FIELD_DIFFICULTY).asString().equals(difficulty) && !beatNode.path("percentage").isNull()) {
+                return beatNode.path("percentage").asDouble();
+            }
+        }
+        return 0.0;
+    }
+
     /**
      * Fallback method when circuit is OPEN - serves stale stats from Redis
      */
+    @SuppressWarnings("unchecked")
     public List<ProblemStats> fetchProblemStatsFallback(String username, Exception ex) {
         log.warn("Circuit breaker OPEN for stats of {}. Serving stale data from cache. Error: {}",
                 username, ex.getMessage());
@@ -235,8 +249,8 @@ public class LeetCodeApiClient {
         if (submissionList.isArray()) {
             for (JsonNode node : submissionList) {
                 try {
-                    String title = node.path("title").asString();
-                    String titleSlug = node.path("titleSlug").asString();
+                    String title = node.path(FIELD_TITLE).asString();
+                    String titleSlug = node.path(FIELD_TITLE_SLUG).asString();
                     long timestamp = Long.parseLong(node.path("timestamp").asString());
                     recentList.add(new RecentSubmission(title, titleSlug, timestamp));
                 } catch (Exception e) {
@@ -254,12 +268,13 @@ public class LeetCodeApiClient {
     /**
      * Fallback method when circuit is OPEN - serves stale submissions from Redis
      */
+    @SuppressWarnings("unchecked")
     public List<RecentSubmission> fetchRecentSubmissionsFallback(String username, int limit, Exception ex) {
         log.warn("Circuit breaker OPEN for recent submissions of {}. Serving stale data from cache. Error: {}",
                 username, ex.getMessage());
         List<RecentSubmission> cached = getFallbackDataFromCache("leetcode:recent:" + username, List.class);
         if (cached != null) {
-            return cached;
+            return cached.size() > limit ? cached.subList(0, limit) : cached;
         }
         throw new LeetCodeApiException("LeetCode API is temporarily unavailable and no cached data exists for user: " + username);
     }
@@ -277,12 +292,12 @@ public class LeetCodeApiClient {
         JsonNode root = executeGraphQLQuery(query, username);
         JsonNode data = root.path("data");
 
-        if (data.path("matchedUser").isNull() || data.path("matchedUser").isMissingNode()) {
+        if (data.path(FIELD_MATCHED_USER).isNull() || data.path(FIELD_MATCHED_USER).isMissingNode()) {
             throw new LeetCodeApiException("LeetCode returned no extended profile data for user: " + username);
         }
 
         Student extendedData = new Student();
-        JsonNode matchedUser = data.path("matchedUser");
+        JsonNode matchedUser = data.path(FIELD_MATCHED_USER);
         JsonNode profile = matchedUser.path("profile");
 
         // 1. Parse Central Fields, Avatar, & Social Media
@@ -393,7 +408,7 @@ public class LeetCodeApiClient {
             // Loop through their recent accepted submissions looking for a match
             for (JsonNode node : submissionList) {
                 String actualId = node.path("id").asString();
-                String actualSlug = node.path("titleSlug").asString();
+                String actualSlug = node.path(FIELD_TITLE_SLUG).asString();
                 String normActualSlug = actualSlug.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
 
                 // If the ID matches AND the question matches, it's 100% valid!
@@ -417,8 +432,8 @@ public class LeetCodeApiClient {
      * Fallback for submission verification - returns false to deny verification during API outage
      */
     public boolean verifySubmissionFallback(String submissionId, String expectedUsername, String expectedTitleSlug, Exception ex) {
-        log.warn("Circuit breaker OPEN for submission verification of {}. Denying verification during outage. Error: {}",
-                expectedUsername, ex.getMessage());
+        log.warn("Circuit breaker OPEN for submission verification of {} (problem: {}, submissionId: {}). Denying verification during outage. Error: {}",
+                expectedUsername, expectedTitleSlug, submissionId, ex.getMessage());
         return false;
     }
 
@@ -437,8 +452,8 @@ public class LeetCodeApiClient {
             JsonNode qNode = root.path("data").path("question");
             if (qNode != null && !qNode.isMissingNode() && !qNode.isNull()) {
                 String problemNumber = qNode.path("questionFrontendId").asString("");
-                String title = qNode.path("title").asString("");
-                String difficulty = qNode.path("difficulty").asString("");
+                String title = qNode.path(FIELD_TITLE).asString("");
+                String difficulty = qNode.path(FIELD_DIFFICULTY).asString("");
                 return new LeetCodeQuestionInfo(problemNumber, title, cleanSlug, difficulty);
             }
         } catch (Exception e) {
@@ -494,6 +509,7 @@ public class LeetCodeApiClient {
     /**
      * Fallback method when circuit is OPEN - serves stale skills from Redis
      */
+    @SuppressWarnings("unchecked")
     public List<SkillStat> fetchSkillStatsFallback(String username, Exception ex) {
         log.warn("Circuit breaker OPEN for skill stats of {}. Serving stale data from cache. Error: {}",
                 username, ex.getMessage());
@@ -545,19 +561,19 @@ public class LeetCodeApiClient {
                 throw new LeetCodeApiException("Daily coding challenge question not found in LeetCode response");
             }
 
-            String date = activeQuestion.path("date").asText(LocalDate.now(ZoneId.of("UTC")).toString());
-            String link = activeQuestion.path("link").asText();
+            String date = activeQuestion.path("date").asString(LocalDate.now(ZoneId.of("UTC")).toString());
+            String link = activeQuestion.path("link").asString("");
             JsonNode qNode = activeQuestion.path("question");
-            String frontendId = qNode.path("questionFrontendId").asText();
-            String title = qNode.path("title").asText();
-            String titleSlug = qNode.path("titleSlug").asText();
-            String difficulty = qNode.path("difficulty").asText();
+            String frontendId = qNode.path("questionFrontendId").asString("");
+            String title = qNode.path(FIELD_TITLE).asString("");
+            String titleSlug = qNode.path(FIELD_TITLE_SLUG).asString("");
+            String difficulty = qNode.path(FIELD_DIFFICULTY).asString("");
 
             List<String> tags = new ArrayList<>();
             JsonNode tagsNode = qNode.path("topicTags");
             if (tagsNode.isArray()) {
                 for (JsonNode t : tagsNode) {
-                    tags.add(t.path("name").asText());
+                    tags.add(t.path("name").asString(""));
                 }
             }
 
@@ -577,13 +593,13 @@ public class LeetCodeApiClient {
         log.warn("Circuit breaker active or error for LeetCode daily challenge: {}. Serving deterministic daily problem.", ex.getMessage());
         String today = LocalDate.now(ZoneId.of("UTC")).toString();
         List<LeetCodeDailyQuestion> fallbacks = List.of(
-                new LeetCodeDailyQuestion(today, "1", "Two Sum", "two-sum", "Easy", "https://leetcode.com/problems/two-sum/", List.of("Array", "Hash Table")),
-                new LeetCodeDailyQuestion(today, "53", "Maximum Subarray", "maximum-subarray", "Medium", "https://leetcode.com/problems/maximum-subarray/", List.of("Array", "Dynamic Programming")),
-                new LeetCodeDailyQuestion(today, "121", "Best Time to Buy and Sell Stock", "best-time-to-buy-and-sell-stock", "Easy", "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", List.of("Array", "Dynamic Programming")),
-                new LeetCodeDailyQuestion(today, "200", "Number of Islands", "number-of-islands", "Medium", "https://leetcode.com/problems/number-of-islands/", List.of("Depth-First Search", "Breadth-First Search", "Union Find")),
-                new LeetCodeDailyQuestion(today, "3", "Longest Substring Without Repeating Characters", "longest-substring-without-repeating-characters", "Medium", "https://leetcode.com/problems/longest-substring-without-repeating-characters/", List.of("Hash Table", "String", "Sliding Window")),
-                new LeetCodeDailyQuestion(today, "206", "Reverse Linked List", "reverse-linked-list", "Easy", "https://leetcode.com/problems/reverse-linked-list/", List.of("Linked List", "Recursion")),
-                new LeetCodeDailyQuestion(today, "70", "Climbing Stairs", "climbing-stairs", "Easy", "https://leetcode.com/problems/climbing-stairs/", List.of("Math", "Dynamic Programming", "Memoization"))
+                new LeetCodeDailyQuestion(today, "1", "Two Sum", "two-sum", DIFFICULTY_EASY, "https://leetcode.com/problems/two-sum/", List.of(TOPIC_ARRAY, "Hash Table")),
+                new LeetCodeDailyQuestion(today, "53", "Maximum Subarray", "maximum-subarray", DIFFICULTY_MEDIUM, "https://leetcode.com/problems/maximum-subarray/", List.of(TOPIC_ARRAY, TOPIC_DP)),
+                new LeetCodeDailyQuestion(today, "121", "Best Time to Buy and Sell Stock", "best-time-to-buy-and-sell-stock", DIFFICULTY_EASY, "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", List.of(TOPIC_ARRAY, TOPIC_DP)),
+                new LeetCodeDailyQuestion(today, "200", "Number of Islands", "number-of-islands", DIFFICULTY_MEDIUM, "https://leetcode.com/problems/number-of-islands/", List.of("Depth-First Search", "Breadth-First Search", "Union Find")),
+                new LeetCodeDailyQuestion(today, "3", "Longest Substring Without Repeating Characters", "longest-substring-without-repeating-characters", DIFFICULTY_MEDIUM, "https://leetcode.com/problems/longest-substring-without-repeating-characters/", List.of("Hash Table", "String", "Sliding Window")),
+                new LeetCodeDailyQuestion(today, "206", "Reverse Linked List", "reverse-linked-list", DIFFICULTY_EASY, "https://leetcode.com/problems/reverse-linked-list/", List.of("Linked List", "Recursion")),
+                new LeetCodeDailyQuestion(today, "70", "Climbing Stairs", "climbing-stairs", DIFFICULTY_EASY, "https://leetcode.com/problems/climbing-stairs/", List.of("Math", TOPIC_DP, "Memoization"))
         );
         int dayIndex = Math.abs(LocalDate.now(ZoneId.of("UTC")).getDayOfYear()) % fallbacks.size();
         return fallbacks.get(dayIndex);

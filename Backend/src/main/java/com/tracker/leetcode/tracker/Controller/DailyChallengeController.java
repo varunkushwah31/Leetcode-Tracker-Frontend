@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/challenges")
+@RequestMapping("/api/challenges/daily")
 @RequiredArgsConstructor
 public class DailyChallengeController {
 
     private final DailyChallengeService dailyChallengeService;
 
-    @GetMapping("/daily")
+    @GetMapping
     public ResponseEntity<DailyChallengeDTO> getDailyChallenge(
             @RequestParam(required = false) String classroomId,
             Authentication authentication
@@ -35,13 +35,13 @@ public class DailyChallengeController {
         return ResponseEntity.ok(challenge);
     }
 
-    @GetMapping("/daily/global")
+    @GetMapping("/global")
     public ResponseEntity<DailyChallengeDTO> getGlobalDailyChallenge() {
         log.info("Fetching pure global LeetCode POTD (no user context).");
         return ResponseEntity.ok(dailyChallengeService.getGlobalDailyChallenge());
     }
 
-    @PostMapping("/daily/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<DailyChallengeDTO> refreshGlobalDailyChallenge() {
         log.info("Request to force refresh global LeetCode POTD.");
         return ResponseEntity.ok(dailyChallengeService.refreshGlobalDailyChallenge());
