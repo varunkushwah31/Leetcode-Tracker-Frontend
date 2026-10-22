@@ -1,6 +1,5 @@
 package com.tracker.leetcode.tracker.Service;
 
-import com.tracker.leetcode.tracker.DTO.ClassroomDashboardDTO;
 import com.tracker.leetcode.tracker.DTO.StudentSummaryDTO;
 import com.tracker.leetcode.tracker.Exception.AssignmentNotFoundException;
 import com.tracker.leetcode.tracker.Exception.ClassroomNotFoundException;

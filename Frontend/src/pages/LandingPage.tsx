@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
     UsersIcon,
@@ -28,6 +28,7 @@ import {
 } from '@phosphor-icons/react';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
+import { AmbientGlow } from '../components/ui/AmbientGlow';
 
 interface SampleStudent {
     id: string;
@@ -45,51 +46,51 @@ interface SampleStudent {
 const SAMPLE_LEADERBOARD: SampleStudent[] = [
     {
         id: '1',
-        name: 'Alex Rivera',
-        handle: 'alex_r',
-        lcSolved: 420,
-        cfSolved: 240,
-        lcRating: 1890,
-        cfRating: 1510,
-        cfRank: 'Specialist',
-        lcRank: 'Knight',
-        streak: 64
+        name: 'Prateek Kumar',
+        handle: 'prateek_k',
+        lcSolved: 440,
+        cfSolved: 260,
+        lcRating: 1980,
+        cfRating: 1640,
+        cfRank: 'Expert',
+        lcRank: 'Guardian',
+        streak: 68
     },
     {
         id: '2',
-        name: 'Sarah Chen',
-        handle: 'sarah_c',
-        lcSolved: 395,
-        cfSolved: 215,
-        lcRating: 1940,
-        cfRating: 1480,
+        name: 'Prachi Sharma',
+        handle: 'prachi_s',
+        lcSolved: 410,
+        cfSolved: 230,
+        lcRating: 1910,
+        cfRating: 1520,
         cfRank: 'Specialist',
-        lcRank: 'Guardian',
-        streak: 52
+        lcRank: 'Knight',
+        streak: 56
     },
     {
         id: '3',
-        name: 'Dev Patel',
-        handle: 'dev_p',
-        lcSolved: 310,
-        cfSolved: 280,
-        lcRating: 1750,
-        cfRating: 1620,
+        name: 'Varun Kushwah',
+        handle: 'varun_k',
+        lcSolved: 380,
+        cfSolved: 290,
+        lcRating: 1840,
+        cfRating: 1680,
         cfRank: 'Expert',
         lcRank: 'Knight',
-        streak: 48
+        streak: 51
     },
     {
         id: '4',
-        name: 'Priya Sharma',
-        handle: 'priya_s',
-        lcSolved: 360,
-        cfSolved: 190,
-        lcRating: 1810,
-        cfRating: 1390,
-        cfRank: 'Pupil',
+        name: 'Piyush Goel',
+        handle: 'piyush_g',
+        lcSolved: 350,
+        cfSolved: 210,
+        lcRating: 1780,
+        cfRating: 1420,
+        cfRank: 'Specialist',
         lcRank: 'Knight',
-        streak: 41
+        streak: 43
     }
 ];
 
@@ -119,90 +120,90 @@ interface StudentProfileDetail {
 const STUDENT_PROFILES: Record<string, StudentProfileDetail> = {
     '1': {
         id: '1',
-        name: 'Alex Rivera',
-        initials: 'AR',
+        name: 'Prateek Kumar',
+        initials: 'PK',
         avatarBg: 'bg-indigo-600',
-        handle: 'alex_r',
-        lcHandle: 'alex_r',
-        cfHandle: 'rivera_a',
-        totalSolved: 660,
-        easySolved: 160,
-        mediumSolved: 360,
-        hardSolved: 140,
-        lcRating: 1890,
-        lcRank: 'Knight',
-        lcPercentile: 'Top 4.8%',
-        cfRating: 1510,
-        cfRank: 'Specialist',
-        cfDivision: 'Div. 2 Participant',
-        streak: 64,
-        annualSubmissions: 480,
+        handle: 'prateek_k',
+        lcHandle: 'prateek_k',
+        cfHandle: 'prateek_cf',
+        totalSolved: 700,
+        easySolved: 175,
+        mediumSolved: 380,
+        hardSolved: 145,
+        lcRating: 1980,
+        lcRank: 'Guardian',
+        lcPercentile: 'Top 3.8%',
+        cfRating: 1640,
+        cfRank: 'Expert',
+        cfDivision: 'Div. 1/2 Contender',
+        streak: 68,
+        annualSubmissions: 520,
         heatmapDensity: [1, 2, 0, 3, 2, 1, 0, 2, 3, 1, 2, 0, 1, 3, 2, 1, 3, 2, 0, 1, 2, 3, 1, 2, 0, 3, 2, 1, 2, 3, 1, 0, 2, 3, 2, 1, 0, 2, 3, 1, 2, 3]
     },
     '2': {
         id: '2',
-        name: 'Sarah Chen',
-        initials: 'SC',
+        name: 'Prachi Sharma',
+        initials: 'PS',
         avatarBg: 'bg-purple-600',
-        handle: 'sarah_c',
-        lcHandle: 'sarah_c',
-        cfHandle: 'chen_s',
-        totalSolved: 610,
-        easySolved: 152,
-        mediumSolved: 335,
-        hardSolved: 123,
-        lcRating: 1940,
-        lcRank: 'Guardian',
-        lcPercentile: 'Top 4.2%',
-        cfRating: 1480,
+        handle: 'prachi_s',
+        lcHandle: 'prachi_s',
+        cfHandle: 'prachi_cf',
+        totalSolved: 640,
+        easySolved: 160,
+        mediumSolved: 350,
+        hardSolved: 130,
+        lcRating: 1910,
+        lcRank: 'Knight',
+        lcPercentile: 'Top 4.5%',
+        cfRating: 1520,
         cfRank: 'Specialist',
         cfDivision: 'Div. 2 Participant',
-        streak: 52,
-        annualSubmissions: 428,
+        streak: 56,
+        annualSubmissions: 440,
         heatmapDensity: [2, 1, 3, 0, 2, 1, 2, 3, 1, 0, 2, 3, 1, 2, 0, 3, 2, 1, 0, 2, 3, 1, 2, 3, 0, 1, 2, 3, 1, 2, 0, 3, 2, 1, 0, 2, 3, 1, 2, 0, 3, 2]
     },
     '3': {
         id: '3',
-        name: 'Dev Patel',
-        initials: 'DP',
+        name: 'Varun Kushwah',
+        initials: 'VK',
         avatarBg: 'bg-emerald-600',
-        handle: 'dev_p',
-        lcHandle: 'dev_p',
-        cfHandle: 'patel_d',
-        totalSolved: 590,
-        easySolved: 130,
-        mediumSolved: 310,
-        hardSolved: 150,
-        lcRating: 1750,
+        handle: 'varun_k',
+        lcHandle: 'varun_k',
+        cfHandle: 'varun_cf',
+        totalSolved: 670,
+        easySolved: 150,
+        mediumSolved: 360,
+        hardSolved: 160,
+        lcRating: 1840,
         lcRank: 'Knight',
-        lcPercentile: 'Top 7.1%',
-        cfRating: 1620,
+        lcPercentile: 'Top 5.2%',
+        cfRating: 1680,
         cfRank: 'Expert',
         cfDivision: 'Div. 1/2 Contender',
-        streak: 48,
-        annualSubmissions: 395,
+        streak: 51,
+        annualSubmissions: 460,
         heatmapDensity: [0, 2, 3, 1, 2, 0, 1, 3, 2, 1, 2, 0, 3, 2, 1, 0, 2, 3, 1, 2, 0, 3, 2, 1, 2, 3, 0, 1, 2, 3, 1, 2, 0, 3, 2, 1, 0, 2, 3, 1, 2, 3]
     },
     '4': {
         id: '4',
-        name: 'Priya Sharma',
-        initials: 'PS',
+        name: 'Piyush Goel',
+        initials: 'PG',
         avatarBg: 'bg-amber-600',
-        handle: 'priya_s',
-        lcHandle: 'priya_s',
-        cfHandle: 'sharma_p',
-        totalSolved: 550,
-        easySolved: 170,
+        handle: 'piyush_g',
+        lcHandle: 'piyush_g',
+        cfHandle: 'piyush_cf',
+        totalSolved: 560,
+        easySolved: 180,
         mediumSolved: 290,
         hardSolved: 90,
-        lcRating: 1810,
+        lcRating: 1780,
         lcRank: 'Knight',
-        lcPercentile: 'Top 5.9%',
-        cfRating: 1390,
-        cfRank: 'Pupil',
-        cfDivision: 'Div. 3 Participant',
-        streak: 41,
-        annualSubmissions: 360,
+        lcPercentile: 'Top 6.5%',
+        cfRating: 1420,
+        cfRank: 'Specialist',
+        cfDivision: 'Div. 2 Participant',
+        streak: 43,
+        annualSubmissions: 370,
         heatmapDensity: [1, 0, 2, 3, 1, 2, 0, 3, 2, 1, 0, 2, 3, 1, 2, 3, 0, 1, 2, 3, 1, 2, 0, 3, 2, 1, 0, 2, 3, 1, 2, 0, 3, 2, 1, 2, 3, 0, 1, 2, 3, 1]
     }
 };
@@ -343,6 +344,18 @@ export function LandingPage() {
     const [hoveredHeatmapDay, setHoveredHeatmapDay] = useState<number | null>(null);
     const [copiedPayload, setCopiedPayload] = useState(false);
 
+    useEffect(() => {
+        if (window.location.hash) {
+            const targetId = window.location.hash.replace('#', '');
+            const element = document.getElementById(targetId);
+            if (element) {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+        }
+    }, []);
+
     const scrollToSection = (id: string) => {
         setMobileMenuOpen(false);
         const section = document.getElementById(id);
@@ -407,9 +420,12 @@ export function LandingPage() {
     return (
         <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0a0a0a] text-zinc-900 dark:text-white selection:bg-[#5b4fff] selection:text-white overflow-x-hidden font-sans relative transition-colors duration-200">
 
-            {/* Background Base matching Signup / Signin */}
+            {/* Background Base matching Signup / Signin / Dashboards */}
             <div className="fixed inset-0 z-0 bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-200 pointer-events-none" aria-hidden="true">
                 <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] bg-fixed opacity-100 pointer-events-none" />
+                <div className="hidden dark:block">
+                    <AmbientGlow />
+                </div>
             </div>
 
             {/* Mobile Backdrop */}
@@ -427,18 +443,25 @@ export function LandingPage() {
                     <BrandLogo size="responsive" theme="auto" />
 
                     {/* Desktop Navigation */}
-                    <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
+                    <nav aria-label="Main navigation" className="hidden md:flex items-center gap-5">
+                        <button 
+                            type="button"
+                            onClick={() => scrollToSection('verification-engine')} 
+                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center cursor-pointer"
+                        >
+                            Features
+                        </button>
                         <Link 
                             to="/how-to-use" 
                             className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center"
                         >
-                            Documentation
+                            How to Use
                         </Link>
                         <Link 
                             to="/contact" 
                             className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors min-h-[44px] flex items-center"
                         >
-                            Support
+                            Contact
                         </Link>
                         <Link 
                             to="/login" 
@@ -479,12 +502,23 @@ export function LandingPage() {
                 {/* Mobile Dropdown Panel */}
                 {mobileMenuOpen && (
                     <div className="md:hidden mt-3 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-2">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setMobileMenuOpen(false);
+                                scrollToSection('verification-engine');
+                            }}
+                            className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px] text-left w-full cursor-pointer"
+                        >
+                            <span>Features</span>
+                            <ChevronRight className="w-4 h-4 text-zinc-400" />
+                        </button>
                         <Link
                             to="/how-to-use"
                             onClick={() => setMobileMenuOpen(false)}
                             className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px]"
                         >
-                            <span>Documentation</span>
+                            <span>How to Use</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
                         </Link>
                         <Link
@@ -492,7 +526,7 @@ export function LandingPage() {
                             onClick={() => setMobileMenuOpen(false)}
                             className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors min-h-[44px]"
                         >
-                            <span>Support</span>
+                            <span>Contact</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
                         </Link>
                         <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2">
@@ -534,7 +568,7 @@ export function LandingPage() {
 
                     <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 text-balance text-zinc-900 dark:text-white animate-fade-slide-up [animation-delay:100ms]">
                         The Engineering OS for <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5b4fff] via-[#7c3aed] to-[#3b82f6] dark:from-[#968fff] dark:via-[#b4aeff] dark:to-[#60a5fa]">
+                        <span className="text-[#5b4fff] dark:text-[#968fff]">
                             Coding Bootcamps & Cohorts
                         </span>
                     </h1>
@@ -589,7 +623,7 @@ export function LandingPage() {
                                 <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block hover:opacity-100 transition-opacity" />
                                 <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block hover:opacity-100 transition-opacity" />
                                 <span className="ml-3 font-mono text-[11px] text-zinc-500 dark:text-zinc-400 hidden sm:inline">
-                                    app.mentorsync.com/cohort/batch-24/leaderboard
+                                    mentorsync.dev/classroom/super-42/leaderboard
                                 </span>
                             </div>
 
@@ -610,9 +644,9 @@ export function LandingPage() {
                                     <div>
                                         <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Classroom Cohort</p>
                                         <div className="p-3 rounded-xl bg-white dark:bg-[#18181f] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs">
-                                            <p className="font-bold text-xs text-zinc-900 dark:text-white">Batch 2024 Placement Track</p>
+                                            <p className="font-bold text-xs text-zinc-900 dark:text-white">Super 42 Placement Track</p>
                                             <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-1">
-                                                <span>64 Enrolled Students</span>
+                                                <span>42 Enrolled Students</span>
                                                 <span className="font-semibold text-emerald-500">Sprint 4 Active</span>
                                             </div>
                                         </div>
@@ -965,7 +999,7 @@ export function LandingPage() {
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                                             <div>
                                                 <h3 className="text-base font-bold text-zinc-900 dark:text-white">Cohort Topic Competency Matrix</h3>
-                                                <p className="text-xs text-zinc-500">Identifies algorithmic weakness areas across all 64 enrolled students</p>
+                                                <p className="text-xs text-zinc-500">Identifies algorithmic weakness areas across all 42 enrolled students in Super 42</p>
                                             </div>
 
                                             <div className="flex items-center gap-2">
@@ -1068,6 +1102,7 @@ export function LandingPage() {
                 </div>
 
                 {/* ASYMMETRIC SECTION 1: AUTOMATED SUBMISSION VERIFICATION */}
+                <div id="features" className="scroll-mt-28" />
                 <section id="verification-engine" className="w-full max-w-6xl mx-auto mb-28 sm:mb-36 scroll-mt-28">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                         
@@ -1384,7 +1419,7 @@ export function LandingPage() {
                                 <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                                     <div>
                                         <p className="text-xs font-bold text-zinc-900 dark:text-white">Cohort Topic Proficiency Analysis</p>
-                                        <p className="text-[11px] text-zinc-500">Aggregated across Batch 2024 (64 students) • 75% Benchmark Target</p>
+                                        <p className="text-[11px] text-zinc-500">Aggregated across Super 42 (42 students) • 75% Benchmark Target</p>
                                     </div>
                                     <span className="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-500 font-bold text-xs border border-indigo-500/20">
                                         Analytics Active
@@ -1495,14 +1530,14 @@ export function LandingPage() {
                                     <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                                         <span className="flex items-center gap-1.5">
                                             <CalendarBlankIcon className="w-3.5 h-3.5 text-amber-500" />
-                                            <span>LC Weekly 440</span>
+                                            <span>LC Weekly Contest 525</span>
                                         </span>
                                         <span className="font-mono font-semibold text-amber-500">in 2d 14h</span>
                                     </div>
                                     <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                                         <span className="flex items-center gap-1.5">
                                             <CalendarBlankIcon className="w-3.5 h-3.5 text-sky-500" />
-                                            <span>CF Div. 2 Round</span>
+                                            <span>CF Round 1129 (Div. 2)</span>
                                         </span>
                                         <span className="font-mono font-semibold text-sky-500">in 4d 08h</span>
                                     </div>
@@ -1536,7 +1571,7 @@ export function LandingPage() {
                                 to="/how-to-use" 
                                 className="w-full sm:w-auto bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-800 dark:text-white border border-zinc-300 dark:border-white/20 text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all min-h-[48px] flex items-center justify-center interactive-press"
                             >
-                                Read Documentation
+                                How to Use Guide
                             </Link>
                         </div>
                     </div>
