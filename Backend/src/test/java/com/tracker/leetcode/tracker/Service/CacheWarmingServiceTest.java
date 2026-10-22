@@ -56,7 +56,7 @@ class CacheWarmingServiceTest {
 
     @Test
     @DisplayName("warmAllCaches refreshes global POTD and upcoming contests and primes classroom and mentor caches")
-    void warmAllCaches_RefreshesPotdAndContests() {
+    void warmAllCachesRefreshesPotdAndContests() {
         Classroom classroom = new Classroom();
         classroom.setId("class-1");
         when(classroomRepository.findAll()).thenReturn(List.of(classroom));
@@ -79,7 +79,7 @@ class CacheWarmingServiceTest {
 
     @Test
     @DisplayName("scheduledCacheWarming invokes distributed lock service with 30m lease")
-    void scheduledCacheWarming_InvokesLockService() {
+    void scheduledCacheWarmingInvokesLockService() {
         when(lockService.executeWithLockOrSkip(eq("lock:cache-warming"), eq(Duration.ofMinutes(30)), any(Runnable.class)))
                 .thenAnswer(invocation -> {
                     Runnable task = invocation.getArgument(2);

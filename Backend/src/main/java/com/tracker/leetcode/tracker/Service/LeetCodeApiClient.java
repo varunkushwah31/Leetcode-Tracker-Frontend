@@ -346,7 +346,7 @@ public class LeetCodeApiClient {
                     if (c.path("attended").asBoolean()) {
                         JsonNode contestMeta = c.path("contest");
                         historyList.add(new ContestHistory(
-                                contestMeta.path("title").asString(),
+                                contestMeta.path(FIELD_TITLE).asString(),
                                 contestMeta.path("startTime").asLong(),
                                 c.path("rating").asDouble(),
                                 c.path("ranking").asInt(),
@@ -473,7 +473,7 @@ public class LeetCodeApiClient {
                 """.formatted(username);
 
         JsonNode root = executeGraphQLQuery(query, username);
-        JsonNode tagCounts = root.path("data").path("matchedUser").path("tagProblemCounts");
+        JsonNode tagCounts = root.path("data").path(FIELD_MATCHED_USER).path("tagProblemCounts");
 
         List<SkillStat> skills = new ArrayList<>();
 

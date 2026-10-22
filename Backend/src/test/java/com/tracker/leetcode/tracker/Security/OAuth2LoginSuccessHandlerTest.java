@@ -11,6 +11,7 @@ import com.tracker.leetcode.tracker.Service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -67,7 +68,8 @@ class OAuth2LoginSuccessHandlerTest {
     }
 
     @Test
-    void onAuthenticationSuccess_ShouldLoginExistingStudent() throws Exception {
+    @DisplayName("onAuthenticationSuccess should login existing student")
+    void onAuthenticationSuccessShouldLoginExistingStudent() throws Exception {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(authentication.getAuthorizedClientRegistrationId()).thenReturn("google");
         when(oAuth2User.getAttribute("email")).thenReturn("student@example.com");
@@ -105,7 +107,8 @@ class OAuth2LoginSuccessHandlerTest {
     }
 
     @Test
-    void onAuthenticationSuccess_ShouldLoginExistingMentor() throws Exception {
+    @DisplayName("onAuthenticationSuccess should login existing mentor")
+    void onAuthenticationSuccessShouldLoginExistingMentor() throws Exception {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(authentication.getAuthorizedClientRegistrationId()).thenReturn("google");
         when(oAuth2User.getAttribute("email")).thenReturn("mentor@example.com");
@@ -141,7 +144,8 @@ class OAuth2LoginSuccessHandlerTest {
     }
 
     @Test
-    void onAuthenticationSuccess_ShouldAutoRegisterNewStudent() throws Exception {
+    @DisplayName("onAuthenticationSuccess should auto register new student")
+    void onAuthenticationSuccessShouldAutoRegisterNewStudent() throws Exception {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(authentication.getAuthorizedClientRegistrationId()).thenReturn("google");
         when(oAuth2User.getAttribute("email")).thenReturn("newbie@example.com");
@@ -183,7 +187,8 @@ class OAuth2LoginSuccessHandlerTest {
     }
 
     @Test
-    void onAuthenticationSuccess_ShouldHandleGitHubAttributes() throws Exception {
+    @DisplayName("onAuthenticationSuccess should handle GitHub attributes")
+    void onAuthenticationSuccessShouldHandleGitHubAttributes() throws Exception {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(authentication.getAuthorizedClientRegistrationId()).thenReturn("github");
         when(oAuth2User.getAttribute("email")).thenReturn("githuber@example.com");
@@ -219,7 +224,8 @@ class OAuth2LoginSuccessHandlerTest {
     }
 
     @Test
-    void onAuthenticationSuccess_ShouldRedirectWithError_WhenEmailMissing() throws Exception {
+    @DisplayName("onAuthenticationSuccess should redirect with error when email is missing")
+    void onAuthenticationSuccessShouldRedirectWithErrorWhenEmailMissing() throws Exception {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(authentication.getAuthorizedClientRegistrationId()).thenReturn("github");
         when(oAuth2User.getAttribute("email")).thenReturn(null);
@@ -236,7 +242,8 @@ class OAuth2LoginSuccessHandlerTest {
     }
 
     @Test
-    void onAuthenticationSuccess_ShouldRedirectWithError_WhenAccountDisabled() throws Exception {
+    @DisplayName("onAuthenticationSuccess should redirect with error when account is disabled")
+    void onAuthenticationSuccessShouldRedirectWithErrorWhenAccountDisabled() throws Exception {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(authentication.getAuthorizedClientRegistrationId()).thenReturn("google");
         when(oAuth2User.getAttribute("email")).thenReturn("disabled@example.com");

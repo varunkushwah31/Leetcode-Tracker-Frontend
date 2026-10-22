@@ -360,7 +360,10 @@ function getStudentHeatmapCells(profile: StudentProfileDetail): HeatmapCellData[
     }));
 }
 
-function getSortedLeaderboardStudents(sort: 'total' | 'lc' | 'cf' | 'streak') {
+type LeaderboardSortOption = 'total' | 'lc' | 'cf' | 'streak';
+type TopicFilterOption = 'all' | 'weaknesses';
+
+function getSortedLeaderboardStudents(sort: LeaderboardSortOption) {
     return [...SAMPLE_LEADERBOARD].sort((a, b) => {
         switch (sort) {
             case 'lc': return b.lcRating - a.lcRating;
@@ -382,8 +385,8 @@ function filterLeaderboardStudents(students: typeof SAMPLE_LEADERBOARD, query: s
 
 interface LeaderboardTabContentProps {
     filteredStudents: typeof SAMPLE_LEADERBOARD;
-    leaderboardSort: 'total' | 'lc' | 'cf' | 'streak';
-    setLeaderboardSort: (sort: 'total' | 'lc' | 'cf' | 'streak') => void;
+    leaderboardSort: LeaderboardSortOption;
+    setLeaderboardSort: (sort: LeaderboardSortOption) => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     onSelectStudent: (id: string) => void;
@@ -396,7 +399,7 @@ function LeaderboardTabContent({
     searchQuery,
     setSearchQuery,
     onSelectStudent
-}: LeaderboardTabContentProps) {
+}: Readonly<LeaderboardTabContentProps>) {
     return (
         <div key="leaderboard" className="animate-tab-enter space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
@@ -554,7 +557,7 @@ function ProfileTabContent({
     profile,
     hoveredHeatmapDay,
     setHoveredHeatmapDay
-}: ProfileTabContentProps) {
+}: Readonly<ProfileTabContentProps>) {
     const heatmapCells = getStudentHeatmapCells(profile);
 
     return (
@@ -677,8 +680,8 @@ function ProfileTabContent({
 }
 
 interface AnalyticsTabContentProps {
-    topicFilter: 'all' | 'weaknesses';
-    setTopicFilter: (filter: 'all' | 'weaknesses') => void;
+    topicFilter: TopicFilterOption;
+    setTopicFilter: (filter: TopicFilterOption) => void;
     filteredTopics: typeof COHORT_TOPICS;
     dispatchSuccess: boolean;
     onDispatchRemedial: () => void;
@@ -690,7 +693,7 @@ function AnalyticsTabContent({
     filteredTopics,
     dispatchSuccess,
     onDispatchRemedial
-}: AnalyticsTabContentProps) {
+}: Readonly<AnalyticsTabContentProps>) {
     return (
         <div key="analytics" className="animate-tab-enter space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
@@ -788,12 +791,12 @@ function AnalyticsTabContent({
 
 export function LandingPage() {
     const [canvasTab, setCanvasTab] = useState<'leaderboard' | 'profile' | 'analytics'>('leaderboard');
-    const [leaderboardSort, setLeaderboardSort] = useState<'total' | 'lc' | 'cf' | 'streak'>('total');
+    const [leaderboardSort, setLeaderboardSort] = useState<LeaderboardSortOption>('total');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedStudentId, setSelectedStudentId] = useState<string>('2');
     const [selectedVerification, setSelectedVerification] = useState<string>('v1');
     const [isVerifyingSim, setIsVerifyingSim] = useState(false);
-    const [topicFilter, setTopicFilter] = useState<'all' | 'weaknesses'>('all');
+    const [topicFilter, setTopicFilter] = useState<TopicFilterOption>('all');
     const [dispatchSuccess, setDispatchSuccess] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [hoveredHeatmapDay, setHoveredHeatmapDay] = useState<number | null>(null);

@@ -5,6 +5,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleRequestNotPermitted_ShouldReturn429WithStructuredResponse() {
+    @DisplayName("handleRequestNotPermitted should return 429 with structured response")
+    void handleRequestNotPermittedShouldReturn429WithStructuredResponse() {
         RateLimiter rateLimiter = RateLimiter.ofDefaults("leetcodeApi");
         RequestNotPermitted ex = RequestNotPermitted.createRequestNotPermitted(rateLimiter);
 
@@ -49,7 +51,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleCallNotPermittedException_ShouldReturn503WithServiceUnavailable() {
+    @DisplayName("handleCallNotPermittedException should return 503 with service unavailable")
+    void handleCallNotPermittedExceptionShouldReturn503WithServiceUnavailable() {
         CircuitBreaker circuitBreaker = CircuitBreaker.ofDefaults("leetcodeApi");
         CallNotPermittedException ex = CallNotPermittedException.createCallNotPermittedException(circuitBreaker);
 
@@ -63,7 +66,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleRateLimitExceeded_ShouldReturn429WithCustomMessage() {
+    @DisplayName("handleRateLimitExceeded should return 429 with custom message")
+    void handleRateLimitExceededShouldReturn429WithCustomMessage() {
         RateLimitExceededException ex = new RateLimitExceededException("Too many login attempts. Retry in 45s.", 45);
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleRateLimitExceeded(ex, request);
@@ -75,7 +79,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleStudentNotFound_ShouldReturn404() {
+    @DisplayName("handleStudentNotFound should return 404")
+    void handleStudentNotFoundShouldReturn404() {
         StudentNotFoundException ex = new StudentNotFoundException("Student 'alice' not found");
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleNotFoundExceptions(ex, request);
@@ -87,7 +92,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleBadCredentials_ShouldReturn401() {
+    @DisplayName("handleBadCredentials should return 401")
+    void handleBadCredentialsShouldReturn401() {
         BadCredentialsException ex = new BadCredentialsException("Bad credentials");
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleBadCredentials(ex, request);
@@ -99,7 +105,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleAccessDenied_ShouldReturn403() {
+    @DisplayName("handleAccessDenied should return 403")
+    void handleAccessDeniedShouldReturn403() {
         AccessDeniedException ex = new AccessDeniedException("Access denied");
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleAccessDenied(ex, request);
@@ -111,7 +118,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleValidationExceptions_ShouldReturn400WithFieldErrorsMap() {
+    @DisplayName("handleValidationExceptions should return 400 with field errors map")
+    void handleValidationExceptionsShouldReturn400WithFieldErrorsMap() {
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "registerRequest");
         bindingResult.addError(new FieldError("registerRequest", "email", "Must be a valid email address"));
         bindingResult.addError(new FieldError("registerRequest", "password", "Password must be at least 6 characters"));
