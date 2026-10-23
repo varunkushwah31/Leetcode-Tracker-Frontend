@@ -22,6 +22,7 @@ export const api = axios.create({
     baseURL: API_BASE_URL,
     // CRITICAL: This tells the browser to include the HTTP-Only refresh token cookie in requests
     withCredentials: true,
+    timeout: 30000,
 });
 
 // Single-flight refresh queue: concurrent 401s share one refresh call.

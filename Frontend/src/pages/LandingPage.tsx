@@ -404,8 +404,8 @@ function LeaderboardTabContent({
         <div key="leaderboard" className="animate-tab-enter space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                 <div>
-                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">Active Cohort Standings</h3>
-                    <p className="text-xs text-zinc-500">Real-time rank recalculation combining LeetCode and Codeforces</p>
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">Class Leaderboard</h3>
+                    <p className="text-xs text-zinc-500">Live rankings based on verified problems solved and contest ratings</p>
                 </div>
 
                 <div className="relative w-full sm:w-60">
@@ -432,7 +432,7 @@ function LeaderboardTabContent({
 
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                 <span className="text-zinc-500 text-[11px] font-medium">
-                    Showing {filteredStudents.length} of {SAMPLE_LEADERBOARD.length} sample records
+                    Showing {filteredStudents.length} of {SAMPLE_LEADERBOARD.length} students
                 </span>
                 <div className="flex items-center gap-1.5">
                     <span className="text-zinc-500 font-medium mr-1">Sort:</span>
@@ -698,8 +698,8 @@ function AnalyticsTabContent({
         <div key="analytics" className="animate-tab-enter space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                 <div>
-                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">Cohort Topic Competency Matrix</h3>
-                    <p className="text-xs text-zinc-500">Identifies algorithmic weakness areas across all 42 enrolled students in Super 42</p>
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">Topic Mastery Matrix</h3>
+                    <p className="text-xs text-zinc-500">Track which algorithmic topics your students have mastered and where they need practice</p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -732,10 +732,10 @@ function AnalyticsTabContent({
                 <div className="space-y-0.5">
                     <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5">
                         <SparkleIcon className="w-4 h-4 text-[#5b4fff]" weight="fill" />
-                        Targeted Remediation Recommendation
+                        Recommended Practice Set
                     </p>
                     <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                        18 students need remedial practice on Dynamic Programming and Graphs.
+                        18 students could use extra practice on Dynamic Programming and Graphs.
                     </p>
                 </div>
                 <button
@@ -751,12 +751,12 @@ function AnalyticsTabContent({
                     {dispatchSuccess ? (
                         <>
                             <CheckIcon className="w-4 h-4" weight="bold" />
-                            Remedial Sheet Dispatched!
+                            Practice Set Assigned!
                         </>
                     ) : (
                         <>
                             <PaperPlaneTiltIcon className="w-4 h-4" weight="bold" />
-                            Dispatch Remedial Problem Set
+                            Assign Practice Problems
                         </>
                     )}
                 </button>
@@ -1013,19 +1013,19 @@ export function LandingPage() {
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                         </span>
                         <span className="text-xs font-bold tracking-wider text-indigo-700 dark:text-indigo-300 uppercase">
-                            Dual-Platform Engine • LeetCode & Codeforces
+                            The Coding LMS - LeetCode & Codeforces
                         </span>
                     </div>
 
                     <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 text-balance text-zinc-900 dark:text-white animate-fade-slide-up [animation-delay:100ms]">
-                        The Engineering OS for <br />
+                        The Modern LMS for <br />
                         <span className="text-[#5b4fff] dark:text-[#968fff]">
                             Coding Bootcamps & Cohorts
                         </span>
                     </h1>
 
                     <p className="text-base sm:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed font-normal animate-fade-slide-up [animation-delay:200ms] text-pretty">
-                        Automate submission verification, monitor dual-platform contest ratings, and track live student leaderboards across LeetCode and Codeforces without manual spreadsheets.
+                        Easily manage coding cohorts, verify homework solutions automatically, and track live student leaderboards across LeetCode and Codeforces without messy spreadsheets.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-8 animate-fade-slide-up [animation-delay:300ms]">
@@ -1033,7 +1033,7 @@ export function LandingPage() {
                             to="/login" 
                             className="w-full sm:w-auto bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_28px_rgba(91,79,255,0.35)] text-white text-[15px] font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] min-h-12 shimmer-sweep interactive-press group"
                         >
-                            <span>Start Free Cohort</span>
+                            <span>Start Free Classroom</span>
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
 
@@ -1042,7 +1042,7 @@ export function LandingPage() {
                             onClick={() => scrollToSection('app-canvas')}
                             className="w-full sm:w-auto bg-white dark:bg-[#111116] border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-white text-[15px] font-semibold px-8 py-3.5 hover:bg-zinc-50 dark:hover:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-700 shadow-sm rounded-xl transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] min-h-12 interactive-press"
                         >
-                            View Live Sandbox
+                            Explore Interactive Demo
                         </button>
                     </div>
 
@@ -1050,15 +1050,15 @@ export function LandingPage() {
                     <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-medium text-zinc-600 dark:text-zinc-300 animate-fade-slide-up [animation-delay:400ms]">
                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs hover:border-amber-500/40 transition-colors cursor-default group">
                             <LightningIcon className="w-4 h-4 text-amber-500 shrink-0 group-hover:scale-110 transition-transform" weight="fill" />
-                            <span>Sub-100ms background polling</span>
+                            <span>Automatic progress syncing</span>
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs hover:border-emerald-500/40 transition-colors cursor-default group">
                             <ShieldCheckIcon className="w-4 h-4 text-emerald-500 shrink-0 group-hover:scale-110 transition-transform" weight="bold" />
-                            <span>Zero student credentials required</span>
+                            <span>No student passwords needed</span>
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs hover:border-[#5b4fff]/40 transition-colors cursor-default group">
                             <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 group-hover:scale-110 transition-transform" weight="fill" />
-                            <span>Free for bootcamps & universities</span>
+                            <span>100% free for teachers & mentors</span>
                         </div>
                     </div>
                 </div>
@@ -1081,7 +1081,7 @@ export function LandingPage() {
                             <div className="flex items-center gap-3">
                                 <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
                                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-                                    <span>Live WebSocket Connected</span>
+                                    <span>Real-Time Updates Active</span>
                                 </span>
                             </div>
                         </div>
@@ -1093,18 +1093,18 @@ export function LandingPage() {
                             <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-zinc-200/80 dark:border-zinc-800/80 p-4 sm:p-5 bg-zinc-50/50 dark:bg-[#121217]/50 flex flex-col justify-between">
                                 <div className="space-y-4">
                                     <div>
-                                        <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Classroom Cohort</p>
+                                        <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Active Classroom</p>
                                         <div className="p-3 rounded-xl bg-white dark:bg-[#18181f] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs">
                                             <p className="font-bold text-xs text-zinc-900 dark:text-white">Super 42 Placement Track</p>
                                             <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-1">
                                                 <span>42 Enrolled Students</span>
-                                                <span className="font-semibold text-emerald-500">Sprint 4 Active</span>
+                                                <span className="font-semibold text-emerald-500">Week 4 Active</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Workstation Views</p>
+                                        <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Classroom Views</p>
                                         <div className="space-y-1">
                                             <button
                                                 type="button"
@@ -1117,7 +1117,7 @@ export function LandingPage() {
                                             >
                                                 <span className="flex items-center gap-2">
                                                     <TrophyIcon className="w-4 h-4" weight="bold" />
-                                                    Cohort Leaderboard
+                                                    Class Leaderboard
                                                 </span>
                                                 <ChevronRight className="w-3.5 h-3.5 opacity-70" />
                                             </button>
@@ -1133,7 +1133,7 @@ export function LandingPage() {
                                             >
                                                 <span className="flex items-center gap-2">
                                                     <UsersIcon className="w-4 h-4" weight="bold" />
-                                                    Student Profile View
+                                                    Student Profile
                                                 </span>
                                                 <ChevronRight className="w-3.5 h-3.5 opacity-70" />
                                             </button>
@@ -1149,7 +1149,7 @@ export function LandingPage() {
                                             >
                                                 <span className="flex items-center gap-2">
                                                     <BrainIcon className="w-4 h-4" weight="bold" />
-                                                    Topic Competency
+                                                    Skill Mastery
                                                 </span>
                                                 <ChevronRight className="w-3.5 h-3.5 opacity-70" />
                                             </button>
@@ -1158,8 +1158,8 @@ export function LandingPage() {
                                 </div>
 
                                 <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 text-[11px] text-zinc-500">
-                                    <span>Redis Cache Hit Rate: </span>
-                                    <strong className="text-emerald-500">99.4% (sub-10ms)</strong>
+                                    <span>Data Sync: </span>
+                                    <strong className="text-emerald-500">Instant (Cached in memory)</strong>
                                 </div>
                             </div>
 
@@ -1201,7 +1201,7 @@ export function LandingPage() {
                                 )}
 
                                 <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
-                                    <span>Sync Schedule: Automatic 15-minute background polling</span>
+                                    <span>Sync Schedule: Automatically refreshes every 15 minutes</span>
                                     <Link to="/login" className="text-[#5b4fff] font-bold hover:underline flex items-center gap-1">
                                         Open Full Dashboard <ArrowUpRightIcon className="w-3.5 h-3.5" />
                                     </Link>
@@ -1219,26 +1219,26 @@ export function LandingPage() {
                         {/* Narrative Column */}
                         <div className="lg:col-span-5 space-y-6">
                             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
-                                Zero spreadsheet toil. <br />
-                                Every solution verified live.
+                                No more manual checking. <br />
+                                Verify solutions automatically.
                             </h2>
 
                             <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
-                                Students submit their solution URL. MentorSync queries live LeetCode and Codeforces profile endpoints to confirm problem ID, accepted status, runtime percentile, and timestamp. False claims and plagiarism are eliminated instantly.
+                                Students simply submit their problem link. MentorSync checks public profiles to verify that the code was accepted, when it was solved, and runtime performance. No manual grading, no fake submissions.
                             </p>
 
                             <div className="space-y-3 pt-2 text-xs sm:text-sm">
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Scrapes official public submission feeds directly without student passwords</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Works with public profiles - students never share their passwords</span>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Validates solution acceptance, runtime beats percentage, and submission recency</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Confirms problem ID, accepted verdict, runtime, and submission recency</span>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Automatically syncs classroom assignment progress bars and grading matrices</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Updates homework progress bars and grades in real time</span>
                                 </div>
                             </div>
                         </div>
@@ -1248,8 +1248,8 @@ export function LandingPage() {
                             <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl interactive-card">
                                 <div className="flex items-center justify-between pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80 mb-5">
                                     <div>
-                                        <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Interactive Submission Tester</p>
-                                        <p className="text-[11px] text-zinc-500">Select a problem preset and simulate verification engine</p>
+                                        <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Try Submission Checker</p>
+                                        <p className="text-[11px] text-zinc-500">Click a problem below to test how automatic verification works</p>
                                     </div>
                                     <span className="px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-mono border border-zinc-200 dark:border-zinc-700/60">
                                         POST /api/verify
@@ -1290,7 +1290,7 @@ export function LandingPage() {
                                         className="px-3.5 py-1.5 rounded-lg bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-60 hover:-translate-y-0.5 active:scale-95 duration-150 shadow-xs hover:shadow-md group"
                                     >
                                         <ArrowsClockwiseIcon className={`w-3.5 h-3.5 ${isVerifyingSim ? 'animate-spin' : 'group-hover:rotate-90 transition-transform duration-300'}`} weight="bold" />
-                                        <span>{isVerifyingSim ? 'Checking...' : 'Run Test'}</span>
+                                        <span>{isVerifyingSim ? 'Checking...' : 'Test Verification'}</span>
                                     </button>
                                 </div>
 
@@ -1299,7 +1299,7 @@ export function LandingPage() {
                                     <div className="flex items-center justify-between text-zinc-500 pb-2 border-b border-zinc-800/80">
                                         <span className="flex items-center gap-1.5">
                                             <TerminalIcon className="w-4 h-4 text-emerald-400" />
-                                            Live Verification Stream
+                                            Live Verification Result
                                         </span>
                                         <div className="flex items-center gap-2">
                                             <button
@@ -1312,7 +1312,7 @@ export function LandingPage() {
                                                 <span>{copiedPayload ? 'Copied' : 'JSON'}</span>
                                             </button>
                                             <span className={`text-emerald-400 font-bold ${isVerifyingSim ? 'animate-pulse' : 'animate-scale-bounce'}`}>
-                                                {isVerifyingSim ? 'PARSING AST...' : '200 OK (8ms)'}
+                                                {isVerifyingSim ? 'CHECKING PROFILE...' : 'VERIFIED ACCEPTED'}
                                             </span>
                                         </div>
                                     </div>
@@ -1471,21 +1471,21 @@ export function LandingPage() {
                             </h2>
 
                             <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
-                                Most serious coding students practice on both LeetCode for technical interview rounds and Codeforces for competitive speed. MentorSync bridges the gap, tracking ratings, solve counts, and streaks under one unified profile.
+                                Students practice for interviews on LeetCode and build speed on Codeforces. MentorSync combines both into a single profile, showing total problems solved, contest ratings, and daily streaks in one place.
                             </p>
 
                             <div className="space-y-3 pt-2 text-xs sm:text-sm">
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Unified solved count prevents duplicated problems across platforms</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Combines solve counts so you see the complete picture</span>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Live official contest ratings and rank badges (Knight, Guardian, Specialist)</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Shows official contest ratings and badges automatically</span>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Upcoming contest radar with automated calendar reminders</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Upcoming contest calendar so students never miss a round</span>
                                 </div>
                             </div>
                         </div>
@@ -1499,26 +1499,26 @@ export function LandingPage() {
                         {/* Narrative Column */}
                         <div className="lg:col-span-5 space-y-6">
                             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-[1.15]">
-                                Spot cohort weaknesses <br />
-                                before placement exams.
+                                Find student weak spots <br />
+                                before interview season.
                             </h2>
 
                             <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
-                                MentorSync analyzes student solve tags across 40+ algorithmic topics. Instantly see when your cohort is struggling with Dynamic Programming, Graphs, or Binary Trees, and assign targeted problem sets with one click.
+                                See which topics your students find easy and where they get stuck. If your batch struggles with Dynamic Programming or Graphs, you can quickly assign targeted practice problems to help them improve.
                             </p>
 
                             <div className="space-y-3 pt-2 text-xs sm:text-sm">
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Automated topic proficiency percentages across all enrolled students</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Clear topic completion percentages for the whole batch</span>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Flag critical weaknesses early to prevent placement interview dropouts</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Identify struggling students early to give them extra help</span>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <CheckCircleIcon className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" weight="bold" />
-                                    <span className="text-zinc-700 dark:text-zinc-300">Export 2D student-assignment completion matrix directly to CSV</span>
+                                    <span className="text-zinc-700 dark:text-zinc-300">Download complete student progress reports to CSV anytime</span>
                                 </div>
                             </div>
                         </div>
@@ -1528,8 +1528,8 @@ export function LandingPage() {
                             <div className="rounded-3xl bg-white dark:bg-[#111116] border border-zinc-200/90 dark:border-white/10 p-6 sm:p-8 shadow-xl space-y-4 interactive-card">
                                 <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
                                     <div>
-                                        <p className="text-xs font-bold text-zinc-900 dark:text-white">Cohort Topic Proficiency Analysis</p>
-                                        <p className="text-[11px] text-zinc-500">Aggregated across Super 42 (42 students) • 75% Benchmark Target</p>
+                                        <p className="text-xs font-bold text-zinc-900 dark:text-white">Batch Topic Proficiency</p>
+                                        <p className="text-[11px] text-zinc-500">Combined data for Super 42 (42 students) - 75% Target Goal</p>
                                     </div>
                                     <span className="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-500 font-bold text-xs border border-indigo-500/20">
                                         Analytics Active
@@ -1581,9 +1581,9 @@ export function LandingPage() {
                                 <div className="pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500">
                                     <span className="flex items-center gap-1.5">
                                         <span className="w-2 h-2 rounded-full bg-rose-500" />
-                                        <span>Target threshold: 75% for campus placement</span>
+                                        <span>Target goal: 75% for campus placements</span>
                                     </span>
-                                    <span className="text-[#5b4fff] font-semibold">18 students flagged for 1:1 mentorship</span>
+                                    <span className="text-[#5b4fff] font-semibold">18 students recommended for extra practice</span>
                                 </div>
                             </div>
                         </div>
@@ -1600,13 +1600,13 @@ export function LandingPage() {
                                 <div className="p-3 w-max rounded-2xl bg-emerald-500/10 text-emerald-500 mb-6 border border-emerald-500/20 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                                     <DatabaseIcon className="w-6 h-6" weight="bold" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-emerald-500 transition-colors">Redis Telemetry Cluster</h3>
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-emerald-500 transition-colors">Fast &amp; Scalable Performance</h3>
                                 <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
-                                    Equipped with multi-region Redis caching. Protects upstream APIs from rate limits and delivers sub-10ms query times for large cohorts.
+                                    High-speed in-memory caching ensures student leaderboards, submissions, and profiles load instantly, even with large classes.
                                 </p>
                             </div>
                             <span className="font-mono text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 w-max group-hover:bg-emerald-500/20 transition-colors">
-                                Cache Hit Latency: 4ms
+                                Sub-10ms Response Time
                             </span>
                         </div>
 
@@ -1616,13 +1616,13 @@ export function LandingPage() {
                                 <div className="p-3 w-max rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] mb-6 border border-[#5b4fff]/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                     <FileSpreadsheet className="w-6 h-6" weight="bold" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-[#5b4fff] transition-colors">1-Click CSV Roster Sync</h3>
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-[#5b4fff] transition-colors">Easy Student Batch Import</h3>
                                 <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
-                                    Upload CSV files exported from Google Sheets or Google Classroom. URLs and handles are sanitized and mapped into classrooms automatically.
+                                    Import your whole classroom in seconds using a CSV file from Google Sheets or Excel. Usernames and profile links are organized automatically.
                                 </p>
                             </div>
                             <span className="font-mono text-xs font-bold text-[#5b4fff] dark:text-[#968fff] bg-[#5b4fff]/10 px-3 py-1.5 rounded-xl border border-[#5b4fff]/20 w-max group-hover:bg-[#5b4fff]/20 transition-colors">
-                                Auto URL Regex Extraction
+                                Google Sheets &amp; Excel Ready
                             </span>
                         </div>
 
@@ -1632,9 +1632,9 @@ export function LandingPage() {
                                 <div className="p-3 w-max rounded-2xl bg-amber-500/10 text-amber-500 mb-6 border border-amber-500/20 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                                     <ClockIcon className="w-6 h-6" weight="bold" />
                                 </div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-amber-500 transition-colors">Integrated Contest Radar</h3>
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-amber-500 transition-colors">Contest Calendar &amp; Reminders</h3>
                                 <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4">
-                                    Never let students miss official LeetCode Weekly contests or Codeforces Div. 2/3 rounds with built-in countdowns and reminders.
+                                    Keep students motivated and active with built-in countdowns and reminders for official LeetCode contests and Codeforces rounds.
                                 </p>
                                 <div className="space-y-1.5 mb-4 text-xs">
                                     <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
@@ -1654,7 +1654,7 @@ export function LandingPage() {
                                 </div>
                             </div>
                             <span className="font-mono text-xs font-bold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 w-max group-hover:bg-amber-500/20 transition-colors">
-                                Synchronized Calendars
+                                Live Contest Calendar
                             </span>
                         </div>
                     </div>
@@ -1665,10 +1665,10 @@ export function LandingPage() {
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.08),transparent)] dark:bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(91,79,255,0.22),transparent)] pointer-events-none animate-pulse-slow" />
                     <div className="relative z-10">
                         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-balance">
-                            Ready to Streamline Your Coding Cohorts?
+                            Ready to Upgrade Your Coding Classroom?
                         </h2>
                         <p className="text-zinc-600 dark:text-zinc-300 text-base sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
-                            Join educators and competitive programmers using MentorSync to automate submission verification and track growth natively.
+                            Join mentors, teachers, and coding clubs using MentorSync to track student progress, verify homework, and build better coders.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link 
@@ -1696,7 +1696,7 @@ export function LandingPage() {
                             <BrandLogo size="md" theme="auto" asLink={false} />
                         </div>
                         <p className="text-zinc-600 dark:text-zinc-500 text-sm leading-relaxed">
-                            The operating system for modern coding bootcamps. Empowering educators to track Scalable cohorts natively.
+                            The modern learning management system for coding bootcamps, college clubs, and mentors.
                         </p>
                     </div>
 
@@ -1705,7 +1705,7 @@ export function LandingPage() {
                             <h4 className="text-zinc-900 dark:text-white font-semibold mb-3 tracking-tight text-sm">Resources</h4>
                             <ul className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
                                 <li>
-                                    <Link to="/how-to-use" className="hover:text-zinc-900 dark:hover:text-white transition-colors">How to Use & Docs</Link>
+                                    <Link to="/how-to-use" className="hover:text-zinc-900 dark:hover:text-white transition-colors">How to Use Guide</Link>
                                 </li>
                                 <li>
                                     <Link to="/contact" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Support & Contact</Link>
