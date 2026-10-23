@@ -53,6 +53,12 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "command -v curl >/dev/null && curl -f http://localhost:8080/health || bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080'"]
+      interval: 4s
+      timeout: 3s
+      retries: 15
+      start_period: 15s
     restart: unless-stopped
 
   # 4. React Frontend
@@ -67,7 +73,8 @@ services:
       - "80:80"
       - "5173:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:

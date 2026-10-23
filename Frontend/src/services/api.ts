@@ -104,6 +104,10 @@ function extractErrorMessage(error: AxiosError<{ message?: string; validationErr
         }
     }
 
+    if (status === 502 || status === 503 || status === 504) {
+        return "The backend server is initializing or temporarily unavailable. Please retry in a few moments.";
+    }
+
     if (typeof data === 'string' && data !== '') {
         const isHtml = data.toLowerCase().includes('<!doctype') || data.toLowerCase().includes('<html');
         if (isHtml) {
@@ -181,7 +185,18 @@ api.interceptors.response.use(
             return await handle401Refresh(originalRequest);
         }
 
-        // --- PART B: Global Error Formatting (For all other errors) ---
+        // --- PART B: Transient Gateway Error Retry (502/503/504) for idempotent GET requests ---
+        const status = error.response?.status;
+        const isGatewayError = status === 502 || status === 503 || status === 504;
+        const isGetRequest = !originalRequest?.method || originalRequest.method.toLowerCase() === 'get';
+
+        if (isGatewayError && originalRequest && !originalRequest._retry && isGetRequest) {
+            originalRequest._retry = true;
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+            return await api(originalRequest);
+        }
+
+        // --- PART C: Global Error Formatting (For all other errors) ---
         const specificErrorMessage = extractErrorMessage(error);
         if (error.response?.status === 429) {
             console.warn(`[RateLimit 429] Too Many Requests for ${originalRequest?.url}:`, specificErrorMessage);
