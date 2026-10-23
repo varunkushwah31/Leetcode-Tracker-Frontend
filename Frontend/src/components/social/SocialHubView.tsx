@@ -126,29 +126,24 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
         <div className="space-y-6">
             {/* Social Hub Hero Command Center Banner */}
             <div className="relative group">
-                <div className="hidden dark:block">
-                    <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-72 h-72 bg-[#5b4fff] opacity-15 blur-[100px] rounded-full pointer-events-none" />
-                    <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-72 h-72 bg-amber-500 opacity-10 blur-[100px] rounded-full pointer-events-none" />
-                </div>
+                <div className="relative z-10 bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl overflow-hidden rounded-2xl transition-colors duration-200 p-5 sm:p-7">
+                    {/* Subtle gradient accent top line matching StudentDashboard */}
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#5b4fff]/40 dark:via-[#5b4fff]/50 to-transparent pointer-events-none" />
 
-                <div className="relative z-10 bg-white dark:bg-[#111111]/70 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-md dark:shadow-2xl overflow-hidden rounded-[2rem] p-6 sm:p-8">
-                    {/* Subtle gradient accent top line */}
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/60 to-transparent pointer-events-none" />
-
-                    <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         {/* Title & Description */}
-                        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-5">
-                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-linear-to-br from-[#5b4fff]/20 to-indigo-600/10 border border-[#5b4fff]/30 flex items-center justify-center text-[#5b4fff] dark:text-[#968fff] shadow-lg shadow-[#5b4fff]/10 shrink-0">
-                                <Swords className="w-7 h-7 sm:w-8 sm:h-8" />
+                        <div className="flex items-start sm:items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 border border-[#5b4fff]/25 flex items-center justify-center text-[#5b4fff] dark:text-[#968fff] shadow-sm shrink-0">
+                                <Swords className="w-6 h-6" />
                             </div>
 
                             <div>
-                                <div className="flex items-center justify-center sm:justify-start gap-2.5 flex-wrap">
-                                    <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                                <div className="flex items-center gap-2.5 flex-wrap">
+                                    <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">
                                         Social Hub & Competitive Arena
                                     </h1>
-                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/25">
-                                        Live PVP
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
+                                        Live Arena
                                     </span>
                                 </div>
                                 <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-xl">
@@ -157,43 +152,43 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             </div>
                         </div>
 
-                        {/* Summary Metrics Bar */}
-                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4 bg-zinc-50/80 dark:bg-zinc-900/40 p-3 sm:p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full lg:w-auto">
+                        {/* Summary Metrics Cards */}
+                        <div className="grid grid-cols-3 gap-2.5 sm:gap-3 shrink-0">
                             {/* Friends Count */}
-                            <div className="text-center px-3 min-w-[70px]">
-                                <p className="text-[10px] font-bold tracking-widest uppercase text-zinc-500 flex items-center justify-center gap-1">
+                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-[90px] sm:min-w-[105px]">
+                                <p className="text-[10px] font-bold tracking-wider uppercase text-zinc-400 flex items-center justify-center gap-1">
                                     <Users className="w-3 h-3 text-[#5b4fff]" /> Friends
                                 </p>
-                                <p className="text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-white mt-0.5">
+                                <p className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mt-0.5">
                                     {friendsCount}
                                 </p>
-                                <p className="text-[10px] text-zinc-400">Connected</p>
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Connected</p>
                             </div>
 
                             {/* PVP Record */}
-                            <div className="text-center px-3 min-w-[85px] border-l border-zinc-200 dark:border-zinc-800">
-                                <p className="text-[10px] font-bold tracking-widest uppercase text-zinc-500 flex items-center justify-center gap-1">
-                                    <Swords className="w-3 h-3 text-[#5b4fff]" /> Duel Record
+                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-[90px] sm:min-w-[105px]">
+                                <p className="text-[10px] font-bold tracking-wider uppercase text-zinc-400 flex items-center justify-center gap-1">
+                                    <Swords className="w-3 h-3 text-indigo-400" /> Duel Record
                                 </p>
-                                <p className="text-xl sm:text-2xl font-extrabold flex items-center justify-center gap-1 mt-0.5">
+                                <p className="text-lg sm:text-xl font-bold mt-0.5 flex items-center justify-center gap-1">
                                     <span className="text-emerald-600 dark:text-emerald-400">{pvpStats.wins}W</span>
                                     <span className="text-zinc-400 text-xs font-normal">-</span>
                                     <span className="text-rose-600 dark:text-rose-400">{pvpStats.losses}L</span>
                                 </p>
-                                <p className="text-[10px] text-zinc-400">
-                                    {pvpStats.total > 0 ? `${pvpStats.winRate}% Win Rate` : 'No Duels Yet'}
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                                    {pvpStats.total > 0 ? `${pvpStats.winRate}% Win Rate` : 'No Duels'}
                                 </p>
                             </div>
 
                             {/* Live Duels */}
-                            <div className="text-center px-3 min-w-[75px] border-l border-zinc-200 dark:border-zinc-800">
-                                <p className="text-[10px] font-bold tracking-widest uppercase text-zinc-500 flex items-center justify-center gap-1">
+                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-[90px] sm:min-w-[105px]">
+                                <p className="text-[10px] font-bold tracking-wider uppercase text-zinc-400 flex items-center justify-center gap-1">
                                     <Sparkles className="w-3 h-3 text-amber-500" /> Active Duels
                                 </p>
-                                <p className="text-xl sm:text-2xl font-extrabold text-amber-500 mt-0.5">
+                                <p className="text-lg sm:text-xl font-bold text-amber-500 mt-0.5">
                                     {activeDuelsCount}
                                 </p>
-                                <p className="text-[10px] text-zinc-400">In Progress</p>
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">In Progress</p>
                             </div>
                         </div>
                     </div>
@@ -204,31 +199,21 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
             {selfViewWarning && (
                 <div
                     role="alert"
-                    className="p-4 sm:p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-400/80 dark:border-amber-600/70 shadow-lg shadow-amber-500/10 flex items-start sm:items-center justify-between gap-4 animate-in slide-in-from-top-3 duration-200"
+                    className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-600/40 shadow-sm flex items-center justify-between gap-3 animate-in slide-in-from-top-2 duration-200"
                 >
-                    <div className="flex items-start sm:items-center gap-3.5 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
-                            <AlertCircle className="w-5 h-5" weight="fill" />
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/25">
+                            <AlertCircle className="w-4 h-4" weight="fill" />
                         </div>
-                        <div className="space-y-0.5 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <p className="text-xs font-black uppercase tracking-wider text-amber-900 dark:text-amber-200">
-                                    Self-Profile Notice
-                                </p>
-                                <span className="px-2 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30">
-                                    Social Hub
-                                </span>
-                            </div>
-                            <p className="text-xs sm:text-sm font-semibold text-amber-800 dark:text-amber-300 leading-normal">
-                                {selfViewWarning}
-                            </p>
-                        </div>
+                        <p className="text-xs sm:text-sm font-medium text-amber-800 dark:text-amber-300">
+                            {selfViewWarning}
+                        </p>
                     </div>
 
                     <button
                         type="button"
                         onClick={() => setSelfViewWarning(null)}
-                        className="p-1.5 rounded-xl text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition-colors cursor-pointer shrink-0"
+                        className="p-1 rounded-lg text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition-colors cursor-pointer shrink-0"
                         title="Dismiss warning"
                         aria-label="Dismiss warning"
                     >
@@ -237,22 +222,22 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                 </div>
             )}
 
-            {/* Social Hub Top Navigation Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 rounded-2xl shadow-xs custom-scrollbar">
+            {/* Social Hub Navigation Tabs */}
+            <div className="flex items-center gap-1 p-1 bg-zinc-100/90 dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/50 rounded-xl overflow-x-auto custom-scrollbar w-fit max-w-full">
                 <button
                     type="button"
                     onClick={() => setActiveTab('friends')}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'friends'
-                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+                            ? 'bg-[#5b4fff] text-white shadow-xs'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <Users className="w-4 h-4" />
+                    <Users className="w-3.5 h-3.5" />
                     <span>Friends Network</span>
                     {friendsCount > 0 && (
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                            activeTab === 'friends' ? 'bg-white/20 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                            activeTab === 'friends' ? 'bg-white/20 text-white' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                         }`}>
                             {friendsCount}
                         </span>
@@ -265,16 +250,16 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                 <button
                     type="button"
                     onClick={() => setActiveTab('pvp')}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'pvp'
-                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+                            ? 'bg-[#5b4fff] text-white shadow-xs'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <Swords className="w-4 h-4" />
+                    <Swords className="w-3.5 h-3.5" />
                     <span>PVP Duels</span>
                     {activeDuelsCount > 0 && (
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                             activeTab === 'pvp' ? 'bg-white/20 text-white' : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25'
                         }`}>
                             {activeDuelsCount} Live
@@ -285,39 +270,39 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                 <button
                     type="button"
                     onClick={() => setActiveTab('activity')}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'activity'
-                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+                            ? 'bg-[#5b4fff] text-white shadow-xs'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <Activity className="w-4 h-4" />
+                    <Activity className="w-3.5 h-3.5" />
                     <span>Activity Feed</span>
                 </button>
 
                 <button
                     type="button"
                     onClick={() => setActiveTab('leaderboard')}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'leaderboard'
-                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+                            ? 'bg-[#5b4fff] text-white shadow-xs'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <Trophy className="w-4 h-4" />
+                    <Trophy className="w-3.5 h-3.5" />
                     <span>Friends Leaderboard</span>
                 </button>
 
                 <button
                     type="button"
                     onClick={() => setActiveTab('peer')}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'peer'
-                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+                            ? 'bg-[#5b4fff] text-white shadow-xs'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/40'
                     }`}
                 >
-                    <BookOpen className="w-4 h-4" />
+                    <BookOpen className="w-3.5 h-3.5" />
                     <span>Peer Learning Hub</span>
                 </button>
             </div>
@@ -361,25 +346,6 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                 }}
                 onChallengePvp={handleChallengePvp}
             />
-
-            {/* Floating Self-View Warning Toast */}
-            {selfViewWarning && (
-                <div
-                    className="fixed bottom-6 right-6 z-50 max-w-md flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-2xl border-2 bg-amber-500 text-amber-950 border-amber-600 dark:bg-amber-600 dark:text-white dark:border-amber-500 animate-in slide-in-from-bottom-5 duration-200"
-                >
-                    <AlertCircle className="w-5 h-5 shrink-0" weight="fill" />
-                    <p className="text-xs font-bold leading-tight flex-1">{selfViewWarning}</p>
-                    <button
-                        type="button"
-                        onClick={() => setSelfViewWarning(null)}
-                        className="ml-2 hover:opacity-75 transition-opacity cursor-pointer p-1"
-                        title="Dismiss"
-                        aria-label="Dismiss warning"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
-                </div>
-            )}
         </div>
     );
 }
