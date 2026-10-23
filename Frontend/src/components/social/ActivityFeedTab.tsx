@@ -163,7 +163,25 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                     {filteredActivities.map((act) => {
                         const formattedTitle = act.title ? formatProblemTitle(act.title) : 'Activity';
 
-                        const isCurrentUser = Boolean(user?.id && act.studentId === user.id);
+                        const isNewFriend = act.type === 'NEW_FRIEND';
+                        const isSelf = Boolean(user?.id && act.studentId === user.id);
+
+                        // For NEW_FRIEND activities: whenever user became friends with another user,
+                        // show the profile pic, name, and details of the friend they have made friends with:
+                        const displayStudentId = (isNewFriend && isSelf && act.targetStudentId)
+                            ? act.targetStudentId
+                            : act.studentId;
+                        const displayStudentName = (isNewFriend && isSelf && act.targetStudentName)
+                            ? act.targetStudentName
+                            : act.studentName;
+                        const displayStudentHandle = (isNewFriend && isSelf && act.targetStudentHandle)
+                            ? act.targetStudentHandle
+                            : act.studentHandle;
+                        const displayStudentAvatarUrl = (isNewFriend && isSelf && act.targetStudentAvatarUrl)
+                            ? act.targetStudentAvatarUrl
+                            : act.studentAvatarUrl;
+
+                        const isDisplayUserSelf = Boolean(user?.id && displayStudentId === user.id);
 
                         return (
                             <div
@@ -174,14 +192,14 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                     <div className="flex items-center gap-3.5 min-w-0">
                                         <button
                                             type="button"
-                                            onClick={() => onViewFriendDashboard(act.studentId)}
+                                            onClick={() => onViewFriendDashboard(displayStudentId)}
                                             className="cursor-pointer hover:opacity-80 transition-opacity"
-                                            title={isCurrentUser ? "Your profile notice" : "View profile"}
+                                            title={isDisplayUserSelf ? "Your profile notice" : `View ${displayStudentName}'s profile`}
                                         >
-                                            <Avatar className={`w-11 h-11 border-2 ${isCurrentUser ? 'border-[#5b4fff]/40' : 'border-zinc-200 dark:border-zinc-700'} shadow-sm`}>
-                                                <AvatarImage src={act.studentAvatarUrl} />
+                                            <Avatar className={`w-11 h-11 border-2 ${isDisplayUserSelf ? 'border-[#5b4fff]/40' : 'border-zinc-200 dark:border-zinc-700'} shadow-sm`}>
+                                                <AvatarImage src={displayStudentAvatarUrl} />
                                                 <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] text-xs font-bold">
-                                                    {act.studentName.substring(0, 2)}
+                                                    {displayStudentName.substring(0, 2)}
                                                 </AvatarFallback>
                                             </Avatar>
                                         </button>
@@ -190,17 +208,17 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     type="button"
-                                                    onClick={() => onViewFriendDashboard(act.studentId)}
+                                                    onClick={() => onViewFriendDashboard(displayStudentId)}
                                                     className="text-xs font-extrabold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
-                                                    title={isCurrentUser ? "Your profile notice" : "View profile"}
+                                                    title={isDisplayUserSelf ? "Your profile notice" : `View ${displayStudentName}'s profile`}
                                                 >
-                                                    {act.studentName}
+                                                    {displayStudentName}
                                                 </button>
-                                                {isCurrentUser && (
+                                                {isDisplayUserSelf && (
                                                     <span className="text-[#5b4fff] text-xs font-bold">(You)</span>
                                                 )}
                                                 <span className="text-[11px] text-zinc-400">
-                                                    @{act.studentHandle || 'coder'}
+                                                    @{displayStudentHandle || 'coder'}
                                                 </span>
                                             </div>
 
@@ -274,11 +292,11 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                         })}
                                     </div>
 
-                                    {isCurrentUser ? (
+                                    {isDisplayUserSelf ? (
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => onViewFriendDashboard(act.studentId)}
+                                            onClick={() => onViewFriendDashboard(displayStudentId)}
                                             className="text-xs h-8 text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-500/10 cursor-pointer rounded-xl font-bold"
                                             title="View activity notice"
                                         >
@@ -288,10 +306,10 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => onViewFriendDashboard(act.studentId)}
+                                            onClick={() => onViewFriendDashboard(displayStudentId)}
                                             className="text-xs h-8 text-zinc-500 hover:text-[#5b4fff] cursor-pointer rounded-xl font-bold"
                                         >
-                                            View Profile & Overlap →
+                                            {isNewFriend ? 'View Friend Profile →' : 'View Profile & Overlap →'}
                                         </Button>
                                     )}
                                 </div>

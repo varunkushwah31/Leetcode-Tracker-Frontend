@@ -289,4 +289,53 @@ class SocialServiceTest {
         assertEquals(2, leaderboard.get(1).getRank());
         assertTrue(leaderboard.get(1).isCurrentUser());
     }
+
+    @Test
+    void testNewFriendActivity_ShowsFriendProfilePicAndDetailsToUser() {
+        studentA.getFriendIds().add("userB");
+        studentB.getFriendIds().add("userA");
+
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(studentRepository.findAllById(anyCollection())).thenReturn(List.of(studentB));
+
+        FriendActivity activity = FriendActivity.builder()
+                .id("act1")
+                .studentId("userA")
+                .studentName("Alice")
+                .studentHandle("alice_lc")
+                .studentAvatarUrl("https://assets.leetcode.com/users/alice/avatar.png")
+                .targetStudentId("userB")
+                .targetStudentName("Bob")
+                .targetStudentHandle("bob_lc")
+                .targetStudentAvatarUrl("https://assets.leetcode.com/users/bob/avatar.png")
+                .type(FriendActivityType.NEW_FRIEND)
+                .title("New Friendship Formed")
+                .description("Alice and Bob became friends! Start competing and solving together.")
+                .createdAt(Instant.now())
+                .build();
+
+        when(friendActivityRepository.findByStudentIdInOrderByCreatedAtDesc(anyCollection(), any(org.springframework.data.domain.PageRequest.class)))
+                .thenReturn(List.of(activity));
+
+        // When userA views activity stream, they should see Bob's (the friend's) profile details as primary
+        List<FriendActivityDTO> userAFeed = socialService.getActivities("userA");
+        assertEquals(1, userAFeed.size());
+        FriendActivityDTO dtoForUserA = userAFeed.get(0);
+        assertEquals("userB", dtoForUserA.getStudentId());
+        assertEquals("Bob", dtoForUserA.getStudentName());
+        assertEquals("bob_lc", dtoForUserA.getStudentHandle());
+        assertEquals("https://assets.leetcode.com/users/bob/avatar.png", dtoForUserA.getStudentAvatarUrl());
+        assertEquals("userA", dtoForUserA.getTargetStudentId());
+
+        // When userB views activity stream, they should also see Alice's (the friend's) profile details as primary
+        when(studentRepository.findById("userB")).thenReturn(Optional.of(studentB));
+        List<FriendActivityDTO> userBFeed = socialService.getActivities("userB");
+        assertEquals(1, userBFeed.size());
+        FriendActivityDTO dtoForUserB = userBFeed.get(0);
+        assertEquals("userA", dtoForUserB.getStudentId());
+        assertEquals("Alice", dtoForUserB.getStudentName());
+        assertEquals("alice_lc", dtoForUserB.getStudentHandle());
+        assertEquals("https://assets.leetcode.com/users/alice/avatar.png", dtoForUserB.getStudentAvatarUrl());
+        assertEquals("userB", dtoForUserB.getTargetStudentId());
+    }
 }

@@ -25,6 +25,11 @@ public class FriendActivityDTO implements Serializable {
     private String studentHandle;
     private String studentAvatarUrl;
 
+    private String targetStudentId;
+    private String targetStudentName;
+    private String targetStudentHandle;
+    private String targetStudentAvatarUrl;
+
     private FriendActivityType type;
     private String title;
     private String description;

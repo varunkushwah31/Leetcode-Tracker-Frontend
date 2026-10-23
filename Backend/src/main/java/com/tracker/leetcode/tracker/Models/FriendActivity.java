@@ -28,6 +28,12 @@ public class FriendActivity {
     private String studentAvatarUrl;
 
     @Indexed
+    private String targetStudentId;
+    private String targetStudentName;
+    private String targetStudentHandle;
+    private String targetStudentAvatarUrl;
+
+    @Indexed
     private FriendActivityType type;
 
     private String title;

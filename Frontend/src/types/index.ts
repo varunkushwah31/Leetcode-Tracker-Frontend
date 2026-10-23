@@ -513,6 +513,10 @@ export interface FriendActivityDTO {
     studentName: string;
     studentHandle?: string;
     studentAvatarUrl?: string;
+    targetStudentId?: string;
+    targetStudentName?: string;
+    targetStudentHandle?: string;
+    targetStudentAvatarUrl?: string;
     type: FriendActivityType;
     title: string;
     description: string;

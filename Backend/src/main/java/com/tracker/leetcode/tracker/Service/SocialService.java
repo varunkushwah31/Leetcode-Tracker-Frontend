@@ -183,9 +183,10 @@ public class SocialService {
                 studentRepository.save(receiver);
             }
 
-            // Create friend activity
+            // Create friend activity with both participants
             recordActivity(
                     requester,
+                    receiver,
                     FriendActivityType.NEW_FRIEND,
                     "New Friendship Formed",
                     requester.getName() + " and " + receiver.getName() + " became friends! Start competing and solving together.",
@@ -787,40 +788,94 @@ public class SocialService {
             activities = friendActivityRepository.findTop50ByOrderByCreatedAtDesc();
         }
 
-        return activities.stream().map(a -> {
-            int kudosCount = a.getKudosUserIds() != null ? a.getKudosUserIds().size() : 0;
-            boolean userReacted = a.getKudosUserIds() != null && a.getKudosUserIds().contains(currentStudentId);
+        List<Student> currentFriends = (current != null && current.getFriendIds() != null && !current.getFriendIds().isEmpty())
+                ? studentRepository.findAllById(current.getFriendIds())
+                : Collections.emptyList();
 
-            Map<String, Integer> counts = new HashMap<>();
-            List<String> myReactions = new ArrayList<>();
-            if (a.getReactions() != null) {
-                for (Map.Entry<String, List<String>> entry : a.getReactions().entrySet()) {
-                    counts.put(entry.getKey(), entry.getValue().size());
-                    if (entry.getValue().contains(currentStudentId)) {
-                        myReactions.add(entry.getKey());
+        return activities.stream().map(a -> {
+            // Auto-heal / backfill targetStudent for legacy NEW_FRIEND records if missing
+            if (a.getType() == FriendActivityType.NEW_FRIEND && a.getTargetStudentId() == null) {
+                for (Student f : currentFriends) {
+                    if (a.getDescription() != null && a.getDescription().contains(f.getName()) && !f.getId().equals(a.getStudentId())) {
+                        a.setTargetStudentId(f.getId());
+                        a.setTargetStudentName(f.getName());
+                        a.setTargetStudentHandle(f.getLeetcodeUsername() != null ? f.getLeetcodeUsername() : f.getCodeforcesHandle());
+                        a.setTargetStudentAvatarUrl(f.getAvatarUrl());
+                        try {
+                            friendActivityRepository.save(a);
+                        } catch (Exception ignored) {}
+                        break;
                     }
                 }
             }
 
-            return FriendActivityDTO.builder()
-                    .id(a.getId())
-                    .studentId(a.getStudentId())
-                    .studentName(a.getStudentName())
-                    .studentHandle(a.getStudentHandle())
-                    .studentAvatarUrl(a.getStudentAvatarUrl())
-                    .type(a.getType())
-                    .title(a.getTitle())
-                    .description(a.getDescription())
-                    .link(a.getLink())
-                    .platform(a.getPlatform())
-                    .difficulty(a.getDifficulty())
-                    .kudosCount(kudosCount)
-                    .userReacted(userReacted)
-                    .reactionCounts(counts)
-                    .myReactions(myReactions)
-                    .createdAt(a.getCreatedAt())
-                    .build();
+            return toActivityDTO(a, currentStudentId);
         }).collect(Collectors.toList());
+    }
+
+    private FriendActivityDTO toActivityDTO(FriendActivity a, String currentStudentId) {
+        int kudosCount = a.getKudosUserIds() != null ? a.getKudosUserIds().size() : 0;
+        boolean userReacted = a.getKudosUserIds() != null && a.getKudosUserIds().contains(currentStudentId);
+
+        Map<String, Integer> counts = new HashMap<>();
+        List<String> myReactions = new ArrayList<>();
+        if (a.getReactions() != null) {
+            for (Map.Entry<String, List<String>> entry : a.getReactions().entrySet()) {
+                counts.put(entry.getKey(), entry.getValue().size());
+                if (entry.getValue().contains(currentStudentId)) {
+                    myReactions.add(entry.getKey());
+                }
+            }
+        }
+
+        String displayStudentId = a.getStudentId();
+        String displayStudentName = a.getStudentName();
+        String displayStudentHandle = a.getStudentHandle();
+        String displayStudentAvatarUrl = a.getStudentAvatarUrl();
+
+        String targetId = a.getTargetStudentId();
+        String targetName = a.getTargetStudentName();
+        String targetHandle = a.getTargetStudentHandle();
+        String targetAvatarUrl = a.getTargetStudentAvatarUrl();
+
+        // When a student views a NEW_FRIEND activity involving themselves,
+        // display the friend they made friends with instead of their own profile:
+        if (a.getType() == FriendActivityType.NEW_FRIEND) {
+            if (currentStudentId != null && currentStudentId.equals(displayStudentId) && targetId != null) {
+                displayStudentId = a.getTargetStudentId();
+                displayStudentName = a.getTargetStudentName();
+                displayStudentHandle = a.getTargetStudentHandle();
+                displayStudentAvatarUrl = a.getTargetStudentAvatarUrl();
+
+                targetId = a.getStudentId();
+                targetName = a.getStudentName();
+                targetHandle = a.getStudentHandle();
+                targetAvatarUrl = a.getStudentAvatarUrl();
+            }
+        }
+
+        return FriendActivityDTO.builder()
+                .id(a.getId())
+                .studentId(displayStudentId)
+                .studentName(displayStudentName)
+                .studentHandle(displayStudentHandle)
+                .studentAvatarUrl(displayStudentAvatarUrl)
+                .targetStudentId(targetId)
+                .targetStudentName(targetName)
+                .targetStudentHandle(targetHandle)
+                .targetStudentAvatarUrl(targetAvatarUrl)
+                .type(a.getType())
+                .title(a.getTitle())
+                .description(a.getDescription())
+                .link(a.getLink())
+                .platform(a.getPlatform())
+                .difficulty(a.getDifficulty())
+                .kudosCount(kudosCount)
+                .userReacted(userReacted)
+                .reactionCounts(counts)
+                .myReactions(myReactions)
+                .createdAt(a.getCreatedAt())
+                .build();
     }
 
     public FriendActivityDTO reactToActivity(String currentStudentId, String activityId, String reaction) {
@@ -846,36 +901,41 @@ public class SocialService {
         }
 
         FriendActivity saved = friendActivityRepository.save(activity);
+        return toActivityDTO(saved, currentStudentId);
+    }
 
-        Map<String, Integer> counts = new HashMap<>();
-        List<String> myReactions = new ArrayList<>();
-        if (saved.getReactions() != null) {
-            for (Map.Entry<String, List<String>> entry : saved.getReactions().entrySet()) {
-                counts.put(entry.getKey(), entry.getValue().size());
-                if (entry.getValue().contains(currentStudentId)) {
-                    myReactions.add(entry.getKey());
-                }
-            }
+    public void recordActivity(
+            Student student,
+            Student targetStudent,
+            FriendActivityType type,
+            String title,
+            String description,
+            String link,
+            Platform platform,
+            String difficulty
+    ) {
+        if (student == null) return;
+        FriendActivity.FriendActivityBuilder builder = FriendActivity.builder()
+                .studentId(student.getId())
+                .studentName(student.getName())
+                .studentHandle(student.getLeetcodeUsername() != null ? student.getLeetcodeUsername() : student.getCodeforcesHandle())
+                .studentAvatarUrl(student.getAvatarUrl())
+                .type(type)
+                .title(title)
+                .description(description)
+                .link(link)
+                .platform(platform)
+                .difficulty(difficulty)
+                .createdAt(Instant.now());
+
+        if (targetStudent != null) {
+            builder.targetStudentId(targetStudent.getId())
+                    .targetStudentName(targetStudent.getName())
+                    .targetStudentHandle(targetStudent.getLeetcodeUsername() != null ? targetStudent.getLeetcodeUsername() : targetStudent.getCodeforcesHandle())
+                    .targetStudentAvatarUrl(targetStudent.getAvatarUrl());
         }
 
-        return FriendActivityDTO.builder()
-                .id(saved.getId())
-                .studentId(saved.getStudentId())
-                .studentName(saved.getStudentName())
-                .studentHandle(saved.getStudentHandle())
-                .studentAvatarUrl(saved.getStudentAvatarUrl())
-                .type(saved.getType())
-                .title(saved.getTitle())
-                .description(saved.getDescription())
-                .link(saved.getLink())
-                .platform(saved.getPlatform())
-                .difficulty(saved.getDifficulty())
-                .kudosCount(saved.getKudosUserIds().size())
-                .userReacted(saved.getKudosUserIds().contains(currentStudentId))
-                .reactionCounts(counts)
-                .myReactions(myReactions)
-                .createdAt(saved.getCreatedAt())
-                .build();
+        friendActivityRepository.save(builder.build());
     }
 
     public void recordActivity(
@@ -887,21 +947,7 @@ public class SocialService {
             Platform platform,
             String difficulty
     ) {
-        if (student == null) return;
-        FriendActivity activity = FriendActivity.builder()
-                .studentId(student.getId())
-                .studentName(student.getName())
-                .studentHandle(student.getLeetcodeUsername() != null ? student.getLeetcodeUsername() : student.getCodeforcesHandle())
-                .studentAvatarUrl(student.getAvatarUrl())
-                .type(type)
-                .title(title)
-                .description(description)
-                .link(link)
-                .platform(platform)
-                .difficulty(difficulty)
-                .createdAt(Instant.now())
-                .build();
-        friendActivityRepository.save(activity);
+        recordActivity(student, null, type, title, description, link, platform, difficulty);
     }
 
     // ==========================================
