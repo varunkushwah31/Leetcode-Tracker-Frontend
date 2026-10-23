@@ -259,6 +259,12 @@ export const SocialService = {
     verifyPvpMatch: (matchId: string, submissionUrl?: string) =>
         api.post<import('@/types').PvpMatchDTO>('/social/pvp/' + matchId + '/verify', { submissionUrl }),
 
+    endPvpMatch: (matchId: string) =>
+        api.post<import('@/types').PvpMatchDTO>('/social/pvp/' + matchId + '/end'),
+
+    forfeitPvpMatch: (matchId: string) =>
+        api.post<import('@/types').PvpMatchDTO>('/social/pvp/' + matchId + '/forfeit'),
+
     getPvpMatches: () =>
         api.get<import('@/types').PvpMatchDTO[]>('/social/pvp/matches'),
 

@@ -11,15 +11,18 @@ import {
     SpinnerIcon as Loader2,
     FlameIcon as Flame,
     SparkleIcon as Sparkles,
-    ShieldCheckIcon as ShieldCheck
+    ShieldCheckIcon as ShieldCheck,
+    SignOutIcon as SignOut,
+    WarningCircleIcon as AlertCircle
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
 import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
+import { usePvpWebSocket } from '../../hooks/usePvpWebSocket';
 import { formatProblemTitle } from '@/lib/problemFormatter';
 import type { FriendDTO, PvpMatchDTO, CreatePvpMatchRequest } from '@/types';
 
@@ -47,8 +50,10 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
     // Match history filter
     const [historyFilter, setHistoryFilter] = useState<'ALL' | 'WON' | 'LOST' | 'DRAWS'>('ALL');
 
-    // Verification state
+    // Verification & Ending state
     const [verifyingMatchId, setVerifyingMatchId] = useState<string | null>(null);
+    const [confirmEndMatchId, setConfirmEndMatchId] = useState<string | null>(null);
+    const [isEndingDuel, setIsEndingDuel] = useState(false);
     const [submissionUrlInput, setSubmissionUrlInput] = useState<{ [key: string]: string }>({});
     const [feedback, setFeedback] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -102,6 +107,27 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
     const activeMatches = matches.filter(m => m.status === 'IN_PROGRESS' || m.status === 'INVITED');
     const isCurrentUserBusy = activeMatches.some(m => m.status === 'IN_PROGRESS');
+
+    const activeMatchIds = useMemo(() => activeMatches.map(m => m.id), [activeMatches]);
+    usePvpWebSocket(
+        activeMatchIds,
+        useCallback((event) => {
+            void loadData();
+            if (event?.action === 'SEVERED') {
+                setFeedback({
+                    text: event.message || 'PvP duel connection severed.',
+                    type: 'success'
+                });
+                setTimeout(() => setFeedback(null), 6000);
+            } else if (event?.action === 'COMPLETED') {
+                setFeedback({
+                    text: event.message || 'PvP duel completed!',
+                    type: 'success'
+                });
+                setTimeout(() => setFeedback(null), 6000);
+            }
+        }, [loadData])
+    );
 
     const handleCreateDuel = async () => {
         if (!selectedFriendId) {
@@ -216,6 +242,27 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             });
         } finally {
             setVerifyingMatchId(null);
+            setTimeout(() => setFeedback(null), 6000);
+        }
+    };
+
+    const handleEndDuelPreemptively = async (matchId: string) => {
+        setIsEndingDuel(true);
+        try {
+            await SocialService.endPvpMatch(matchId);
+            setFeedback({
+                text: 'PvP duel ended preemptively. The duel connection has been severed.',
+                type: 'success'
+            });
+            setConfirmEndMatchId(null);
+            void loadData();
+        } catch (err: any) {
+            setFeedback({
+                text: err.response?.data?.message || 'Failed to end PvP duel.',
+                type: 'error'
+            });
+        } finally {
+            setIsEndingDuel(false);
             setTimeout(() => setFeedback(null), 6000);
         }
     };
@@ -529,7 +576,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                                         />
                                                         <Button
                                                             onClick={() => handleVerifySubmission(match.id)}
-                                                            disabled={verifyingMatchId === match.id}
+                                                            disabled={verifyingMatchId === match.id || isEndingDuel}
                                                             className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold px-4 h-9 gap-1.5 shrink-0 cursor-pointer shadow-xs"
                                                         >
                                                             {verifyingMatchId === match.id ? (
@@ -539,16 +586,37 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                                             )}
                                                             Verify My Solution
                                                         </Button>
+
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={() => setConfirmEndMatchId(match.id)}
+                                                            disabled={isEndingDuel || verifyingMatchId === match.id}
+                                                            className="border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-semibold px-3 h-9 gap-1.5 shrink-0 cursor-pointer"
+                                                            title="End this PvP duel preemptively and sever connection"
+                                                        >
+                                                            <SignOut className="w-3.5 h-3.5" />
+                                                            End Duel
+                                                        </Button>
                                                     </div>
                                                     <p className="text-[10px] text-zinc-400">
-                                                        Tip: Submit on LeetCode, then click Verify. MentorSync will scan your recent submissions or verify your URL in seconds!
+                                                        Tip: Submit on LeetCode, then click Verify. You can also end the duel preemptively if you wish to forfeit and sever the connection.
                                                     </p>
                                                 </div>
                                             )}
 
                                             {isInvitedPending && isChallenger && (
-                                                <div className="p-2.5 rounded-lg bg-zinc-100/70 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800 text-xs text-zinc-500 text-center">
-                                                    Waiting for {opponentName} to accept your duel invitation...
+                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 p-2.5 rounded-lg bg-zinc-100/70 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800 text-xs text-zinc-500">
+                                                    <span>Waiting for {opponentName} to accept your duel invitation...</span>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDeclineMatch(match.id)}
+                                                        className="text-xs font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 h-7 px-2.5 rounded-lg cursor-pointer"
+                                                    >
+                                                        Cancel Invitation
+                                                    </Button>
                                                 </div>
                                             )}
                                         </div>
@@ -1017,6 +1085,48 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                             </Button>
                         </div>
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Confirmation Dialog for Ending PvP Duel Preemptively */}
+            <Dialog open={!!confirmEndMatchId} onOpenChange={(open) => !open && setConfirmEndMatchId(null)}>
+                <DialogContent className="sm:max-w-[440px] bg-white dark:bg-[#0d0d0d] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
+                    <DialogHeader>
+                        <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center mb-2">
+                            <AlertCircle className="w-5 h-5" />
+                        </div>
+                        <DialogTitle className="text-base font-bold text-zinc-900 dark:text-white">
+                            End PvP Duel Preemptively?
+                        </DialogTitle>
+                        <DialogDescription className="text-xs text-zinc-500 dark:text-zinc-400 pt-1 leading-relaxed">
+                            Ending the PvP duel preemptively will immediately sever the live match connection between both users. Your opponent will be awarded the victory by forfeit, and both participants will be released from active duel status.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter className="gap-2 sm:gap-0 mt-4">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setConfirmEndMatchId(null)}
+                            disabled={isEndingDuel}
+                            className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-9 cursor-pointer"
+                        >
+                            Keep Playing
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={() => confirmEndMatchId && handleEndDuelPreemptively(confirmEndMatchId)}
+                            disabled={isEndingDuel}
+                            className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold h-9 gap-1.5 shadow-xs cursor-pointer"
+                        >
+                            {isEndingDuel ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                                <SignOut className="w-3.5 h-3.5" />
+                            )}
+                            Yes, End Duel & Sever Connection
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>

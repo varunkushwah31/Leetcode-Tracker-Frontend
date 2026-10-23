@@ -19,11 +19,13 @@ import java.util.Map;
 public class RedisWebSocketBridge implements MessageListener {
 
     public static final String CLASSROOM_EVENTS_TOPIC = "mentorsync:classroom:events";
+    public static final String PVP_EVENTS_TOPIC = "mentorsync:pvp:events";
 
     private final StringRedisTemplate stringRedisTemplate;
     private final SimpMessagingTemplate messagingTemplate;
     private final ObjectMapper objectMapper;
     private final ChannelTopic channelTopic;
+    private final ChannelTopic pvpChannelTopic;
 
     public RedisWebSocketBridge(
             StringRedisTemplate stringRedisTemplate,
@@ -34,10 +36,36 @@ public class RedisWebSocketBridge implements MessageListener {
         this.messagingTemplate = messagingTemplate;
         this.objectMapper = redisObjectMapper;
         this.channelTopic = new ChannelTopic(CLASSROOM_EVENTS_TOPIC);
+        this.pvpChannelTopic = new ChannelTopic(PVP_EVENTS_TOPIC);
     }
 
     public ChannelTopic getChannelTopic() {
         return channelTopic;
+    }
+
+    public ChannelTopic getPvpChannelTopic() {
+        return pvpChannelTopic;
+    }
+
+    /**
+     * Publishes a PvP event to the Redis topic so all cluster nodes can dispatch it to connected WebSockets.
+     */
+    public void broadcastPvpUpdate(String matchId, String action, String message) {
+        if (matchId == null || matchId.isBlank()) return;
+
+        Map<String, Object> event = new HashMap<>();
+        event.put("matchId", matchId);
+        event.put("action", action != null ? action : "SEVERED");
+        event.put("message", message != null ? message : "PVP match updated");
+
+        try {
+            String json = objectMapper.writeValueAsString(event);
+            stringRedisTemplate.convertAndSend(PVP_EVENTS_TOPIC, json);
+            log.debug("Published PVP update to Redis topic [{}] for match: {}", PVP_EVENTS_TOPIC, matchId);
+        } catch (Exception ex) {
+            log.warn("Redis pub/sub unavailable, delivering directly to local WebSocket template: {}", ex.getMessage());
+            dispatchPvpLocally(matchId, event);
+        }
     }
 
     /**
@@ -72,6 +100,10 @@ public class RedisWebSocketBridge implements MessageListener {
             if (classroomId != null) {
                 dispatchLocally(classroomId, event);
             }
+            String matchId = (String) event.get("matchId");
+            if (matchId != null) {
+                dispatchPvpLocally(matchId, event);
+            }
         } catch (Exception ex) {
             log.error("Failed to process Redis WebSocket message: {}", ex.getMessage());
         }
@@ -83,6 +115,15 @@ public class RedisWebSocketBridge implements MessageListener {
             log.debug("Dispatched WebSocket event to /topic/classrooms/{}", classroomId);
         } catch (Exception ex) {
             log.error("Error dispatching STOMP message for classroom {}: {}", classroomId, ex.getMessage());
+        }
+    }
+
+    private void dispatchPvpLocally(String matchId, Object payload) {
+        try {
+            messagingTemplate.convertAndSend("/topic/pvp/" + matchId, payload);
+            log.debug("Dispatched WebSocket event to /topic/pvp/{}", matchId);
+        } catch (Exception ex) {
+            log.error("Error dispatching STOMP message for match {}: {}", matchId, ex.getMessage());
         }
     }
 }

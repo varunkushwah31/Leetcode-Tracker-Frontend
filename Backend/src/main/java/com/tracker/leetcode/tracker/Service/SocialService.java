@@ -30,6 +30,7 @@ public class SocialService {
     private final StudentMapper studentMapper;
     private final CuratedTopicCatalog curatedTopicCatalog;
     private final StringRedisTemplate stringRedisTemplate;
+    private final RedisWebSocketBridge webSocketBridge;
 
     public void touchPresence(String studentId) {
         if (studentId == null || studentId.isBlank()) return;
@@ -639,7 +640,74 @@ public class SocialService {
         match.setStatus(PvpMatchStatus.DECLINED);
         match.setCompletedAt(Instant.now());
         PvpMatch saved = pvpMatchRepository.save(match);
+        if (webSocketBridge != null) {
+            webSocketBridge.broadcastPvpUpdate(matchId, "SEVERED", "Duel invitation was declined.");
+        }
         return toPvpMatchDTO(saved);
+    }
+
+    public PvpMatchDTO endPvpMatchPreemptively(String currentStudentId, String matchId) {
+        PvpMatch match = pvpMatchRepository.findById(matchId)
+                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+
+        if (!match.getChallengerId().equals(currentStudentId) && !match.getOpponentId().equals(currentStudentId)) {
+            throw new IllegalStateException("You are not a participant in this duel.");
+        }
+
+        if (match.getStatus() == PvpMatchStatus.COMPLETED || match.getStatus() == PvpMatchStatus.DECLINED
+                || match.getStatus() == PvpMatchStatus.EXPIRED || match.getStatus() == PvpMatchStatus.DRAW) {
+            throw new IllegalStateException("This duel has already ended.");
+        }
+
+        Instant now = Instant.now();
+        boolean isChallengerEnding = match.getChallengerId().equals(currentStudentId);
+        String forfeiterName = isChallengerEnding ? match.getChallengerName() : match.getOpponentName();
+
+        if (match.getStatus() == PvpMatchStatus.INVITED) {
+            match.setStatus(PvpMatchStatus.DECLINED);
+            match.setCompletedAt(now);
+            PvpMatch saved = pvpMatchRepository.save(match);
+            if (webSocketBridge != null) {
+                webSocketBridge.broadcastPvpUpdate(matchId, "SEVERED", forfeiterName + " cancelled the duel invitation.");
+            }
+            return toPvpMatchDTO(saved);
+        }
+
+        // Match was IN_PROGRESS (or ACCEPTED) - ending it forfeits the duel
+        String winnerId = isChallengerEnding ? match.getOpponentId() : match.getChallengerId();
+        String winnerName = isChallengerEnding ? match.getOpponentName() : match.getChallengerName();
+
+        match.setStatus(PvpMatchStatus.COMPLETED);
+        match.setCompletedAt(now);
+        match.setWinnerId(winnerId);
+        match.setWinnerName(winnerName);
+
+        updatePvpStats(winnerId, currentStudentId, false);
+
+        PvpMatch saved = pvpMatchRepository.save(match);
+
+        Student forfeiter = studentRepository.findById(currentStudentId).orElse(null);
+        if (forfeiter != null) {
+            recordActivity(
+                    forfeiter,
+                    FriendActivityType.PVP_WIN,
+                    "PVP Duel Ended Preemptively",
+                    forfeiterName + " ended the 1v1 Problem Duel on '" + match.getProblemTitle() + "' preemptively. " + winnerName + " won by forfeit!",
+                    match.getProblemLink(),
+                    match.getProblemPlatform(),
+                    match.getProblemDifficulty()
+            );
+        }
+
+        if (webSocketBridge != null) {
+            webSocketBridge.broadcastPvpUpdate(matchId, "SEVERED", forfeiterName + " ended the duel preemptively. Duel connection severed.");
+        }
+
+        return toPvpMatchDTO(saved);
+    }
+
+    public PvpMatchDTO forfeitPvpMatch(String currentStudentId, String matchId) {
+        return endPvpMatchPreemptively(currentStudentId, matchId);
     }
 
     public PvpMatchDTO verifyPvpMatch(String currentStudentId, String matchId, String submissionUrl) {
@@ -726,6 +794,10 @@ public class SocialService {
                     match.getProblemPlatform(),
                     match.getProblemDifficulty()
             );
+
+            if (webSocketBridge != null) {
+                webSocketBridge.broadcastPvpUpdate(match.getId(), "COMPLETED", match.getWinnerName() + " won the 1v1 Problem Duel!");
+            }
         }
 
         PvpMatch saved = pvpMatchRepository.save(match);

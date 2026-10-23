@@ -40,6 +40,8 @@ class SocialServiceTest {
     private CuratedTopicCatalog curatedTopicCatalog;
     @Mock
     private org.springframework.data.redis.core.StringRedisTemplate stringRedisTemplate;
+    @Mock
+    private RedisWebSocketBridge webSocketBridge;
 
     @InjectMocks
     private SocialService socialService;
@@ -460,5 +462,119 @@ class SocialServiceTest {
         assertEquals("alice_lc", dtoForUserB.getStudentHandle());
         assertEquals("https://assets.leetcode.com/users/alice/avatar.png", dtoForUserB.getStudentAvatarUrl());
         assertEquals("userB", dtoForUserB.getTargetStudentId());
+    }
+
+    @Test
+    void testEndPvpMatchPreemptively_ChallengerEnds_OpponentWinsByForfeit() {
+        PvpMatch match = PvpMatch.builder()
+                .id("match1")
+                .challengerId("userA")
+                .challengerName("Alice")
+                .opponentId("userB")
+                .opponentName("Bob")
+                .problemTitle("Two Sum")
+                .problemPlatform(Platform.LEETCODE)
+                .problemDifficulty("Easy")
+                .status(PvpMatchStatus.IN_PROGRESS)
+                .build();
+
+        when(pvpMatchRepository.findById("match1")).thenReturn(Optional.of(match));
+        when(pvpMatchRepository.save(any(PvpMatch.class))).thenAnswer(i -> i.getArgument(0));
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(studentRepository.findById("userB")).thenReturn(Optional.of(studentB));
+
+        PvpMatchDTO result = socialService.endPvpMatchPreemptively("userA", "match1");
+
+        assertNotNull(result);
+        assertEquals(PvpMatchStatus.COMPLETED, result.getStatus());
+        assertEquals("userB", result.getWinnerId());
+        assertEquals("Bob", result.getWinnerName());
+        assertEquals(1, studentB.getPvpWins());
+        assertEquals(1, studentA.getPvpLosses());
+        verify(webSocketBridge, times(1)).broadcastPvpUpdate(eq("match1"), eq("SEVERED"), contains("ended the duel preemptively"));
+    }
+
+    @Test
+    void testEndPvpMatchPreemptively_OpponentEnds_ChallengerWinsByForfeit() {
+        PvpMatch match = PvpMatch.builder()
+                .id("match1")
+                .challengerId("userA")
+                .challengerName("Alice")
+                .opponentId("userB")
+                .opponentName("Bob")
+                .problemTitle("Two Sum")
+                .problemPlatform(Platform.LEETCODE)
+                .problemDifficulty("Easy")
+                .status(PvpMatchStatus.IN_PROGRESS)
+                .build();
+
+        when(pvpMatchRepository.findById("match1")).thenReturn(Optional.of(match));
+        when(pvpMatchRepository.save(any(PvpMatch.class))).thenAnswer(i -> i.getArgument(0));
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(studentRepository.findById("userB")).thenReturn(Optional.of(studentB));
+
+        PvpMatchDTO result = socialService.endPvpMatchPreemptively("userB", "match1");
+
+        assertNotNull(result);
+        assertEquals(PvpMatchStatus.COMPLETED, result.getStatus());
+        assertEquals("userA", result.getWinnerId());
+        assertEquals("Alice", result.getWinnerName());
+        assertEquals(1, studentA.getPvpWins());
+        assertEquals(1, studentB.getPvpLosses());
+        verify(webSocketBridge, times(1)).broadcastPvpUpdate(eq("match1"), eq("SEVERED"), contains("ended the duel preemptively"));
+    }
+
+    @Test
+    void testEndPvpMatchPreemptively_InvitedMatch_CancelsMatch() {
+        PvpMatch match = PvpMatch.builder()
+                .id("match1")
+                .challengerId("userA")
+                .challengerName("Alice")
+                .opponentId("userB")
+                .opponentName("Bob")
+                .status(PvpMatchStatus.INVITED)
+                .build();
+
+        when(pvpMatchRepository.findById("match1")).thenReturn(Optional.of(match));
+        when(pvpMatchRepository.save(any(PvpMatch.class))).thenAnswer(i -> i.getArgument(0));
+
+        PvpMatchDTO result = socialService.endPvpMatchPreemptively("userA", "match1");
+
+        assertNotNull(result);
+        assertEquals(PvpMatchStatus.DECLINED, result.getStatus());
+        assertNull(result.getWinnerId());
+        verify(webSocketBridge, times(1)).broadcastPvpUpdate(eq("match1"), eq("SEVERED"), contains("cancelled the duel invitation"));
+    }
+
+    @Test
+    void testEndPvpMatchPreemptively_NotParticipant_Throws() {
+        PvpMatch match = PvpMatch.builder()
+                .id("match1")
+                .challengerId("userA")
+                .opponentId("userB")
+                .status(PvpMatchStatus.IN_PROGRESS)
+                .build();
+
+        when(pvpMatchRepository.findById("match1")).thenReturn(Optional.of(match));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> socialService.endPvpMatchPreemptively("userC", "match1"));
+        assertTrue(ex.getMessage().contains("not a participant"));
+    }
+
+    @Test
+    void testEndPvpMatchPreemptively_AlreadyCompleted_Throws() {
+        PvpMatch match = PvpMatch.builder()
+                .id("match1")
+                .challengerId("userA")
+                .opponentId("userB")
+                .status(PvpMatchStatus.COMPLETED)
+                .build();
+
+        when(pvpMatchRepository.findById("match1")).thenReturn(Optional.of(match));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> socialService.endPvpMatchPreemptively("userA", "match1"));
+        assertTrue(ex.getMessage().contains("already ended"));
     }
 }

@@ -82,5 +82,29 @@ class RedisWebSocketBridgeTest {
     @Test
     void getChannelTopic_ShouldReturnCorrectTopic() {
         assertEquals(RedisWebSocketBridge.CLASSROOM_EVENTS_TOPIC, webSocketBridge.getChannelTopic().getTopic());
+        assertEquals(RedisWebSocketBridge.PVP_EVENTS_TOPIC, webSocketBridge.getPvpChannelTopic().getTopic());
+    }
+
+    @Test
+    void broadcastPvpUpdate_WhenRedisAvailable_ShouldPublishToPvpTopic() {
+        webSocketBridge.broadcastPvpUpdate("match-100", "SEVERED", "Connection severed");
+
+        verify(stringRedisTemplate, times(1)).convertAndSend(
+                eq(RedisWebSocketBridge.PVP_EVENTS_TOPIC),
+                contains("match-100")
+        );
+    }
+
+    @Test
+    void broadcastPvpUpdate_WhenRedisFails_ShouldFallbackToDirectWebSocket() {
+        doThrow(new RuntimeException("Redis connection refused"))
+                .when(stringRedisTemplate).convertAndSend(eq(RedisWebSocketBridge.PVP_EVENTS_TOPIC), anyString());
+
+        webSocketBridge.broadcastPvpUpdate("match-100", "SEVERED", "Connection severed");
+
+        verify(messagingTemplate, times(1)).convertAndSend(
+                eq("/topic/pvp/match-100"),
+                (Object) any()
+        );
     }
 }

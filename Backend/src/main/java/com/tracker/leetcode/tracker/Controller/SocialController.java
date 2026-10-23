@@ -144,6 +144,16 @@ public class SocialController {
         return ResponseEntity.ok(socialService.declinePvpMatch(studentId, matchId));
     }
 
+    @PostMapping({"/pvp/{matchId}/forfeit", "/pvp/{matchId}/end"})
+    public ResponseEntity<PvpMatchDTO> endPvpMatchPreemptively(
+            @PathVariable String matchId,
+            @AuthenticationPrincipal Student currentStudent,
+            Authentication authentication
+    ) {
+        String studentId = resolveStudentId(currentStudent, authentication);
+        return ResponseEntity.ok(socialService.endPvpMatchPreemptively(studentId, matchId));
+    }
+
     @PostMapping("/pvp/{matchId}/verify")
     public ResponseEntity<PvpMatchDTO> verifyPvpMatch(
             @PathVariable String matchId,

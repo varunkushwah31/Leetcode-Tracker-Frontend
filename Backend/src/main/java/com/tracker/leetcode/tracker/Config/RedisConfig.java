@@ -153,6 +153,7 @@ public class RedisConfig {
                 };
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(webSocketBridge, webSocketBridge.getChannelTopic());
+        container.addMessageListener(webSocketBridge, webSocketBridge.getPvpChannelTopic());
         return container;
     }
 }
