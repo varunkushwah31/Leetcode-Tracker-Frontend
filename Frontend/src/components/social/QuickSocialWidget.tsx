@@ -9,6 +9,7 @@ import {
     ArrowRightIcon as ArrowRight
 } from '@phosphor-icons/react';
 import { SocialService } from '../../services/endpoints';
+import { useAuth } from '../../hooks/useAuth';
 import type { FriendDTO } from '@/types';
 
 interface QuickSocialWidgetProps {
@@ -16,6 +17,7 @@ interface QuickSocialWidgetProps {
 }
 
 export function QuickSocialWidget({ onOpenSocialHub }: QuickSocialWidgetProps) {
+    const { user } = useAuth();
     const [friends, setFriends] = useState<FriendDTO[]>([]);
     const [activeDuelsCount, setActiveDuelsCount] = useState(0);
 
@@ -26,7 +28,8 @@ export function QuickSocialWidget({ onOpenSocialHub }: QuickSocialWidgetProps) {
                     SocialService.getFriends(),
                     SocialService.getPvpMatches()
                 ]);
-                setFriends(friendsRes.data.friends || []);
+                const rawFriends: FriendDTO[] = friendsRes.data.friends || [];
+                setFriends(rawFriends.filter(f => f.id !== user?.id));
                 const active = pvpRes.data?.filter(m => m.status === 'IN_PROGRESS' || m.status === 'INVITED').length || 0;
                 setActiveDuelsCount(active);
             } catch (err) {
@@ -34,7 +37,7 @@ export function QuickSocialWidget({ onOpenSocialHub }: QuickSocialWidgetProps) {
             }
         };
         void load();
-    }, []);
+    }, [user?.id]);
 
     return (
         <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm rounded-2xl overflow-hidden">

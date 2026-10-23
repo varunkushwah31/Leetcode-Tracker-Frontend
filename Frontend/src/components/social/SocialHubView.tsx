@@ -93,6 +93,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
     }, [user?.id]);
 
     const handleViewFriendDashboard = (friendId: string) => {
+        if (!friendId || friendId === user?.id) return;
         setSelectedFriendId(friendId);
         setDashboardModalOpen(true);
     };

@@ -58,7 +58,32 @@ describe('SocialHubView Component', () => {
         } as any);
 
         vi.mocked(SocialService.getFriendsLeaderboard).mockResolvedValue({
-            data: []
+            data: [
+                {
+                    studentId: 'f1',
+                    name: 'Bob Coder',
+                    leetcodeUsername: 'bob_lc',
+                    rank: 1,
+                    totalSolved: 150,
+                    isCurrentUser: false,
+                    streak: 5,
+                    pvpWins: 3,
+                    pvpLosses: 1,
+                    pvpWinRate: 75
+                },
+                {
+                    studentId: 'u1',
+                    name: 'Tester',
+                    leetcodeUsername: 'tester_lc',
+                    rank: 2,
+                    totalSolved: 100,
+                    isCurrentUser: true,
+                    streak: 3,
+                    pvpWins: 1,
+                    pvpLosses: 1,
+                    pvpWinRate: 50
+                }
+            ]
         } as any);
 
         vi.mocked(SocialService.getPeerStudyPosts).mockResolvedValue({
@@ -115,5 +140,17 @@ describe('SocialHubView Component', () => {
         await waitFor(() => {
             expect(screen.getByText(/Peer-to-Peer.*Study Hub/i)).toBeDefined();
         });
+    });
+
+    it('does not allow viewing own profile from leaderboard and displays You indicator', async () => {
+        render(<SocialHubView initialTab="leaderboard" />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Friends Network Leaderboard')).toBeDefined();
+        });
+
+        // Current user should have "You" indicators and "Your Standing", and not have a view button for themselves
+        expect(screen.getAllByText('You').length).toBeGreaterThan(0);
+        expect(screen.getByText('Your Standing')).toBeDefined();
     });
 });

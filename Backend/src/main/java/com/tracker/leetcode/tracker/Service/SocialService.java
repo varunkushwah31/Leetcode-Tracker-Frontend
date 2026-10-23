@@ -39,16 +39,22 @@ public class SocialService {
         }
         String cleanQuery = query.trim().toLowerCase();
 
+        Student currentStudent = studentRepository.findById(currentStudentId).orElse(null);
+        String currentEmail = currentStudent != null ? currentStudent.getEmail() : null;
+
         // Retrieve all friendships involving the current student
         List<Friendship> myFriendships = friendshipRepository.findAllByStudentId(currentStudentId);
         Map<String, Friendship> friendshipByTarget = new HashMap<>();
         for (Friendship f : myFriendships) {
             String otherId = f.getRequesterId().equals(currentStudentId) ? f.getReceiverId() : f.getRequesterId();
-            friendshipByTarget.put(otherId, f);
+            if (!otherId.equals(currentStudentId)) {
+                friendshipByTarget.put(otherId, f);
+            }
         }
 
         return studentRepository.findAll().stream()
                 .filter(s -> !s.getId().equals(currentStudentId))
+                .filter(s -> currentEmail == null || s.getEmail() == null || !s.getEmail().equalsIgnoreCase(currentEmail))
                 .filter(s -> {
                     boolean matchName = s.getName() != null && s.getName().toLowerCase().contains(cleanQuery);
                     boolean matchEmail = s.getEmail() != null && s.getEmail().toLowerCase().contains(cleanQuery);
@@ -92,7 +98,7 @@ public class SocialService {
     }
 
     public Friendship sendFriendRequest(String requesterId, String targetStudentId) {
-        if (requesterId.equals(targetStudentId)) {
+        if (requesterId == null || targetStudentId == null || requesterId.trim().equalsIgnoreCase(targetStudentId.trim())) {
             throw new IllegalArgumentException("You cannot send a friend request to yourself.");
         }
 
@@ -100,6 +106,10 @@ public class SocialService {
                 .orElseThrow(() -> new StudentNotFoundException("Requester not found"));
         Student target = studentRepository.findById(targetStudentId)
                 .orElseThrow(() -> new StudentNotFoundException("Target student not found"));
+
+        if (requester.getEmail() != null && target.getEmail() != null && requester.getEmail().trim().equalsIgnoreCase(target.getEmail().trim())) {
+            throw new IllegalArgumentException("You cannot send a friend request to yourself.");
+        }
 
         Optional<Friendship> existing = friendshipRepository.findBetween(requesterId, targetStudentId);
         if (existing.isPresent()) {
@@ -138,6 +148,10 @@ public class SocialService {
         Friendship friendship = friendshipRepository.findById(friendshipId)
                 .orElseThrow(() -> new IllegalArgumentException("Friendship request not found"));
 
+        if (friendship.getRequesterId().equals(friendship.getReceiverId())) {
+            throw new IllegalArgumentException("Cannot be friends with yourself.");
+        }
+
         if (!friendship.getReceiverId().equals(currentStudentId) && !friendship.getRequesterId().equals(currentStudentId)) {
             throw new IllegalStateException("You are not authorized to accept this friend request.");
         }
@@ -151,13 +165,19 @@ public class SocialService {
         Student receiver = studentRepository.findById(friendship.getReceiverId()).orElse(null);
 
         if (requester != null && receiver != null) {
+            if (requester.getId().equals(receiver.getId())) {
+                throw new IllegalArgumentException("Cannot be friends with yourself.");
+            }
+
             if (requester.getFriendIds() == null) requester.setFriendIds(new ArrayList<>());
+            requester.getFriendIds().remove(requester.getId());
             if (!requester.getFriendIds().contains(receiver.getId())) {
                 requester.getFriendIds().add(receiver.getId());
                 studentRepository.save(requester);
             }
 
             if (receiver.getFriendIds() == null) receiver.setFriendIds(new ArrayList<>());
+            receiver.getFriendIds().remove(receiver.getId());
             if (!receiver.getFriendIds().contains(requester.getId())) {
                 receiver.getFriendIds().add(requester.getId());
                 studentRepository.save(receiver);
@@ -207,6 +227,12 @@ public class SocialService {
     }
 
     public Map<String, Object> getFriendsAndRequests(String currentStudentId) {
+        Student currentStudent = studentRepository.findById(currentStudentId).orElse(null);
+        if (currentStudent != null && currentStudent.getFriendIds() != null && currentStudent.getFriendIds().contains(currentStudentId)) {
+            currentStudent.getFriendIds().remove(currentStudentId);
+            studentRepository.save(currentStudent);
+        }
+
         List<Friendship> allFriendships = friendshipRepository.findAllByStudentId(currentStudentId);
 
         List<FriendDTO> acceptedFriends = new ArrayList<>();
@@ -214,10 +240,17 @@ public class SocialService {
         List<FriendRequestDTO> pendingOutgoing = new ArrayList<>();
 
         for (Friendship f : allFriendships) {
+            if (f.getRequesterId() != null && f.getRequesterId().equals(f.getReceiverId())) {
+                continue;
+            }
+
             if (f.getStatus() == FriendshipStatus.ACCEPTED) {
                 String friendId = f.getRequesterId().equals(currentStudentId) ? f.getReceiverId() : f.getRequesterId();
+                if (friendId.equals(currentStudentId)) {
+                    continue;
+                }
                 Student friend = studentRepository.findById(friendId).orElse(null);
-                if (friend != null) {
+                if (friend != null && !friend.getId().equals(currentStudentId)) {
                     int lcSolved = studentMapper.calculateLeetcodeSolved(friend.getProblemStats());
                     int cfSolved = friend.getCodeforcesSolvedCount() != null ? friend.getCodeforcesSolvedCount() : 0;
 
@@ -244,9 +277,12 @@ public class SocialService {
                 }
             } else if (f.getStatus() == FriendshipStatus.PENDING) {
                 if (f.getReceiverId().equals(currentStudentId)) {
+                    if (f.getRequesterId().equals(currentStudentId)) {
+                        continue;
+                    }
                     // Incoming
                     Student req = studentRepository.findById(f.getRequesterId()).orElse(null);
-                    if (req != null) {
+                    if (req != null && !req.getId().equals(currentStudentId)) {
                         pendingIncoming.add(FriendRequestDTO.builder()
                                 .id(f.getId())
                                 .requesterId(req.getId())
@@ -259,9 +295,12 @@ public class SocialService {
                                 .build());
                     }
                 } else {
+                    if (f.getReceiverId().equals(currentStudentId)) {
+                        continue;
+                    }
                     // Outgoing
                     Student rec = studentRepository.findById(f.getReceiverId()).orElse(null);
-                    if (rec != null) {
+                    if (rec != null && !rec.getId().equals(currentStudentId)) {
                         pendingOutgoing.add(FriendRequestDTO.builder()
                                 .id(f.getId())
                                 .requesterId(currentStudentId)
@@ -289,6 +328,10 @@ public class SocialService {
     // ==========================================
 
     public FriendComparisonDTO getFriendDashboard(String currentStudentId, String friendId) {
+        if (currentStudentId == null || friendId == null || currentStudentId.trim().equalsIgnoreCase(friendId.trim())) {
+            throw new IllegalArgumentException("Cannot view own profile as a friend dashboard.");
+        }
+
         // Verify friendship
         Optional<Friendship> friendship = friendshipRepository.findBetween(currentStudentId, friendId);
         if (friendship.isEmpty() || friendship.get().getStatus() != FriendshipStatus.ACCEPTED) {
@@ -401,6 +444,10 @@ public class SocialService {
     // ==========================================
 
     public PvpMatchDTO createPvpChallenge(String challengerId, CreatePvpMatchRequest request) {
+        if (challengerId == null || request.getOpponentId() == null || challengerId.trim().equalsIgnoreCase(request.getOpponentId().trim())) {
+            throw new IllegalArgumentException("You cannot challenge yourself to a PVP duel.");
+        }
+
         Student challenger = studentRepository.findById(challengerId)
                 .orElseThrow(() -> new StudentNotFoundException("Challenger not found"));
         Student opponent = studentRepository.findById(request.getOpponentId())
@@ -868,7 +915,11 @@ public class SocialService {
         List<String> targetIds = new ArrayList<>();
         targetIds.add(currentStudentId);
         if (current.getFriendIds() != null) {
-            targetIds.addAll(current.getFriendIds());
+            for (String fId : current.getFriendIds()) {
+                if (fId != null && !fId.equals(currentStudentId) && !targetIds.contains(fId)) {
+                    targetIds.add(fId);
+                }
+            }
         }
 
         List<Student> students = studentRepository.findAllById(targetIds);

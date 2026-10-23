@@ -177,14 +177,20 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                     {getPrimaryValue(topThree[0])}
                                 </div>
                                 <div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => onViewDashboard(topThree[0].studentId)}
-                                        className="h-8 text-xs font-bold border-amber-400/60 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl"
-                                    >
-                                        <Eye className="w-3.5 h-3.5 mr-1.5" /> View Champion Profile
-                                    </Button>
+                                    {topThree[0].isCurrentUser ? (
+                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
+                                            Your Standing
+                                        </span>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[0].studentId)}
+                                            className="h-8 text-xs font-bold border-amber-400/60 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> View Champion Profile
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -215,14 +221,20 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                     {getPrimaryValue(topThree[1])}
                                 </div>
                                 <div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => onViewDashboard(topThree[1].studentId)}
-                                        className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                                    >
-                                        <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
-                                    </Button>
+                                    {topThree[1].isCurrentUser ? (
+                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
+                                            Your Standing
+                                        </span>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[1].studentId)}
+                                            className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
 
@@ -255,14 +267,20 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                     {getPrimaryValue(topThree[0])}
                                 </div>
                                 <div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => onViewDashboard(topThree[0].studentId)}
-                                        className="h-8 text-xs font-bold border-amber-400/60 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl"
-                                    >
-                                        <Eye className="w-3.5 h-3.5 mr-1.5" /> View Champion Profile
-                                    </Button>
+                                    {topThree[0].isCurrentUser ? (
+                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
+                                            Your Standing
+                                        </span>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[0].studentId)}
+                                            className="h-8 text-xs font-bold border-amber-400/60 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> View Champion Profile
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -293,14 +311,20 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                     {getPrimaryValue(topThree[1])}
                                 </div>
                                 <div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => onViewDashboard(topThree[1].studentId)}
-                                        className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                                    >
-                                        <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
-                                    </Button>
+                                    {topThree[1].isCurrentUser ? (
+                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
+                                            Your Standing
+                                        </span>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[1].studentId)}
+                                            className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
 
@@ -333,14 +357,20 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                     {getPrimaryValue(topThree[0])}
                                 </div>
                                 <div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => onViewDashboard(topThree[0].studentId)}
-                                        className="h-8 text-xs font-bold border-amber-400/60 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl"
-                                    >
-                                        <Eye className="w-3.5 h-3.5 mr-1" /> View Champion Profile
-                                    </Button>
+                                    {topThree[0].isCurrentUser ? (
+                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
+                                            Your Standing
+                                        </span>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[0].studentId)}
+                                            className="h-8 text-xs font-bold border-amber-400/60 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1" /> View Champion Profile
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
 
@@ -367,14 +397,20 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                     {getPrimaryValue(topThree[2])}
                                 </div>
                                 <div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => onViewDashboard(topThree[2].studentId)}
-                                        className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                                    >
-                                        <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
-                                    </Button>
+                                    {topThree[2].isCurrentUser ? (
+                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
+                                            Your Standing
+                                        </span>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[2].studentId)}
+                                            className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -478,15 +514,21 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                             </td>
 
                                             <td className="py-4 px-5 text-right">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => onViewDashboard(e.studentId)}
-                                                    className="h-8 px-3 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-xl cursor-pointer gap-1.5"
-                                                >
-                                                    <Eye className="w-3.5 h-3.5" />
-                                                    <span>View</span>
-                                                </Button>
+                                                {e.isCurrentUser ? (
+                                                    <span className="inline-flex items-center gap-1 py-1 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 text-xs font-bold border border-zinc-200 dark:border-zinc-700">
+                                                        You
+                                                    </span>
+                                                ) : (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => onViewDashboard(e.studentId)}
+                                                        className="h-8 px-3 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-xl cursor-pointer gap-1.5"
+                                                    >
+                                                        <Eye className="w-3.5 h-3.5" />
+                                                        <span>View</span>
+                                                    </Button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

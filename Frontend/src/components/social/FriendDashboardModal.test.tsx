@@ -10,6 +10,13 @@ vi.mock('../../services/endpoints', () => ({
     }
 }));
 
+vi.mock('../../hooks/useAuth', () => ({
+    useAuth: () => ({
+        user: { id: 'current-user-123', name: 'Current User', email: 'me@test.com' },
+        isAuthenticated: true
+    })
+}));
+
 // Mock subcomponents that might use complex DOM or Canvas
 vi.mock('@/components/dashboard/student/ActivityHeatmap', () => ({
     ActivityHeatmap: () => <div data-testid="activity-heatmap">Activity Heatmap Mock</div>
@@ -177,5 +184,22 @@ describe('FriendDashboardModal Component', () => {
 
         expect(handleClose).toHaveBeenCalled();
         expect(handleChallenge).toHaveBeenCalledWith('friend-1', 'Pranav Dhar Dwivedi');
+    });
+
+    it('prevents viewing own profile and displays an error message', async () => {
+        render(
+            <FriendDashboardModal
+                friendId="current-user-123"
+                open={true}
+                onClose={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('You cannot view your own profile as a friend dashboard.')).toBeDefined();
+        });
+
+        // Ensure SocialService was never called
+        expect(SocialService.getFriendDashboard).not.toHaveBeenCalled();
     });
 });

@@ -69,7 +69,16 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         }
 
         localStorage.setItem('accessToken', accessToken);
-        const nextUser: User = { id, name: userName, role: userRole };
+        let userEmail: string | undefined;
+        try {
+            const decoded = jwtDecode<{ sub?: string }>(accessToken);
+            if (decoded.sub && decoded.sub.includes('@')) {
+                userEmail = decoded.sub;
+            }
+        } catch {
+            // Ignore decoding failure
+        }
+        const nextUser: User = { id, name: userName, role: userRole, email: userEmail };
         localStorage.setItem('user', JSON.stringify(nextUser));
 
         setUser(nextUser);
@@ -79,13 +88,14 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         if (!token || isTokenExpired(token)) {
             throw new Error('Invalid or expired token.');
         }
-        const decoded = jwtDecode<{ sub?: string; roles?: string[]; role?: string; userId?: string; id?: string; name?: string }>(token);
+        const decoded = jwtDecode<{ sub?: string; roles?: string[]; role?: string; userId?: string; id?: string; name?: string; email?: string }>(token);
         const roleCandidate = userOverride?.role || decoded.role || (decoded.roles?.[0]?.replace('ROLE_', '')) || 'STUDENT';
         const role = (ALLOWED_ROLES.includes(roleCandidate as Role) ? roleCandidate : 'STUDENT') as Role;
         const id = userOverride?.id || decoded.userId || decoded.id || decoded.sub || 'user';
         const name = userOverride?.name || decoded.name || decoded.sub?.split('@')[0] || 'User';
+        const email = userOverride?.email || decoded.email || (decoded.sub?.includes('@') ? decoded.sub : undefined);
 
-        const nextUser: User = { id, name, role };
+        const nextUser: User = { id, name, role, email };
         localStorage.setItem('accessToken', token);
         localStorage.setItem('user', JSON.stringify(nextUser));
         setUser(nextUser);

@@ -29,6 +29,7 @@ import { ActivityHeatmap } from '@/components/dashboard/student/ActivityHeatmap'
 import { ContestRatingsSection } from '@/components/dashboard/student/ContestRatingsSection';
 import { UnifiedContestHistory } from '@/components/dashboard/student/UnifiedContestHistory';
 import { formatProblemTitle, getProblemPlatform } from '@/lib/problemFormatter';
+import { useAuth } from '../../hooks/useAuth';
 import type { FriendComparisonDTO } from '@/types';
 
 interface FriendDashboardModalProps {
@@ -39,6 +40,7 @@ interface FriendDashboardModalProps {
 }
 
 export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }: Readonly<FriendDashboardModalProps>) {
+    const { user } = useAuth();
     const [comparison, setComparison] = useState<FriendComparisonDTO | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -47,6 +49,13 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
 
     useEffect(() => {
         if (!open || !friendId) return;
+
+        if (user?.id && friendId === user.id) {
+            setError('You cannot view your own profile as a friend dashboard.');
+            setIsLoading(false);
+            setComparison(null);
+            return;
+        }
 
         let isMounted = true;
         setIsLoading(true);

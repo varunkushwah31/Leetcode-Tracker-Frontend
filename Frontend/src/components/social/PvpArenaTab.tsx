@@ -63,7 +63,8 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                 SocialService.getFriends()
             ]);
             setMatches(matchesRes.data || []);
-            setFriends(friendsRes.data.friends || []);
+            const rawFriends: FriendDTO[] = friendsRes.data.friends || [];
+            setFriends(rawFriends.filter(f => f.id !== user?.id));
         } catch (err) {
             console.error('Failed to load PVP data:', err);
         } finally {

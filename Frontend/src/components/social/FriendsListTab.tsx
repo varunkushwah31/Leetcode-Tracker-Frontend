@@ -20,6 +20,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { SocialService } from '../../services/endpoints';
+import { useAuth } from '../../hooks/useAuth';
 import type { FriendDTO, FriendRequestDTO, SocialSearchStudentDTO } from '@/types';
 
 interface FriendsListTabProps {
@@ -28,6 +29,7 @@ interface FriendsListTabProps {
 }
 
 export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<FriendsListTabProps>) {
+    const { user } = useAuth();
     const [friends, setFriends] = useState<FriendDTO[]>([]);
     const [incomingRequests, setIncomingRequests] = useState<FriendRequestDTO[]>([]);
     const [outgoingRequests, setOutgoingRequests] = useState<FriendRequestDTO[]>([]);
@@ -43,15 +45,19 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
     const loadFriendsData = useCallback(async () => {
         try {
             const res = await SocialService.getFriends();
-            setFriends(res.data.friends || []);
-            setIncomingRequests(res.data.pendingIncoming || []);
-            setOutgoingRequests(res.data.pendingOutgoing || []);
+            const rawFriends: FriendDTO[] = res.data.friends || [];
+            const rawIncoming: FriendRequestDTO[] = res.data.pendingIncoming || [];
+            const rawOutgoing: FriendRequestDTO[] = res.data.pendingOutgoing || [];
+
+            setFriends(rawFriends.filter(f => f.id !== user?.id));
+            setIncomingRequests(rawIncoming.filter(r => r.requesterId !== user?.id));
+            setOutgoingRequests(rawOutgoing.filter(r => r.receiverId !== user?.id));
         } catch (err: unknown) {
             console.error('Failed to load friends:', err);
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [user?.id]);
 
     useEffect(() => {
         void loadFriendsData();
@@ -68,7 +74,8 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             setIsSearching(true);
             try {
                 const res = await SocialService.searchStudents(searchQuery);
-                setSearchResults(res.data || []);
+                const rawResults: SocialSearchStudentDTO[] = res.data || [];
+                setSearchResults(rawResults.filter(s => s.id !== user?.id && (!user?.email || s.email?.toLowerCase() !== user.email.toLowerCase())));
             } catch (err) {
                 console.error('Failed to search students:', err);
             } finally {
@@ -77,9 +84,13 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, user?.id, user?.email]);
 
     const handleSendRequest = async (targetId: string) => {
+        if (!targetId || targetId === user?.id) {
+            setFeedbackMessage({ text: 'You cannot send a friend request to yourself.', type: 'error' });
+            return;
+        }
         setActionLoadingId(targetId);
         try {
             await SocialService.sendFriendRequest(targetId);

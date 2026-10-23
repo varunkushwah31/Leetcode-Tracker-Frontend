@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { SocialService } from '../../services/endpoints';
+import { useAuth } from '../../hooks/useAuth';
 import { formatProblemTitle } from '@/lib/problemFormatter';
 import type { FriendActivityDTO } from '@/types';
 
@@ -32,6 +33,7 @@ const reactionDefinitions = [
 ];
 
 export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps) {
+    const { user } = useAuth();
     const [activities, setActivities] = useState<FriendActivityDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filter, setFilter] = useState<'ALL' | 'SOLVES' | 'DUELS'>('ALL');
@@ -161,6 +163,8 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                     {filteredActivities.map((act) => {
                         const formattedTitle = act.title ? formatProblemTitle(act.title) : 'Activity';
 
+                        const isCurrentUser = Boolean(user?.id && act.studentId === user.id);
+
                         return (
                             <div
                                 key={act.id}
@@ -168,28 +172,46 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3.5 min-w-0">
-                                        <button
-                                            type="button"
-                                            onClick={() => onViewFriendDashboard(act.studentId)}
-                                            className="cursor-pointer hover:opacity-80 transition-opacity"
-                                        >
+                                        {isCurrentUser ? (
                                             <Avatar className="w-11 h-11 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm">
                                                 <AvatarImage src={act.studentAvatarUrl} />
                                                 <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] text-xs font-bold">
                                                     {act.studentName.substring(0, 2)}
                                                 </AvatarFallback>
                                             </Avatar>
-                                        </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() => onViewFriendDashboard(act.studentId)}
+                                                className="cursor-pointer hover:opacity-80 transition-opacity"
+                                            >
+                                                <Avatar className="w-11 h-11 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                                    <AvatarImage src={act.studentAvatarUrl} />
+                                                    <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] text-xs font-bold">
+                                                        {act.studentName.substring(0, 2)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            </button>
+                                        )}
 
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onViewFriendDashboard(act.studentId)}
-                                                    className="text-xs font-extrabold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
-                                                >
-                                                    {act.studentName}
-                                                </button>
+                                                {isCurrentUser ? (
+                                                    <span className="text-xs font-extrabold text-zinc-900 dark:text-white truncate">
+                                                        {act.studentName}
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => onViewFriendDashboard(act.studentId)}
+                                                        className="text-xs font-extrabold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
+                                                    >
+                                                        {act.studentName}
+                                                    </button>
+                                                )}
+                                                {isCurrentUser && (
+                                                    <span className="text-[#5b4fff] text-xs font-bold">(You)</span>
+                                                )}
                                                 <span className="text-[11px] text-zinc-400">
                                                     @{act.studentHandle || 'coder'}
                                                 </span>
@@ -265,14 +287,20 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                         })}
                                     </div>
 
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => onViewFriendDashboard(act.studentId)}
-                                        className="text-xs h-8 text-zinc-500 hover:text-[#5b4fff] cursor-pointer rounded-xl font-bold"
-                                    >
-                                        View Profile & Overlap →
-                                    </Button>
+                                    {isCurrentUser ? (
+                                        <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 italic py-1 px-2.5">
+                                            Your Activity
+                                        </span>
+                                    ) : (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => onViewFriendDashboard(act.studentId)}
+                                            className="text-xs h-8 text-zinc-500 hover:text-[#5b4fff] cursor-pointer rounded-xl font-bold"
+                                        >
+                                            View Profile & Overlap →
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         );

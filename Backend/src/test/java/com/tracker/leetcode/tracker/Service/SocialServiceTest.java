@@ -183,6 +183,93 @@ class SocialServiceTest {
     }
 
     @Test
+    void testSendFriendRequest_SameEmail_Throws() {
+        studentB.setEmail("alice@test.com"); // Same email as studentA
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(studentRepository.findById("userB")).thenReturn(Optional.of(studentB));
+
+        assertThrows(IllegalArgumentException.class, () -> socialService.sendFriendRequest("userA", "userB"));
+    }
+
+    @Test
+    void testAcceptFriendRequest_SameRequesterAndReceiver_Throws() {
+        Friendship selfFriendship = Friendship.builder()
+                .id("fSelf")
+                .requesterId("userA")
+                .receiverId("userA")
+                .status(FriendshipStatus.PENDING)
+                .build();
+        when(friendshipRepository.findById("fSelf")).thenReturn(Optional.of(selfFriendship));
+
+        assertThrows(IllegalArgumentException.class, () -> socialService.acceptFriendRequest("userA", "fSelf"));
+    }
+
+    @Test
+    void testCreatePvpChallenge_SelfDuel_Throws() {
+        CreatePvpMatchRequest req = CreatePvpMatchRequest.builder()
+                .opponentId("userA")
+                .build();
+        assertThrows(IllegalArgumentException.class, () -> socialService.createPvpChallenge("userA", req));
+    }
+
+    @Test
+    void testGetFriendDashboard_SelfView_Throws() {
+        assertThrows(IllegalArgumentException.class, () -> socialService.getFriendDashboard("userA", "userA"));
+    }
+
+    @Test
+    void testSearchStudents_ExcludesSelfAndSameEmail() {
+        Student userC = new Student("carol_lc", "Carol");
+        userC.setId("userC");
+        userC.setEmail("carol@test.com");
+
+        Student userClone = new Student("alice2_lc", "Alice Clone");
+        userClone.setId("userClone");
+        userClone.setEmail("alice@test.com"); // Same email as Alice
+
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(friendshipRepository.findAllByStudentId("userA")).thenReturn(Collections.emptyList());
+        when(studentRepository.findAll()).thenReturn(List.of(studentA, studentB, userC, userClone));
+
+        List<SocialSearchStudentDTO> results = socialService.searchStudents("userA", "Alice");
+        // studentA is excluded by id, userClone is excluded by email matching studentA's email
+        assertEquals(0, results.size());
+    }
+
+    @Test
+    void testGetFriendsAndRequests_SanitizesAndExcludesSelf() {
+        // Suppose studentA corruptedly has own id in friendIds
+        studentA.getFriendIds().add("userA");
+        studentA.getFriendIds().add("userB");
+
+        Friendship selfF = Friendship.builder()
+                .id("fSelf")
+                .requesterId("userA")
+                .receiverId("userA")
+                .status(FriendshipStatus.ACCEPTED)
+                .build();
+
+        Friendship validF = Friendship.builder()
+                .id("fValid")
+                .requesterId("userA")
+                .receiverId("userB")
+                .status(FriendshipStatus.ACCEPTED)
+                .build();
+
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(studentRepository.findById("userB")).thenReturn(Optional.of(studentB));
+        when(friendshipRepository.findAllByStudentId("userA")).thenReturn(List.of(selfF, validF));
+
+        Map<String, Object> result = socialService.getFriendsAndRequests("userA");
+        @SuppressWarnings("unchecked")
+        List<FriendDTO> friends = (List<FriendDTO>) result.get("friends");
+
+        assertEquals(1, friends.size());
+        assertEquals("userB", friends.get(0).getId());
+        assertFalse(studentA.getFriendIds().contains("userA"));
+    }
+
+    @Test
     void testFriendsLeaderboard_SortedByTotalSolved() {
         studentA.getFriendIds().add("userB");
         studentA.setStreak(5);
