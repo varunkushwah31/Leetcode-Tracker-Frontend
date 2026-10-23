@@ -19,7 +19,9 @@ public class LeetCodeService {
      * Deprecated: This service is maintained for backward compatibility only.
      * Please use StudentService instead for all new code.
      * This method fetches and updates student progress (calendar heatmap).
+     * @deprecated Use {@link StudentService#fetchAndUpdateStudentProgress(String)} instead.
      */
+    @SuppressWarnings("java:S1133")
     @Deprecated(since = "2.0", forRemoval = true)
     public Student fetchAndUpdateStudentProgress(String leetcodeUsername) {
         log.info("DEPRECATED: fetchAndUpdateStudentProgress called. Please use StudentService instead.");
@@ -36,6 +38,7 @@ public class LeetCodeService {
      * Deprecated: This service is maintained for backward compatibility only.
      * Please use StudentService instead for all new code.
      * This method fetches and updates problem statistics.
+     * @deprecated Use {@link StudentService#fetchAndUpdateProblemStats(String)} instead.
      */
     @Deprecated(since = "2.0", forRemoval = true)
     public Student fetchAndUpdateProblemStats(String leetcodeUsername) {

@@ -36,16 +36,19 @@ public class Assignment {
     }
 
     public void ensureQuestionLink() {
-        String input = (this.questionLink != null && !this.questionLink.isBlank()) 
-                ? this.questionLink.trim() 
-                : (this.titleSlug != null ? this.titleSlug.trim() : "");
+        String input = "";
+        if (this.questionLink != null && !this.questionLink.isBlank()) {
+            input = this.questionLink.trim();
+        } else if (this.titleSlug != null) {
+            input = this.titleSlug.trim();
+        }
 
         if (input.isBlank()) {
             return;
         }
 
         // 1. Check if input is a Codeforces URL
-        Pattern cfUrlPattern = Pattern.compile("(?i)codeforces\\.com/(?:problemset/problem|contest|gym)/(\\d+)/(?:problem/)?([A-Za-z0-9]+)");
+        Pattern cfUrlPattern = Pattern.compile("(?i)codeforces\\.com/(?:problemset/problem|contest|gym)/(\\d+)/(?:problem/)?([a-z0-9]+)");
         Matcher cfUrlMatcher = cfUrlPattern.matcher(input);
         if (cfUrlMatcher.find()) {
             this.platform = Platform.CODEFORCES;
@@ -58,7 +61,7 @@ public class Assignment {
         }
 
         // 2. Check if input is a LeetCode URL
-        Pattern lcUrlPattern = Pattern.compile("(?i)leetcode\\.(?:com|cn)/problems/([a-zA-Z0-9_-]+)");
+        Pattern lcUrlPattern = Pattern.compile("(?i)leetcode\\.(?:com|cn)/problems/([a-z0-9_-]+)");
         Matcher lcUrlMatcher = lcUrlPattern.matcher(input);
         if (lcUrlMatcher.find()) {
             this.platform = Platform.LEETCODE;
@@ -70,7 +73,7 @@ public class Assignment {
 
         // 3. Fallback when input is an identifier/slug (not a full URL)
         if (this.platform == Platform.CODEFORCES) {
-            Pattern cfPattern = Pattern.compile("^(\\d+)[/-]?([A-Za-z0-9]+)$");
+            Pattern cfPattern = Pattern.compile("^(\\d++)[/\\-]?([A-Za-z0-9]+)$");
             Matcher matcher = cfPattern.matcher(input);
             if (matcher.find()) {
                 String contestId = matcher.group(1);

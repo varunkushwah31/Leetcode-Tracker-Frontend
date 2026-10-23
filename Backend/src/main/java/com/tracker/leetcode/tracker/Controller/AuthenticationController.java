@@ -119,7 +119,7 @@ public class AuthenticationController {
 
     // Logout Endpoint
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(
+    public ResponseEntity<Void> logout(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authHeader,
             @CookieValue(name = "refresh_token", required = false) String refreshToken,
             HttpServletResponse response) {

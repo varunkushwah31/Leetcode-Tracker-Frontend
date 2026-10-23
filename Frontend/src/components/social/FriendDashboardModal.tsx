@@ -285,29 +285,29 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
 
                                 {/* Stat Metric Summary Pill */}
                                 <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-7 bg-zinc-50/80 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
-                                    <div className="text-center min-w-[70px]">
+                                    <div className="text-center min-w-17.5">
                                         <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rank</p>
                                         <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                                             {profile.rank ? `#${Number.parseInt(profile.rank).toLocaleString()}` : (profile.codeforcesRank || 'N/A')}
                                         </p>
                                     </div>
-                                    <div className="text-center min-w-[80px]">
+                                    <div className="text-center min-w-20">
                                         <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Solved</p>
                                         <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{totalSolved}</p>
                                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcSolved} • CF: {cfSolved}</p>
                                     </div>
-                                    <div className="text-center min-w-[80px]">
+                                    <div className="text-center min-w-20">
                                         <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rating</p>
                                         <p className="text-2xl font-bold text-[#5b4fff] dark:text-[#b4afff]">{maxRating > 0 ? maxRating : 'Unrated'}</p>
                                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcRating > 0 ? lcRating : 'Unrated'} • CF: {cfRating > 0 ? cfRating : 'Unrated'}</p>
                                     </div>
-                                    <div className="text-center min-w-[70px]">
+                                    <div className="text-center min-w-17.5">
                                         <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Streak</p>
                                         <p className="text-2xl font-bold text-amber-500 flex justify-center items-center">
                                             {profile.consistencyStreak || 0} <StreakFlame className="w-5 h-5 ml-1.5" />
                                         </p>
                                     </div>
-                                    <div className="text-center min-w-[85px] sm:border-l sm:border-zinc-200 sm:dark:border-zinc-800 sm:pl-5">
+                                    <div className="text-center min-w-21.25 sm:border-l sm:border-zinc-200 sm:dark:border-zinc-800 sm:pl-5">
                                         <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Head-to-Head</p>
                                         <p className="text-2xl font-bold flex items-center justify-center gap-1">
                                             <span className="text-emerald-600 dark:text-emerald-400">{userWins}W</span>
@@ -787,7 +787,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                     </div>
                                 </CardHeader>
                                 <CardContent className="pt-6">
-                                    <ScrollArea className="h-[460px] pr-2 custom-scrollbar">
+                                    <ScrollArea className="h-115 pr-2 custom-scrollbar">
                                         <div className="space-y-2.5">
                                             {(!profile.recentSubmissions || profile.recentSubmissions.length === 0) ? (
                                                 <p className="py-16 text-center text-xs text-zinc-500">

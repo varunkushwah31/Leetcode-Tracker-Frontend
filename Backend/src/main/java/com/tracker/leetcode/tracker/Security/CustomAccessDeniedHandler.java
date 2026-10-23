@@ -18,6 +18,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
 @Component
@@ -38,7 +39,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 request.getMethod(), request.getRequestURI(), traceId, accessDeniedException.getMessage());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .time(LocalDateTime.now())
+                .time(LocalDateTime.now(ZoneId.systemDefault()))
                 .status(HttpStatus.FORBIDDEN.value())
                 .error("Forbidden")
                 .message("You do not have permission to access this resource.")

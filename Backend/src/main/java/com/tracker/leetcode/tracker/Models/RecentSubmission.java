@@ -4,10 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecentSubmission {
+public class RecentSubmission implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String title;
     private String titleSlug;
     private long timestamp;
@@ -29,12 +33,5 @@ public class RecentSubmission {
         this.timestamp = timestamp;
         this.platform = platform != null ? platform : Platform.LEETCODE;
         this.questionLink = questionLink;
-    }
-
-    public void setTitleSlug(String titleSlug) {
-        this.titleSlug = titleSlug;
-        if (this.questionLink == null && this.platform == Platform.LEETCODE) {
-            this.questionLink = "https://leetcode.com/problems/" + titleSlug + "/";
-        }
     }
 }

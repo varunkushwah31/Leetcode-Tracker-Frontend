@@ -20,6 +20,8 @@ import java.util.UUID;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestLoggingFilter extends OncePerRequestFilter {
 
+    private static final String HTTP_OUT_LOG_PATTERN = "[HTTP OUT] {} {} -> HTTP {} (took {}ms, traceId: {})";
+
     public static final String TRACE_ID_HEADER = "X-Request-ID";
     public static final String MDC_TRACE_ID_KEY = "traceId";
     public static final String MDC_CLIENT_IP_KEY = "clientIp";
@@ -64,11 +66,11 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 
             if (!isHealth) {
                 if (status >= 500) {
-                    log.error("[HTTP OUT] {} {} -> HTTP {} (took {}ms, traceId: {})", method, uri, status, duration, traceId);
+                    log.error(HTTP_OUT_LOG_PATTERN, method, uri, status, duration, traceId);
                 } else if (status >= 400) {
-                    log.warn("[HTTP OUT] {} {} -> HTTP {} (took {}ms, traceId: {})", method, uri, status, duration, traceId);
+                    log.warn(HTTP_OUT_LOG_PATTERN, method, uri, status, duration, traceId);
                 } else {
-                    log.info("[HTTP OUT] {} {} -> HTTP {} (took {}ms, traceId: {})", method, uri, status, duration, traceId);
+                    log.info(HTTP_OUT_LOG_PATTERN, method, uri, status, duration, traceId);
                 }
             }
 

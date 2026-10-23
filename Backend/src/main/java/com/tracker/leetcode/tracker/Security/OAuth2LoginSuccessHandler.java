@@ -34,6 +34,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    private static final String ATTR_LOGIN = "login";
+    private static final String PARAM_ERROR = "error";
+
     private final MentorRepository mentorRepository;
     private final StudentRepository studentRepository;
     private final JwtService jwtService;
@@ -67,7 +70,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             picture = oAuth2User.getAttribute("avatar_url"); // GitHub
         }
         if (name == null || name.isBlank()) {
-            name = oAuth2User.getAttribute("login"); // GitHub fallback
+            name = oAuth2User.getAttribute(ATTR_LOGIN); // GitHub fallback
         }
 
         log.info("OAuth2 Login successful from provider [{}] for email [{}]", providerName, email);
@@ -76,7 +79,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             log.warn("OAuth2 provider [{}] did not return an email address.", providerName);
             String errorMsg = "Could not retrieve email from " + providerName + ". Please ensure your email is verified and public on " + providerName + ".";
             String targetUrl = UriComponentsBuilder.fromUriString(frontendRedirectUri)
-                    .queryParam("error", errorMsg)
+                    .queryParam(PARAM_ERROR, errorMsg)
                     .build().toUriString();
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
             return;
@@ -95,7 +98,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             Student student = studentOptional.get();
             if (!student.isEnabled()) {
                 String targetUrl = UriComponentsBuilder.fromUriString(frontendRedirectUri)
-                        .queryParam("error", "Your student account has been disabled. Please contact your mentor.")
+                        .queryParam(PARAM_ERROR, "Your student account has been disabled. Please contact your mentor.")
                         .build().toUriString();
                 getRedirectStrategy().sendRedirect(request, response, targetUrl);
                 return;
@@ -116,7 +119,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             Mentor mentor = mentorOptional.get();
             if (!mentor.isEnabled()) {
                 String targetUrl = UriComponentsBuilder.fromUriString(frontendRedirectUri)
-                        .queryParam("error", "Your mentor account has been disabled. Please contact support.")
+                        .queryParam(PARAM_ERROR, "Your mentor account has been disabled. Please contact support.")
                         .build().toUriString();
                 getRedirectStrategy().sendRedirect(request, response, targetUrl);
                 return;
@@ -142,8 +145,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             if (picture != null) {
                 student.setAvatarUrl(picture);
             }
-            if (authProvider == AuthProvider.GITHUB && oAuth2User.getAttribute("login") != null) {
-                String githubUsername = oAuth2User.getAttribute("login");
+            if (authProvider == AuthProvider.GITHUB && oAuth2User.getAttribute(ATTR_LOGIN) != null) {
+                String githubUsername = oAuth2User.getAttribute(ATTR_LOGIN);
                 student.setSocialMedia(new SocialMedia(githubUsername, null, null));
             }
             student = studentRepository.save(student);

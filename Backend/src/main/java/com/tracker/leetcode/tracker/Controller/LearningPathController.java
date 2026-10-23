@@ -1,11 +1,13 @@
 package com.tracker.leetcode.tracker.Controller;
 
+import com.tracker.leetcode.tracker.DTO.CreateLearningPathRequest;
 import com.tracker.leetcode.tracker.Models.LearningPath;
 import com.tracker.leetcode.tracker.Service.LearningPathService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -15,19 +17,21 @@ public class LearningPathController {
 
     private final LearningPathService pathService;
 
-    // POST /api/paths
     @PostMapping
-    public ResponseEntity<LearningPath> createPath(@RequestBody LearningPath path) {
+    public ResponseEntity<LearningPath> createPath(@RequestBody CreateLearningPathRequest request) {
+        LearningPath path = new LearningPath();
+        path.setMentorId(request.mentorId());
+        path.setTitle(request.title());
+        path.setDescription(request.description());
+        path.setQuestions(request.questions() != null ? request.questions() : new ArrayList<>());
         return ResponseEntity.ok(pathService.createPath(path));
     }
 
-    // GET /api/paths/mentor/{mentorId}
     @GetMapping("/mentor/{mentorId}")
     public ResponseEntity<List<LearningPath>> getMentorPaths(@PathVariable String mentorId) {
         return ResponseEntity.ok(pathService.getPathsByMentor(mentorId));
     }
 
-    // POST /api/paths/{pathId}/assign/{classroomId}
     @PostMapping("/{pathId}/assign/{classroomId}")
     public ResponseEntity<String> assignPathToClassroom(
             @PathVariable String pathId,

@@ -22,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -90,7 +91,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
             ErrorResponse errorResponse = ErrorResponse.builder()
-                    .time(LocalDateTime.now())
+                    .time(LocalDateTime.now(ZoneId.systemDefault()))
                     .status(HttpStatus.TOO_MANY_REQUESTS.value())
                     .error("Too Many Requests")
                     .message("Rate limit exceeded. Please wait " + result.getResetSeconds() + " seconds before trying again.")

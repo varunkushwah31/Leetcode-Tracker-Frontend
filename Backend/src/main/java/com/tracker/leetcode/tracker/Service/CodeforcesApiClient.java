@@ -28,6 +28,13 @@ import java.util.regex.Pattern;
 @Component
 public class CodeforcesApiClient {
 
+    private static final String FIELD_CONTEST_ID = "contestId";
+    private static final String FIELD_INDEX = "index";
+    private static final String TAG_STRINGS = "strings";
+    private static final String TAG_IMPLEMENTATION = "implementation";
+    private static final String TAG_GREEDY = "greedy";
+    private static final String TAG_BINARY_SEARCH = "binary search";
+
     private static final String BASE_URL = "https://codeforces.com/api";
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -56,7 +63,7 @@ public class CodeforcesApiClient {
             long elapsed = now - lastCfRequestTime;
             if (elapsed < 350) {
                 try {
-                    Thread.sleep(350 - elapsed);
+                    CF_REQUEST_LOCK.wait(350 - elapsed);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
@@ -108,7 +115,7 @@ public class CodeforcesApiClient {
             Object cached = redisTemplate.opsForValue().get(key);
             if (cached != null) {
                 log.info("Using fallback Codeforces data from Redis cache: {}", key);
-                return (T) cached;
+                return type.cast(cached);
             }
         } catch (Exception e) {
             log.warn("Failed to retrieve Codeforces fallback data from cache: {}", e.getMessage());
@@ -174,7 +181,7 @@ public class CodeforcesApiClient {
             for (JsonNode node : result) {
                 try {
                     history.add(CodeforcesContestHistory.builder()
-                            .contestId(node.path("contestId").asInt())
+                            .contestId(node.path(FIELD_CONTEST_ID).asInt())
                             .contestName(node.path("contestName").asString())
                             .rank(node.path("rank").asInt())
                             .oldRating(node.path("oldRating").asInt())
@@ -242,8 +249,8 @@ public class CodeforcesApiClient {
                 try {
                     String verdict = subNode.path("verdict").asString("");
                     JsonNode problem = subNode.path("problem");
-                    int contestId = problem.path("contestId").asInt(0);
-                    String index = problem.path("index").asString("");
+                    int contestId = problem.path(FIELD_CONTEST_ID).asInt(0);
+                    String index = problem.path(FIELD_INDEX).asString("");
                     String name = problem.path("name").asString("");
                     long creationTime = subNode.path("creationTimeSeconds").asLong();
 
@@ -321,6 +328,7 @@ public class CodeforcesApiClient {
         return fetchSubmissionsFallback(handle, 0, ex);
     }
 
+    @SuppressWarnings("java:S1172")
     public CodeforcesSubmissionData fetchSubmissionsFallback(String handle, int count, Exception ex) {
         log.warn("Circuit breaker OPEN for Codeforces submissions of {}. Serving stale data. Error: {}",
                 handle, ex.getMessage());
@@ -362,21 +370,19 @@ public class CodeforcesApiClient {
         try {
             JsonNode result = executeGetRequest("/user.status?handle=" + handle.trim() + "&from=1&count=200", handle);
             if (result != null && result.isArray()) {
-                boolean submissionIdFound = false;
-
+                
                 for (JsonNode subNode : result) {
                     long id = subNode.path("id").asLong(0);
                     String verdict = subNode.path("verdict").asString("");
                     JsonNode problem = subNode.path("problem");
-                    int contestId = problem.path("contestId").asInt(0);
-                    String index = problem.path("index").asString("");
+                    int contestId = problem.path(FIELD_CONTEST_ID).asInt(0);
+                    String index = problem.path(FIELD_INDEX).asString("");
                     String currentSlug = contestId + index.toUpperCase();
 
                     // If manual submission validation (URL provided):
                     if (targetSubmissionId != null) {
                         if (String.valueOf(id).equals(targetSubmissionId)) {
-                            submissionIdFound = true;
-
+                            
                             if (!"OK".equalsIgnoreCase(verdict)) {
                                 throw new com.tracker.leetcode.tracker.Exception.ValidationFailedException(
                                         "Submission #" + targetSubmissionId + " was not accepted! Verdict on Codeforces was: " + verdict);
@@ -395,18 +401,16 @@ public class CodeforcesApiClient {
                         }
                     } else {
                         // Auto-validation (no submission URL provided - match any recent accepted submission)
-                        if ("OK".equalsIgnoreCase(verdict)) {
-                            if (currentSlug.equalsIgnoreCase(normalizedTarget) ||
-                                    (index.equalsIgnoreCase(normalizedTarget) && contestId > 0)) {
-                                log.info("Codeforces Auto-Validation Successful -> Found accepted submission for {} on problem {}",
-                                        handle, currentSlug);
-                                return true;
-                            }
+                        if ("OK".equalsIgnoreCase(verdict) && (currentSlug.equalsIgnoreCase(normalizedTarget) ||
+                                (index.equalsIgnoreCase(normalizedTarget) && contestId > 0))) {
+                            log.info("Codeforces Auto-Validation Successful -> Found accepted submission for {} on problem {}",
+                                    handle, currentSlug);
+                            return true;
                         }
                     }
                 }
 
-                if (targetSubmissionId != null && !submissionIdFound) {
+                if (targetSubmissionId != null) {
                     throw new com.tracker.leetcode.tracker.Exception.ValidationFailedException(
                             "Submission #" + targetSubmissionId + " was not found among recent submissions for Codeforces handle @" +
                                     handle + ". Please verify this submission belongs to your account.");
@@ -434,7 +438,7 @@ public class CodeforcesApiClient {
                 JsonNode problems = result.path("problems");
                 if (problems != null && problems.isArray()) {
                     for (JsonNode pNode : problems) {
-                        String pIndex = pNode.path("index").asString("");
+                        String pIndex = pNode.path(FIELD_INDEX).asString("");
                         if (cleanIndex.equalsIgnoreCase(pIndex)) {
                             String name = pNode.path("name").asString("");
                             int rating = pNode.path("rating").asInt(0);
@@ -473,25 +477,25 @@ public class CodeforcesApiClient {
 
         List<CodeforcesDailyPick> curatedPicks = List.of(
                 new CodeforcesDailyPick("Watermelon", 4, "A", 800, "https://codeforces.com/problemset/problem/4/A", List.of("brute force", "math")),
-                new CodeforcesDailyPick("Way Too Long Words", 71, "A", 800, "https://codeforces.com/problemset/problem/71/A", List.of("strings")),
-                new CodeforcesDailyPick("Next Round", 158, "A", 800, "https://codeforces.com/problemset/problem/158/A", List.of("special problem", "implementation")),
-                new CodeforcesDailyPick("Domino piling", 50, "A", 800, "https://codeforces.com/problemset/problem/50/A", List.of("greedy", "math")),
-                new CodeforcesDailyPick("Beautiful Matrix", 263, "A", 800, "https://codeforces.com/problemset/problem/263/A", List.of("implementation")),
+                new CodeforcesDailyPick("Way Too Long Words", 71, "A", 800, "https://codeforces.com/problemset/problem/71/A", List.of(TAG_STRINGS)),
+                new CodeforcesDailyPick("Next Round", 158, "A", 800, "https://codeforces.com/problemset/problem/158/A", List.of("special problem", TAG_IMPLEMENTATION)),
+                new CodeforcesDailyPick("Domino piling", 50, "A", 800, "https://codeforces.com/problemset/problem/50/A", List.of(TAG_GREEDY, "math")),
+                new CodeforcesDailyPick("Beautiful Matrix", 263, "A", 800, "https://codeforces.com/problemset/problem/263/A", List.of(TAG_IMPLEMENTATION)),
                 new CodeforcesDailyPick("Theatre Square", 1, "A", 1000, "https://codeforces.com/problemset/problem/1/A", List.of("math")),
-                new CodeforcesDailyPick("Young Physicist", 69, "A", 1000, "https://codeforces.com/problemset/problem/69/A", List.of("math", "implementation")),
-                new CodeforcesDailyPick("Chat room", 58, "A", 1000, "https://codeforces.com/problemset/problem/58/A", List.of("greedy", "strings")),
-                new CodeforcesDailyPick("String Task", 118, "A", 1000, "https://codeforces.com/problemset/problem/118/A", List.of("implementation", "strings")),
-                new CodeforcesDailyPick("Interesting drink", 706, "B", 1100, "https://codeforces.com/problemset/problem/706/B", List.of("binary search", "dp")),
-                new CodeforcesDailyPick("Taxi", 158, "B", 1100, "https://codeforces.com/problemset/problem/158/B", List.of("greedy", "special problem")),
+                new CodeforcesDailyPick("Young Physicist", 69, "A", 1000, "https://codeforces.com/problemset/problem/69/A", List.of("math", TAG_IMPLEMENTATION)),
+                new CodeforcesDailyPick("Chat room", 58, "A", 1000, "https://codeforces.com/problemset/problem/58/A", List.of(TAG_GREEDY, TAG_STRINGS)),
+                new CodeforcesDailyPick("String Task", 118, "A", 1000, "https://codeforces.com/problemset/problem/118/A", List.of(TAG_IMPLEMENTATION, TAG_STRINGS)),
+                new CodeforcesDailyPick("Interesting drink", 706, "B", 1100, "https://codeforces.com/problemset/problem/706/B", List.of(TAG_BINARY_SEARCH, "dp")),
+                new CodeforcesDailyPick("Taxi", 158, "B", 1100, "https://codeforces.com/problemset/problem/158/B", List.of(TAG_GREEDY, "special problem")),
                 new CodeforcesDailyPick("Fancy Fence", 270, "A", 1100, "https://codeforces.com/problemset/problem/270/A", List.of("geometry", "math")),
-                new CodeforcesDailyPick("Vanya and Lanterns", 492, "B", 1200, "https://codeforces.com/problemset/problem/492/B", List.of("binary search", "math", "sortings")),
-                new CodeforcesDailyPick("Chewbaсca and Number", 514, "A", 1200, "https://codeforces.com/problemset/problem/514/A", List.of("greedy")),
-                new CodeforcesDailyPick("Worms", 474, "B", 1200, "https://codeforces.com/problemset/problem/474/B", List.of("binary search", "implementation")),
+                new CodeforcesDailyPick("Vanya and Lanterns", 492, "B", 1200, "https://codeforces.com/problemset/problem/492/B", List.of(TAG_BINARY_SEARCH, "math", "sortings")),
+                new CodeforcesDailyPick("Chewbaсca and Number", 514, "A", 1200, "https://codeforces.com/problemset/problem/514/A", List.of(TAG_GREEDY)),
+                new CodeforcesDailyPick("Worms", 474, "B", 1200, "https://codeforces.com/problemset/problem/474/B", List.of(TAG_BINARY_SEARCH, TAG_IMPLEMENTATION)),
                 new CodeforcesDailyPick("Registration System", 4, "C", 1300, "https://codeforces.com/problemset/problem/4/C", List.of("data structures", "hashing")),
                 new CodeforcesDailyPick("Cut Ribbon", 189, "A", 1300, "https://codeforces.com/problemset/problem/189/A", List.of("dp")),
-                new CodeforcesDailyPick("T-primes", 230, "B", 1300, "https://codeforces.com/problemset/problem/230/B", List.of("binary search", "math", "number theory")),
-                new CodeforcesDailyPick("Given Length and Sum of Digits...", 489, "C", 1400, "https://codeforces.com/problemset/problem/489/C", List.of("dp", "greedy")),
-                new CodeforcesDailyPick("Two Substrings", 550, "A", 1500, "https://codeforces.com/problemset/problem/550/A", List.of("brute force", "dp", "greedy", "strings"))
+                new CodeforcesDailyPick("T-primes", 230, "B", 1300, "https://codeforces.com/problemset/problem/230/B", List.of(TAG_BINARY_SEARCH, "math", "number theory")),
+                new CodeforcesDailyPick("Given Length and Sum of Digits...", 489, "C", 1400, "https://codeforces.com/problemset/problem/489/C", List.of("dp", TAG_GREEDY)),
+                new CodeforcesDailyPick("Two Substrings", 550, "A", 1500, "https://codeforces.com/problemset/problem/550/A", List.of("brute force", "dp", TAG_GREEDY, TAG_STRINGS))
         );
 
         int dayOfYear = LocalDate.now(ZoneId.of("UTC")).getDayOfYear();

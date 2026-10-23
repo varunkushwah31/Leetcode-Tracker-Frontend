@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -35,13 +34,19 @@ public class StudentController {
 
     // 1. Add a New Student -> Returns Summary
     @PostMapping
-    public ResponseEntity<StudentSummaryDTO> addStudent(@RequestBody Student student) {
-        log.info("Attempting to add new student with username: {}", student.getLeetcodeUsername());
-        Optional<Student> existingStudent = studentRepository.findByLeetcodeUsername(student.getLeetcodeUsername());
+    public ResponseEntity<StudentSummaryDTO> addStudent(@RequestBody CreateStudentRequest request) {
+        log.info("Attempting to add new student with username: {}", request.leetcodeUsername());
+        Optional<Student> existingStudent = studentRepository.findByLeetcodeUsername(request.leetcodeUsername());
 
         if (existingStudent.isPresent()) {
-            throw new DuplicateStudentException("A student with the LeetCode username '" + student.getLeetcodeUsername() + "' already exists.");
+            throw new DuplicateStudentException("A student with the LeetCode username '" + request.leetcodeUsername() + "' already exists.");
         }
+
+        Student student = new Student();
+        student.setName(request.name());
+        student.setEmail(request.email());
+        student.setLeetcodeUsername(request.leetcodeUsername());
+        student.setCodeforcesHandle(request.codeforcesHandle());
 
         Student savedStudent = studentRepository.save(student);
         return ResponseEntity.ok(mapper.toSummaryDTO(savedStudent));
@@ -102,7 +107,7 @@ public class StudentController {
         List<StudentSummaryDTO> summaries = studentRepository.findAll()
                 .stream()
                 .map(mapper::toSummaryDTO)
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.ok(summaries);
     }
@@ -227,9 +232,10 @@ public class StudentController {
     // 9. Authenticated Student's Own Report CSV Export
     @GetMapping(value = "/me/report", produces = "text/csv")
     public ResponseEntity<byte[]> exportMyReport(@AuthenticationPrincipal Student currentStudent) {
-        String identifier = currentStudent.getLeetcodeUsername() != null ? currentStudent.getLeetcodeUsername()
-                : currentStudent.getCodeforcesHandle() != null ? currentStudent.getCodeforcesHandle()
-                : currentStudent.getId();
+        String identifier = currentStudent.getLeetcodeUsername();
+        if (identifier == null) {
+            identifier = currentStudent.getCodeforcesHandle() != null ? currentStudent.getCodeforcesHandle() : currentStudent.getId();
+        }
         String csvData = studentService.generateStudentReportCsv(identifier);
         byte[] output = csvData.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 

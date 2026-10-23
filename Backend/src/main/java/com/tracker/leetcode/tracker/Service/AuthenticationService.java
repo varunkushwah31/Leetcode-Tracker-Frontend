@@ -28,7 +28,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
@@ -39,6 +38,9 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthenticationService {
+    private static final String MESSAGE_KEY = "message";
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
 
     private final StudentRepository studentRepository;
     private final MentorRepository mentorRepository;
@@ -109,22 +111,22 @@ public class AuthenticationService {
             if (otpRecordOpt.isEmpty()) {
                 throw new ValidationFailedException("No pending verification found for this email. Please request a verification code.");
             }
-            StudentRegistrationOtp record = otpRecordOpt.get();
-            if (record.getExpiryDate().isBefore(Instant.now())) {
-                studentRegistrationOtpRepository.delete(record);
+            StudentRegistrationOtp regOtpRecord = otpRecordOpt.get();
+            if (regOtpRecord.getExpiryDate().isBefore(Instant.now())) {
+                studentRegistrationOtpRepository.delete(regOtpRecord);
                 throw new ValidationFailedException("Verification code has expired. Please request a new one.");
             }
-            if (!record.getOtp().equals(submittedOtp)) {
-                int attempts = record.getFailedAttempts() + 1;
-                record.setFailedAttempts(attempts);
+            if (!regOtpRecord.getOtp().equals(submittedOtp)) {
+                int attempts = regOtpRecord.getFailedAttempts() + 1;
+                regOtpRecord.setFailedAttempts(attempts);
                 if (attempts >= 5) {
-                    studentRegistrationOtpRepository.delete(record);
+                    studentRegistrationOtpRepository.delete(regOtpRecord);
                     throw new ValidationFailedException("Too many incorrect attempts. This verification code has been invalidated. Please request a new code.");
                 }
-                studentRegistrationOtpRepository.save(record);
+                studentRegistrationOtpRepository.save(regOtpRecord);
                 throw new ValidationFailedException("Invalid verification code. " + (5 - attempts) + " attempts remaining.");
             }
-            studentRegistrationOtpRepository.delete(record);
+            studentRegistrationOtpRepository.delete(regOtpRecord);
         }
 
         String rawLc = request.leetcodeUsername() != null ? request.leetcodeUsername().trim() : null;
@@ -307,10 +309,9 @@ public class AuthenticationService {
             throw new ValidationFailedException("New password must be at least 6 characters long.");
         }
 
-        if (request.confirmPassword() != null && !request.confirmPassword().isBlank()) {
-            if (!request.newPassword().equals(request.confirmPassword())) {
-                throw new ValidationFailedException("New password and confirmation password do not match.");
-            }
+        if (request.confirmPassword() != null && !request.confirmPassword().isBlank()
+                && !request.newPassword().equals(request.confirmPassword())) {
+            throw new ValidationFailedException("New password and confirmation password do not match.");
         }
 
         // 1. Check if user is a Student
@@ -384,29 +385,24 @@ public class AuthenticationService {
             }
         }
 
-        int randomPin;
-        try {
-            randomPin = SecureRandom.getInstanceStrong().nextInt(900000) + 100000;
-        } catch (NoSuchAlgorithmException e) {
-            randomPin = new SecureRandom().nextInt(900000) + 100000;
-        }
+        int randomPin = SECURE_RANDOM.nextInt(900000) + 100000;
         String otp = String.valueOf(randomPin);
 
         studentRegistrationOtpRepository.deleteByEmail(email);
 
-        StudentRegistrationOtp record = StudentRegistrationOtp.builder()
+        StudentRegistrationOtp newRegOtpRecord = StudentRegistrationOtp.builder()
                 .email(email)
                 .otp(otp)
                 .failedAttempts(0)
                 .expiryDate(Instant.now().plus(Duration.ofMinutes(10)))
                 .createdAt(Instant.now())
                 .build();
-        studentRegistrationOtpRepository.save(record);
+        studentRegistrationOtpRepository.save(newRegOtpRecord);
 
         resendEmailService.sendStudentRegistrationOtp(email, otp, request.name());
 
         log.info("Sent student registration OTP to email: {}", email);
-        return Map.of("message", "A 6-digit verification code has been sent to " + email);
+        return Map.of(MESSAGE_KEY, "A 6-digit verification code has been sent to " + email);
     }
 
     public Map<String, String> sendPasswordResetOtp(ForgotPasswordRequest request) {
@@ -445,12 +441,7 @@ public class AuthenticationService {
         }
 
         // Generate 6-digit cryptographic random OTP
-        int randomPin;
-        try {
-            randomPin = SecureRandom.getInstanceStrong().nextInt(900000) + 100000;
-        } catch (NoSuchAlgorithmException e) {
-            randomPin = new SecureRandom().nextInt(900000) + 100000;
-        }
+        int randomPin = SECURE_RANDOM.nextInt(900000) + 100000;
         String otp = String.valueOf(randomPin);
 
         // Remove any prior OTP records for this email
@@ -470,7 +461,7 @@ public class AuthenticationService {
         resendEmailService.sendOtpEmail(email, otp, userName);
 
         log.info("Sent password reset OTP to email: {}", email);
-        return Map.of("message", "A 6-digit verification code has been sent to your email.");
+        return Map.of(MESSAGE_KEY, "A 6-digit verification code has been sent to your email.");
     }
 
     public VerifyOtpResponse verifyPasswordResetOtp(VerifyOtpRequest request) {
@@ -486,28 +477,28 @@ public class AuthenticationService {
             throw new ValidationFailedException("No pending verification found for this email. Please request a new code.");
         }
 
-        PasswordResetOtp record = otpRecordOpt.get();
-        if (record.getExpiryDate().isBefore(Instant.now())) {
-            passwordResetOtpRepository.delete(record);
+        PasswordResetOtp resetOtpRecord = otpRecordOpt.get();
+        if (resetOtpRecord.getExpiryDate().isBefore(Instant.now())) {
+            passwordResetOtpRepository.delete(resetOtpRecord);
             throw new ValidationFailedException("Verification code has expired. Please request a new one.");
         }
 
-        if (!record.getOtp().equals(otp)) {
-            int attempts = record.getFailedAttempts() + 1;
-            record.setFailedAttempts(attempts);
+        if (!resetOtpRecord.getOtp().equals(otp)) {
+            int attempts = resetOtpRecord.getFailedAttempts() + 1;
+            resetOtpRecord.setFailedAttempts(attempts);
             if (attempts >= 5) {
-                passwordResetOtpRepository.delete(record);
+                passwordResetOtpRepository.delete(resetOtpRecord);
                 throw new ValidationFailedException("Too many incorrect attempts. This verification code has been invalidated. Please request a new one.");
             }
-            passwordResetOtpRepository.save(record);
+            passwordResetOtpRepository.save(resetOtpRecord);
             throw new ValidationFailedException("Invalid verification code. " + (5 - attempts) + " attempts remaining.");
         }
 
         String resetToken = UUID.randomUUID().toString();
-        record.setVerified(true);
-        record.setResetToken(resetToken);
-        record.setExpiryDate(Instant.now().plus(Duration.ofMinutes(15))); // Allow 15 mins to set password
-        passwordResetOtpRepository.save(record);
+        resetOtpRecord.setVerified(true);
+        resetOtpRecord.setResetToken(resetToken);
+        resetOtpRecord.setExpiryDate(Instant.now().plus(Duration.ofMinutes(15))); // Allow 15 mins to set password
+        passwordResetOtpRepository.save(resetOtpRecord);
 
         log.info("OTP verified successfully for email: {}", email);
         return new VerifyOtpResponse(
@@ -566,7 +557,7 @@ public class AuthenticationService {
             refreshTokenService.deleteByMentorId(student.getId());
             passwordResetOtpRepository.delete(validRecord);
             log.info("Password successfully reset for student: {}", email);
-            return Map.of("message", "Password reset successfully. Please log in with your new password.");
+            return Map.of(MESSAGE_KEY, "Password reset successfully. Please log in with your new password.");
         }
 
         var mentorOpt = mentorRepository.findByEmailIgnoreCase(email)
@@ -578,7 +569,7 @@ public class AuthenticationService {
             refreshTokenService.deleteByMentorId(mentor.getId());
             passwordResetOtpRepository.delete(validRecord);
             log.info("Password successfully reset for mentor: {}", email);
-            return Map.of("message", "Password reset successfully. Please log in with your new password.");
+            return Map.of(MESSAGE_KEY, "Password reset successfully. Please log in with your new password.");
         }
 
         throw new UserAuthenticationException("Account not found for email: " + email);

@@ -201,7 +201,7 @@ export function UnifiedContestHistory({
             </CardHeader>
 
             <CardContent className="p-4 pt-0 overflow-hidden">
-                <ScrollArea className={`${scrollHeightClass} pr-4 w-full [&>div]:!block [&>div]:w-full overflow-hidden`}>
+                <ScrollArea className={`${scrollHeightClass} pr-4 w-full [&>div]:block! [&>div]:w-full overflow-hidden`}>
                     <div className="flex flex-col gap-2.5 w-full min-w-0">
                         {displayedItems.map((contest) => (
                             <div
@@ -242,7 +242,7 @@ export function UnifiedContestHistory({
                                         )}
                                     </div>
                                 </div>
-                                <div className="text-right shrink-0 min-w-[56px] flex flex-col items-end justify-center self-center pl-1">
+                                <div className="text-right shrink-0 min-w-14 flex flex-col items-end justify-center self-center pl-1">
                                     <p
                                         className={`text-sm font-bold tracking-tight whitespace-nowrap ${
                                             contest.platform === 'CODEFORCES'

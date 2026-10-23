@@ -68,14 +68,8 @@ public class CacheWarmingService {
         try {
             List<Classroom> classrooms = classroomRepository.findAll();
             for (Classroom c : classrooms) {
-                try {
-                    classroomService.getClassroomDashboard(c.getId(), "name");
-                    classroomService.getClassroomDashboard(c.getId(), "problemsSolved");
-                    classroomService.getClassroomDashboard(c.getId(), "contestRating");
-                    classroomService.getClassroomAnalytics(c.getId());
+                if (warmClassroom(c)) {
                     classroomsWarmed++;
-                } catch (Exception e) {
-                    log.warn("Cache warming failed for classroom {}: {}", c.getId(), e.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -86,11 +80,8 @@ public class CacheWarmingService {
         try {
             List<MentorDTO> mentors = mentorService.getAllMentors();
             for (MentorDTO m : mentors) {
-                try {
-                    mentorService.getMentorById(m.getId());
+                if (warmMentor(m)) {
                     mentorsWarmed++;
-                } catch (Exception e) {
-                    log.warn("Cache warming failed for mentor {}: {}", m.getId(), e.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -109,5 +100,28 @@ public class CacheWarmingService {
         report.put("potdWarmed", true);
         report.put("contestsWarmed", true);
         return report;
+    }
+
+    private boolean warmClassroom(Classroom c) {
+        try {
+            classroomService.getClassroomDashboard(c.getId(), "name");
+            classroomService.getClassroomDashboard(c.getId(), "problemsSolved");
+            classroomService.getClassroomDashboard(c.getId(), "contestRating");
+            classroomService.getClassroomAnalytics(c.getId());
+            return true;
+        } catch (Exception e) {
+            log.warn("Cache warming failed for classroom {}: {}", c.getId(), e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean warmMentor(MentorDTO m) {
+        try {
+            mentorService.getMentorById(m.getId());
+            return true;
+        } catch (Exception e) {
+            log.warn("Cache warming failed for mentor {}: {}", m.getId(), e.getMessage());
+            return false;
+        }
     }
 }

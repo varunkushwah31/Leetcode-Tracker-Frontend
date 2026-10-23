@@ -65,7 +65,7 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
     return (
         <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-all duration-300">
             {/* Top ambient brand gradient glow */}
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/40 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/40 to-transparent pointer-events-none" />
 
             <CardHeader className="flex flex-row items-center justify-between pb-3.5 border-b border-zinc-200/80 dark:border-zinc-800/60">
                 <div className="flex items-center gap-3">

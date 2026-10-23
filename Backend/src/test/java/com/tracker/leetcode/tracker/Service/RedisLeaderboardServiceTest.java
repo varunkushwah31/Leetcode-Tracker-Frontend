@@ -155,10 +155,10 @@ class RedisLeaderboardServiceTest {
     void deleteClassroomLeaderboards_ShouldDeleteAllClassroomKeys() {
         leaderboardService.deleteClassroomLeaderboards("class-1");
 
-        verify(stringRedisTemplate).delete(eq(List.of(
+        verify(stringRedisTemplate).delete(List.of(
                 "leaderboard:classroom:class-1:solved",
                 "leaderboard:classroom:class-1:rating",
                 "leaderboard:classroom:class-1:streak"
-        )));
+        ));
     }
 }

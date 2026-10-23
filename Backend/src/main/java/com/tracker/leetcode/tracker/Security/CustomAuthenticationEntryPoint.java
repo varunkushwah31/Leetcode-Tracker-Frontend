@@ -18,6 +18,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
 @Component
@@ -35,7 +36,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 request.getMethod(), request.getRequestURI(), traceId, authException.getMessage());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .time(LocalDateTime.now())
+                .time(LocalDateTime.now(ZoneId.systemDefault()))
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .error("Unauthorized")
                 .message("Missing, invalid, or expired authentication token.")

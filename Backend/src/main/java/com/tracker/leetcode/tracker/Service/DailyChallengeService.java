@@ -25,6 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DailyChallengeService {
 
+    private static final String CACHE_KEY_TODAY = "today";
+
     private final LeetCodeApiClient leetCodeApiClient;
     private final StudentRepository studentRepository;
     private final ClassroomRepository classroomRepository;
@@ -54,7 +56,7 @@ public class DailyChallengeService {
             if (cacheManager != null) {
                 cache = cacheManager.getCache("global-potd");
                 if (cache != null) {
-                    DailyChallengeDTO cached = cache.get("today", DailyChallengeDTO.class);
+                    DailyChallengeDTO cached = cache.get(CACHE_KEY_TODAY, DailyChallengeDTO.class);
                     if (cached != null) {
                         if (todayUtc.equals(cached.getDate())) {
                             log.debug("Global POTD cache HIT for today ({}).", todayUtc);
@@ -62,7 +64,7 @@ public class DailyChallengeService {
                         } else {
                             log.warn("Global POTD cache entry date ({}) is stale (expected today {}). Evicting stale entry.",
                                     cached.getDate(), todayUtc);
-                            cache.evict("today");
+                            cache.evict(CACHE_KEY_TODAY);
                         }
                     }
                 }
@@ -89,7 +91,7 @@ public class DailyChallengeService {
 
         if (cache != null) {
             try {
-                cache.put("today", challenge);
+                cache.put(CACHE_KEY_TODAY, challenge);
                 log.info("Cached global POTD in Redis under 'global-potd::today' for date {}.", todayUtc);
             } catch (Exception e) {
                 log.warn("Failed to put global POTD into cache: {}", e.getMessage());

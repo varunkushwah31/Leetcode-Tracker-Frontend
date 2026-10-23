@@ -24,6 +24,12 @@ import jakarta.mail.internet.MimeMessage;
 @Service
 public class ResendEmailService {
 
+    private static final String MESSAGE_KEY = "message";
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String PLACEHOLDER_GREETING = "{{GREETING}}";
+    private static final String PLACEHOLDER_OTP = "{{OTP}}";
+
+
     private final String resendApiKey;
     private final String resendFromEmail;
     private final String mailUsername;
@@ -115,13 +121,15 @@ public class ResendEmailService {
             return;
         }
 
-        log.warn("\n=================================================================\n" +
-                 " [DEV MODE] Neither EMAILJS, RESEND_API_KEY nor MAIL_USERNAME is configured.\n" +
-                 " Type         : PASSWORD RESET OTP\n" +
-                 " Target Email : {}\n" +
-                 " OTP Code     : {}\n" +
-                 " (In production, configure EmailJS, Resend, or Gmail SMTP to dispatch real emails)\n" +
-                 "=================================================================", toEmail, otp);
+        log.warn("""
+                 
+                 =================================================================
+                  [DEV MODE] Neither EMAILJS, RESEND_API_KEY nor MAIL_USERNAME is configured.
+                  Type         : PASSWORD RESET OTP
+                  Target Email : {}
+                  OTP Code     : {}
+                  (In production, configure EmailJS, Resend, or Gmail SMTP to dispatch real emails)
+                 =================================================================""", toEmail, otp);
     }
 
     /**
@@ -159,13 +167,15 @@ public class ResendEmailService {
             return;
         }
 
-        log.warn("\n=================================================================\n" +
-                 " [DEV MODE] Neither EMAILJS, RESEND_API_KEY nor MAIL_USERNAME is configured.\n" +
-                 " Type         : STUDENT REGISTRATION EMAIL VERIFICATION\n" +
-                 " Target Email : {}\n" +
-                 " OTP Code     : {}\n" +
-                 " (In production, configure EmailJS, Resend, or Gmail SMTP to dispatch real emails)\n" +
-                 "=================================================================", toEmail, otp);
+        log.warn("""
+                 
+                 =================================================================
+                  [DEV MODE] Neither EMAILJS, RESEND_API_KEY nor MAIL_USERNAME is configured.
+                  Type         : STUDENT REGISTRATION EMAIL VERIFICATION
+                  Target Email : {}
+                  OTP Code     : {}
+                  (In production, configure EmailJS, Resend, or Gmail SMTP to dispatch real emails)
+                 =================================================================""", toEmail, otp);
     }
 
     /**
@@ -217,17 +227,19 @@ public class ResendEmailService {
             provider = "SMTP";
         } else {
             provider = "DEV_CONSOLE";
-            log.warn("\n=================================================================\n" +
-                     " [DEV MODE] Test email dispatched.\n" +
-                     " Provider     : NONE (Console Log Only)\n" +
-                     " Target Email : {}\n" +
-                     " OTP Code     : {}\n" +
-                     "=================================================================", toEmail, testOtp);
+            log.warn("""
+                     
+                     =================================================================
+                      [DEV MODE] Test email dispatched.
+                      Provider     : NONE (Console Log Only)
+                      Target Email : {}
+                      OTP Code     : {}
+                     =================================================================""", toEmail, testOtp);
         }
 
         return Map.of(
                 "status", "SUCCESS",
-                "message", "Test verification email dispatched successfully to " + toEmail.trim(),
+                MESSAGE_KEY, "Test verification email dispatched successfully to " + toEmail.trim(),
                 "provider", provider,
                 "emailJsConfigured", isEmailJsConfigured(),
                 "resendConfigured", isConfigured(),
@@ -251,7 +263,7 @@ public class ResendEmailService {
         templateParams.put("otp", otp != null ? otp : "");
         templateParams.put("code", otp != null ? otp : "");
         templateParams.put("subject", subject);
-        templateParams.put("message", message != null ? message : "");
+        templateParams.put(MESSAGE_KEY, message != null ? message : "");
         templateParams.put("expiry_minutes", "10");
         templateParams.put("app_name", "MentorSync");
         templateParams.put("support_email", "support@mentorsync.dev");
@@ -269,7 +281,7 @@ public class ResendEmailService {
             String jsonBody = objectMapper.writeValueAsString(payload);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.emailjs.com/api/v1.0/email/send"))
-                    .header("Content-Type", "application/json")
+                    .header("Content-Type", APPLICATION_JSON)
                     .header("Accept", "application/json, text/plain, */*")
                     .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody, StandardCharsets.UTF_8))
@@ -288,6 +300,10 @@ public class ResendEmailService {
         } catch (java.net.http.HttpTimeoutException e) {
             log.error("EmailJS request timed out for {}: {}", toEmail, e.getMessage());
             throw new ValidationFailedException("Verification email service timed out. Please try again or check EmailJS settings.");
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.error("EmailJS sending interrupted for {}: {}", toEmail, ie.getMessage(), ie);
+            throw new ValidationFailedException("Verification email dispatch was interrupted. Please try again.");
         } catch (Exception e) {
             log.error("Exception sending email via EmailJS to {}: {}", toEmail, e.getMessage(), e);
             throw new ValidationFailedException("Unable to send verification email. Please try again later.");
@@ -336,8 +352,8 @@ public class ResendEmailService {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.resend.com/emails"))
                     .header("Authorization", "Bearer " + resendApiKey)
-                    .header("Content-Type", "application/json")
-                    .header("Accept", "application/json")
+                    .header("Content-Type", APPLICATION_JSON)
+                    .header("Accept", APPLICATION_JSON)
                     .timeout(Duration.ofSeconds(15))
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody, StandardCharsets.UTF_8))
                     .build();
@@ -353,6 +369,10 @@ public class ResendEmailService {
             }
         } catch (ValidationFailedException vfe) {
             throw vfe;
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.error("Resend email sending interrupted for {}: {}", toEmail, ie.getMessage(), ie);
+            throw new ValidationFailedException("Verification email dispatch was interrupted. Please try again.");
         } catch (Exception e) {
             log.error("Unexpected error sending email via Resend to {}: {}", toEmail, e.getMessage(), e);
             throw new ValidationFailedException("Unable to send verification email at this time. Please try again later.");
@@ -373,15 +393,17 @@ public class ResendEmailService {
             }
 
             if (statusCode == 403 && message != null && message.contains("only send testing emails")) {
-                log.error("\n=================================================================\n" +
-                          " [RESEND CONFIGURATION ACTION REQUIRED]\n" +
-                          " Resend trial domain (onboarding@resend.dev) is restricted to your\n" +
-                          " account owner's email address.\n" +
-                          " To send emails to all students and mentors:\n" +
-                          " 1. Go to https://resend.com/domains and verify your custom domain\n" +
-                          " 2. Set RESEND_FROM_EMAIL to an address on your verified domain\n" +
-                          "    (e.g., MentorSync <auth@yourdomain.com>)\n" +
-                          "=================================================================");
+                log.error("""
+                          
+                          =================================================================
+                           [RESEND CONFIGURATION ACTION REQUIRED]
+                           Resend trial domain (onboarding@resend.dev) is restricted to your
+                           account owner's email address.
+                           To send emails to all students and mentors:
+                           1. Go to https://resend.com/domains and verify your custom domain
+                           2. Set RESEND_FROM_EMAIL to an address on your verified domain
+                              (e.g., MentorSync <auth@yourdomain.com>)
+                          =================================================================""");
                 return "Trial domain restriction: To send to all emails, add and verify your custom domain on resend.com/domains.";
             }
 
@@ -508,8 +530,8 @@ public class ResendEmailService {
             </html>
             """;
         return template
-                .replace("{{GREETING}}", greeting != null ? greeting : "")
-                .replace("{{OTP}}", otp != null ? otp : "");
+                .replace(PLACEHOLDER_GREETING, greeting != null ? greeting : "")
+                .replace(PLACEHOLDER_OTP, otp != null ? otp : "");
     }
 
     private String buildStudentRegistrationOtpHtmlTemplate(String greeting, String otp) {
@@ -622,8 +644,8 @@ public class ResendEmailService {
             </html>
             """;
         return template
-                .replace("{{GREETING}}", greeting != null ? greeting : "")
-                .replace("{{OTP}}", otp != null ? otp : "");
+                .replace(PLACEHOLDER_GREETING, greeting != null ? greeting : "")
+                .replace(PLACEHOLDER_OTP, otp != null ? otp : "");
     }
 
     private String buildNudgeHtmlTemplate(String greeting, String assignmentName, String className) {
@@ -676,7 +698,7 @@ public class ResendEmailService {
             </html>
             """;
         return template
-                .replace("{{GREETING}}", greeting != null ? greeting : "")
+                .replace(PLACEHOLDER_GREETING, greeting != null ? greeting : "")
                 .replace("{{CLASS_NAME}}", className != null ? className : "")
                 .replace("{{ASSIGNMENT_NAME}}", assignmentName != null ? assignmentName : "");
     }

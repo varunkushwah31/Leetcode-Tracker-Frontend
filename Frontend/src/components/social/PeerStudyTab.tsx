@@ -113,7 +113,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
 
     const handleAddReply = async (postId: string) => {
         const text = replyInputs[postId];
-        if (!text || !text.trim()) return;
+        if (!text?.trim()) return;
 
         setIsReplyingId(postId);
         try {
@@ -160,7 +160,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
         <div className="space-y-6">
             {/* Header with Topic Filter & Create Button */}
             <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm space-y-5 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3.5">
@@ -311,7 +311,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                                         : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20'
                                                 }`}
                                             >
-                                                {post.type.replace(/_/g, ' ')}
+                                                {post.type.replaceAll('_', ' ')}
                                             </Badge>
                                         </div>
 

@@ -24,6 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private static final String ROLE_SUPER_ADMIN = "SUPER_ADMIN";
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -43,6 +45,7 @@ public class SecurityConfig {
         return new RateLimitingFilter(rateLimitingService, objectMapper);
     }
 
+    @SuppressWarnings({"java:S112", "java:S1130"})
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, RateLimitingFilter rateLimitingFilter) throws Exception {
         http
@@ -66,14 +69,14 @@ public class SecurityConfig {
                         // Auth endpoints
                         .requestMatchers("/api/v1/auth/change-password").authenticated()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole(ROLE_SUPER_ADMIN)
 
                         // Allow WebSocket Connections 
                         .requestMatchers("/ws-endpoint/**").permitAll()
 
                         // Mentor & Student Routes
-                        .requestMatchers("/api/classrooms/**").hasAnyRole("MENTOR", "SUPER_ADMIN")
-                        .requestMatchers("/api/paths/**").hasAnyRole("MENTOR", "SUPER_ADMIN")
+                        .requestMatchers("/api/classrooms/**").hasAnyRole("MENTOR", ROLE_SUPER_ADMIN)
+                        .requestMatchers("/api/paths/**").hasAnyRole("MENTOR", ROLE_SUPER_ADMIN)
                         .requestMatchers("/api/students/me/**").hasRole("STUDENT")
                         .requestMatchers("/api/social/**").authenticated()
 

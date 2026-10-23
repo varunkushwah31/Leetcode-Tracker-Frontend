@@ -128,7 +128,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
             <div className="relative group">
                 <div className="relative z-10 bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl overflow-hidden rounded-2xl transition-colors duration-200 p-5 sm:p-7">
                     {/* Subtle gradient accent top line matching StudentDashboard */}
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#5b4fff]/40 dark:via-[#5b4fff]/50 to-transparent pointer-events-none" />
+                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/40 dark:via-[#5b4fff]/50 to-transparent pointer-events-none" />
 
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         {/* Title & Description */}
@@ -155,7 +155,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                         {/* Summary Metrics Cards */}
                         <div className="grid grid-cols-3 gap-2.5 sm:gap-3 shrink-0">
                             {/* Friends Count */}
-                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-[90px] sm:min-w-[105px]">
+                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-22.5 sm:min-w-26.25">
                                 <p className="text-[10px] font-bold tracking-wider uppercase text-zinc-400 flex items-center justify-center gap-1">
                                     <Users className="w-3 h-3 text-[#5b4fff]" /> Friends
                                 </p>

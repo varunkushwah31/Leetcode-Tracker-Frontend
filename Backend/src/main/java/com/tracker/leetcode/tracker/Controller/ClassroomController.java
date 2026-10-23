@@ -33,20 +33,22 @@ public class ClassroomController {
     private final ClassroomRepository classroomRepository;
     private final StudentRepository studentRepository;
     private final EmailService emailService;
+    private static final String MENTOR_ID = "mentorId";
 
     @SuppressWarnings("unchecked")
     private java.util.Map<String, Object> parseJsonBody(jakarta.servlet.http.HttpServletRequest request) {
-        if (request == null) return null;
+        if (request == null) return java.util.Collections.emptyMap();
         String contentType = request.getContentType();
         if (contentType == null || !contentType.toLowerCase().contains("application/json")) {
-            return null;
+            return java.util.Collections.emptyMap();
         }
         try {
             tools.jackson.databind.ObjectMapper mapper = new tools.jackson.databind.ObjectMapper();
-            return mapper.readValue(request.getInputStream(), java.util.Map.class);
+            java.util.Map<String, Object> result = mapper.readValue(request.getInputStream(), java.util.Map.class);
+            return result != null ? result : java.util.Collections.emptyMap();
         } catch (Exception e) {
             log.debug("Could not parse request body as JSON: {}", e.getMessage());
-            return null;
+            return java.util.Collections.emptyMap();
         }
     }
 
@@ -62,7 +64,7 @@ public class ClassroomController {
 
         java.util.Map<String, Object> body = parseJsonBody(request);
         if (body != null) {
-            if (effectiveMentorId == null && body.containsKey("mentorId")) effectiveMentorId = String.valueOf(body.get("mentorId"));
+            if (effectiveMentorId == null && body.containsKey(MENTOR_ID)) effectiveMentorId = String.valueOf(body.get(MENTOR_ID));
             if (effectiveClassName == null && body.containsKey("className")) effectiveClassName = String.valueOf(body.get("className"));
         }
 
@@ -85,9 +87,10 @@ public class ClassroomController {
             @RequestParam(required = false) String mentorId,
             jakarta.servlet.http.HttpServletRequest request) {
 
-        String effectiveIdentifier = identifier != null ? identifier
-                : leetcodeUsername != null ? leetcodeUsername
-                : studentId;
+        String effectiveIdentifier = identifier;
+        if (effectiveIdentifier == null) {
+            effectiveIdentifier = leetcodeUsername != null ? leetcodeUsername : studentId;
+        }
 
         String effectiveMentorId = mentorId;
 
@@ -99,8 +102,8 @@ public class ClassroomController {
                 else if (body.containsKey("studentId")) effectiveIdentifier = String.valueOf(body.get("studentId"));
                 else if (body.containsKey("username")) effectiveIdentifier = String.valueOf(body.get("username"));
             }
-            if (effectiveMentorId == null && body.containsKey("mentorId")) {
-                effectiveMentorId = String.valueOf(body.get("mentorId"));
+            if (effectiveMentorId == null && body.containsKey(MENTOR_ID)) {
+                effectiveMentorId = String.valueOf(body.get(MENTOR_ID));
             }
         }
 
@@ -129,7 +132,10 @@ public class ClassroomController {
             @RequestParam(required = false) String leetcodeUsername,
             @RequestParam(required = false) String mentorId) {
 
-        String effectiveId = studentId != null ? studentId : identifier != null ? identifier : leetcodeUsername;
+        String effectiveId = studentId;
+        if (effectiveId == null) {
+            effectiveId = identifier != null ? identifier : leetcodeUsername;
+        }
         if (effectiveId == null || effectiveId.isBlank()) {
             throw new ValidationFailedException("Student identifier is required to remove student.");
         }
@@ -162,13 +168,6 @@ public class ClassroomController {
 
     // 4. Assign a Question to the Classroom
     // URL: POST /api/classrooms/{id}/assignments
-    /* Body Example:
-       {
-           "titleSlug": "two-sum",
-           "startTimestamp": 1711000000,
-           "endTimestamp": 1711604800
-       }
-    */
     @PostMapping("/{classroomId}/assignments")
     public ResponseEntity<Classroom> assignQuestion(
             @PathVariable String classroomId,
@@ -178,7 +177,6 @@ public class ClassroomController {
 
     // 5. Manually Validate Assignment URL
     // URL: POST /api/classrooms/{classroomId}/students/{username}/assignments/{assignmentId}/validate
-    /* Body: { "url": "https://leetcode.com/problems/two-sum/submissions/123456789/" } */
     @PostMapping("/{classroomId}/students/{username}/assignments/{assignmentId}/validate")
     public ResponseEntity<Student> validateSubmission(
             @PathVariable String classroomId,
@@ -191,7 +189,7 @@ public class ClassroomController {
 
     // Autowire EmailService and StudentRepository at the top of your controller
     @PostMapping("/{classroomId}/students/{studentId}/nudge")
-    public ResponseEntity<?> nudgeStudent(
+    public ResponseEntity<Void> nudgeStudent(
             @PathVariable String classroomId,
             @PathVariable String studentId,
             @RequestParam String assignmentName) {
@@ -292,8 +290,8 @@ public class ClassroomController {
 
         java.util.Map<String, Object> body = parseJsonBody(request);
         if (body != null) {
-            if (effectiveMentorId == null && body.containsKey("mentorId")) {
-                effectiveMentorId = String.valueOf(body.get("mentorId"));
+            if (effectiveMentorId == null && body.containsKey(MENTOR_ID)) {
+                effectiveMentorId = String.valueOf(body.get(MENTOR_ID));
             }
             if (effectiveDeadline == null && (body.containsKey("newEndTimestamp") || body.containsKey("endTimestamp"))) {
                 Object rawTs = body.getOrDefault("newEndTimestamp", body.get("endTimestamp"));

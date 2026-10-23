@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SocialService {
 
+    private static final String MATCH_NOT_FOUND = "Match not found";
+
     private final StudentRepository studentRepository;
     private final FriendshipRepository friendshipRepository;
     private final PvpMatchRepository pvpMatchRepository;
@@ -144,7 +146,7 @@ public class SocialService {
                             .friendshipId(friendshipId)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Friendship sendFriendRequest(String requesterId, String targetStudentId) {
@@ -464,7 +466,7 @@ public class SocialService {
 
     private String toKebabSlug(String text) {
         if (text == null || text.isBlank()) return "";
-        return text.trim().toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-+|-+$", "");
+        return text.trim().toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("(?:^-+)|(?:-+$)", "");
     }
 
     private Map<String, String> extractSolvedCatalog(Student student) {
@@ -553,7 +555,7 @@ public class SocialService {
             if (curated.getTopic() != null) topic = curated.getTopic();
         }
 
-        int duration = request.getDurationMinutes() > 0 ? Math.min(Math.max(request.getDurationMinutes(), 10), 120) : 30;
+        int duration = request.getDurationMinutes() > 0 ? Math.clamp(request.getDurationMinutes(), 10, 120) : 30;
 
         PvpMatch match = PvpMatch.builder()
                 .challengerId(challenger.getId())
@@ -593,7 +595,7 @@ public class SocialService {
 
     public PvpMatchDTO acceptPvpMatch(String currentStudentId, String matchId) {
         PvpMatch match = pvpMatchRepository.findById(matchId)
-                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+                .orElseThrow(() -> new IllegalArgumentException(MATCH_NOT_FOUND));
 
         if (!match.getOpponentId().equals(currentStudentId)) {
             throw new IllegalStateException("Only the invited opponent can accept this duel.");
@@ -631,7 +633,7 @@ public class SocialService {
 
     public PvpMatchDTO declinePvpMatch(String currentStudentId, String matchId) {
         PvpMatch match = pvpMatchRepository.findById(matchId)
-                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+                .orElseThrow(() -> new IllegalArgumentException(MATCH_NOT_FOUND));
 
         if (!match.getOpponentId().equals(currentStudentId) && !match.getChallengerId().equals(currentStudentId)) {
             throw new IllegalStateException("Not authorized to decline this match.");
@@ -648,7 +650,7 @@ public class SocialService {
 
     public PvpMatchDTO endPvpMatchPreemptively(String currentStudentId, String matchId) {
         PvpMatch match = pvpMatchRepository.findById(matchId)
-                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+                .orElseThrow(() -> new IllegalArgumentException(MATCH_NOT_FOUND));
 
         if (!match.getChallengerId().equals(currentStudentId) && !match.getOpponentId().equals(currentStudentId)) {
             throw new IllegalStateException("You are not a participant in this duel.");
@@ -712,7 +714,7 @@ public class SocialService {
 
     public PvpMatchDTO verifyPvpMatch(String currentStudentId, String matchId, String submissionUrl) {
         PvpMatch match = pvpMatchRepository.findById(matchId)
-                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+                .orElseThrow(() -> new IllegalArgumentException(MATCH_NOT_FOUND));
 
         if (!match.getChallengerId().equals(currentStudentId) && !match.getOpponentId().equals(currentStudentId)) {
             throw new IllegalStateException("You are not a participant in this duel.");
@@ -874,12 +876,12 @@ public class SocialService {
         return matches.stream()
                 .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
                 .map(this::toPvpMatchDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public PvpMatchDTO getPvpMatch(String matchId) {
         PvpMatch match = pvpMatchRepository.findById(matchId)
-                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+                .orElseThrow(() -> new IllegalArgumentException(MATCH_NOT_FOUND));
 
         if (match.getStatus() == PvpMatchStatus.IN_PROGRESS && match.getExpiresAt() != null && Instant.now().isAfter(match.getExpiresAt())) {
             resolveExpiredMatch(match);
@@ -964,14 +966,16 @@ public class SocialService {
                         a.setTargetStudentAvatarUrl(f.getAvatarUrl());
                         try {
                             friendActivityRepository.save(a);
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                            // Best-effort auto-heal persistence failure ignored
+                        }
                         break;
                     }
                 }
             }
 
             return toActivityDTO(a, currentStudentId);
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     private FriendActivityDTO toActivityDTO(FriendActivity a, String currentStudentId) {
@@ -1131,7 +1135,7 @@ public class SocialService {
 
         List<Student> students = studentRepository.findAllById(targetIds);
 
-        List<FriendsLeaderboardEntryDTO> entries = students.stream().map(s -> {
+        List<FriendsLeaderboardEntryDTO> entries = new ArrayList<>(students.stream().map(s -> {
             int lcSolved = studentMapper.calculateLeetcodeSolved(s.getProblemStats());
             int cfSolved = s.getCodeforcesSolvedCount() != null ? s.getCodeforcesSolvedCount() : 0;
             int total = lcSolved + cfSolved;
@@ -1158,7 +1162,7 @@ public class SocialService {
                     .pvpWinRate(Math.round(winRate * 10.0) / 10.0)
                     .isCurrentUser(s.getId().equals(currentStudentId))
                     .build();
-        }).collect(Collectors.toList());
+        }).toList());
 
         // Sort comparator
         String criterion = sortBy != null ? sortBy.toLowerCase() : "totalsolved";
@@ -1199,7 +1203,7 @@ public class SocialService {
             posts = peerStudyPostRepository.findAllByOrderByCreatedAtDesc(page);
         }
 
-        return posts.stream().map(p -> toPeerStudyPostDTO(p, currentStudentId)).collect(Collectors.toList());
+        return posts.stream().map(p -> toPeerStudyPostDTO(p, currentStudentId)).toList();
     }
 
     public PeerStudyPostDTO createPeerStudyPost(String currentStudentId, CreatePeerStudyPostRequest request) {

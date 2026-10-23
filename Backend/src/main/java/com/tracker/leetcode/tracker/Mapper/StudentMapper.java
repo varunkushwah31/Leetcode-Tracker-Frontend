@@ -171,6 +171,7 @@ public class StudentMapper {
         return calculateStreak(history, (List<RecentSubmission>) null);
     }
 
+    @SuppressWarnings("java:S1172")
     public int calculateStreak(List<DailyProgress> history, Integer ignoredOfficialStreak, List<RecentSubmission> recentSubmissions) {
         return calculateStreak(history, recentSubmissions);
     }

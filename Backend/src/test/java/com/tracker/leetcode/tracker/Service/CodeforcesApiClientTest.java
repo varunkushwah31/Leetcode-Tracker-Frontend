@@ -68,8 +68,9 @@ class CodeforcesApiClientTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(anyString())).thenReturn(null);
 
+        Exception timeoutEx = new RuntimeException("Timeout");
         assertThrows(CodeforcesApiException.class, () ->
-                client.fetchUserInfoFallback("unknown_handle", new RuntimeException("Timeout")));
+                client.fetchUserInfoFallback("unknown_handle", timeoutEx));
     }
 
     @Test

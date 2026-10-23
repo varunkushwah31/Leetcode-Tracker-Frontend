@@ -15,12 +15,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class HealthController {
 
+    private static final String STATUS_KEY = "status";
+
     private final RedisConnectionFactory redisConnectionFactory;
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> response = new HashMap<>();
-        response.put("status", "UP");
+        response.put(STATUS_KEY, "UP");
         response.put("timestamp", Instant.now().toString());
         response.put("service", "leetcode-tracker-backend");
 
@@ -30,11 +32,11 @@ public class HealthController {
             try (RedisConnection connection = redisConnectionFactory.getConnection()) {
                 String ping = connection.ping();
                 long latency = System.currentTimeMillis() - start;
-                redisHealth.put("status", "PONG".equalsIgnoreCase(ping) ? "UP" : "DOWN");
+                redisHealth.put(STATUS_KEY, "PONG".equalsIgnoreCase(ping) ? "UP" : "DOWN");
                 redisHealth.put("latencyMs", latency);
             }
         } catch (Exception ex) {
-            redisHealth.put("status", "DOWN");
+            redisHealth.put(STATUS_KEY, "DOWN");
             redisHealth.put("error", ex.getMessage());
         }
         response.put("redis", redisHealth);

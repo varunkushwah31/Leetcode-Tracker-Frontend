@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,13 +44,13 @@ public class JwtService {
         // Inject roles ONLY if they haven't already been provided
         claims.putIfAbsent("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+                .toList());
 
         return Jwts.builder()
                 .claims(claims) // Modern syntax
                 .subject(userDetails.getUsername()) // Modern syntax
-                .issuedAt(new Date(System.currentTimeMillis())) // Modern syntax
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration)) // Modern syntax
+                .issuedAt(Date.from(Instant.now())) // Modern syntax
+                .expiration(Date.from(Instant.now().plusMillis(jwtExpiration))) // Modern syntax
                 .signWith(getSignInKey()) // Automatically uses the best algorithm
                 .compact();
     }
@@ -71,8 +71,8 @@ public class JwtService {
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
-        if (claims == null) {
-            return null; // Return null safely if parsing failed
+        if (claims == null || claims.isEmpty()) {
+            return null;
         }
         return claimsResolver.apply(claims);
     }
@@ -95,7 +95,7 @@ public class JwtService {
         } catch (IllegalArgumentException e) {
             log.warn("JWT claims string is empty: {}", e.getMessage());
         }
-        return null;
+        return io.jsonwebtoken.Jwts.claims().build();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

@@ -13,6 +13,10 @@ import java.util.*;
 @Service
 public class RedisLeaderboardService {
 
+    private static final String META_LC_USERNAME = "lcUsername";
+    private static final String META_CF_HANDLE = "cfHandle";
+    private static final String META_AVATAR_URL = "avatarUrl";
+
     public static final String METRIC_SOLVED = "solved";
     public static final String METRIC_RATING = "rating";
     public static final String METRIC_STREAK = "streak";
@@ -50,9 +54,9 @@ public class RedisLeaderboardService {
             String metaKey = STUDENT_META_PREFIX + studentId;
             Map<String, String> metaMap = new HashMap<>();
             metaMap.put("name", name != null ? name : "Student");
-            metaMap.put("lcUsername", lcUsername != null ? lcUsername : "");
-            metaMap.put("cfHandle", cfHandle != null ? cfHandle : "");
-            metaMap.put("avatarUrl", avatarUrl != null ? avatarUrl : "");
+            metaMap.put(META_LC_USERNAME, lcUsername != null ? lcUsername : "");
+            metaMap.put(META_CF_HANDLE, cfHandle != null ? cfHandle : "");
+            metaMap.put(META_AVATAR_URL, avatarUrl != null ? avatarUrl : "");
             stringRedisTemplate.opsForHash().putAll(metaKey, metaMap);
             stringRedisTemplate.expire(metaKey, Duration.ofDays(14));
 
@@ -109,9 +113,9 @@ public class RedisLeaderboardService {
                 Map<Object, Object> meta = stringRedisTemplate.opsForHash().entries(metaKey);
 
                 String name = meta.get("name") != null ? meta.get("name").toString() : studentId;
-                String lc = meta.get("lcUsername") != null ? meta.get("lcUsername").toString() : "";
-                String cf = meta.get("cfHandle") != null ? meta.get("cfHandle").toString() : "";
-                String avatar = meta.get("avatarUrl") != null ? meta.get("avatarUrl").toString() : "";
+                String lc = meta.get(META_LC_USERNAME) != null ? meta.get(META_LC_USERNAME).toString() : "";
+                String cf = meta.get(META_CF_HANDLE) != null ? meta.get(META_CF_HANDLE).toString() : "";
+                String avatar = meta.get(META_AVATAR_URL) != null ? meta.get(META_AVATAR_URL).toString() : "";
 
                 entries.add(LeaderboardEntryDTO.builder()
                         .rank(currentRank++)
@@ -187,8 +191,8 @@ public class RedisLeaderboardService {
     private String normalizeMetric(String metric) {
         if (metric == null || metric.isBlank()) return METRIC_SOLVED;
         return switch (metric.toLowerCase().trim()) {
-            case "rating", "contest" -> METRIC_RATING;
-            case "streak", "consistency" -> METRIC_STREAK;
+            case METRIC_RATING, "contest" -> METRIC_RATING;
+            case METRIC_STREAK, "consistency" -> METRIC_STREAK;
             default -> METRIC_SOLVED;
         };
     }

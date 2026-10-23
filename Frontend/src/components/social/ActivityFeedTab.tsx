@@ -92,7 +92,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
         <div className="space-y-6">
             {/* Header with filter buttons */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
 
                 <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
@@ -232,7 +232,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                                             : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20'
                                                     }`}
                                                 >
-                                                    {act.type.replace(/_/g, ' ')}
+                                                    {act.type.replaceAll('_', ' ')}
                                                 </Badge>
                                                 <span className="text-[10px] text-zinc-400 flex items-center gap-1 font-medium">
                                                     <Clock className="w-3 h-3" />

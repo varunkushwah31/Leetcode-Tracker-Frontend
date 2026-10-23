@@ -24,11 +24,16 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ContestScheduleService {
+
+    private static final String CACHE_UPCOMING_CONTESTS = "upcoming-contests";
+    private static final String PLATFORM_LEETCODE = "LEETCODE";
+    private static final String PLATFORM_CODEFORCES = "CODEFORCES";
+    private static final String PHASE_BEFORE = "BEFORE";
+    private static final String TYPE_CODING = "CODING";
 
     private final CacheManager cacheManager;
     private final RestTemplate restTemplate;
@@ -45,6 +50,7 @@ public class ContestScheduleService {
         this.virtualThreadExecutor = virtualThreadExecutor;
     }
 
+    @SuppressWarnings("java:S1172")
     public ContestScheduleService(
             RedisTemplate<String, Object> redisTemplate,
             CacheManager cacheManager,
@@ -52,6 +58,7 @@ public class ContestScheduleService {
         this(cacheManager, restTemplate, null);
     }
 
+    @SuppressWarnings("java:S1172")
     public ContestScheduleService(RedisTemplate<String, Object> redisTemplate, CacheManager cacheManager) {
         this(cacheManager, null, null);
     }
@@ -69,7 +76,7 @@ public class ContestScheduleService {
      * Cached globally in Redis under "upcoming-contests" with platform keys ("ALL", "LEETCODE", "CODEFORCES").
      * Shared across all users with a 30-minute TTL without user-level computation.
      */
-    @Cacheable(value = "upcoming-contests", key = "#platformFilter != null && !#platformFilter.isBlank() ? #platformFilter.toUpperCase() : 'ALL'")
+    @Cacheable(value = CACHE_UPCOMING_CONTESTS, key = "#platformFilter != null && !#platformFilter.isBlank() ? #platformFilter.toUpperCase() : 'ALL'")
     public List<UpcomingContestDTO> getUpcomingContests(String platformFilter) {
         String filterKey = (platformFilter != null && !platformFilter.isBlank())
                 ? platformFilter.trim().toUpperCase()
@@ -77,7 +84,7 @@ public class ContestScheduleService {
 
         if (cacheManager != null) {
             try {
-                Cache cache = cacheManager.getCache("upcoming-contests");
+                Cache cache = cacheManager.getCache(CACHE_UPCOMING_CONTESTS);
                 if (cache != null) {
                     @SuppressWarnings("unchecked")
                     List<UpcomingContestDTO> cached = cache.get(filterKey, List.class);
@@ -100,7 +107,7 @@ public class ContestScheduleService {
 
         return allContests.stream()
                 .filter(c -> filterKey.equalsIgnoreCase(c.getPlatform()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -136,12 +143,12 @@ public class ContestScheduleService {
 
                     List<UpcomingContestDTO> lcList = allContests.stream()
                             .filter(c -> "LEETCODE".equalsIgnoreCase(c.getPlatform()))
-                            .collect(Collectors.toList());
+                            .toList();
                     cache.put("LEETCODE", lcList);
 
                     List<UpcomingContestDTO> cfList = allContests.stream()
                             .filter(c -> "CODEFORCES".equalsIgnoreCase(c.getPlatform()))
-                            .collect(Collectors.toList());
+                            .toList();
                     cache.put("CODEFORCES", cfList);
                     log.info("Cached global upcoming contests in Redis under 'upcoming-contests' for ALL, LEETCODE, and CODEFORCES.");
                 }
@@ -152,6 +159,7 @@ public class ContestScheduleService {
         return allContests;
     }
 
+    @SuppressWarnings("java:S6809")
     public List<UpcomingContestDTO> getCachedOrFetchContests() {
         return getUpcomingContests("ALL");
     }
@@ -214,7 +222,7 @@ public class ContestScheduleService {
 
         // Find relevant Sundays (today if Sunday and not ended, plus upcoming)
         LocalDate candidateSunday = utcNow.toLocalDate();
-        if (candidateSunday.getDayOfWeek() == DayOfWeek.SUNDAY) {
+        if (DayOfWeek.SUNDAY.equals(candidateSunday.getDayOfWeek())) {
             ZonedDateTime sundayEnd = candidateSunday.atTime(4, 0).atZone(utc);
             if (utcNow.isAfter(sundayEnd)) {
                 candidateSunday = candidateSunday.with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
@@ -233,14 +241,14 @@ public class ContestScheduleService {
             long weeksDiff = ChronoUnit.WEEKS.between(refSunday, sunday);
             int contestNum = refWeeklyNum + (int) weeksDiff;
 
-            String phase = "BEFORE";
+            String phase = PHASE_BEFORE;
             if (now.getEpochSecond() >= startSec && now.getEpochSecond() < startSec + durationSec) {
-                phase = "CODING";
+                phase = TYPE_CODING;
             }
 
             list.add(UpcomingContestDTO.builder()
                     .id("LC-WEEKLY-" + contestNum)
-                    .platform("LEETCODE")
+                    .platform(PLATFORM_LEETCODE)
                     .title("LeetCode Weekly Contest " + contestNum)
                     .startTimeSeconds(startSec)
                     .durationSeconds(durationSec)
@@ -255,7 +263,7 @@ public class ContestScheduleService {
         int refBiweeklyNum = 141;
 
         LocalDate candidateSaturday = utcNow.toLocalDate();
-        if (candidateSaturday.getDayOfWeek() == DayOfWeek.SATURDAY) {
+        if (DayOfWeek.SATURDAY.equals(candidateSaturday.getDayOfWeek())) {
             ZonedDateTime satEnd = candidateSaturday.atTime(16, 0).atZone(utc);
             if (utcNow.isAfter(satEnd)) {
                 candidateSaturday = candidateSaturday.with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
@@ -275,14 +283,14 @@ public class ContestScheduleService {
                 long durationSec = 5400;
                 int contestNum = refBiweeklyNum + (int) (daysDiff / 14);
 
-                String phase = "BEFORE";
+                String phase = PHASE_BEFORE;
                 if (now.getEpochSecond() >= startSec && now.getEpochSecond() < startSec + durationSec) {
-                    phase = "CODING";
+                    phase = TYPE_CODING;
                 }
 
                 list.add(UpcomingContestDTO.builder()
                         .id("LC-BIWEEKLY-" + contestNum)
-                        .platform("LEETCODE")
+                        .platform(PLATFORM_LEETCODE)
                         .title("LeetCode Biweekly Contest " + contestNum)
                         .startTimeSeconds(startSec)
                         .durationSeconds(durationSec)
@@ -298,7 +306,7 @@ public class ContestScheduleService {
         return list.stream()
                 .sorted(Comparator.comparingLong(UpcomingContestDTO::getStartTimeSeconds))
                 .limit(2)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -346,7 +354,7 @@ public class ContestScheduleService {
 
                         list.add(UpcomingContestDTO.builder()
                                 .id("CF-" + id)
-                                .platform("CODEFORCES")
+                                .platform(PLATFORM_CODEFORCES)
                                 .title(name)
                                 .startTimeSeconds(startTime)
                                 .durationSeconds(duration)

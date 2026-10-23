@@ -35,6 +35,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AdminService {
 
+    private static final String MESSAGE_KEY = "message";
+
     private final StudentRepository studentRepository;
     private final MentorRepository mentorRepository;
     private final ClassroomRepository classroomRepository;
@@ -96,7 +98,7 @@ public class AdminService {
                     .build();
         } catch (Exception e) {
             log.error("Failed to generate system overview: {}", e.getMessage());
-            throw new RuntimeException("Failed to generate system overview. Please try again later.");
+            throw new IllegalStateException("Failed to generate system overview. Please try again later.", e);
         }
     }
 
@@ -137,7 +139,7 @@ public class AdminService {
 
         studentService.syncAllProfileData(identifier);
         log.info("SUPER ADMIN ACTION: Synced profile for student: {} ({})", student.getName(), identifier);
-        return Map.of("message", "Profile synced successfully for " + student.getName() + ".");
+        return Map.of(MESSAGE_KEY, "Profile synced successfully for " + student.getName() + ".");
     }
 
     public MentorDTO createMentor(RegisterRequest request) {
@@ -201,7 +203,7 @@ public class AdminService {
         }
 
         log.info("SUPER ADMIN ACTION: Forced global sync completed.");
-        return Map.of("message", "Successfully synced " + successCount + " out of " + allStudents.size() + " students.");
+        return Map.of(MESSAGE_KEY, "Successfully synced " + successCount + " out of " + allStudents.size() + " students.");
     }
 
     public Map<String, Object> getCacheStats() {
@@ -260,14 +262,14 @@ public class AdminService {
                 }
             }
             log.info("SUPER ADMIN ACTION: Cleared ALL Spring Redis caches.");
-            return Map.of("message", "All caches successfully cleared.");
+            return Map.of(MESSAGE_KEY, "All caches successfully cleared.");
         }
 
         Cache cache = cacheManager.getCache(cacheName);
         if (cache != null) {
             cache.clear();
             log.info("SUPER ADMIN ACTION: Cleared cache '{}'.", cacheName);
-            return Map.of("message", "Cache '" + cacheName + "' successfully cleared.");
+            return Map.of(MESSAGE_KEY, "Cache '" + cacheName + "' successfully cleared.");
         } else {
             return Map.of("error", "Cache '" + cacheName + "' not found.");
         }

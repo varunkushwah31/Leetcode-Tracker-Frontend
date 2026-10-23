@@ -5,11 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CodeforcesContestHistory {
+public class CodeforcesContestHistory implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int contestId;
     private String contestName;
     private int rank;

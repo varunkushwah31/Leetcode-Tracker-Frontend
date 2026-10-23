@@ -62,7 +62,7 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
         <div className="space-y-6">
             {/* Sort Switcher Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-amber-500/50 to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-amber-500/50 to-transparent pointer-events-none" />
 
                 <div className="flex items-center gap-3.5">
                     <div className="p-3 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-500">
@@ -456,7 +456,7 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                     {/* Leaderboard Data Table */}
                     <div className="rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 overflow-hidden shadow-sm">
                         <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-left border-collapse min-w-[700px]">
+                            <table className="w-full text-left border-collapse min-w-175">
                                 <thead>
                                     <tr className="border-b border-zinc-200/80 dark:border-zinc-800/70 bg-zinc-50/70 dark:bg-zinc-900/40 text-[11px] font-extrabold uppercase tracking-wider text-zinc-500">
                                         <th className="py-3.5 px-5 w-16 text-center">Rank</th>

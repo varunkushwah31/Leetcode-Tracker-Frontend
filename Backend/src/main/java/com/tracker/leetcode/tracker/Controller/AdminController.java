@@ -20,6 +20,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AdminController {
 
+    private static final String MESSAGE_KEY = "message";
+
     private final AdminService adminService;
     private final com.tracker.leetcode.tracker.Service.CacheWarmingService cacheWarmingService;
     private final com.tracker.leetcode.tracker.Service.ResendEmailService resendEmailService;
@@ -35,13 +37,13 @@ public class AdminController {
     }
 
     @DeleteMapping("/students/{id}")
-    public ResponseEntity<?> deleteStudent(@PathVariable String id) {
+    public ResponseEntity<Map<String, String>> deleteStudent(@PathVariable String id) {
         adminService.deleteStudent(id);
-        return ResponseEntity.ok(Map.of("message", "Student deleted successfully."));
+        return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Student deleted successfully."));
     }
 
     @PostMapping("/students/{id}/sync")
-    public ResponseEntity<?> syncStudent(@PathVariable String id) {
+    public ResponseEntity<Map<String, String>> syncStudent(@PathVariable String id) {
         return ResponseEntity.ok(adminService.syncStudent(id));
     }
 
@@ -51,19 +53,19 @@ public class AdminController {
     }
 
     @DeleteMapping("/mentors/{id}")
-    public ResponseEntity<?> deleteMentor(@PathVariable String id) {
+    public ResponseEntity<Map<String, String>> deleteMentor(@PathVariable String id) {
         adminService.deleteMentor(id);
-        return ResponseEntity.ok(Map.of("message", "Mentor and associated classrooms deleted successfully."));
+        return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Mentor and associated classrooms deleted successfully."));
     }
 
     @DeleteMapping("/classrooms/{id}")
-    public ResponseEntity<?> deleteClassroom(@PathVariable String id) {
+    public ResponseEntity<Map<String, String>> deleteClassroom(@PathVariable String id) {
         adminService.deleteClassroom(id);
-        return ResponseEntity.ok(Map.of("message", "Classroom deleted successfully."));
+        return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Classroom deleted successfully."));
     }
 
     @PostMapping("/sync-all")
-    public ResponseEntity<?> forceGlobalSync() {
+    public ResponseEntity<Map<String, String>> forceGlobalSync() {
         return ResponseEntity.ok(adminService.forceGlobalSync());
     }
 

@@ -83,7 +83,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             try {
                 const res = await SocialService.searchStudents(searchQuery);
                 const rawResults: SocialSearchStudentDTO[] = res.data || [];
-                setSearchResults(rawResults.filter(s => s.id !== user?.id && (!user?.email || s.email?.toLowerCase() !== user.email.toLowerCase())));
+                setSearchResults(rawResults.filter(s => s.id !== user?.id && (s.email?.toLowerCase() !== user?.email?.toLowerCase())));
             } catch (err) {
                 console.error('Failed to search students:', err);
             } finally {
@@ -194,7 +194,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
 
             {/* Find Friends Search Card */}
             <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden space-y-4">
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
@@ -391,7 +391,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 hover:border-[#5b4fff]/50 hover:shadow-lg hover:shadow-[#5b4fff]/5 transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
                             >
                                 {/* Gradient top border accent */}
-                                <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/30 to-transparent group-hover:via-[#5b4fff]/70 transition-colors" />
+                                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/30 to-transparent group-hover:via-[#5b4fff]/70 transition-colors" />
 
                                 {/* Friend Header */}
                                 <div className="flex items-start justify-between gap-3">
