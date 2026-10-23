@@ -16,5 +16,8 @@ public interface PvpMatchRepository extends MongoRepository<PvpMatch, String> {
     @Query("{ '$and': [ { '$or': [ { 'challengerId': ?0, 'opponentId': ?1 }, { 'challengerId': ?1, 'opponentId': ?0 } ] }, { 'status': 'COMPLETED' } ] }")
     List<PvpMatch> findHeadToHeadCompleted(String studentA, String studentB);
 
+    @Query("{ '$and': [ { '$or': [ { 'challengerId': ?0 }, { 'opponentId': ?0 } ] }, { 'status': ?1 } ] }")
+    List<PvpMatch> findByStudentIdAndStatus(String studentId, PvpMatchStatus status);
+
     List<PvpMatch> findByStatusAndExpiresAtBefore(PvpMatchStatus status, Instant now);
 }

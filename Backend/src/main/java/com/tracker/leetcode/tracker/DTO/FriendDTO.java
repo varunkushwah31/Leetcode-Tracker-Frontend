@@ -34,4 +34,5 @@ public class FriendDTO implements Serializable {
     private Instant friendSince;
     private Instant lastActive;
     private boolean isOnline;
+    private boolean isBusy;
 }

@@ -100,9 +100,37 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
         return () => clearInterval(timer);
     }, []);
 
+    const activeMatches = matches.filter(m => m.status === 'IN_PROGRESS' || m.status === 'INVITED');
+    const isCurrentUserBusy = activeMatches.some(m => m.status === 'IN_PROGRESS');
+
     const handleCreateDuel = async () => {
         if (!selectedFriendId) {
             setFeedback({ text: 'Please select a friend to duel.', type: 'error' });
+            return;
+        }
+
+        if (isCurrentUserBusy) {
+            setFeedback({
+                text: 'You are already in an active PvP duel. You cannot enter another PvP duel until your current duel is completed.',
+                type: 'error'
+            });
+            return;
+        }
+
+        const target = friends.find(f => f.id === selectedFriendId);
+        if (!target?.isOnline) {
+            setFeedback({
+                text: 'PvP duel can only happen when both users are live and active. Your friend is currently offline.',
+                type: 'error'
+            });
+            return;
+        }
+
+        if (target?.isBusy) {
+            setFeedback({
+                text: `${target.name} is currently busy in another PvP duel. Please wait until their duel finishes.`,
+                type: 'error'
+            });
             return;
         }
 
@@ -135,6 +163,14 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
     };
 
     const handleAcceptMatch = async (matchId: string) => {
+        if (isCurrentUserBusy) {
+            setFeedback({
+                text: 'You are already in an active PvP duel. You cannot enter another PvP duel until your current duel is completed.',
+                type: 'error'
+            });
+            return;
+        }
+
         try {
             await SocialService.acceptPvpMatch(matchId);
             setFeedback({ text: 'Duel started! Both clocks are ticking. Good luck!', type: 'success' });
@@ -191,7 +227,6 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
-    const activeMatches = matches.filter(m => m.status === 'IN_PROGRESS' || m.status === 'INVITED');
     const pastMatches = matches.filter(m => m.status === 'COMPLETED' || m.status === 'DRAW' || m.status === 'DECLINED' || m.status === 'EXPIRED');
 
     const wonMatchesCount = pastMatches.filter(m => m.winnerId === user?.id).length;
@@ -464,7 +499,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                                 <div className="flex items-center gap-2.5 pt-1">
                                                     <Button
                                                         onClick={() => handleAcceptMatch(match.id)}
-                                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold h-9 gap-1.5 cursor-pointer shadow-xs"
+                                                        disabled={isCurrentUserBusy}
+                                                        title={isCurrentUserBusy ? "Cannot accept while already in an active duel" : ""}
+                                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold h-9 gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                                                     >
                                                         <Check className="w-3.5 h-3.5" /> Accept Duel Challenge
                                                     </Button>
@@ -669,18 +706,26 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                         </div>
 
                         <div className="space-y-3.5">
+                            {isCurrentUserBusy && (
+                                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-semibold flex items-center gap-2">
+                                    <Clock className="w-4 h-4 shrink-0" />
+                                    <span>You are currently in an active duel. Complete your duel before challenging others!</span>
+                                </div>
+                            )}
+
                             {/* Choose Friend */}
                             <div className="space-y-1">
-                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Friend</label>
+                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Friend (Live & Ready)</label>
                                 <select
                                     value={selectedFriendId}
                                     onChange={(e) => setSelectedFriendId(e.target.value)}
-                                    className="w-full h-9 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#5b4fff]"
+                                    disabled={isCurrentUserBusy}
+                                    className="w-full h-9 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#5b4fff] disabled:opacity-50"
                                 >
                                     <option value="">Select a friend to challenge...</option>
                                     {friends.map((f) => (
-                                        <option key={f.id} value={f.id}>
-                                            {f.name} {f.isOnline ? '(Live Now)' : ''}
+                                        <option key={f.id} value={f.id} disabled={!f.isOnline || f.isBusy}>
+                                            {f.name} {f.isBusy ? '(Busy in Duel)' : f.isOnline ? '(Live & Ready)' : '(Offline)'}
                                         </option>
                                     ))}
                                 </select>
@@ -748,8 +793,8 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
                             <Button
                                 onClick={handleCreateDuel}
-                                disabled={isCreating || !selectedFriendId}
-                                className="w-full bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-9.5 gap-1.5 shadow-sm cursor-pointer mt-1"
+                                disabled={isCreating || !selectedFriendId || isCurrentUserBusy}
+                                className="w-full bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-9.5 gap-1.5 shadow-sm cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isCreating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                                 Send 1v1 Challenge
@@ -845,18 +890,26 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                     </DialogHeader>
 
                     <div className="space-y-3.5 pt-2">
+                        {isCurrentUserBusy && (
+                            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-semibold flex items-center gap-2">
+                                <Clock className="w-4 h-4 shrink-0" />
+                                <span>You are currently in an active duel. Complete your duel before issuing new challenges!</span>
+                            </div>
+                        )}
+
                         {/* Select Opponent */}
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Choose Friend</label>
+                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Choose Friend (Live & Ready)</label>
                             <select
                                 value={selectedFriendId}
                                 onChange={(e) => setSelectedFriendId(e.target.value)}
-                                className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none"
+                                disabled={isCurrentUserBusy}
+                                className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none disabled:opacity-50"
                             >
                                 <option value="">Select a friend to challenge...</option>
                                 {friends.map((f) => (
-                                    <option key={f.id} value={f.id}>
-                                        {f.name} {f.isOnline ? '(Live Now)' : ''}
+                                    <option key={f.id} value={f.id} disabled={!f.isOnline || f.isBusy}>
+                                        {f.name} {f.isBusy ? '(Busy in Duel)' : f.isOnline ? '(Live & Ready)' : '(Offline)'}
                                     </option>
                                 ))}
                             </select>
@@ -956,8 +1009,8 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                             </Button>
                             <Button
                                 onClick={handleCreateDuel}
-                                disabled={isCreating || !selectedFriendId}
-                                className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4 h-9 gap-1.5 shadow-sm cursor-pointer"
+                                disabled={isCreating || !selectedFriendId || isCurrentUserBusy}
+                                className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4 h-9 gap-1.5 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isCreating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                                 Issue Challenge

@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -52,11 +53,13 @@ class SocialServiceTest {
         studentA.setId("userA");
         studentA.setEmail("alice@test.com");
         studentA.setFriendIds(new ArrayList<>());
+        studentA.setLastSyncedAt(Instant.now());
 
         studentB = new Student("bob_lc", "Bob");
         studentB.setId("userB");
         studentB.setEmail("bob@test.com");
         studentB.setFriendIds(new ArrayList<>());
+        studentB.setLastSyncedAt(Instant.now());
     }
 
     @Test
@@ -212,6 +215,124 @@ class SocialServiceTest {
                 .opponentId("userA")
                 .build();
         assertThrows(IllegalArgumentException.class, () -> socialService.createPvpChallenge("userA", req));
+    }
+
+    @Test
+    void testCreatePvpChallenge_OpponentOffline_Throws() {
+        studentA.getFriendIds().add("userB");
+        studentB.getFriendIds().add("userA");
+        studentB.setLastSyncedAt(null);
+        when(stringRedisTemplate.hasKey("presence:student:userB")).thenReturn(Boolean.FALSE);
+
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(studentRepository.findById("userB")).thenReturn(Optional.of(studentB));
+
+        CreatePvpMatchRequest req = CreatePvpMatchRequest.builder()
+                .opponentId("userB")
+                .build();
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> socialService.createPvpChallenge("userA", req));
+        assertTrue(ex.getMessage().contains("offline"));
+    }
+
+    @Test
+    void testCreatePvpChallenge_ChallengerBusy_Throws() {
+        studentA.getFriendIds().add("userB");
+        studentB.getFriendIds().add("userA");
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(studentRepository.findById("userB")).thenReturn(Optional.of(studentB));
+
+        PvpMatch ongoing = PvpMatch.builder()
+                .id("ongoing1")
+                .challengerId("userA")
+                .status(PvpMatchStatus.IN_PROGRESS)
+                .expiresAt(Instant.now().plus(Duration.ofMinutes(15)))
+                .build();
+        when(pvpMatchRepository.findByStudentIdAndStatus("userA", PvpMatchStatus.IN_PROGRESS))
+                .thenReturn(List.of(ongoing));
+
+        CreatePvpMatchRequest req = CreatePvpMatchRequest.builder()
+                .opponentId("userB")
+                .build();
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> socialService.createPvpChallenge("userA", req));
+        assertTrue(ex.getMessage().contains("already in an active PvP duel"));
+    }
+
+    @Test
+    void testCreatePvpChallenge_OpponentBusy_Throws() {
+        studentA.getFriendIds().add("userB");
+        studentB.getFriendIds().add("userA");
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+        when(studentRepository.findById("userB")).thenReturn(Optional.of(studentB));
+
+        PvpMatch ongoing = PvpMatch.builder()
+                .id("ongoing2")
+                .challengerId("userB")
+                .status(PvpMatchStatus.IN_PROGRESS)
+                .expiresAt(Instant.now().plus(Duration.ofMinutes(15)))
+                .build();
+        when(pvpMatchRepository.findByStudentIdAndStatus("userA", PvpMatchStatus.IN_PROGRESS))
+                .thenReturn(Collections.emptyList());
+        when(pvpMatchRepository.findByStudentIdAndStatus("userB", PvpMatchStatus.IN_PROGRESS))
+                .thenReturn(List.of(ongoing));
+
+        CreatePvpMatchRequest req = CreatePvpMatchRequest.builder()
+                .opponentId("userB")
+                .build();
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> socialService.createPvpChallenge("userA", req));
+        assertTrue(ex.getMessage().contains("busy in another PvP duel"));
+    }
+
+    @Test
+    void testAcceptPvpMatch_ChallengerOffline_Throws() {
+        PvpMatch match = PvpMatch.builder()
+                .id("m1")
+                .challengerId("userA")
+                .opponentId("userB")
+                .status(PvpMatchStatus.INVITED)
+                .durationMinutes(30)
+                .build();
+
+        when(pvpMatchRepository.findById("m1")).thenReturn(Optional.of(match));
+        studentA.setLastSyncedAt(null);
+        when(stringRedisTemplate.hasKey("presence:student:userA")).thenReturn(Boolean.FALSE);
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> socialService.acceptPvpMatch("userB", "m1"));
+        assertTrue(ex.getMessage().contains("offline"));
+    }
+
+    @Test
+    void testAcceptPvpMatch_AcceptorBusy_Throws() {
+        PvpMatch match = PvpMatch.builder()
+                .id("m1")
+                .challengerId("userA")
+                .opponentId("userB")
+                .status(PvpMatchStatus.INVITED)
+                .durationMinutes(30)
+                .build();
+
+        when(pvpMatchRepository.findById("m1")).thenReturn(Optional.of(match));
+        when(studentRepository.findById("userA")).thenReturn(Optional.of(studentA));
+
+        PvpMatch ongoing = PvpMatch.builder()
+                .id("mOther")
+                .challengerId("userB")
+                .status(PvpMatchStatus.IN_PROGRESS)
+                .expiresAt(Instant.now().plus(Duration.ofMinutes(15)))
+                .build();
+        when(pvpMatchRepository.findByStudentIdAndStatus("userB", PvpMatchStatus.IN_PROGRESS))
+                .thenReturn(List.of(ongoing));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> socialService.acceptPvpMatch("userB", "m1"));
+        assertTrue(ex.getMessage().contains("already in an active PvP duel"));
     }
 
     @Test

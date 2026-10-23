@@ -174,16 +174,22 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                                         </div>
                                     </div>
 
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() => onOpenSocialHub('pvp')}
-                                        className="h-7 px-2 text-[11px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-white hover:bg-[#5b4fff] rounded-xl cursor-pointer gap-1 transition-all"
-                                        title={`Challenge ${f.name} to 1v1 Duel`}
-                                    >
-                                        <Swords className="w-3.5 h-3.5" />
-                                        <span>Duel</span>
-                                    </Button>
+                                    {f.isBusy ? (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 shrink-0">
+                                            In Duel
+                                        </span>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => onOpenSocialHub('pvp')}
+                                            className="h-7 px-2 text-[11px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-white hover:bg-[#5b4fff] rounded-xl cursor-pointer gap-1 transition-all"
+                                            title={`Challenge ${f.name} to 1v1 Duel`}
+                                        >
+                                            <Swords className="w-3.5 h-3.5" />
+                                            <span>Duel</span>
+                                        </Button>
+                                    )}
                                 </div>
                             ))}
                         </div>

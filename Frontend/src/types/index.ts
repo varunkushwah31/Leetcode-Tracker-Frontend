@@ -399,6 +399,7 @@ export interface FriendDTO {
     friendSince?: string;
     lastActive?: string;
     isOnline?: boolean;
+    isBusy?: boolean;
 }
 
 export interface FriendRequestDTO {

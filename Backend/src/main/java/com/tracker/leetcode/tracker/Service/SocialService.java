@@ -62,6 +62,22 @@ public class SocialService {
         return false;
     }
 
+    public boolean isStudentBusyInPvp(String studentId) {
+        if (studentId == null || studentId.isBlank()) return false;
+        List<PvpMatch> inProgressMatches = pvpMatchRepository.findByStudentIdAndStatus(studentId, PvpMatchStatus.IN_PROGRESS);
+        if (inProgressMatches == null || inProgressMatches.isEmpty()) return false;
+        Instant now = Instant.now();
+        for (PvpMatch m : inProgressMatches) {
+            if (m.getExpiresAt() != null && now.isAfter(m.getExpiresAt())) {
+                resolveExpiredMatch(m);
+                pvpMatchRepository.save(m);
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ==========================================
     // 1. FRIEND MANAGEMENT & DISCOVERY
     // ==========================================
@@ -289,6 +305,7 @@ public class SocialService {
                     int lcSolved = studentMapper.calculateLeetcodeSolved(friend.getProblemStats());
                     int cfSolved = friend.getCodeforcesSolvedCount() != null ? friend.getCodeforcesSolvedCount() : 0;
                     boolean isOnline = isStudentOnline(friend.getId(), friend);
+                    boolean isBusy = isStudentBusyInPvp(friend.getId());
 
                     acceptedFriends.add(FriendDTO.builder()
                             .id(friend.getId())
@@ -310,6 +327,7 @@ public class SocialService {
                             .friendSince(f.getUpdatedAt() != null ? f.getUpdatedAt() : f.getCreatedAt())
                             .lastActive(friend.getLastSyncedAt())
                             .isOnline(isOnline)
+                            .isBusy(isBusy)
                             .build());
                 }
             } else if (f.getStatus() == FriendshipStatus.PENDING) {
@@ -490,6 +508,23 @@ public class SocialService {
         Student opponent = studentRepository.findById(request.getOpponentId())
                 .orElseThrow(() -> new StudentNotFoundException("Opponent not found"));
 
+        // Touch current presence
+        touchPresence(challengerId);
+
+        // Rule 1: PvP duel can only happen when both users are live and active
+        boolean opponentOnline = isStudentOnline(opponent.getId(), opponent);
+        if (!opponentOnline) {
+            throw new IllegalStateException("Opponent is currently offline. PvP duels can only happen when both users are live and active.");
+        }
+
+        // Rule 2: If one user is busy in PvP, he/she cannot enter another PvP
+        if (isStudentBusyInPvp(challengerId)) {
+            throw new IllegalStateException("You are already in an active PvP duel. You cannot enter another PvP duel until your current duel is completed.");
+        }
+        if (isStudentBusyInPvp(opponent.getId())) {
+            throw new IllegalStateException(opponent.getName() + " is currently busy in another PvP duel. Please wait until their duel finishes.");
+        }
+
         // Validate friend
         Optional<Friendship> friendship = friendshipRepository.findBetween(challengerId, request.getOpponentId());
         if (friendship.isEmpty() || friendship.get().getStatus() != FriendshipStatus.ACCEPTED) {
@@ -564,6 +599,24 @@ public class SocialService {
         }
         if (match.getStatus() != PvpMatchStatus.INVITED) {
             throw new IllegalStateException("Match cannot be accepted (current status: " + match.getStatus() + ")");
+        }
+
+        touchPresence(currentStudentId);
+
+        Student challenger = studentRepository.findById(match.getChallengerId())
+                .orElseThrow(() -> new StudentNotFoundException("Challenger not found"));
+
+        // Rule 1: PvP duel can only happen when both users are live and active
+        if (!isStudentOnline(challenger.getId(), challenger)) {
+            throw new IllegalStateException("The challenger is currently offline. PvP duels can only happen when both users are live and active.");
+        }
+
+        // Rule 2: If one user is busy in PvP, he/she cannot enter another PvP
+        if (isStudentBusyInPvp(currentStudentId)) {
+            throw new IllegalStateException("You are already in an active PvP duel. You cannot enter another PvP duel until your current duel is completed.");
+        }
+        if (isStudentBusyInPvp(challenger.getId())) {
+            throw new IllegalStateException(challenger.getName() + " is currently busy in another PvP duel. Please wait until their duel finishes.");
         }
 
         Instant now = Instant.now();

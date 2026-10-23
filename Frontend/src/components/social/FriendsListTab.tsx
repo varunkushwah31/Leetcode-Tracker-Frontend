@@ -431,7 +431,12 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                                 >
                                                     {friend.name}
                                                 </button>
-                                                {friend.isOnline ? (
+                                                {friend.isBusy ? (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.2 rounded-full shrink-0">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                                        In Duel
+                                                    </span>
+                                                ) : friend.isOnline ? (
                                                     <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 rounded-full shrink-0">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                                         Live
@@ -529,10 +534,19 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                     </Button>
                                     <Button
                                         size="sm"
-                                        className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all"
+                                        disabled={!friend.isOnline || friend.isBusy}
+                                        title={
+                                            friend.isBusy
+                                                ? `${friend.name} is currently busy in another duel`
+                                                : !friend.isOnline
+                                                ? `${friend.name} is offline. Both players must be live to duel`
+                                                : `Challenge ${friend.name} to 1v1 Duel`
+                                        }
+                                        className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                         onClick={() => onChallengePvp(friend.id, friend.name)}
                                     >
-                                        <Swords className="w-3.5 h-3.5" /> PVP Duel
+                                        <Swords className="w-3.5 h-3.5" />
+                                        <span>{friend.isBusy ? 'In Duel' : 'PVP Duel'}</span>
                                     </Button>
                                 </div>
                             </div>
