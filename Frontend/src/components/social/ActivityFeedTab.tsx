@@ -56,10 +56,10 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
         return () => clearInterval(interval);
     }, [loadActivities]);
 
-    const handleReact = async (activityId: string, emoji: string) => {
+    const handleReact = async (activityId: string, reactionKey: string) => {
         setReactingActivityId(activityId);
         try {
-            const res = await SocialService.reactToActivity(activityId, emoji);
+            const res = await SocialService.reactToActivity(activityId, reactionKey);
             // Optimistic update
             setActivities(prev =>
                 prev.map(a => (a.id === activityId ? res.data : a))

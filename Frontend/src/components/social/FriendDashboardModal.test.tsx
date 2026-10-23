@@ -39,21 +39,21 @@ const mockComparisonData: FriendComparisonDTO = {
         rank: '19071',
         consistencyStreak: 18,
         problemStats: [
-            { difficulty: 'Easy', count: 332 },
-            { difficulty: 'Medium', count: 697 },
-            { difficulty: 'Hard', count: 170 }
+            { difficulty: 'Easy', count: 332, beatsPercentage: 80 },
+            { difficulty: 'Medium', count: 697, beatsPercentage: 75 },
+            { difficulty: 'Hard', count: 170, beatsPercentage: 60 }
         ],
         skills: [
             { tagName: 'Dynamic Programming', problemsSolved: 85 },
             { tagName: 'Graph', problemsSolved: 42 }
         ],
         badges: [
-            { id: 'b1', title: '50 Days 2024', icon: '/badge.png' }
+            { title: '50 Days 2024', icon: '/badge.png' }
         ],
         recentSubmissions: [
-            { title: 'Trapping Rain Water', titleSlug: 'trapping-rain-water', platform: 'LEETCODE', timestamp: 1700000000 }
+            { title: 'Trapping Rain Water', titleSlug: 'trapping-rain-water', platform: 'LEETCODE', timestamp: 1700000000, questionLink: 'https://leetcode.com/problems/trapping-rain-water' }
         ]
-    },
+    } as unknown as FriendComparisonDTO['friendProfile'],
     mutualSolved: ['two-sum', 'valid-parentheses'],
     friendOnlySolved: ['trapping-rain-water', 'merge-k-sorted-lists'],
     userOnlySolved: ['lru-cache'],

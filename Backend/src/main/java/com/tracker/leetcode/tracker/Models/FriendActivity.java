@@ -40,7 +40,7 @@ public class FriendActivity {
     private Set<String> kudosUserIds = new HashSet<>();
 
     @Builder.Default
-    private Map<String, List<String>> reactions = new HashMap<>(); // emoji -> list of studentIds
+    private Map<String, List<String>> reactions = new HashMap<>(); // reaction token -> list of studentIds
 
     @Indexed
     private Instant createdAt;

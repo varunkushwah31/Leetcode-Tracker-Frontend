@@ -34,7 +34,7 @@ public class FriendActivityDTO implements Serializable {
 
     private int kudosCount;
     private boolean userReacted;
-    private Map<String, Integer> reactionCounts; // emoji -> count
+    private Map<String, Integer> reactionCounts; // reaction token -> count
     private List<String> myReactions;
 
     private Instant createdAt;

@@ -793,7 +793,7 @@ public class SocialService {
         List<String> reactUsers = activity.getReactions().computeIfAbsent(reactionKey, k -> new ArrayList<>());
         if (reactUsers.contains(currentStudentId)) {
             reactUsers.remove(currentStudentId);
-            if (reactUsers.isEmpty()) activity.getReactions().remove(emoji);
+            if (reactUsers.isEmpty()) activity.getReactions().remove(reactionKey);
         } else {
             reactUsers.add(currentStudentId);
         }
