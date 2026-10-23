@@ -17,7 +17,7 @@ export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassro
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-3 grid-cols-1 xl:grid-cols-2">
                     {classrooms?.map(cls => (
                         <div
                             key={cls.id}
@@ -40,7 +40,7 @@ export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassro
                         </div>
                     ))}
                     {(!classrooms || classrooms.length === 0) && (
-                        <p className="col-span-2 text-sm text-zinc-500 dark:text-zinc-400 py-4">You are not enrolled in any classrooms.</p>
+                        <p className="col-span-full text-sm text-zinc-500 dark:text-zinc-400 py-4">You are not enrolled in any classrooms.</p>
                     )}
                 </div>
             </CardContent>

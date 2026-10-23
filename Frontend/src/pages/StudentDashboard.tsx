@@ -7,7 +7,12 @@ import {
     DownloadSimpleIcon as Download,
     KeyIcon,
     CodeIcon,
-    UsersIcon as Users
+    UsersIcon as Users,
+    SquaresFourIcon as SquaresFour,
+    FlameIcon as Flame,
+    GraduationCapIcon as GraduationCap,
+    ChartBarIcon as ChartBar,
+    TrophyIcon as Trophy
 } from '@phosphor-icons/react';
 import { SocialHubView, type SocialTabType } from '../components/social/SocialHubView';
 import { QuickSocialWidget } from '../components/social/QuickSocialWidget';
@@ -27,12 +32,16 @@ import { PendingAssignments } from '../components/dashboard/student/PendingAssig
 import { ClassroomList } from '../components/dashboard/student/ClassroomList';
 import { ContestRatingsSection } from '../components/dashboard/student/ContestRatingsSection';
 import { BadgesList } from '../components/dashboard/student/BadgesList';
-import { StudentRightSidebar } from '../components/dashboard/student/StudentRightSidebar';
+import { DifficultyBreakdownCard } from '../components/dashboard/student/DifficultyBreakdownCard';
+import { RecentActivityCard } from '../components/dashboard/student/RecentActivityCard';
+import { UnifiedContestHistory } from '../components/dashboard/student/UnifiedContestHistory';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+
+type DashboardViewFilter = 'all' | 'daily' | 'academic' | 'practice' | 'contests';
 
 export function StudentDashboard() {
     const { logout, user } = useAuth();
@@ -45,6 +54,7 @@ export function StudentDashboard() {
     const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
     const [mainTab, setMainTab] = useState<'overview' | 'social'>('overview');
     const [socialInitialTab, setSocialInitialTab] = useState<SocialTabType>('friends');
+    const [activeFilter, setActiveFilter] = useState<DashboardViewFilter>('all');
 
     // --- Specific Error States ---
     const [pageError, setPageError] = useState<string | null>(null);
@@ -318,57 +328,178 @@ export function StudentDashboard() {
                 {mainTab === 'social' ? (
                     <SocialHubView initialTab={socialInitialTab} />
                 ) : (
-                    <>
-                        <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} onProfileUpdated={fetchDashboard} />
+                    <div className="space-y-8">
+                        {/* Profile Identity & Core Metrics */}
+                        <ProfileStats
+                            data={dashboardData}
+                            totalSolved={totalSolved}
+                            rating={rating}
+                            onProfileUpdated={fetchDashboard}
+                        />
 
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div className="lg:col-span-2 space-y-8">
-                                <ErrorBoundary fallback={null}>
-                                    <DailyChallengeCard
-                                        classroomId={selectedClassroomId}
-                                        recentSubmissions={dashboardData?.recentSubmissions}
-                                    />
-                                </ErrorBoundary>
-                                <ActivityHeatmap
-                                    progressHistory={dashboardData?.progressHistory}
-                                    consistencyStreak={dashboardData?.consistencyStreak}
-                                />
-                                <PendingAssignments
-                                    assignments={pendingAssignments}
-                                    isSyncing={isSyncing}
-                                    onSync={handleSync}
-                                    selectedClassroomId={selectedClassroomId}
-                                    onClearFilter={() => setSelectedClassroomId(null)}
-                                    onValidationSuccess={fetchDashboard}
-                                />
-                                <ClassroomList classrooms={dashboardData?.classrooms} selectedClassroomId={selectedClassroomId} onSelectClassroom={setSelectedClassroomId} />
-                                <ContestRatingsSection
-                                    contestHistory={dashboardData?.contestHistory}
-                                    currentContestRating={dashboardData?.currentContestRating}
-                                    globalRanking={dashboardData?.rank}
-                                    codeforcesContestHistory={dashboardData?.codeforcesContestHistory}
-                                    codeforcesRating={dashboardData?.codeforcesRating}
-                                    codeforcesMaxRating={dashboardData?.codeforcesMaxRating}
-                                    codeforcesRank={dashboardData?.codeforcesRank}
-                                    codeforcesMaxRank={dashboardData?.codeforcesMaxRank}
-                                />
+                        {/* Modular Focus Filters for Enhanced Scalability */}
+                        <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
+                            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/60 overflow-x-auto custom-scrollbar">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveFilter('all')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                        activeFilter === 'all'
+                                            ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs'
+                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                    }`}
+                                >
+                                    <SquaresFour className="w-3.5 h-3.5" /> All Overview
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveFilter('daily')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                        activeFilter === 'daily'
+                                            ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
+                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                    }`}
+                                >
+                                    <Flame className="w-3.5 h-3.5" /> Daily Focus
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveFilter('academic')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                        activeFilter === 'academic'
+                                            ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
+                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                    }`}
+                                >
+                                    <GraduationCap className="w-3.5 h-3.5" /> Academic & Classrooms
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveFilter('practice')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                        activeFilter === 'practice'
+                                            ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
+                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                    }`}
+                                >
+                                    <ChartBar className="w-3.5 h-3.5" /> Practice Analytics
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveFilter('contests')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                        activeFilter === 'contests'
+                                            ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
+                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                    }`}
+                                >
+                                    <Trophy className="w-3.5 h-3.5" /> Contest Arena
+                                </button>
                             </div>
 
-                            <div className="space-y-8">
-                                <QuickSocialWidget
-                                    onOpenSocialHub={(tab) => {
-                                        if (tab) setSocialInitialTab(tab);
-                                        setMainTab('social');
-                                    }}
-                                />
-                                <ErrorBoundary fallback={null}>
-                                    <UpcomingContestsCard />
-                                </ErrorBoundary>
-                                <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
-                                <BadgesList badges={dashboardData?.badges} />
+                            <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                                <span>Live Sync Active</span>
                             </div>
                         </div>
-                    </>
+
+                        {/* --- ZONE 1: Daily Focus & Live Peer Arena --- */}
+                        {(activeFilter === 'all' || activeFilter === 'daily') && (
+                            <section className="space-y-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                                    <div className="lg:col-span-2">
+                                        <ErrorBoundary fallback={null}>
+                                            <DailyChallengeCard
+                                                classroomId={selectedClassroomId}
+                                                recentSubmissions={dashboardData?.recentSubmissions}
+                                            />
+                                        </ErrorBoundary>
+                                    </div>
+                                    <div>
+                                        <QuickSocialWidget
+                                            onOpenSocialHub={(tab) => {
+                                                if (tab) setSocialInitialTab(tab);
+                                                setMainTab('social');
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {/* --- ZONE 2: Academic & Classroom Focus + Upcoming Contests --- */}
+                        {(activeFilter === 'all' || activeFilter === 'daily' || activeFilter === 'academic' || activeFilter === 'contests') && (
+                            <section className="space-y-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                        <PendingAssignments
+                                            assignments={pendingAssignments}
+                                            isSyncing={isSyncing}
+                                            onSync={handleSync}
+                                            selectedClassroomId={selectedClassroomId}
+                                            onClearFilter={() => setSelectedClassroomId(null)}
+                                            onValidationSuccess={fetchDashboard}
+                                        />
+                                        <ClassroomList
+                                            classrooms={dashboardData?.classrooms}
+                                            selectedClassroomId={selectedClassroomId}
+                                            onSelectClassroom={setSelectedClassroomId}
+                                        />
+                                    </div>
+                                    <div>
+                                        <ErrorBoundary fallback={null}>
+                                            <UpcomingContestsCard />
+                                        </ErrorBoundary>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {/* --- ZONE 3: Practice Analytics, Consistency & Mastery --- */}
+                        {(activeFilter === 'all' || activeFilter === 'practice') && (
+                            <section className="space-y-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                                    <div className="lg:col-span-2">
+                                        <ActivityHeatmap
+                                            progressHistory={dashboardData?.progressHistory}
+                                            consistencyStreak={dashboardData?.consistencyStreak}
+                                        />
+                                    </div>
+                                    <div className="space-y-6">
+                                        <DifficultyBreakdownCard data={dashboardData} totalSolved={totalSolved} />
+                                        <BadgesList badges={dashboardData?.badges} />
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {/* --- ZONE 4: Competitive Programming Arena & Submissions Stream --- */}
+                        {(activeFilter === 'all' || activeFilter === 'contests' || activeFilter === 'practice') && (
+                            <section className="space-y-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                                    <div className="lg:col-span-2">
+                                        <ContestRatingsSection
+                                            contestHistory={dashboardData?.contestHistory}
+                                            currentContestRating={dashboardData?.currentContestRating}
+                                            globalRanking={dashboardData?.rank}
+                                            codeforcesContestHistory={dashboardData?.codeforcesContestHistory}
+                                            codeforcesRating={dashboardData?.codeforcesRating}
+                                            codeforcesMaxRating={dashboardData?.codeforcesMaxRating}
+                                            codeforcesRank={dashboardData?.codeforcesRank}
+                                            codeforcesMaxRank={dashboardData?.codeforcesMaxRank}
+                                        />
+                                    </div>
+                                    <div className="space-y-6">
+                                        <UnifiedContestHistory
+                                            contestHistory={dashboardData?.contestHistory}
+                                            codeforcesContestHistory={dashboardData?.codeforcesContestHistory}
+                                        />
+                                        <RecentActivityCard data={dashboardData} />
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+                    </div>
                 )}
             </main>
 
