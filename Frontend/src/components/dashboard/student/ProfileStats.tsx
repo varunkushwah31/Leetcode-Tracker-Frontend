@@ -4,10 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog';
-import { ArrowSquareOutIcon as ExternalLink, FlameIcon, TrophyIcon, TerminalIcon, GearIcon as Settings, SpinnerIcon as Loader2, TrendUpIcon as TrendingUp, TrendDownIcon as TrendingDown } from '@phosphor-icons/react';
+import { ArrowSquareOutIcon as ExternalLink, TrophyIcon, TerminalIcon, GearIcon as Settings, SpinnerIcon as Loader2, TrendUpIcon as TrendingUp, TrendDownIcon as TrendingDown } from '@phosphor-icons/react';
 import type { StudentExtendedDTO, CodeforcesContestHistory } from '@/types';
 import { StudentService } from '@/services/endpoints';
 import { ErrorBanner } from '@/components/ui/ErrorBanner';
+import { StreakFlame } from '@/components/ui/StreakFlame';
 
 interface ProfileStatsProps {
     data: StudentExtendedDTO | null;
@@ -138,8 +139,8 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     {data.name?.substring(0, 2) || 'ST'}
                                 </AvatarFallback>
                             </Avatar>
-                            <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-1 sm:p-1.5 rounded-full z-20 shadow-md">
-                                <FlameIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 animate-flame" />
+                            <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 bg-white dark:bg-zinc-900 border border-orange-200/90 dark:border-orange-500/30 p-1 sm:p-1.5 rounded-full z-20 shadow-md ring-2 ring-orange-500/10 dark:ring-orange-500/20 flex items-center justify-center">
+                                <StreakFlame className="w-4 h-4 sm:w-5 sm:h-5" />
                             </div>
                         </div>
 
@@ -221,7 +222,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 </div>
 
                                 <div className="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/20 dark:border-amber-500/20 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full self-center md:self-auto shadow-xs dark:shadow-none hover:scale-105 transition-transform duration-200 cursor-default">
-                                    <FlameIcon className="w-4 h-4 text-orange-500 animate-flame" />
+                                    <StreakFlame className="w-4 h-4 sm:w-5 sm:h-5" />
                                     <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white"><span className="text-orange-500 dark:text-orange-400 mr-1.5">{data.consistencyStreak || 0}</span>Day Combined Streak</span>
                                 </div>
                             </div>

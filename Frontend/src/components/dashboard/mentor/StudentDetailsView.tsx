@@ -5,7 +5,7 @@ import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import {
-    ArrowLeftIcon, FlameIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, DownloadSimpleIcon as Download, TrashIcon as Trash2, WarningIcon as AlertTriangle
+    ArrowLeftIcon, CheckCircleIcon as CheckCircle2, ArrowSquareOutIcon as ExternalLink, SpinnerIcon as Loader2, BrainIcon as BrainCircuit, ClockIcon, MedalIcon as Award, DownloadSimpleIcon as Download, TrashIcon as Trash2, WarningIcon as AlertTriangle
 } from '@phosphor-icons/react';
 import { StudentService, ClassroomService } from '@/services/endpoints';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
@@ -14,6 +14,7 @@ import { ActivityHeatmap } from '../student/ActivityHeatmap';
 import { ContestRatingsSection } from '../student/ContestRatingsSection';
 import { UnifiedContestHistory } from '../student/UnifiedContestHistory';
 import { ErrorBanner } from "@/components/ui/ErrorBanner.tsx";
+import { StreakFlame } from '@/components/ui/StreakFlame';
 
 interface StudentDetailsViewProps {
     username: string;
@@ -266,7 +267,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Streak</p>
                                 <p className="text-2xl font-bold text-amber-500 flex justify-center items-center">
-                                    {data.consistencyStreak || 0} <FlameIcon className="w-5 h-5 ml-1 animate-flame" />
+                                    {data.consistencyStreak || 0} <StreakFlame className="w-5 h-5 ml-1.5" />
                                 </p>
                             </div>
                         </div>

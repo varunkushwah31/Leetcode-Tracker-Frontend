@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
+import { StreakFlame } from '../ui/StreakFlame';
 import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
 import type { FriendDTO, FriendRequestDTO, SocialSearchStudentDTO } from '@/types';
@@ -417,7 +418,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                             </span>
                                             {friend.streak > 0 && (
                                                 <div className="absolute -top-1 -right-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-0.5 rounded-full shadow-xs z-10">
-                                                    <Flame className="w-3.5 h-3.5 text-orange-500 animate-flame" />
+                                                    <StreakFlame className="w-3.5 h-3.5" />
                                                 </div>
                                             )}
                                         </div>

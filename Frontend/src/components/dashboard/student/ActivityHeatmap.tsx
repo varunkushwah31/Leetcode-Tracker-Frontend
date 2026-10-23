@@ -1,8 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip';
-import { CalendarBlankIcon as Calendar, FlameIcon, LightningIcon } from '@phosphor-icons/react';
+import { CalendarBlankIcon as Calendar, LightningIcon } from '@phosphor-icons/react';
 import type { ProgressRecord } from '@/types';
+import { StreakFlame } from '@/components/ui/StreakFlame';
 
 export type ActivityRange = '12weeks' | '6months' | '1year';
 
@@ -254,7 +255,7 @@ export function ActivityHeatmap({
                         </span>
                         <span className="text-zinc-300 dark:text-zinc-700">•</span>
                         <span className="flex items-center gap-1">
-                            <FlameIcon className="w-3.5 h-3.5 text-amber-500" weight="fill" />
+                            <StreakFlame className="w-3.5 h-3.5" />
                             Streak: <strong className="text-amber-600 dark:text-amber-400 font-bold">{effectiveCurrentStreak}d</strong>
                         </span>
                         <span className="text-zinc-300 dark:text-zinc-700">•</span>

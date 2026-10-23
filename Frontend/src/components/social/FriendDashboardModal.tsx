@@ -8,7 +8,6 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Input } from '../ui/input';
 import {
     ArrowLeftIcon,
-    FlameIcon,
     CheckCircleIcon as CheckCircle2,
     ArrowSquareOutIcon as ExternalLink,
     SpinnerIcon as Loader2,
@@ -25,6 +24,7 @@ import {
     XIcon
 } from '@phosphor-icons/react';
 import { SocialService } from '../../services/endpoints';
+import { StreakFlame } from '../ui/StreakFlame';
 import { ActivityHeatmap } from '@/components/dashboard/student/ActivityHeatmap';
 import { ContestRatingsSection } from '@/components/dashboard/student/ContestRatingsSection';
 import { UnifiedContestHistory } from '@/components/dashboard/student/UnifiedContestHistory';
@@ -304,7 +304,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                     <div className="text-center min-w-[70px]">
                                         <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Streak</p>
                                         <p className="text-2xl font-bold text-amber-500 flex justify-center items-center">
-                                            {profile.consistencyStreak || 0} <FlameIcon className="w-5 h-5 ml-1 animate-flame" />
+                                            {profile.consistencyStreak || 0} <StreakFlame className="w-5 h-5 ml-1.5" />
                                         </p>
                                     </div>
                                     <div className="text-center min-w-[85px] sm:border-l sm:border-zinc-200 sm:dark:border-zinc-800 sm:pl-5">

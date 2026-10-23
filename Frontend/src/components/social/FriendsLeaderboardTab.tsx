@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
+import { StreakFlame } from '../ui/StreakFlame';
 import { SocialService } from '../../services/endpoints';
 import type { FriendsLeaderboardEntryDTO } from '@/types';
 
@@ -534,7 +535,7 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
 
                                             <td className="py-4 px-5 text-center">
                                                 <span className="inline-flex items-center gap-1 font-bold text-amber-500">
-                                                    {e.streak}d <Flame className="w-3.5 h-3.5 animate-flame" />
+                                                    {e.streak}d <StreakFlame className="w-3.5 h-3.5" />
                                                 </span>
                                             </td>
 

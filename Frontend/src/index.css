@@ -157,11 +157,28 @@ body {
 }
 
 /* Subtle micro-interactions and animations */
-@keyframes flame-wiggle {
-  0%, 100% { transform: rotate(-3deg) scale(1); }
-  25% { transform: rotate(3deg) scale(1.08); }
-  50% { transform: rotate(-2deg) scale(0.97); }
-  75% { transform: rotate(2deg) scale(1.05); }
+/* Smooth organic flame breathing animation */
+@keyframes flame-breathe {
+  0%, 100% {
+    transform: scale(1) translateY(0) rotate(0deg);
+    filter: drop-shadow(0 1px 3px rgba(249, 115, 22, 0.45));
+  }
+  20% {
+    transform: scale(1.04, 1.08) translateY(-0.75px) rotate(-1.2deg);
+    filter: drop-shadow(0 2px 6px rgba(249, 115, 22, 0.65));
+  }
+  45% {
+    transform: scale(0.97, 1.02) translateY(0) rotate(0.8deg);
+    filter: drop-shadow(0 1px 4px rgba(245, 158, 11, 0.5));
+  }
+  70% {
+    transform: scale(1.03, 1.06) translateY(-0.5px) rotate(-0.6deg);
+    filter: drop-shadow(0 2px 7px rgba(234, 88, 12, 0.6));
+  }
+  85% {
+    transform: scale(0.99, 1.01) translateY(0) rotate(0.8deg);
+    filter: drop-shadow(0 1px 4px rgba(249, 115, 22, 0.5));
+  }
 }
 
 @keyframes pulse-slow {
@@ -199,8 +216,10 @@ body {
 }
 
 .animate-flame {
-  animation: flame-wiggle 1.8s ease-in-out infinite;
-  transform-origin: bottom center;
+  animation: flame-breathe 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: 50% 90%;
+  will-change: transform, filter;
+  display: inline-block;
 }
 
 .animate-pulse-slow {

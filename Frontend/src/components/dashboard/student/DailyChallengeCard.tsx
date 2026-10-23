@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import {
-    FlameIcon as Flame,
     UsersIcon as Users,
     ArrowSquareOutIcon as ExternalLink,
     CheckCircleIcon as CheckCircle,
@@ -11,6 +10,7 @@ import {
 } from '@phosphor-icons/react';
 import { DailyChallengeService } from '@/services/endpoints';
 import type { DailyChallengeDTO, RecentSubmission } from '@/types';
+import { StreakFlame } from '@/components/ui/StreakFlame';
 
 interface DailyChallengeCardProps {
     classroomId?: string | null;
@@ -77,7 +77,7 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center animate-pulse">
-                            <Flame className="w-5 h-5 text-amber-500" />
+                            <StreakFlame className="w-5 h-5" />
                         </div>
                         <div className="h-5 w-40 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse" />
                     </div>
@@ -110,7 +110,7 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
             <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/60">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">
-                        <Flame className="w-5 h-5" weight="fill" />
+                        <StreakFlame className="w-5 h-5" />
                     </div>
                     <div>
                         <CardTitle className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">

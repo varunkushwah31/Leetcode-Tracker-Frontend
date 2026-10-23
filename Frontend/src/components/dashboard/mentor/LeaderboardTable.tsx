@@ -20,6 +20,7 @@ import {
 } from '@phosphor-icons/react';
 import type { StudentSummaryDTO } from '@/types';
 import { ClassroomService, StudentService } from '@/services/endpoints';
+import { StreakFlame } from '@/components/ui/StreakFlame';
 import { useState, useMemo, useEffect } from 'react';
 
 function SortIndicator({ field, activeField, direction }: Readonly<{ field: string; activeField: string; direction: 'asc' | 'desc' }>) {
@@ -504,7 +505,7 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                     <>
                                                         <span className="text-zinc-300 dark:text-zinc-700">•</span>
                                                         <span className="font-semibold text-amber-500 flex items-center gap-0.5">
-                                                            <FlameIcon className="w-3 h-3 text-amber-500" />
+                                                            <StreakFlame className="w-3 h-3" />
                                                             {student.consistencyStreak}d
                                                         </span>
                                                     </>
@@ -515,7 +516,11 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                 </td>
                                 <td className="hidden sm:table-cell py-3 px-3 sm:py-4 sm:px-6 text-center">
                                     <div className="flex items-center justify-center gap-1.5">
-                                        <FlameIcon className={`w-4 h-4 ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500 animate-flame' : 'text-zinc-300 dark:text-zinc-700'}`} />
+                                        {(student.consistencyStreak ?? 0) > 0 ? (
+                                            <StreakFlame className="w-4 h-4" />
+                                        ) : (
+                                            <FlameIcon className="w-4 h-4 text-zinc-300 dark:text-zinc-700" />
+                                        )}
                                         <span className={`font-bold ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-600'}`}>{student.consistencyStreak || 0}</span>
                                     </div>
                                 </td>

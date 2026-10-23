@@ -166,7 +166,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             </div>
 
                             {/* PVP Record */}
-                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-[90px] sm:min-w-[105px]">
+                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-22.5 sm:min-w-26.25">
                                 <p className="text-[10px] font-bold tracking-wider uppercase text-zinc-400 flex items-center justify-center gap-1">
                                     <Swords className="w-3 h-3 text-indigo-400" /> Duel Record
                                 </p>
@@ -181,7 +181,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             </div>
 
                             {/* Live Duels */}
-                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-[90px] sm:min-w-[105px]">
+                            <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-22.5 sm:min-w-26.25">
                                 <p className="text-[10px] font-bold tracking-wider uppercase text-zinc-400 flex items-center justify-center gap-1">
                                     <Sparkles className="w-3 h-3 text-amber-500" /> Active Duels
                                 </p>

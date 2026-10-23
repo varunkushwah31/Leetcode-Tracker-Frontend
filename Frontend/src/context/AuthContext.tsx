@@ -72,7 +72,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         let userEmail: string | undefined;
         try {
             const decoded = jwtDecode<{ sub?: string }>(accessToken);
-            if (decoded.sub && decoded.sub.includes('@')) {
+            if (decoded.sub?.includes('@')) {
                 userEmail = decoded.sub;
             }
         } catch {
