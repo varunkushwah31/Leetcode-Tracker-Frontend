@@ -3,12 +3,15 @@ import {
     ActivityIcon as Activity,
     ArrowSquareOutIcon as ExternalLink,
     SpinnerIcon as Loader2,
-    ClockIcon as Clock
+    ClockIcon as Clock,
+    TrophyIcon as Trophy,
+    CheckCircleIcon as CheckCircle2
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { SocialService } from '../../services/endpoints';
+import { formatProblemTitle } from '@/lib/problemFormatter';
 import type { FriendActivityDTO } from '@/types';
 
 interface ActivityFeedTabProps {
@@ -36,7 +39,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
         void loadActivities();
         const interval = setInterval(() => {
             void loadActivities();
-        }, 15000);
+        }, 12000);
         return () => clearInterval(interval);
     }, [loadActivities]);
 
@@ -67,7 +70,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
         return (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <Loader2 className="w-8 h-8 animate-spin text-[#5b4fff]" />
-                <p className="text-xs font-medium text-zinc-500">Loading friend activity...</p>
+                <p className="text-xs font-semibold text-zinc-500">Loading friend activity stream...</p>
             </div>
         );
     }
@@ -75,76 +78,93 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
     return (
         <div className="space-y-6">
             {/* Header with filter buttons */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-xs">
-                <div className="flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-[#5b4fff]" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
+
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
+                        <Activity className="w-6 h-6" />
+                    </div>
                     <div>
-                        <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Live Friends Activity Stream</h3>
-                        <p className="text-[11px] text-zinc-500">Track solved problems, streaks, and duel victories in your peer network</p>
+                        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                            Live Peer Activity Feed
+                        </h3>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            Real-time solved problems, duel victories, and milestones from your friend network
+                        </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800/60 p-1 rounded-xl">
+                <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800/70 p-1.5 rounded-2xl">
                     <button
                         type="button"
                         onClick={() => setFilter('ALL')}
-                        className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                             filter === 'ALL'
-                                ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs'
-                                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        All
+                        All Activity
                     </button>
                     <button
                         type="button"
                         onClick={() => setFilter('SOLVES')}
-                        className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 ${
                             filter === 'SOLVES'
-                                ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs'
-                                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                                ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        Solves
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Solves
                     </button>
                     <button
                         type="button"
                         onClick={() => setFilter('DUELS')}
-                        className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 ${
                             filter === 'DUELS'
-                                ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-2xs'
-                                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        PVP Duels
+                        <Trophy className="w-3.5 h-3.5" /> PVP Duels
                     </button>
                 </div>
             </div>
 
             {/* Activities List */}
             {filteredActivities.length === 0 ? (
-                <div className="p-10 rounded-2xl bg-white dark:bg-zinc-900 border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-2">
-                    <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300">No activity yet</p>
-                    <p className="text-xs text-zinc-500">Add friends and solve problems or initiate duels to see real-time updates here!</p>
+                <div className="p-12 rounded-3xl bg-white dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400">
+                        <Activity className="w-6 h-6" />
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">No activity logged yet</p>
+                        <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+                            Add friends and solve problems or complete duels to see real-time updates here!
+                        </p>
+                    </div>
                 </div>
             ) : (
-                <div className="space-y-3.5">
+                <div className="space-y-4">
                     {filteredActivities.map((act) => {
+                        const formattedTitle = act.title ? formatProblemTitle(act.title) : 'Activity';
+
                         return (
                             <div
                                 key={act.id}
-                                className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-xs hover:border-[#5b4fff]/30 transition-all space-y-3"
+                                className="p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs hover:border-[#5b4fff]/40 transition-all space-y-3.5"
                             >
                                 <div className="flex items-start justify-between gap-3">
-                                    <div className="flex items-center gap-3 min-w-0">
+                                    <div className="flex items-center gap-3.5 min-w-0">
                                         <button
                                             type="button"
                                             onClick={() => onViewFriendDashboard(act.studentId)}
                                             className="cursor-pointer hover:opacity-80 transition-opacity"
                                         >
-                                            <Avatar className="w-10 h-10 border border-zinc-200 dark:border-zinc-700">
+                                            <Avatar className="w-11 h-11 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm">
                                                 <AvatarImage src={act.studentAvatarUrl} />
-                                                <AvatarFallback className="bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-bold">
+                                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] text-xs font-bold">
                                                     {act.studentName.substring(0, 2)}
                                                 </AvatarFallback>
                                             </Avatar>
@@ -155,26 +175,28 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                                 <button
                                                     type="button"
                                                     onClick={() => onViewFriendDashboard(act.studentId)}
-                                                    className="text-xs font-bold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
+                                                    className="text-xs font-extrabold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
                                                 >
                                                     {act.studentName}
                                                 </button>
-                                                <span className="text-[11px] text-zinc-400">@{act.studentHandle || 'coder'}</span>
+                                                <span className="text-[11px] text-zinc-400">
+                                                    @{act.studentHandle || 'coder'}
+                                                </span>
                                             </div>
 
-                                            <div className="flex items-center gap-2 mt-0.5">
+                                            <div className="flex items-center gap-2 mt-1">
                                                 <Badge
-                                                    className={
+                                                    className={`text-[9px] font-black px-2 py-0.2 rounded-md border ${
                                                         act.type === 'PVP_WIN'
-                                                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px]'
+                                                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                                                             : act.type === 'PROBLEM_SOLVED'
-                                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[10px]'
-                                                            : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20 text-[10px]'
-                                                    }
+                                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                                            : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20'
+                                                    }`}
                                                 >
                                                     {act.type.replace(/_/g, ' ')}
                                                 </Badge>
-                                                <span className="text-[10px] text-zinc-400 flex items-center gap-1">
+                                                <span className="text-[10px] text-zinc-400 flex items-center gap-1 font-medium">
                                                     <Clock className="w-3 h-3" />
                                                     {new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · {new Date(act.createdAt).toLocaleDateString()}
                                                 </span>
@@ -187,8 +209,8 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                             href={act.link}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="text-zinc-400 hover:text-[#5b4fff] transition-colors p-1"
-                                            title="View Problem"
+                                            className="text-zinc-400 hover:text-[#5b4fff] transition-colors p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                            title="View Problem on LeetCode"
                                         >
                                             <ExternalLink className="w-4 h-4" />
                                         </a>
@@ -196,14 +218,18 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                 </div>
 
                                 {/* Content / Description */}
-                                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/80 text-xs text-zinc-800 dark:text-zinc-200">
-                                    <p className="font-semibold text-zinc-900 dark:text-white mb-0.5">{act.title}</p>
-                                    <p className="text-zinc-600 dark:text-zinc-400">{act.description}</p>
+                                <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800/80 text-xs text-zinc-800 dark:text-zinc-200">
+                                    <p className="font-extrabold text-zinc-900 dark:text-white mb-0.5">
+                                        {formattedTitle}
+                                    </p>
+                                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                        {act.description}
+                                    </p>
                                 </div>
 
                                 {/* Reactions / Kudos Row */}
                                 <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800/60">
-                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                    <div className="flex items-center gap-2 flex-wrap">
                                         {reactionEmojis.map((emoji) => {
                                             const count = act.reactionCounts?.[emoji] || 0;
                                             const isSelected = act.myReactions?.includes(emoji);
@@ -214,14 +240,14 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                                     key={emoji}
                                                     onClick={() => handleReact(act.id, emoji)}
                                                     disabled={reactingActivityId === act.id}
-                                                    className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer flex items-center gap-1 ${
+                                                    className={`px-3 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1.5 ${
                                                         isSelected
-                                                            ? 'bg-[#5b4fff]/15 text-[#5b4fff] border-[#5b4fff]/30 font-bold scale-105'
+                                                            ? 'bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/40 font-bold scale-105 shadow-xs'
                                                             : 'bg-zinc-50 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                                     }`}
                                                 >
                                                     <span>{emoji}</span>
-                                                    {count > 0 && <span className="text-[11px]">{count}</span>}
+                                                    {count > 0 && <span className="text-[11px] font-bold">{count}</span>}
                                                 </button>
                                             );
                                         })}
@@ -231,9 +257,9 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => onViewFriendDashboard(act.studentId)}
-                                        className="text-[11px] h-7 text-zinc-500 hover:text-[#5b4fff] cursor-pointer"
+                                        className="text-xs h-8 text-zinc-500 hover:text-[#5b4fff] cursor-pointer rounded-xl font-bold"
                                     >
-                                        View Dashboard →
+                                        View Profile & Overlap →
                                     </Button>
                                 </div>
                             </div>

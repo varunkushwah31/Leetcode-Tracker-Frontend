@@ -102,7 +102,7 @@ describe('SocialHubView Component', () => {
         fireEvent.click(leaderboardTabBtn);
 
         await waitFor(() => {
-            expect(screen.getByText('Rankings among you and your accepted coding friends')).toBeDefined();
+            expect(screen.getByText('Friends Network Leaderboard')).toBeDefined();
         });
     });
 
@@ -113,7 +113,7 @@ describe('SocialHubView Component', () => {
         fireEvent.click(peerTabBtn);
 
         await waitFor(() => {
-            expect(screen.getByText('Peer-to-Peer Problem Study Hub')).toBeDefined();
+            expect(screen.getByText(/Peer-to-Peer.*Study Hub/i)).toBeDefined();
         });
     });
 });

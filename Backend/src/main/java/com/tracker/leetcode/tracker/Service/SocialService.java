@@ -304,24 +304,24 @@ public class SocialService {
         StudentExtendedDTO friendDTO = studentMapper.toExtendedDTO(friend);
 
         // Problem overlap comparison
-        Set<String> userSolvedSlugs = extractSolvedSlugs(user);
-        Set<String> friendSolvedSlugs = extractSolvedSlugs(friend);
+        Map<String, String> userCatalog = extractSolvedCatalog(user);
+        Map<String, String> friendCatalog = extractSolvedCatalog(friend);
 
         List<String> mutualSolved = new ArrayList<>();
         List<String> friendOnlySolved = new ArrayList<>();
         List<String> userOnlySolved = new ArrayList<>();
 
-        for (String slug : friendSolvedSlugs) {
-            if (userSolvedSlugs.contains(slug)) {
-                mutualSolved.add(slug);
+        for (Map.Entry<String, String> entry : friendCatalog.entrySet()) {
+            if (userCatalog.containsKey(entry.getKey())) {
+                mutualSolved.add(entry.getValue());
             } else {
-                friendOnlySolved.add(slug);
+                friendOnlySolved.add(entry.getValue());
             }
         }
 
-        for (String slug : userSolvedSlugs) {
-            if (!friendSolvedSlugs.contains(slug)) {
-                userOnlySolved.add(slug);
+        for (Map.Entry<String, String> entry : userCatalog.entrySet()) {
+            if (!friendCatalog.containsKey(entry.getKey())) {
+                userOnlySolved.add(entry.getValue());
             }
         }
 
@@ -363,23 +363,37 @@ public class SocialService {
                 .build();
     }
 
-    private Set<String> extractSolvedSlugs(Student student) {
-        Set<String> slugs = new HashSet<>();
+    private String toKebabSlug(String text) {
+        if (text == null || text.isBlank()) return "";
+        return text.trim().toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-+|-+$", "");
+    }
+
+    private Map<String, String> extractSolvedCatalog(Student student) {
+        Map<String, String> catalog = new LinkedHashMap<>();
         if (student.getRecentSubmissions() != null) {
             for (RecentSubmission sub : student.getRecentSubmissions()) {
+                String canonical = null;
                 if (sub.getTitleSlug() != null && !sub.getTitleSlug().isBlank()) {
-                    slugs.add(StudentMapper.normalizeSlug(sub.getTitleSlug()));
-                } else if (sub.getTitle() != null) {
-                    slugs.add(StudentMapper.normalizeSlug(sub.getTitle()));
+                    canonical = sub.getTitleSlug().trim().toLowerCase();
+                } else if (sub.getTitle() != null && !sub.getTitle().isBlank()) {
+                    canonical = toKebabSlug(sub.getTitle());
+                }
+                if (canonical != null && !canonical.isEmpty()) {
+                    String normKey = StudentMapper.normalizeSlug(canonical);
+                    catalog.putIfAbsent(normKey, canonical);
                 }
             }
         }
         if (student.getManuallyCompletedAssignments() != null) {
             for (String assId : student.getManuallyCompletedAssignments()) {
-                slugs.add(StudentMapper.normalizeSlug(assId));
+                if (assId != null && !assId.isBlank()) {
+                    String canonical = assId.trim().toLowerCase();
+                    String normKey = StudentMapper.normalizeSlug(canonical);
+                    catalog.putIfAbsent(normKey, canonical);
+                }
             }
         }
-        return slugs;
+        return catalog;
     }
 
     // ==========================================

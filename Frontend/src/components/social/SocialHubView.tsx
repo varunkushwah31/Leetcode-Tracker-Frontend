@@ -68,20 +68,20 @@ export function SocialHubView({ initialTab = 'friends' }: SocialHubViewProps) {
     return (
         <div className="space-y-6">
             {/* Social Hub Top Navigation Tabs */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-zinc-200/90 dark:border-zinc-800 custom-scrollbar">
+            <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 rounded-2xl shadow-xs custom-scrollbar">
                 <button
                     type="button"
                     onClick={() => setActiveTab('friends')}
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'friends'
-                            ? 'bg-[#5b4fff] text-white shadow-sm'
-                            : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-800'
+                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
                     }`}
                 >
                     <Users className="w-4 h-4" />
                     <span>Friends Network</span>
                     {friendsCount > 0 && (
-                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
                             activeTab === 'friends' ? 'bg-white/20 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                         }`}>
                             {friendsCount}
@@ -97,15 +97,15 @@ export function SocialHubView({ initialTab = 'friends' }: SocialHubViewProps) {
                     onClick={() => setActiveTab('pvp')}
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'pvp'
-                            ? 'bg-[#5b4fff] text-white shadow-sm'
-                            : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-800'
+                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
                     }`}
                 >
                     <Swords className="w-4 h-4" />
                     <span>PVP Duels</span>
                     {activeDuelsCount > 0 && (
-                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                            activeTab === 'pvp' ? 'bg-white/20 text-white' : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                            activeTab === 'pvp' ? 'bg-white/20 text-white' : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25'
                         }`}>
                             {activeDuelsCount} Live
                         </span>
@@ -117,8 +117,8 @@ export function SocialHubView({ initialTab = 'friends' }: SocialHubViewProps) {
                     onClick={() => setActiveTab('activity')}
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'activity'
-                            ? 'bg-[#5b4fff] text-white shadow-sm'
-                            : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-800'
+                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
                     }`}
                 >
                     <Activity className="w-4 h-4" />
@@ -130,8 +130,8 @@ export function SocialHubView({ initialTab = 'friends' }: SocialHubViewProps) {
                     onClick={() => setActiveTab('leaderboard')}
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'leaderboard'
-                            ? 'bg-[#5b4fff] text-white shadow-sm'
-                            : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-800'
+                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
                     }`}
                 >
                     <Trophy className="w-4 h-4" />
@@ -143,8 +143,8 @@ export function SocialHubView({ initialTab = 'friends' }: SocialHubViewProps) {
                     onClick={() => setActiveTab('peer')}
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                         activeTab === 'peer'
-                            ? 'bg-[#5b4fff] text-white shadow-sm'
-                            : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-800'
+                            ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/20'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
                     }`}
                 >
                     <BookOpen className="w-4 h-4" />

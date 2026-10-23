@@ -18,6 +18,7 @@ import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
+import { formatProblemTitle } from '@/lib/problemFormatter';
 import type { FriendDTO, PvpMatchDTO, CreatePvpMatchRequest } from '@/types';
 
 interface PvpArenaTabProps {
@@ -72,10 +73,10 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
     useEffect(() => {
         void loadData();
-        // Periodic background poll for match updates every 10 seconds during active duels
+        // Periodic background poll for match updates every 8 seconds during active duels
         const interval = setInterval(() => {
             void loadData();
-        }, 10000);
+        }, 8000);
         return () => clearInterval(interval);
     }, [loadData]);
 
@@ -112,7 +113,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             };
 
             await SocialService.createPvpChallenge(req);
-            setFeedback({ text: 'Challenge sent! Waiting for your friend to accept.', type: 'success' });
+            setFeedback({ text: '⚔️ Challenge sent! Waiting for your friend to accept.', type: 'success' });
             setCreateDialogOpen(false);
             setCustomTitle('');
             setCustomLink('');
@@ -131,7 +132,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
     const handleAcceptMatch = async (matchId: string) => {
         try {
             await SocialService.acceptPvpMatch(matchId);
-            setFeedback({ text: 'Duel started! Good luck!', type: 'success' });
+            setFeedback({ text: '⚔️ Duel started! Both clocks are ticking. Good luck!', type: 'success' });
             void loadData();
         } catch (err: any) {
             setFeedback({
@@ -157,12 +158,12 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             const res = await SocialService.verifyPvpMatch(matchId, subUrl);
             const isWinner = res.data.winnerId === user?.id;
             if (isWinner) {
-                setFeedback({ text: '🏆 Victory! You solved the duel problem first!', type: 'success' });
+                setFeedback({ text: '🏆 VICTORY! You solved the duel problem first! Congratulations!', type: 'success' });
             } else if (res.data.status === 'COMPLETED') {
-                setFeedback({ text: 'The match is completed.', type: 'success' });
+                setFeedback({ text: 'The match has been completed.', type: 'success' });
             } else {
                 setFeedback({
-                    text: 'Solution not detected yet. Submit on LeetCode first or paste your submission link!',
+                    text: 'Solution not detected yet. Submit on LeetCode first, or paste your submission link!',
                     type: 'error'
                 });
             }
@@ -174,7 +175,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             });
         } finally {
             setVerifyingMatchId(null);
-            setTimeout(() => setFeedback(null), 5000);
+            setTimeout(() => setFeedback(null), 6000);
         }
     };
 
@@ -192,7 +193,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
         return (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <Loader2 className="w-8 h-8 animate-spin text-[#5b4fff]" />
-                <p className="text-xs font-medium text-zinc-500">Loading PVP Arena...</p>
+                <p className="text-xs font-semibold text-zinc-500">Loading PVP Arena...</p>
             </div>
         );
     }
@@ -201,55 +202,81 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
         <div className="space-y-6">
             {feedback && (
                 <div
-                    className={`p-3.5 rounded-xl text-xs font-semibold flex items-center justify-between ${
+                    className={`p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm animate-in fade-in duration-200 ${
                         feedback.type === 'success'
-                            ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20'
-                            : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20'
+                            ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30'
+                            : 'bg-rose-50 dark:bg-rose-500/15 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30'
                     }`}
                 >
-                    <span>{feedback.text}</span>
-                    <button type="button" onClick={() => setFeedback(null)} className="cursor-pointer text-zinc-400 hover:text-zinc-600">
+                    <span className="flex items-center gap-2">
+                        {feedback.type === 'success' ? <Check className="w-4 h-4 text-emerald-500 shrink-0" /> : <X className="w-4 h-4 text-rose-500 shrink-0" />}
+                        {feedback.text}
+                    </span>
+                    <button type="button" onClick={() => setFeedback(null)} className="cursor-pointer text-zinc-400 hover:text-zinc-600 p-1">
                         <X className="w-4 h-4" />
                     </button>
                 </div>
             )}
 
             {/* PVP Arena Header Banner */}
-            <div className="p-6 rounded-3xl bg-linear-to-r from-[#5b4fff]/15 via-indigo-500/10 to-purple-500/15 border border-[#5b4fff]/20 dark:border-[#5b4fff]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <span className="p-1.5 rounded-lg bg-[#5b4fff] text-white">
-                            <Swords className="w-5 h-5" />
+            <div className="p-6 sm:p-8 rounded-3xl bg-linear-to-r from-[#5b4fff]/20 via-indigo-600/15 to-purple-600/20 border border-[#5b4fff]/30 dark:border-[#5b4fff]/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative overflow-hidden">
+                <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#5b4fff]/20 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="space-y-2 relative z-10">
+                    <div className="flex items-center gap-2.5">
+                        <span className="p-2.5 rounded-2xl bg-[#5b4fff] text-white shadow-md">
+                            <Swords className="w-6 h-6" />
                         </span>
-                        <h2 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">
-                            PVP Problem-Solving Arena
-                        </h2>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-xl font-black tracking-tight text-zinc-900 dark:text-white">
+                                    PVP Problem-Solving Arena
+                                </h2>
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25 animate-pulse">
+                                    <Flame className="w-3 h-3" /> Live Duels
+                                </span>
+                            </div>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 max-w-xl">
+                                Challenge your peers to 1v1 speed duels. Both receive the same problem — the first one to solve and verify wins the match and climbs the leaderboard!
+                            </p>
+                        </div>
                     </div>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-xl">
-                        Challenge friends to 1v1 speed duels. Both get the same problem — the first one to solve and verify wins the duel!
-                    </p>
                 </div>
 
                 <Button
                     onClick={() => setCreateDialogOpen(true)}
-                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-5 h-10 shadow-md gap-2 shrink-0 cursor-pointer"
+                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-2xl text-xs font-extrabold px-6 h-11 shadow-lg hover:shadow-xl hover:shadow-[#5b4fff]/25 transition-all gap-2 shrink-0 cursor-pointer relative z-10"
                 >
-                    <Play className="w-4 h-4" /> Start New Duel
+                    <Play className="w-4 h-4" /> Launch 1v1 Duel
                 </Button>
             </div>
 
             {/* Active Duels Section */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                        <Flame className="w-4 h-4 text-rose-500" /> Active Duels & Invites ({activeMatches.length})
+                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                        <Flame className="w-4 h-4 text-rose-500" /> Active Duels & In-Progress Battles ({activeMatches.length})
                     </h3>
                 </div>
 
                 {activeMatches.length === 0 ? (
-                    <div className="p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-2">
-                        <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">No active duels right now</p>
-                        <p className="text-xs text-zinc-500">Pick a friend and start a duel to test your speed and problem-solving skills!</p>
+                    <div className="p-10 rounded-3xl bg-white dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-3">
+                        <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400">
+                            <Swords className="w-6 h-6" />
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">No active duels right now</p>
+                            <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+                                Pick a friend from your network, set the difficulty and time limit, and battle in real time!
+                            </p>
+                        </div>
+                        <Button
+                            onClick={() => setCreateDialogOpen(true)}
+                            variant="outline"
+                            className="rounded-xl text-xs font-bold mt-2"
+                        >
+                            <Play className="w-4 h-4 mr-1.5" /> Start First Duel
+                        </Button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4">
@@ -258,132 +285,153 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                             const opponentName = isChallenger ? match.opponentName : match.challengerName;
                             const isInvitedPending = match.status === 'INVITED';
                             const needsMyAcceptance = isInvitedPending && !isChallenger;
+                            const remaining = match.remainingSeconds ?? 0;
+                            const isClockRunningOut = remaining < 300 && remaining > 0;
+                            const formattedTitle = match.problemTitle ? formatProblemTitle(match.problemTitle) : 'Duel Problem';
 
                             return (
                                 <div
                                     key={match.id}
-                                    className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm space-y-4"
+                                    className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm space-y-4 hover:border-[#5b4fff]/40 transition-all"
                                 >
-                                    {/* Match Header */}
+                                    {/* Match Status Bar & Timer */}
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2.5">
                                             <Badge
-                                                className={
+                                                className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-lg border ${
                                                     match.status === 'IN_PROGRESS'
-                                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 animate-pulse'
-                                                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                                                }
+                                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25 animate-pulse'
+                                                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25'
+                                                }`}
                                             >
-                                                {match.status === 'IN_PROGRESS' ? '⚔️ IN PROGRESS' : '📨 INVITATION PENDING'}
+                                                {match.status === 'IN_PROGRESS' ? '⚔️ DUEL IN PROGRESS' : '📨 INVITATION PENDING'}
                                             </Badge>
-                                            <span className="text-xs font-semibold text-zinc-500">
-                                                Topic: <strong className="text-zinc-800 dark:text-zinc-200">{match.problemTopic}</strong>
+                                            <span className="text-xs font-medium text-zinc-500">
+                                                Topic: <strong className="text-zinc-900 dark:text-white font-bold">{match.problemTopic}</strong>
                                             </span>
                                         </div>
 
                                         {match.status === 'IN_PROGRESS' && (
-                                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-mono font-bold">
-                                                <Clock className="w-4 h-4" />
+                                            <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full font-mono text-xs font-extrabold shadow-2xs border ${
+                                                isClockRunningOut
+                                                    ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30 animate-bounce'
+                                                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700'
+                                            }`}>
+                                                <Clock className="w-4 h-4 text-rose-500" />
                                                 <span>Time Left: {formatSeconds(match.remainingSeconds)}</span>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Problem details */}
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800">
+                                    {/* VS Coder Dual Face-off */}
+                                    <div className="grid grid-cols-3 items-center gap-2 py-2">
+                                        {/* Challenger */}
+                                        <div className="text-center space-y-1.5">
+                                            <Avatar className="w-12 h-12 mx-auto border-2 border-[#5b4fff]/40 shadow-sm">
+                                                <AvatarImage src={match.challengerAvatarUrl} />
+                                                <AvatarFallback className="bg-[#5b4fff]/10 text-[#5b4fff] font-bold text-sm">
+                                                    {match.challengerName.substring(0, 2)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
+                                                {match.challengerName} {isChallenger && <span className="text-[#5b4fff]">(You)</span>}
+                                            </p>
+                                            <div>
+                                                {match.challengerSolved ? (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                                                        <CheckCircle2 className="w-3 h-3" /> SOLVED
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-400">
+                                                        <Clock className="w-3 h-3" /> Solving...
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* VS Badge */}
+                                        <div className="flex flex-col items-center justify-center">
+                                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-rose-500 via-purple-600 to-[#5b4fff] text-white font-black text-xs flex items-center justify-center shadow-md shadow-purple-500/20">
+                                                VS
+                                            </div>
+                                            <span className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-wider">
+                                                {match.durationMinutes}m Duel
+                                            </span>
+                                        </div>
+
+                                        {/* Opponent */}
+                                        <div className="text-center space-y-1.5">
+                                            <Avatar className="w-12 h-12 mx-auto border-2 border-purple-500/40 shadow-sm">
+                                                <AvatarImage src={match.opponentAvatarUrl} />
+                                                <AvatarFallback className="bg-purple-500/10 text-purple-600 font-bold text-sm">
+                                                    {match.opponentName.substring(0, 2)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
+                                                {match.opponentName} {!isChallenger && <span className="text-[#5b4fff]">(You)</span>}
+                                            </p>
+                                            <div>
+                                                {match.opponentSolved ? (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                                                        <CheckCircle2 className="w-3 h-3" /> SOLVED
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-400">
+                                                        <Clock className="w-3 h-3" /> Solving...
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Problem Target Box */}
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800">
                                         <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <h4 className="text-sm font-bold text-zinc-900 dark:text-white">
-                                                    {match.problemTitle}
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h4 className="text-sm font-extrabold text-zinc-900 dark:text-white">
+                                                    {formattedTitle}
                                                 </h4>
                                                 <Badge
-                                                    variant="outline"
-                                                    className={`text-[10px] font-bold ${
+                                                    className={`text-[10px] font-bold px-2 py-0.2 rounded-md border ${
                                                         match.problemDifficulty === 'Easy'
-                                                            ? 'text-emerald-600 dark:text-emerald-400'
+                                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                                             : match.problemDifficulty === 'Medium'
-                                                            ? 'text-amber-600 dark:text-amber-400'
-                                                            : 'text-rose-600 dark:text-rose-400'
+                                                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                                            : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
                                                     }`}
                                                 >
                                                     {match.problemDifficulty}
                                                 </Badge>
                                             </div>
-                                            <p className="text-[11px] text-zinc-500">Duration: {match.durationMinutes} minutes</p>
+                                            <p className="text-[11px] text-zinc-500">
+                                                First coder to submit and verify takes the victory crown.
+                                            </p>
                                         </div>
 
                                         <a
                                             href={match.problemLink}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-900 text-[#5b4fff] border border-zinc-200 dark:border-zinc-700 hover:border-[#5b4fff] shadow-2xs transition-colors shrink-0"
+                                            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all shrink-0"
                                         >
-                                            Open Problem <ExternalLink className="w-3.5 h-3.5" />
+                                            <span>Open Problem on LeetCode</span>
+                                            <ExternalLink className="w-3.5 h-3.5" />
                                         </a>
                                     </div>
 
-                                    {/* Both players duel board */}
-                                    <div className="grid grid-cols-2 gap-3 text-center">
-                                        <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-200/80 dark:border-zinc-800 space-y-1.5">
-                                            <Avatar className="w-8 h-8 mx-auto">
-                                                <AvatarImage src={match.challengerAvatarUrl} />
-                                                <AvatarFallback className="bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-bold">
-                                                    {match.challengerName.substring(0, 2)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
-                                                {match.challengerName} {isChallenger && '(You)'}
-                                            </p>
-                                            <div className="inline-flex items-center gap-1 text-[11px] font-semibold">
-                                                {match.challengerSolved ? (
-                                                    <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                                                        <CheckCircle2 className="w-3.5 h-3.5" /> Solved
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-zinc-400 flex items-center gap-1">
-                                                        <Clock className="w-3.5 h-3.5" /> Solving...
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-200/80 dark:border-zinc-800 space-y-1.5">
-                                            <Avatar className="w-8 h-8 mx-auto">
-                                                <AvatarImage src={match.opponentAvatarUrl} />
-                                                <AvatarFallback className="bg-purple-500/10 text-purple-600 text-xs font-bold">
-                                                    {match.opponentName.substring(0, 2)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
-                                                {match.opponentName} {!isChallenger && '(You)'}
-                                            </p>
-                                            <div className="inline-flex items-center gap-1 text-[11px] font-semibold">
-                                                {match.opponentSolved ? (
-                                                    <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                                                        <CheckCircle2 className="w-3.5 h-3.5" /> Solved
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-zinc-400 flex items-center gap-1">
-                                                        <Clock className="w-3.5 h-3.5" /> Solving...
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Action row */}
+                                    {/* Action Row */}
                                     {needsMyAcceptance && (
-                                        <div className="flex items-center gap-2 pt-2">
+                                        <div className="flex items-center gap-3 pt-2">
                                             <Button
                                                 onClick={() => handleAcceptMatch(match.id)}
-                                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold h-9 gap-1.5 cursor-pointer"
+                                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold h-10 gap-2 cursor-pointer shadow-sm"
                                             >
                                                 <Check className="w-4 h-4" /> Accept Duel Challenge
                                             </Button>
                                             <Button
                                                 variant="outline"
                                                 onClick={() => handleDeclineMatch(match.id)}
-                                                className="flex-1 border-zinc-200 dark:border-zinc-700 text-zinc-600 rounded-xl text-xs font-semibold h-9 gap-1.5 cursor-pointer"
+                                                className="flex-1 border-zinc-200 dark:border-zinc-700 text-zinc-600 rounded-xl text-xs font-bold h-10 gap-2 cursor-pointer"
                                             >
                                                 <X className="w-4 h-4" /> Decline
                                             </Button>
@@ -392,7 +440,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
                                     {match.status === 'IN_PROGRESS' && (
                                         <div className="pt-2 space-y-2">
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                                 <Input
                                                     type="text"
                                                     placeholder="Optional: Paste LeetCode submission link to verify instantly..."
@@ -400,12 +448,12 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                                     onChange={(e) =>
                                                         setSubmissionUrlInput(prev => ({ ...prev, [match.id]: e.target.value }))
                                                     }
-                                                    className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9 text-xs rounded-xl"
+                                                    className="bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-700 h-10 text-xs rounded-xl flex-1"
                                                 />
                                                 <Button
                                                     onClick={() => handleVerifySubmission(match.id)}
                                                     disabled={verifyingMatchId === match.id}
-                                                    className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold px-4 h-9 gap-1.5 shrink-0 cursor-pointer shadow-xs"
+                                                    className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold px-5 h-10 gap-2 shrink-0 cursor-pointer shadow-md hover:shadow-lg transition-all"
                                                 >
                                                     {verifyingMatchId === match.id ? (
                                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -416,15 +464,15 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                                 </Button>
                                             </div>
                                             <p className="text-[10px] text-zinc-400">
-                                                💡 Tip: Submit on LeetCode first, then click Verify. The server auto-checks your recent submissions!
+                                                💡 Tip: Submit on LeetCode, then click Verify. MentorSync will scan your recent submissions or verify your URL in seconds!
                                             </p>
                                         </div>
                                     )}
 
                                     {isInvitedPending && isChallenger && (
-                                        <p className="text-xs text-zinc-400 text-center py-1">
-                                            Waiting for {opponentName} to accept the duel challenge...
-                                        </p>
+                                        <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800 text-xs text-zinc-500 text-center">
+                                            Waiting for {opponentName} to accept your duel invitation...
+                                        </div>
                                     )}
                                 </div>
                             );
@@ -435,38 +483,41 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
             {/* Match History */}
             <div className="space-y-4">
-                <h3 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-amber-500" /> Duel Match History ({pastMatches.length})
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-amber-500" /> Duel Match History & Past Battles ({pastMatches.length})
                 </h3>
 
                 {pastMatches.length === 0 ? (
-                    <p className="text-xs text-zinc-500">No completed duels yet.</p>
+                    <div className="p-8 rounded-2xl bg-white dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 text-center text-xs text-zinc-500">
+                        No completed duels yet. Complete your first match to build your head-to-head record!
+                    </div>
                 ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                         {pastMatches.slice(0, 10).map((m) => {
                             const isWinner = m.winnerId === user?.id;
                             const isDraw = m.status === 'DRAW';
+                            const title = m.problemTitle ? formatProblemTitle(m.problemTitle) : 'Duel Problem';
 
                             return (
                                 <div
                                     key={m.id}
-                                    className="p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 flex items-center justify-between gap-3 text-xs"
+                                    className="p-4 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 flex items-center justify-between gap-3 text-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
                                 >
                                     <div className="flex items-center gap-3 min-w-0">
                                         <Badge
-                                            className={
+                                            className={`text-[10px] font-black px-2.5 py-0.5 rounded-lg border ${
                                                 isWinner
                                                     ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                                     : isDraw
                                                     ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                                                     : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
-                                            }
+                                            }`}
                                         >
                                             {isWinner ? 'VICTORY 🏆' : isDraw ? 'DRAW 🤝' : 'DEFEAT'}
                                         </Badge>
                                         <div className="truncate">
                                             <p className="font-bold text-zinc-900 dark:text-white truncate">
-                                                {m.problemTitle}
+                                                {title}
                                             </p>
                                             <p className="text-[10px] text-zinc-400">
                                                 vs {m.challengerId === user?.id ? m.opponentName : m.challengerName} · {m.problemDifficulty} · {m.problemTopic}
@@ -486,13 +537,13 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
             {/* Create Challenge Dialog */}
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-                <DialogContent className="max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
+                <DialogContent className="max-w-md bg-white dark:bg-[#0c0c0e]/95 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                             <Swords className="w-5 h-5 text-[#5b4fff]" /> Launch 1v1 PVP Duel
                         </DialogTitle>
                         <DialogDescription className="text-xs text-zinc-500">
-                            Select a friend and duel settings. Both will compete on the chosen problem in real time!
+                            Select a friend and battle parameters. Both receive the same problem simultaneously!
                         </DialogDescription>
                     </DialogHeader>
 
@@ -513,7 +564,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                 ))}
                             </select>
                             {friends.length === 0 && (
-                                <p className="text-[11px] text-amber-600">
+                                <p className="text-[11px] text-amber-600 font-medium">
                                     You don't have any accepted friends yet. Add a friend first in the Friends tab!
                                 </p>
                             )}
@@ -588,13 +639,13 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                 placeholder="Problem Title (e.g. Trapping Rain Water)"
                                 value={customTitle}
                                 onChange={(e) => setCustomTitle(e.target.value)}
-                                className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9 text-xs rounded-xl"
+                                className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9.5 text-xs rounded-xl"
                             />
                             <Input
                                 placeholder="Problem URL (e.g. https://leetcode.com/problems/...)"
                                 value={customLink}
                                 onChange={(e) => setCustomLink(e.target.value)}
-                                className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9 text-xs rounded-xl"
+                                className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9.5 text-xs rounded-xl"
                             />
                         </div>
 
@@ -602,14 +653,14 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                             <Button
                                 variant="outline"
                                 onClick={() => setCreateDialogOpen(false)}
-                                className="rounded-xl text-xs h-9 cursor-pointer"
+                                className="rounded-xl text-xs h-10 cursor-pointer"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 onClick={handleCreateDuel}
                                 disabled={isCreating || !selectedFriendId}
-                                className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4 h-9 gap-1.5 shadow-sm cursor-pointer"
+                                className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-5 h-10 gap-2 shadow-md cursor-pointer"
                             >
                                 {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
                                 Issue Challenge
