@@ -178,9 +178,15 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                 </div>
                                 <div>
                                     {topThree[0].isCurrentUser ? (
-                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
-                                            Your Standing
-                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[0].studentId)}
+                                            className="h-8 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            title="View standing notice"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
+                                        </Button>
                                     ) : (
                                         <Button
                                             variant="outline"
@@ -222,9 +228,15 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                 </div>
                                 <div>
                                     {topThree[1].isCurrentUser ? (
-                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
-                                            Your Standing
-                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[1].studentId)}
+                                            className="h-8 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            title="View standing notice"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
+                                        </Button>
                                     ) : (
                                         <Button
                                             variant="outline"
@@ -268,9 +280,15 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                 </div>
                                 <div>
                                     {topThree[0].isCurrentUser ? (
-                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
-                                            Your Standing
-                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[0].studentId)}
+                                            className="h-8 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            title="View standing notice"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
+                                        </Button>
                                     ) : (
                                         <Button
                                             variant="outline"
@@ -312,9 +330,15 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                 </div>
                                 <div>
                                     {topThree[1].isCurrentUser ? (
-                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
-                                            Your Standing
-                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[1].studentId)}
+                                            className="h-8 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            title="View standing notice"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
+                                        </Button>
                                     ) : (
                                         <Button
                                             variant="outline"
@@ -358,9 +382,15 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                 </div>
                                 <div>
                                     {topThree[0].isCurrentUser ? (
-                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
-                                            Your Standing
-                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[0].studentId)}
+                                            className="h-8 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            title="View standing notice"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
+                                        </Button>
                                     ) : (
                                         <Button
                                             variant="outline"
@@ -398,9 +428,15 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                 </div>
                                 <div>
                                     {topThree[2].isCurrentUser ? (
-                                        <span className="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] text-xs font-bold border border-[#5b4fff]/20">
-                                            Your Standing
-                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onViewDashboard(topThree[2].studentId)}
+                                            className="h-8 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            title="View standing notice"
+                                        >
+                                            <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
+                                        </Button>
                                     ) : (
                                         <Button
                                             variant="outline"
@@ -515,9 +551,16 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
 
                                             <td className="py-4 px-5 text-right">
                                                 {e.isCurrentUser ? (
-                                                    <span className="inline-flex items-center gap-1 py-1 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 text-xs font-bold border border-zinc-200 dark:border-zinc-700">
-                                                        You
-                                                    </span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => onViewDashboard(e.studentId)}
+                                                        className="h-8 px-3 text-xs font-bold text-[#5b4fff] bg-[#5b4fff]/10 hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer gap-1.5"
+                                                        title="View standing notice"
+                                                    >
+                                                        <Eye className="w-3.5 h-3.5" />
+                                                        <span>You</span>
+                                                    </Button>
                                                 ) : (
                                                     <Button
                                                         variant="ghost"

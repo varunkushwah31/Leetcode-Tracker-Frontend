@@ -196,7 +196,7 @@ describe('FriendDashboardModal Component', () => {
         );
 
         await waitFor(() => {
-            expect(screen.getByText('You cannot view your own profile as a friend dashboard.')).toBeDefined();
+            expect(screen.getByText('You cannot view your own profile in Social Hub. Please view your personal dashboard in the Overview tab.')).toBeDefined();
         });
 
         // Ensure SocialService was never called

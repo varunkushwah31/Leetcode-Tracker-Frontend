@@ -142,15 +142,19 @@ describe('SocialHubView Component', () => {
         });
     });
 
-    it('does not allow viewing own profile from leaderboard and displays You indicator', async () => {
+    it('warns the user when they click to view their own profile from leaderboard', async () => {
         render(<SocialHubView initialTab="leaderboard" />);
 
         await waitFor(() => {
             expect(screen.getByText('Friends Network Leaderboard')).toBeDefined();
         });
 
-        // Current user should have "You" indicators and "Your Standing", and not have a view button for themselves
-        expect(screen.getAllByText('You').length).toBeGreaterThan(0);
-        expect(screen.getByText('Your Standing')).toBeDefined();
+        // Click "Your Standing"
+        const yourStandingBtn = screen.getByRole('button', { name: /Your Standing/i });
+        fireEvent.click(yourStandingBtn);
+
+        await waitFor(() => {
+            expect(screen.getAllByText(/You cannot view your own profile in Social Hub/i).length).toBeGreaterThan(0);
+        });
     });
 });

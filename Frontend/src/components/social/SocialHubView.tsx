@@ -5,7 +5,9 @@ import {
     ActivityIcon as Activity,
     TrophyIcon as Trophy,
     BookOpenIcon as BookOpen,
-    SparkleIcon as Sparkles
+    SparkleIcon as Sparkles,
+    WarningCircleIcon as AlertCircle,
+    XIcon as X
 } from '@phosphor-icons/react';
 import { FriendsListTab } from './FriendsListTab';
 import { PvpArenaTab } from './PvpArenaTab';
@@ -92,8 +94,23 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
         void loadCounters();
     }, [user?.id]);
 
+    // Warning state when attempting to view own profile
+    const [selfViewWarning, setSelfViewWarning] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!selfViewWarning) return;
+        const timer = setTimeout(() => {
+            setSelfViewWarning(null);
+        }, 6000);
+        return () => clearTimeout(timer);
+    }, [selfViewWarning]);
+
     const handleViewFriendDashboard = (friendId: string) => {
-        if (!friendId || friendId === user?.id) return;
+        if (!friendId) return;
+        if (friendId === user?.id) {
+            setSelfViewWarning('You cannot view your own profile in Social Hub. Please view your personal dashboard in the Overview tab.');
+            return;
+        }
         setSelectedFriendId(friendId);
         setDashboardModalOpen(true);
     };
@@ -182,6 +199,43 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                     </div>
                 </div>
             </div>
+
+            {/* Self-Profile View Warning Banner */}
+            {selfViewWarning && (
+                <div
+                    role="alert"
+                    className="p-4 sm:p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-400/80 dark:border-amber-600/70 shadow-lg shadow-amber-500/10 flex items-start sm:items-center justify-between gap-4 animate-in slide-in-from-top-3 duration-200"
+                >
+                    <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
+                            <AlertCircle className="w-5 h-5" weight="fill" />
+                        </div>
+                        <div className="space-y-0.5 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-xs font-black uppercase tracking-wider text-amber-900 dark:text-amber-200">
+                                    Self-Profile Notice
+                                </p>
+                                <span className="px-2 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                                    Social Hub
+                                </span>
+                            </div>
+                            <p className="text-xs sm:text-sm font-semibold text-amber-800 dark:text-amber-300 leading-normal">
+                                {selfViewWarning}
+                            </p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() => setSelfViewWarning(null)}
+                        className="p-1.5 rounded-xl text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition-colors cursor-pointer shrink-0"
+                        title="Dismiss warning"
+                        aria-label="Dismiss warning"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
 
             {/* Social Hub Top Navigation Tabs */}
             <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 rounded-2xl shadow-xs custom-scrollbar">
@@ -307,6 +361,25 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                 }}
                 onChallengePvp={handleChallengePvp}
             />
+
+            {/* Floating Self-View Warning Toast */}
+            {selfViewWarning && (
+                <div
+                    className="fixed bottom-6 right-6 z-50 max-w-md flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-2xl border-2 bg-amber-500 text-amber-950 border-amber-600 dark:bg-amber-600 dark:text-white dark:border-amber-500 animate-in slide-in-from-bottom-5 duration-200"
+                >
+                    <AlertCircle className="w-5 h-5 shrink-0" weight="fill" />
+                    <p className="text-xs font-bold leading-tight flex-1">{selfViewWarning}</p>
+                    <button
+                        type="button"
+                        onClick={() => setSelfViewWarning(null)}
+                        className="ml-2 hover:opacity-75 transition-opacity cursor-pointer p-1"
+                        title="Dismiss"
+                        aria-label="Dismiss warning"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

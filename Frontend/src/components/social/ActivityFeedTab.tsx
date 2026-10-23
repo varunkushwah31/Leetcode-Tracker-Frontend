@@ -172,43 +172,30 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3.5 min-w-0">
-                                        {isCurrentUser ? (
-                                            <Avatar className="w-11 h-11 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                        <button
+                                            type="button"
+                                            onClick={() => onViewFriendDashboard(act.studentId)}
+                                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                                            title={isCurrentUser ? "Your profile notice" : "View profile"}
+                                        >
+                                            <Avatar className={`w-11 h-11 border-2 ${isCurrentUser ? 'border-[#5b4fff]/40' : 'border-zinc-200 dark:border-zinc-700'} shadow-sm`}>
                                                 <AvatarImage src={act.studentAvatarUrl} />
                                                 <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] text-xs font-bold">
                                                     {act.studentName.substring(0, 2)}
                                                 </AvatarFallback>
                                             </Avatar>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                onClick={() => onViewFriendDashboard(act.studentId)}
-                                                className="cursor-pointer hover:opacity-80 transition-opacity"
-                                            >
-                                                <Avatar className="w-11 h-11 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm">
-                                                    <AvatarImage src={act.studentAvatarUrl} />
-                                                    <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] text-xs font-bold">
-                                                        {act.studentName.substring(0, 2)}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                            </button>
-                                        )}
+                                        </button>
 
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-2">
-                                                {isCurrentUser ? (
-                                                    <span className="text-xs font-extrabold text-zinc-900 dark:text-white truncate">
-                                                        {act.studentName}
-                                                    </span>
-                                                ) : (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => onViewFriendDashboard(act.studentId)}
-                                                        className="text-xs font-extrabold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
-                                                    >
-                                                        {act.studentName}
-                                                    </button>
-                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onViewFriendDashboard(act.studentId)}
+                                                    className="text-xs font-extrabold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
+                                                    title={isCurrentUser ? "Your profile notice" : "View profile"}
+                                                >
+                                                    {act.studentName}
+                                                </button>
                                                 {isCurrentUser && (
                                                     <span className="text-[#5b4fff] text-xs font-bold">(You)</span>
                                                 )}
@@ -288,9 +275,15 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                     </div>
 
                                     {isCurrentUser ? (
-                                        <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 italic py-1 px-2.5">
-                                            Your Activity
-                                        </span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => onViewFriendDashboard(act.studentId)}
+                                            className="text-xs h-8 text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-500/10 cursor-pointer rounded-xl font-bold"
+                                            title="View activity notice"
+                                        >
+                                            Your Activity (You) →
+                                        </Button>
                                     ) : (
                                         <Button
                                             variant="ghost"

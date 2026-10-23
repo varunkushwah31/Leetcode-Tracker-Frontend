@@ -51,7 +51,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
         if (!open || !friendId) return;
 
         if (user?.id && friendId === user.id) {
-            setError('You cannot view your own profile as a friend dashboard.');
+            setError('You cannot view your own profile in Social Hub. Please view your personal dashboard in the Overview tab.');
             setIsLoading(false);
             setComparison(null);
             return;
@@ -213,11 +213,17 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                     </div>
                 )}
 
-                {/* Error State */}
+                {/* Error / Warning State */}
                 {error && !isLoading && (
-                    <div className="p-8 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 rounded-2xl text-center space-y-4">
-                        <p className="text-sm font-semibold text-rose-600 dark:text-rose-400">{error}</p>
-                        <Button onClick={onClose} variant="outline" className="text-xs rounded-xl">
+                    <div className="p-8 bg-amber-50 dark:bg-amber-950/20 border-2 border-amber-300 dark:border-amber-700/60 rounded-2xl text-center space-y-4">
+                        <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto">
+                            <AlertTriangle className="w-6 h-6" />
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-sm font-extrabold text-amber-900 dark:text-amber-100">Notice</p>
+                            <p className="text-xs font-semibold text-amber-800 dark:text-amber-300 max-w-md mx-auto">{error}</p>
+                        </div>
+                        <Button onClick={onClose} variant="outline" className="text-xs rounded-xl border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40 cursor-pointer">
                             Return to Friends Hub
                         </Button>
                     </div>
