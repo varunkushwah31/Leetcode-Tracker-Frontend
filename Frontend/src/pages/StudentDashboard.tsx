@@ -361,10 +361,10 @@ export function StudentDashboard() {
                                         setMainTab('social');
                                     }}
                                 />
-                                <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
                                 <ErrorBoundary fallback={null}>
                                     <UpcomingContestsCard />
                                 </ErrorBoundary>
+                                <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
                                 <BadgesList badges={dashboardData?.badges} />
                             </div>
                         </div>
