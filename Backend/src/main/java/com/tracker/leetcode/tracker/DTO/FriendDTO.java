@@ -33,4 +33,5 @@ public class FriendDTO implements Serializable {
     private String status; // ACCEPTED, PENDING_INCOMING, PENDING_OUTGOING
     private Instant friendSince;
     private Instant lastActive;
+    private boolean isOnline;
 }

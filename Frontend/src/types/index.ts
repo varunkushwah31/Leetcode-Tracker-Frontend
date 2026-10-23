@@ -398,6 +398,7 @@ export interface FriendDTO {
     status: 'ACCEPTED' | 'PENDING_INCOMING' | 'PENDING_OUTGOING';
     friendSince?: string;
     lastActive?: string;
+    isOnline?: boolean;
 }
 
 export interface FriendRequestDTO {

@@ -234,6 +234,9 @@ export const SocialService = {
     removeFriend: (friendId: string) =>
         api.delete<{ message: string }>('/social/friends/' + friendId),
 
+    pingPresence: () =>
+        api.post<{ status: string; studentId: string }>('/social/presence'),
+
     getFriends: () =>
         api.get<{
             friends: import('@/types').FriendDTO[];

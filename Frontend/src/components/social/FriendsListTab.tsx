@@ -31,6 +31,13 @@ interface FriendsListTabProps {
 export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<FriendsListTabProps>) {
     const { user } = useAuth();
     const [friends, setFriends] = useState<FriendDTO[]>([]);
+
+    const onlineCount = friends.filter(f => Boolean(f.isOnline)).length;
+    const sortedFriends = [...friends].sort((a, b) => {
+        if (a.isOnline && !b.isOnline) return -1;
+        if (!a.isOnline && b.isOnline) return 1;
+        return (b.totalSolved || 0) - (a.totalSolved || 0);
+    });
     const [incomingRequests, setIncomingRequests] = useState<FriendRequestDTO[]>([]);
     const [outgoingRequests, setOutgoingRequests] = useState<FriendRequestDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -349,9 +356,17 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             {/* Coding Friends Grid Section */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
-                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
-                        <Users className="w-4 h-4 text-[#5b4fff]" /> My Coding Friends ({friends.length})
-                    </h3>
+                    <div className="flex items-center gap-2.5">
+                        <h3 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                            <Users className="w-4 h-4 text-[#5b4fff]" /> My Coding Friends ({friends.length})
+                        </h3>
+                        {onlineCount > 0 && (
+                            <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                {onlineCount} Live Now
+                            </span>
+                        )}
+                    </div>
                     <span className="text-xs text-zinc-400 font-medium">Compete, Compare & Duel</span>
                 </div>
 
@@ -369,7 +384,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                        {friends.map((friend) => (
+                        {sortedFriends.map((friend) => (
                             <div
                                 key={friend.id}
                                 className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 hover:border-[#5b4fff]/50 hover:shadow-lg hover:shadow-[#5b4fff]/5 transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
@@ -387,21 +402,46 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                                     {friend.name.substring(0, 2)}
                                                 </AvatarFallback>
                                             </Avatar>
+                                            {/* Discord-style Live Online Indicator */}
+                                            <span
+                                                className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-[#111111] z-10 transition-all ${
+                                                    friend.isOnline
+                                                        ? 'bg-emerald-500 ring-2 ring-emerald-500/30'
+                                                        : 'bg-zinc-400/80 dark:bg-zinc-600'
+                                                }`}
+                                                title={friend.isOnline ? 'Online / Live Now' : 'Offline'}
+                                            >
+                                                {friend.isOnline && (
+                                                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60" />
+                                                )}
+                                            </span>
                                             {friend.streak > 0 && (
-                                                <div className="absolute -bottom-1 -right-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-0.5 rounded-full shadow-xs">
+                                                <div className="absolute -top-1 -right-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-0.5 rounded-full shadow-xs z-10">
                                                     <Flame className="w-3.5 h-3.5 text-orange-500 animate-flame" />
                                                 </div>
                                             )}
                                         </div>
 
                                         <div className="min-w-0">
-                                            <button
-                                                type="button"
-                                                onClick={() => onViewDashboard(friend.id)}
-                                                className="text-sm font-extrabold text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] transition-colors text-left block cursor-pointer"
-                                            >
-                                                {friend.name}
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onViewDashboard(friend.id)}
+                                                    className="text-sm font-extrabold text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] transition-colors text-left block cursor-pointer"
+                                                >
+                                                    {friend.name}
+                                                </button>
+                                                {friend.isOnline ? (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 rounded-full shrink-0">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                                        Live
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[10px] text-zinc-400 font-medium shrink-0">
+                                                        Offline
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div className="flex items-center gap-1.5 text-xs text-zinc-400 truncate mt-0.5">
                                                 {friend.leetcodeUsername ? (
                                                     <a

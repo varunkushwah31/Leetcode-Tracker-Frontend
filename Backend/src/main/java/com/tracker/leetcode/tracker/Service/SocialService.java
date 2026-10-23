@@ -8,6 +8,7 @@ import com.tracker.leetcode.tracker.Repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -28,6 +29,38 @@ public class SocialService {
     private final StudentService studentService;
     private final StudentMapper studentMapper;
     private final CuratedTopicCatalog curatedTopicCatalog;
+    private final StringRedisTemplate stringRedisTemplate;
+
+    public void touchPresence(String studentId) {
+        if (studentId == null || studentId.isBlank()) return;
+        try {
+            if (stringRedisTemplate != null) {
+                stringRedisTemplate.opsForValue().set("presence:student:" + studentId, String.valueOf(System.currentTimeMillis()), Duration.ofMinutes(10));
+            }
+        } catch (Exception ex) {
+            log.debug("Redis presence update failed: {}", ex.getMessage());
+        }
+    }
+
+    public boolean isStudentOnline(String studentId, Student student) {
+        if (studentId == null || studentId.isBlank()) return false;
+        try {
+            if (stringRedisTemplate != null) {
+                Boolean hasKey = stringRedisTemplate.hasKey("presence:student:" + studentId);
+                if (Boolean.TRUE.equals(hasKey)) {
+                    return true;
+                }
+            }
+        } catch (Exception ex) {
+            log.debug("Redis presence check failed: {}", ex.getMessage());
+        }
+        // Fallback: If lastSyncedAt is within the last 10 minutes
+        if (student != null && student.getLastSyncedAt() != null) {
+            Instant tenMinAgo = Instant.now().minus(Duration.ofMinutes(10));
+            return student.getLastSyncedAt().isAfter(tenMinAgo);
+        }
+        return false;
+    }
 
     // ==========================================
     // 1. FRIEND MANAGEMENT & DISCOVERY
@@ -228,6 +261,7 @@ public class SocialService {
     }
 
     public Map<String, Object> getFriendsAndRequests(String currentStudentId) {
+        touchPresence(currentStudentId);
         Student currentStudent = studentRepository.findById(currentStudentId).orElse(null);
         if (currentStudent != null && currentStudent.getFriendIds() != null && currentStudent.getFriendIds().contains(currentStudentId)) {
             currentStudent.getFriendIds().remove(currentStudentId);
@@ -254,6 +288,7 @@ public class SocialService {
                 if (friend != null && !friend.getId().equals(currentStudentId)) {
                     int lcSolved = studentMapper.calculateLeetcodeSolved(friend.getProblemStats());
                     int cfSolved = friend.getCodeforcesSolvedCount() != null ? friend.getCodeforcesSolvedCount() : 0;
+                    boolean isOnline = isStudentOnline(friend.getId(), friend);
 
                     acceptedFriends.add(FriendDTO.builder()
                             .id(friend.getId())
@@ -274,6 +309,7 @@ public class SocialService {
                             .status("ACCEPTED")
                             .friendSince(f.getUpdatedAt() != null ? f.getUpdatedAt() : f.getCreatedAt())
                             .lastActive(friend.getLastSyncedAt())
+                            .isOnline(isOnline)
                             .build());
                 }
             } else if (f.getStatus() == FriendshipStatus.PENDING) {

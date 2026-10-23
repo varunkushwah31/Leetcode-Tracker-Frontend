@@ -37,6 +37,8 @@ class SocialServiceTest {
     private StudentMapper studentMapper;
     @Mock
     private CuratedTopicCatalog curatedTopicCatalog;
+    @Mock
+    private org.springframework.data.redis.core.StringRedisTemplate stringRedisTemplate;
 
     @InjectMocks
     private SocialService socialService;

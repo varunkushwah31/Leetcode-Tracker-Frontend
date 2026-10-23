@@ -260,4 +260,14 @@ public class SocialController {
     ) {
         return ResponseEntity.ok(socialService.getCuratedProblems(topic));
     }
+
+    @PostMapping("/presence")
+    public ResponseEntity<Map<String, Object>> pingPresence(
+            @AuthenticationPrincipal Student currentStudent,
+            Authentication authentication
+    ) {
+        String studentId = resolveStudentId(currentStudent, authentication);
+        socialService.touchPresence(studentId);
+        return ResponseEntity.ok(Map.of("status", "ACTIVE", "studentId", studentId));
+    }
 }
