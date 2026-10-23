@@ -11,7 +11,9 @@ import {
     TrophyIcon as Trophy,
     FlameIcon as Flame,
     CheckCircleIcon as CheckCircle2,
-    UsersIcon as Users
+    UsersIcon as Users,
+    ArrowSquareOutIcon as ExternalLink,
+    PaperPlaneRightIcon as Send
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -25,7 +27,7 @@ interface FriendsListTabProps {
     onChallengePvp: (friendId: string, friendName: string) => void;
 }
 
-export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListTabProps) {
+export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<FriendsListTabProps>) {
     const [friends, setFriends] = useState<FriendDTO[]>([]);
     const [incomingRequests, setIncomingRequests] = useState<FriendRequestDTO[]>([]);
     const [outgoingRequests, setOutgoingRequests] = useState<FriendRequestDTO[]>([]);
@@ -55,7 +57,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
         void loadFriendsData();
     }, [loadFriendsData]);
 
-    // Handle search query
+    // Handle search query with debounce
     useEffect(() => {
         if (!searchQuery.trim() || searchQuery.trim().length < 2) {
             setSearchResults([]);
@@ -82,7 +84,6 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
         try {
             await SocialService.sendFriendRequest(targetId);
             setFeedbackMessage({ text: 'Friend request sent successfully!', type: 'success' });
-            // Update search item status locally
             setSearchResults(prev =>
                 prev.map(s => (s.id === targetId ? { ...s, friendshipStatus: 'PENDING_OUTGOING' } : s))
             );
@@ -128,7 +129,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
     };
 
     const handleRemoveFriend = async (friendId: string, name: string) => {
-        if (!window.confirm(`Are you sure you want to remove ${name} from your friends?`)) return;
+        if (!window.confirm(`Are you sure you want to remove ${name} from your friends list?`)) return;
         setActionLoadingId(friendId);
         try {
             await SocialService.removeFriend(friendId);
@@ -144,8 +145,8 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-[#5b4fff]" />
+            <div className="flex flex-col items-center justify-center py-24 gap-3">
+                <Loader2 className="w-9 h-9 animate-spin text-[#5b4fff]" />
                 <p className="text-xs font-semibold text-zinc-500">Loading your friends network...</p>
             </div>
         );
@@ -153,6 +154,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
 
     return (
         <div className="space-y-6">
+            {/* Feedback Notification Banner */}
             {feedbackMessage && (
                 <div
                     className={`p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm animate-in fade-in duration-200 ${
@@ -171,45 +173,62 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
                 </div>
             )}
 
-            {/* Find Friends Search Bar */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden space-y-4">
+            {/* Find Friends Search Card */}
+            <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden space-y-4">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
 
-                <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
-                        <UserPlus className="w-6 h-6" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
+                            <UserPlus className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h3 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                                Discover & Add Coding Peers
+                            </h3>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                Search peers by full name, campus email, LeetCode handle, or Codeforces handle.
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
-                            Discover & Add Coding Friends
-                        </h3>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                            Connect with fellow engineers to share non-spoiler hints, compare solved questions, and compete in 1v1 duels
-                        </p>
-                    </div>
+
+                    {outgoingRequests.length > 0 && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700/60 self-start sm:self-auto">
+                            <Send className="w-3.5 h-3.5 text-zinc-400" />
+                            <span><strong>{outgoingRequests.length}</strong> request{outgoingRequests.length > 1 ? 's' : ''} pending response</span>
+                        </span>
+                    )}
                 </div>
 
                 <div className="relative">
                     <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <Input
                         type="text"
-                        placeholder="Search peers by name, email, LeetCode username, or Codeforces handle..."
+                        placeholder="Type name, email, LeetCode username, or Codeforces handle..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10.5 bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 h-10.5 text-xs rounded-2xl"
+                        className="pl-10.5 pr-10 bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 h-11 text-xs rounded-2xl shadow-inner focus-visible:ring-[#5b4fff]/30"
                     />
-                    {isSearching && (
+                    {isSearching ? (
                         <Loader2 className="w-4 h-4 text-zinc-400 animate-spin absolute right-4 top-1/2 -translate-y-1/2" />
-                    )}
+                    ) : searchQuery ? (
+                        <button
+                            type="button"
+                            onClick={() => setSearchQuery('')}
+                            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 absolute right-4 top-1/2 -translate-y-1/2"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    ) : null}
                 </div>
 
                 {/* Live Search Results Dropdown */}
                 {searchResults.length > 0 && (
-                    <div className="mt-3 divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 max-h-72 overflow-y-auto shadow-lg">
+                    <div className="mt-2 divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-[#151518] max-h-72 overflow-y-auto shadow-xl">
                         {searchResults.map((user) => (
-                            <div key={user.id} className="p-3.5 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                            <div key={user.id} className="p-3.5 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <Avatar className="w-9 h-9 border border-zinc-200 dark:border-zinc-700">
+                                    <Avatar className="w-10 h-10 border border-zinc-200 dark:border-zinc-700 shrink-0">
                                         <AvatarImage src={user.avatarUrl} />
                                         <AvatarFallback className="bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-bold">
                                             {user.name.substring(0, 2)}
@@ -217,20 +236,22 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
                                     </Avatar>
                                     <div className="min-w-0">
                                         <p className="text-xs font-extrabold text-zinc-900 dark:text-white truncate">{user.name}</p>
-                                        <p className="text-[11px] text-zinc-500 truncate">
-                                            @{user.leetcodeUsername || user.codeforcesHandle || 'coder'} · {user.totalSolved} solved
+                                        <p className="text-[11px] text-zinc-500 truncate flex items-center gap-1.5 mt-0.5">
+                                            <span>@{user.leetcodeUsername || user.codeforcesHandle || 'coder'}</span>
+                                            <span>·</span>
+                                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{user.totalSolved} solved</span>
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 shrink-0">
                                     {user.friendshipStatus === 'ACCEPTED' ? (
                                         <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
                                             Friends
                                         </Badge>
                                     ) : user.friendshipStatus === 'PENDING_OUTGOING' ? (
                                         <Badge variant="secondary" className="text-[10px] font-bold">
-                                            Request Sent
+                                            Pending
                                         </Badge>
                                     ) : user.friendshipStatus === 'PENDING_INCOMING' ? (
                                         <Button
@@ -248,12 +269,8 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
                                             onClick={() => handleSendRequest(user.id)}
                                             disabled={actionLoadingId === user.id}
                                         >
-                                            {actionLoadingId === user.id ? (
-                                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                            ) : (
-                                                <UserPlus className="w-3.5 h-3.5" />
-                                            )}
-                                            Add Friend
+                                            <UserPlus className="w-3.5 h-3.5" />
+                                            <span>Add Friend</span>
                                         </Button>
                                     )}
                                 </div>
@@ -263,25 +280,27 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
                 )}
             </div>
 
-            {/* Pending Incoming Friend Requests Banner */}
+            {/* Pending Incoming Friend Requests */}
             {incomingRequests.length > 0 && (
-                <div className="p-5 rounded-3xl bg-indigo-50/70 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800/60 space-y-3.5">
-                    <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        <h4 className="text-xs font-black uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
-                            Friend Requests Received ({incomingRequests.length})
+                <div className="p-6 rounded-3xl bg-amber-50/60 dark:bg-amber-950/15 border border-amber-200/90 dark:border-amber-800/40 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                            Incoming Friend Requests ({incomingRequests.length})
                         </h4>
+                        <span className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">Action Required</span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {incomingRequests.map((req) => (
                             <div
                                 key={req.id}
-                                className="p-3.5 bg-white dark:bg-zinc-900 rounded-2xl border border-indigo-200/80 dark:border-indigo-900/40 flex items-center justify-between gap-3 shadow-xs"
+                                className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-amber-200 dark:border-zinc-800 shadow-xs flex items-center justify-between gap-3"
                             >
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <Avatar className="w-9 h-9 border border-zinc-200 dark:border-zinc-700">
+                                    <Avatar className="w-10 h-10 border border-zinc-200 dark:border-zinc-700 shrink-0">
                                         <AvatarImage src={req.requesterAvatarUrl} />
-                                        <AvatarFallback className="bg-indigo-100 text-indigo-700 text-xs font-bold">
+                                        <AvatarFallback className="bg-amber-100 text-amber-800 text-xs font-bold">
                                             {req.requesterName.substring(0, 2)}
                                         </AvatarFallback>
                                     </Avatar>
@@ -291,25 +310,23 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-1.5 shrink-0">
+                                <div className="flex items-center gap-2 shrink-0">
                                     <Button
-                                        size="icon"
-                                        className="h-8 w-8 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-pointer shadow-xs"
+                                        size="sm"
+                                        className="h-8 px-3 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-pointer shadow-xs gap-1.5"
                                         onClick={() => handleAccept(req.id)}
                                         disabled={actionLoadingId === req.id}
-                                        title="Accept Friend"
                                     >
-                                        <Check className="w-4 h-4" />
+                                        <Check className="w-3.5 h-3.5" /> Accept
                                     </Button>
                                     <Button
-                                        size="icon"
+                                        size="sm"
                                         variant="outline"
-                                        className="h-8 w-8 text-zinc-500 hover:text-rose-600 rounded-xl cursor-pointer border-zinc-200 dark:border-zinc-700"
+                                        className="h-8 px-3 text-xs font-semibold text-zinc-600 hover:text-rose-600 rounded-xl cursor-pointer border-zinc-200 dark:border-zinc-700"
                                         onClick={() => handleReject(req.id)}
                                         disabled={actionLoadingId === req.id}
-                                        title="Decline"
                                     >
-                                        <X className="w-4 h-4" />
+                                        <X className="w-3.5 h-3.5" /> Decline
                                     </Button>
                                 </div>
                             </div>
@@ -318,66 +335,94 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
                 </div>
             )}
 
-            {/* Pending Outgoing Requests */}
-            {outgoingRequests.length > 0 && (
-                <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 text-xs text-zinc-500 flex items-center justify-between">
-                    <span>
-                        You have <strong className="text-zinc-900 dark:text-white font-bold">{outgoingRequests.length}</strong> pending outgoing friend request(s).
-                    </span>
-                    <span className="text-[11px] text-zinc-400 font-medium">Waiting for response</span>
-                </div>
-            )}
-
-            {/* Friends Grid */}
+            {/* Coding Friends Grid Section */}
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between px-1">
                     <h3 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
                         <Users className="w-4 h-4 text-[#5b4fff]" /> My Coding Friends ({friends.length})
                     </h3>
-                    <span className="text-xs text-zinc-400">Compete & Learn Together</span>
+                    <span className="text-xs text-zinc-400 font-medium">Compete, Compare & Duel</span>
                 </div>
 
                 {friends.length === 0 ? (
-                    <div className="p-12 rounded-3xl bg-white dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-3">
-                        <div className="w-12 h-12 rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center mx-auto">
+                    <div className="p-12 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-3">
+                        <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400">
                             <Users className="w-6 h-6" />
                         </div>
                         <div className="space-y-1">
-                            <h4 className="text-sm font-bold text-zinc-900 dark:text-white">No friends added yet</h4>
+                            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">No Coding Friends Added Yet</p>
                             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-                                Search for peers by username above to add them as friends, launch 1v1 PVP duels, and view their dashboard!
+                                Search for your classmates or coding partners using the search box above to compare solutions and duel in real time.
                             </p>
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                         {friends.map((friend) => (
                             <div
                                 key={friend.id}
-                                className="p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 hover:border-[#5b4fff]/40 transition-all shadow-xs flex flex-col justify-between space-y-3.5 group"
+                                className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 hover:border-[#5b4fff]/50 hover:shadow-lg hover:shadow-[#5b4fff]/5 transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
                             >
+                                {/* Gradient top border accent */}
+                                <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/30 to-transparent group-hover:via-[#5b4fff]/70 transition-colors" />
+
+                                {/* Friend Header */}
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3.5 min-w-0">
-                                        <Avatar className="w-12 h-12 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm">
-                                            <AvatarImage src={friend.avatarUrl} />
-                                            <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] font-bold text-sm">
-                                                {friend.name.substring(0, 2)}
-                                            </AvatarFallback>
-                                        </Avatar>
+                                        <div className="relative shrink-0">
+                                            <Avatar className="w-13 h-13 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm ring-2 ring-[#5b4fff]/10">
+                                                <AvatarImage src={friend.avatarUrl} className="object-cover" />
+                                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] font-bold text-sm">
+                                                    {friend.name.substring(0, 2)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            {friend.streak > 0 && (
+                                                <div className="absolute -bottom-1 -right-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-0.5 rounded-full shadow-xs">
+                                                    <Flame className="w-3.5 h-3.5 text-orange-500 animate-flame" />
+                                                </div>
+                                            )}
+                                        </div>
+
                                         <div className="min-w-0">
-                                            <h4 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] transition-colors">
+                                            <button
+                                                type="button"
+                                                onClick={() => onViewDashboard(friend.id)}
+                                                className="text-sm font-extrabold text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] transition-colors text-left block cursor-pointer"
+                                            >
                                                 {friend.name}
-                                            </h4>
-                                            <p className="text-xs text-zinc-400 truncate mt-0.5">
-                                                @{friend.leetcodeUsername || friend.codeforcesHandle || 'coder'}
-                                            </p>
+                                            </button>
+                                            <div className="flex items-center gap-1.5 text-xs text-zinc-400 truncate mt-0.5">
+                                                {friend.leetcodeUsername ? (
+                                                    <a
+                                                        href={`https://leetcode.com/${friend.leetcodeUsername}`}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="hover:text-[#ffa116] transition-colors flex items-center gap-0.5"
+                                                    >
+                                                        <span>LC: @{friend.leetcodeUsername}</span>
+                                                        <ExternalLink className="w-3 h-3" />
+                                                    </a>
+                                                ) : friend.codeforcesHandle ? (
+                                                    <a
+                                                        href={`https://codeforces.com/profile/${friend.codeforcesHandle}`}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="hover:text-blue-400 transition-colors flex items-center gap-0.5"
+                                                    >
+                                                        <span>CF: @{friend.codeforcesHandle}</span>
+                                                        <ExternalLink className="w-3 h-3" />
+                                                    </a>
+                                                ) : (
+                                                    <span>@{friend.email?.split('@')[0] || 'coder'}</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 text-zinc-400 hover:text-rose-600 rounded-xl cursor-pointer"
+                                        className="h-8 w-8 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl cursor-pointer shrink-0"
                                         onClick={() => handleRemoveFriend(friend.id, friend.name)}
                                         title="Remove Friend"
                                     >
@@ -385,43 +430,55 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
                                     </Button>
                                 </div>
 
-                                {/* Stats row */}
-                                <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800/80 text-center">
+                                {/* Stats metric pill box */}
+                                <div className="grid grid-cols-3 gap-2 py-3 px-3.5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800/80 text-center">
                                     <div>
                                         <p className="text-[10px] text-zinc-400 font-semibold flex items-center justify-center gap-1">
                                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Solved
                                         </p>
-                                        <p className="text-xs font-black text-zinc-900 dark:text-white mt-0.5">{friend.totalSolved}</p>
+                                        <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5">{friend.totalSolved}</p>
                                     </div>
                                     <div>
                                         <p className="text-[10px] text-zinc-400 font-semibold flex items-center justify-center gap-1">
                                             <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rating
                                         </p>
-                                        <p className="text-xs font-black text-zinc-900 dark:text-white mt-0.5">
-                                            {Math.round(friend.currentContestRating || 0)}
+                                        <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5">
+                                            {Math.round(friend.currentContestRating || 0) || 'Unrated'}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-[10px] text-zinc-400 font-semibold flex items-center justify-center gap-1">
                                             <Flame className="w-3.5 h-3.5 text-rose-500" /> Streak
                                         </p>
-                                        <p className="text-xs font-black text-zinc-900 dark:text-white mt-0.5">{friend.streak}d</p>
+                                        <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5">{friend.streak}d</p>
                                     </div>
                                 </div>
 
-                                {/* Actions row */}
-                                <div className="grid grid-cols-2 gap-2 pt-1">
+                                {/* Head-to-Head duel record pill */}
+                                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 text-[11px] text-zinc-500 dark:text-zinc-400">
+                                    <span className="flex items-center gap-1 font-medium">
+                                        <Swords className="w-3.5 h-3.5 text-[#5b4fff]" /> Head-to-Head
+                                    </span>
+                                    <span className="font-bold">
+                                        <span className="text-emerald-600 dark:text-emerald-400">{friend.pvpWins || 0}W</span>
+                                        <span className="text-zinc-400 mx-1">-</span>
+                                        <span className="text-rose-600 dark:text-rose-400">{friend.pvpLosses || 0}L</span>
+                                    </span>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="grid grid-cols-2 gap-2.5 pt-1">
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="h-9 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer gap-1.5"
+                                        className="h-9 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer gap-1.5 shadow-xs"
                                         onClick={() => onViewDashboard(friend.id)}
                                     >
                                         <Eye className="w-3.5 h-3.5 text-zinc-500" /> View Profile
                                     </Button>
                                     <Button
                                         size="sm"
-                                        className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-xs hover:shadow-[#5b4fff]/20 transition-all"
+                                        className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all"
                                         onClick={() => onChallengePvp(friend.id, friend.name)}
                                     >
                                         <Swords className="w-3.5 h-3.5" /> PVP Duel
@@ -429,6 +486,35 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: FriendsListT
                                 </div>
                             </div>
                         ))}
+
+                        {/* Companion "Invite / Add More Friends" Card (Fills out grid balance when friends count is low) */}
+                        {friends.length < 3 && (
+                            <div className="p-6 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800/90 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 transition-colors flex flex-col justify-between items-center text-center space-y-4 bg-zinc-50/50 dark:bg-zinc-900/20">
+                                <div className="w-12 h-12 rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center mt-2">
+                                    <UserPlus className="w-6 h-6" />
+                                </div>
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-extrabold text-zinc-900 dark:text-white">
+                                        Grow Your Coding Circle
+                                    </h4>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs">
+                                        Add more peers to compete on the leaderboard, view detailed problem overlap, and duel in speed challenges.
+                                    </p>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        const inputEl = document.querySelector('input[type="text"]') as HTMLInputElement;
+                                        inputEl?.focus();
+                                    }}
+                                    className="h-9 px-4 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:border-[#5b4fff] cursor-pointer gap-1.5"
+                                >
+                                    <Search className="w-3.5 h-3.5 text-[#5b4fff]" /> Find Peers
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

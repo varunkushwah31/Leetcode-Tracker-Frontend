@@ -12,7 +12,12 @@ import {
     SparkleIcon as Sparkles,
     EyeIcon as Eye,
     EyeSlashIcon as EyeSlash,
-    GraduationCapIcon as GraduationCap
+    GraduationCapIcon as GraduationCap,
+    BrainIcon as Brain,
+    TreeStructureIcon as TreeStructure,
+    LightningIcon as Lightning,
+    MagnifyingGlassIcon as Search,
+    ArrowsLeftRightIcon as ArrowsLeftRight
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -27,7 +32,7 @@ interface PeerStudyTabProps {
     onChallengePvp?: (friendId?: string, friendName?: string) => void;
 }
 
-export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
+export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
     const [posts, setPosts] = useState<PeerStudyPostDTO[]>([]);
     const [curatedProblems, setCuratedProblems] = useState<CuratedProblemItemDTO[]>([]);
     const [selectedTopic, setSelectedTopic] = useState('Dynamic Programming');
@@ -54,6 +59,7 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
     const [revealedSpoilers, setRevealedSpoilers] = useState<{ [postId: string]: boolean }>({});
 
     const loadData = useCallback(async () => {
+        setIsLoading(true);
         try {
             const [postsRes, problemsRes] = await Promise.all([
                 SocialService.getPeerStudyPosts(selectedTopic),
@@ -136,23 +142,29 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
     };
 
     const topics = [
-        'Dynamic Programming',
-        'Tree',
-        'Graph',
-        'Binary Search',
-        'Two Pointers',
-        'Greedy'
+        { name: 'Dynamic Programming', icon: Brain },
+        { name: 'Tree', icon: TreeStructure },
+        { name: 'Graph', icon: BookOpen },
+        { name: 'Binary Search', icon: Search },
+        { name: 'Two Pointers', icon: ArrowsLeftRight },
+        { name: 'Greedy', icon: Lightning }
     ];
+
+    const openCreateWithSuggestion = (type: PeerStudyPostType, initialPrompt: string) => {
+        setPostType(type);
+        setTitle(initialPrompt);
+        setCreateDialogOpen(true);
+    };
 
     return (
         <div className="space-y-6">
             {/* Header with Topic Filter & Create Button */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm space-y-5 relative overflow-hidden">
+            <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm space-y-5 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
+                    <div className="flex items-center gap-3.5">
+                        <div className="p-3 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
                             <GraduationCap className="w-6 h-6" />
                         </div>
                         <div>
@@ -160,35 +172,37 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                 Peer-to-Peer Study Hub & Non-Spoiler Hints
                             </h3>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                Ask friends for hints without code spoilers, master key algorithms, and practice curated problem sets together.
+                                Ask friends for conceptual hints without full code spoilers, master key algorithmic paradigms, and practice together.
                             </p>
                         </div>
                     </div>
 
                     <Button
                         onClick={() => setCreateDialogOpen(true)}
-                        className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4.5 h-10 gap-2 shadow-md hover:shadow-lg hover:shadow-[#5b4fff]/20 transition-all cursor-pointer shrink-0"
+                        className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4.5 h-10 gap-2 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all cursor-pointer shrink-0"
                     >
                         <Plus className="w-4 h-4" /> Share Note or Ask Hint
                     </Button>
                 </div>
 
-                {/* Topic Filter Pills */}
+                {/* Topic Selector Pills with Icons */}
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
                     {topics.map((t) => {
-                        const isSelected = selectedTopic === t;
+                        const isSelected = selectedTopic === t.name;
+                        const IconComponent = t.icon;
                         return (
                             <button
                                 type="button"
-                                key={t}
-                                onClick={() => setSelectedTopic(t)}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                                key={t.name}
+                                onClick={() => setSelectedTopic(t.name)}
+                                className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 ${
                                     isSelected
-                                        ? 'bg-[#5b4fff] text-white shadow-sm ring-2 ring-[#5b4fff]/30'
+                                        ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/30'
                                         : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700/80'
                                 }`}
                             >
-                                {t}
+                                <IconComponent className="w-4 h-4" />
+                                <span>{t.name}</span>
                             </button>
                         );
                     })}
@@ -198,10 +212,11 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 {/* Main: Peer Study Posts (2 cols) */}
                 <div className="lg:col-span-2 space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between px-1">
                         <h4 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
-                            <ChatCircleDots className="w-4 h-4 text-[#5b4fff]" /> Peer Discussions & Hints ({posts.length})
+                            <ChatCircleDots className="w-4 h-4 text-[#5b4fff]" /> Discussions & Non-Spoiler Notes ({posts.length})
                         </h4>
+                        <span className="text-xs text-zinc-400 font-medium">Topic: {selectedTopic}</span>
                     </div>
 
                     {isLoading ? (
@@ -210,25 +225,45 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                             <p className="text-xs font-semibold text-zinc-500">Loading study discussions...</p>
                         </div>
                     ) : posts.length === 0 ? (
-                        <div className="p-12 rounded-3xl bg-white dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-3">
-                            <div className="w-12 h-12 rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center mx-auto">
-                                <Sparkles className="w-6 h-6" />
+                        <div className="p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm text-center space-y-5">
+                            <div className="w-14 h-14 rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center mx-auto shadow-inner">
+                                <Lightbulb className="w-7 h-7" />
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                                    No study notes on {selectedTopic} yet
-                                </p>
-                                <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-                                    Be the first to ask a hint or share an algorithmic pattern for your peer study group!
+                            <div className="space-y-1.5 max-w-md mx-auto">
+                                <h4 className="text-base font-extrabold text-zinc-900 dark:text-white">
+                                    No Discussions on {selectedTopic} Yet
+                                </h4>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                                    Be the first to post! Ask for a high-level nudge without getting code spoiled, or share a pattern breakthrough that helped you conquer this topic.
                                 </p>
                             </div>
-                            <Button
-                                onClick={() => setCreateDialogOpen(true)}
-                                variant="outline"
-                                className="rounded-xl text-xs font-bold mt-2"
-                            >
-                                <Plus className="w-4 h-4 mr-1.5" /> Start Discussion
-                            </Button>
+
+                            {/* Suggested Starter Prompts */}
+                            <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => openCreateWithSuggestion('HINT_REQUEST', `Hint needed for ${selectedTopic} state definition`)}
+                                    className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-[#5b4fff]/10 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 hover:text-[#5b4fff] border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
+                                >
+                                    Ask for a hint without full code
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => openCreateWithSuggestion('SOLUTION_INSIGHT', `Key algorithmic pattern for ${selectedTopic}`)}
+                                    className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-[#5b4fff]/10 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 hover:text-[#5b4fff] border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
+                                >
+                                    Share key pattern insight
+                                </button>
+                            </div>
+
+                            <div>
+                                <Button
+                                    onClick={() => setCreateDialogOpen(true)}
+                                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-5 h-10 gap-2 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all cursor-pointer"
+                                >
+                                    <Plus className="w-4 h-4" /> Start First Discussion
+                                </Button>
+                            </div>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -312,7 +347,7 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
 
                                         {/* Non-Spoiler Guard for Approach & Complexity */}
                                         {(post.approach || post.timeComplexity) && (
-                                            <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                                            <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                                                         <Sparkles className="w-3.5 h-3.5 text-amber-500" />
@@ -420,10 +455,11 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                                     </div>
                                                 )}
 
-                                                {/* Add reply input */}
-                                                <div className="flex items-center gap-2">
+                                                {/* Reply Composer */}
+                                                <div className="flex items-center gap-2 pt-2">
                                                     <Input
-                                                        placeholder="Provide a peer hint or ask a clarifying question..."
+                                                        type="text"
+                                                        placeholder="Provide a non-spoiler hint or comment..."
                                                         value={replyInputs[post.id] || ''}
                                                         onChange={(e) =>
                                                             setReplyInputs(prev => ({ ...prev, [post.id]: e.target.value }))
@@ -431,12 +467,12 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                                         onKeyDown={(e) => {
                                                             if (e.key === 'Enter') void handleAddReply(post.id);
                                                         }}
-                                                        className="h-9.5 bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-700 text-xs rounded-xl"
+                                                        className="h-9.5 text-xs bg-zinc-50 dark:bg-zinc-900/60 rounded-xl"
                                                     />
                                                     <Button
                                                         size="sm"
                                                         onClick={() => handleAddReply(post.id)}
-                                                        disabled={isReplyingId === post.id}
+                                                        disabled={isReplyingId === post.id || !replyInputs[post.id]?.trim()}
                                                         className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white h-9.5 px-3.5 rounded-xl cursor-pointer"
                                                     >
                                                         {isReplyingId === post.id ? (
@@ -457,10 +493,11 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
 
                 {/* Sidebar: Curated Practice Problems (1 col) */}
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between px-1">
                         <h4 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
                             <Sparkles className="w-4 h-4 text-amber-500" /> Curated {selectedTopic} Problems
                         </h4>
+                        <span className="text-xs text-zinc-400 font-medium">{curatedProblems.length} available</span>
                     </div>
 
                     <div className="space-y-3">
@@ -477,15 +514,15 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                 return (
                                     <div
                                         key={prob.titleSlug}
-                                        className="p-4 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs hover:border-[#5b4fff]/50 hover:shadow-lg dark:hover:shadow-[#5b4fff]/10 transition-all space-y-3 group"
+                                        className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs hover:border-[#5b4fff]/50 hover:shadow-lg dark:hover:shadow-[#5b4fff]/10 transition-all space-y-3.5 group"
                                     >
                                         <div className="flex items-start justify-between gap-2">
-                                            <div className="space-y-1">
-                                                <h5 className="text-xs font-bold text-zinc-900 dark:text-white line-clamp-1 group-hover:text-[#5b4fff] transition-colors">
+                                            <div className="space-y-1.5 min-w-0">
+                                                <h5 className="text-xs font-extrabold text-zinc-900 dark:text-white truncate group-hover:text-[#5b4fff] transition-colors">
                                                     {formattedTitle}
                                                 </h5>
                                                 <Badge
-                                                    className={`text-[9px] font-bold px-2 py-0.2 rounded-md border ${
+                                                    className={`text-[9px] font-bold px-2 py-0.5 rounded-md border ${
                                                         isEasy
                                                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                                             : isMed
@@ -504,7 +541,7 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                                 className="text-zinc-400 hover:text-[#5b4fff] transition-colors p-1"
                                                 title="Open on LeetCode"
                                             >
-                                                <ExternalLink className="w-3.5 h-3.5" />
+                                                <ExternalLink className="w-4 h-4" />
                                             </a>
                                         </div>
 
@@ -514,18 +551,18 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                                 href={prob.link}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="py-1.5 px-2 rounded-xl text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-1 text-center"
+                                                className="py-2 px-2.5 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-1.5 text-center cursor-pointer shadow-xs"
                                             >
                                                 <span>Practice</span>
-                                                <ExternalLink className="w-3 h-3" />
+                                                <ExternalLink className="w-3.5 h-3.5" />
                                             </a>
                                             {onChallengePvp ? (
                                                 <button
                                                     type="button"
                                                     onClick={() => onChallengePvp()}
-                                                    className="py-1.5 px-2 rounded-xl text-[11px] font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs hover:shadow-[#5b4fff]/20 transition-all cursor-pointer flex items-center justify-center gap-1 text-center"
+                                                    className="py-2 px-2.5 rounded-xl text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs hover:shadow-[#5b4fff]/20 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-center"
                                                 >
-                                                    <Swords className="w-3 h-3" />
+                                                    <Swords className="w-3.5 h-3.5" />
                                                     <span>Duel</span>
                                                 </button>
                                             ) : null}
@@ -534,131 +571,171 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                 );
                             })
                         )}
+
+                        {/* Educational Companion Card */}
+                        <div className="p-5 rounded-3xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-xs space-y-2 text-zinc-500 dark:text-zinc-400">
+                            <p className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Non-Spoiler Study Tip
+                            </p>
+                            <p className="text-[11px] leading-relaxed">
+                                Struggling on a problem? Post the subproblem transition or recurrence relation you are stuck on. Peers can suggest base case adjustments without spoiling the full implementation!
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Create Post Dialog */}
+            {/* Create Peer Study Post Modal */}
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-                <DialogContent className="max-w-lg bg-white dark:bg-[#0c0c0e]/95 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+                <DialogContent className="max-w-lg bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl">
                     <DialogHeader>
-                        <DialogTitle className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                            <BookOpen className="w-5 h-5 text-[#5b4fff]" /> Share Study Note or Ask Hint
+                        <DialogTitle className="text-lg font-bold text-zinc-900 dark:text-white">
+                            Share Note or Ask Non-Spoiler Hint
                         </DialogTitle>
                         <DialogDescription className="text-xs text-zinc-500">
-                            Post an algorithmic question, non-spoiler hint, or design pattern for your peer network.
+                            Topic: <strong className="text-[#5b4fff]">{selectedTopic}</strong>. Foster collaborative learning without spoiling complete solutions.
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="space-y-4 pt-3">
+                    <div className="space-y-4 pt-2">
                         {/* Type Picker */}
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                             <button
                                 type="button"
                                 onClick={() => setPostType('HINT_REQUEST')}
-                                className={`p-3 rounded-2xl border text-left text-xs font-bold transition-all cursor-pointer ${
+                                className={`p-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                                     postType === 'HINT_REQUEST'
-                                        ? 'bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-300 ring-2 ring-amber-500/20'
-                                        : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400'
+                                        ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                                        : 'border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
                                 }`}
                             >
-                                <span className="flex items-center gap-1.5">
-                                    <Lightbulb className="w-4 h-4 text-amber-500" /> Ask for a Hint
-                                </span>
-                                <span className="block font-normal text-[10px] text-zinc-400 mt-0.5">Need a hint without full spoiler</span>
+                                Hint Request
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setPostType('SOLUTION_INSIGHT')}
-                                className={`p-3 rounded-2xl border text-left text-xs font-bold transition-all cursor-pointer ${
+                                className={`p-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                                     postType === 'SOLUTION_INSIGHT'
-                                        ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/20'
-                                        : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400'
+                                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                                        : 'border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
                                 }`}
                             >
-                                <span className="flex items-center gap-1.5">
-                                    <Sparkles className="w-4 h-4 text-emerald-500" /> Share Solution Pattern
-                                </span>
-                                <span className="block font-normal text-[10px] text-zinc-400 mt-0.5">Core pattern & complexity</span>
+                                Pattern Insight
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPostType('STUDY_NOTE')}
+                                className={`p-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                                    postType === 'STUDY_NOTE'
+                                        ? 'bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/30'
+                                        : 'border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
+                                }`}
+                            >
+                                Study Note
                             </button>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Title</label>
+                        {/* Title */}
+                        <div>
+                            <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
+                                Post Title *
+                            </label>
                             <Input
-                                placeholder="e.g. Stuck on base case for Coin Change / Pattern for Daily Temperatures"
+                                placeholder="E.g., How to identify state variables for 2D Grid DP?"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9.5 text-xs rounded-xl"
+                                className="h-9.5 text-xs rounded-xl"
                             />
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Problem Title & Link</label>
-                            <div className="grid grid-cols-2 gap-2">
+                        {/* Optional Problem Details */}
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
+                                    Problem Name (Optional)
+                                </label>
                                 <Input
-                                    placeholder="Problem Name (e.g. Coin Change)"
+                                    placeholder="E.g., Coin Change II"
                                     value={problemTitle}
                                     onChange={(e) => setProblemTitle(e.target.value)}
-                                    className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9.5 text-xs rounded-xl"
+                                    className="h-9.5 text-xs rounded-xl"
                                 />
+                            </div>
+                            <div>
+                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
+                                    Problem URL (Optional)
+                                </label>
                                 <Input
-                                    placeholder="Problem URL"
+                                    placeholder="https://leetcode.com/problems/..."
                                     value={problemLink}
                                     onChange={(e) => setProblemLink(e.target.value)}
-                                    className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9.5 text-xs rounded-xl"
+                                    className="h-9.5 text-xs rounded-xl"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Your Notes / Hint Details</label>
+                        {/* Content */}
+                        <div>
+                            <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
+                                Explanation or Question *
+                            </label>
                             <textarea
-                                rows={4}
-                                placeholder="Write your question, insights, or hints here..."
+                                rows={3}
+                                placeholder="Describe what you tried, what edge case fails, or your key observation..."
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
-                                className="w-full p-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 text-xs rounded-xl text-zinc-900 dark:text-white resize-none"
+                                className="w-full text-xs p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5b4fff]/40"
                             />
                         </div>
 
-                        {postType === 'SOLUTION_INSIGHT' && (
-                            <div className="grid grid-cols-3 gap-2">
+                        {/* Approach & Complexity (Hidden under spoiler on post) */}
+                        <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-2">
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 block">
+                                Optional Spoiler Tagged Details (Hidden Behind Click)
+                            </span>
+                            <Input
+                                placeholder="Approach hint: E.g., Reverse iteration from target"
+                                value={approach}
+                                onChange={(e) => setApproach(e.target.value)}
+                                className="h-8.5 text-xs rounded-xl bg-white dark:bg-zinc-800"
+                            />
+                            <div className="grid grid-cols-2 gap-2">
                                 <Input
-                                    placeholder="Approach (e.g. DP)"
-                                    value={approach}
-                                    onChange={(e) => setApproach(e.target.value)}
-                                    className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9 text-xs rounded-xl"
-                                />
-                                <Input
-                                    placeholder="Time (e.g. O(N))"
+                                    placeholder="Time: O(N*M)"
                                     value={timeComplexity}
                                     onChange={(e) => setTimeComplexity(e.target.value)}
-                                    className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9 text-xs rounded-xl"
+                                    className="h-8.5 text-xs rounded-xl bg-white dark:bg-zinc-800"
                                 />
                                 <Input
-                                    placeholder="Space (e.g. O(1))"
+                                    placeholder="Space: O(N)"
                                     value={spaceComplexity}
                                     onChange={(e) => setSpaceComplexity(e.target.value)}
-                                    className="bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9 text-xs rounded-xl"
+                                    className="h-8.5 text-xs rounded-xl bg-white dark:bg-zinc-800"
                                 />
                             </div>
-                        )}
+                        </div>
 
-                        <div className="pt-2 flex items-center justify-end gap-2">
+                        {/* Footer buttons */}
+                        <div className="flex items-center justify-end gap-2 pt-2">
                             <Button
                                 variant="outline"
                                 onClick={() => setCreateDialogOpen(false)}
-                                className="rounded-xl text-xs h-9.5 cursor-pointer"
+                                className="rounded-xl text-xs"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 onClick={handleCreatePost}
                                 disabled={isSubmitting || !title.trim() || !content.trim()}
-                                className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-5 h-9.5 shadow-md cursor-pointer"
+                                className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4"
                             >
-                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Publish Note'}
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> Posting...
+                                    </>
+                                ) : (
+                                    'Publish Post'
+                                )}
                             </Button>
                         </div>
                     </div>
