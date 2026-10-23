@@ -389,8 +389,8 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                                             className="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-300"
                                                         />
                                                     ) : (
-                                                        <div className="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg">
-                                                            🏆
+                                                        <div className="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                                                            <Medal className="w-5 h-5 text-amber-500" />
                                                         </div>
                                                     )}
                                                     <span className="text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 text-center truncate max-w-full mt-1.5">

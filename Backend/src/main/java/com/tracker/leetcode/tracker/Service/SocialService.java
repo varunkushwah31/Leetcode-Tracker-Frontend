@@ -583,7 +583,7 @@ public class SocialService {
             recordActivity(
                     student,
                     FriendActivityType.PVP_WIN,
-                    "PVP Duel Victory! 🏆",
+                    "PVP Duel Victory",
                     match.getWinnerName() + " won the 1v1 Problem Duel on '" + match.getProblemTitle() + "'!",
                     match.getProblemLink(),
                     match.getProblemPlatform(),
@@ -781,16 +781,16 @@ public class SocialService {
                 .orElseThrow(() -> new IllegalArgumentException("Activity not found"));
 
         if (reaction == null || reaction.isBlank()) {
-            reaction = "🔥";
+            reaction = "kudos";
         }
-        String emoji = reaction.trim();
+        String reactionKey = reaction.trim();
 
         if (activity.getKudosUserIds() == null) activity.setKudosUserIds(new HashSet<>());
         if (activity.getReactions() == null) activity.setReactions(new HashMap<>());
 
         activity.getKudosUserIds().add(currentStudentId);
 
-        List<String> reactUsers = activity.getReactions().computeIfAbsent(emoji, k -> new ArrayList<>());
+        List<String> reactUsers = activity.getReactions().computeIfAbsent(reactionKey, k -> new ArrayList<>());
         if (reactUsers.contains(currentStudentId)) {
             reactUsers.remove(currentStudentId);
             if (reactUsers.isEmpty()) activity.getReactions().remove(emoji);

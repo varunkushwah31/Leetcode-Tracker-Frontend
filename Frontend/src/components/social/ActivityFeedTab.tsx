@@ -5,7 +5,12 @@ import {
     SpinnerIcon as Loader2,
     ClockIcon as Clock,
     TrophyIcon as Trophy,
-    CheckCircleIcon as CheckCircle2
+    CheckCircleIcon as CheckCircle2,
+    FlameIcon as Flame,
+    RocketLaunchIcon as RocketLaunch,
+    LightbulbIcon as Lightbulb,
+    HandsClappingIcon as HandsClapping,
+    HeartIcon as Heart
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -17,6 +22,14 @@ import type { FriendActivityDTO } from '@/types';
 interface ActivityFeedTabProps {
     onViewFriendDashboard: (friendId: string) => void;
 }
+
+const reactionDefinitions = [
+    { key: 'fire', label: 'Fire', Icon: Flame, legacy: 'fire' },
+    { key: 'rocket', label: 'Rocket', Icon: RocketLaunch, legacy: 'rocket' },
+    { key: 'insight', label: 'Idea', Icon: Lightbulb, legacy: 'insight' },
+    { key: 'clap', label: 'Clap', Icon: HandsClapping, legacy: 'clap' },
+    { key: 'heart', label: 'Kudos', Icon: Heart, legacy: 'heart' }
+];
 
 export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps) {
     const [activities, setActivities] = useState<FriendActivityDTO[]>([]);
@@ -63,8 +76,6 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
         if (filter === 'DUELS') return a.type === 'PVP_WIN' || a.type === 'PVP_DRAW';
         return true;
     });
-
-    const reactionEmojis = ['🔥', '🚀', '💡', '👏', '❤️'];
 
     if (isLoading) {
         return (
@@ -230,15 +241,15 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                 {/* Reactions / Kudos Row */}
                                 <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800/60">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        {reactionEmojis.map((emoji) => {
-                                            const count = act.reactionCounts?.[emoji] || 0;
-                                            const isSelected = act.myReactions?.includes(emoji);
+                                        {reactionDefinitions.map((item) => {
+                                            const count = (act.reactionCounts?.[item.key] || 0) + (act.reactionCounts?.[item.legacy] || 0);
+                                            const isSelected = act.myReactions?.includes(item.key) || act.myReactions?.includes(item.legacy);
 
                                             return (
                                                 <button
                                                     type="button"
-                                                    key={emoji}
-                                                    onClick={() => handleReact(act.id, emoji)}
+                                                    key={item.key}
+                                                    onClick={() => handleReact(act.id, item.key)}
                                                     disabled={reactingActivityId === act.id}
                                                     className={`px-3 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1.5 ${
                                                         isSelected
@@ -246,8 +257,9 @@ export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps)
                                                             : 'bg-zinc-50 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                                     }`}
                                                 >
-                                                    <span>{emoji}</span>
-                                                    {count > 0 && <span className="text-[11px] font-bold">{count}</span>}
+                                                    <item.Icon className="w-3.5 h-3.5" />
+                                                    <span className="text-[11px] font-bold">{item.label}</span>
+                                                    {count > 0 && <span className="text-[11px] font-bold">({count})</span>}
                                                 </button>
                                             );
                                         })}

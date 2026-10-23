@@ -562,7 +562,9 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                         : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400'
                                 }`}
                             >
-                                💡 Ask for a Hint
+                                <span className="flex items-center gap-1.5">
+                                    <Lightbulb className="w-4 h-4 text-amber-500" /> Ask for a Hint
+                                </span>
                                 <span className="block font-normal text-[10px] text-zinc-400 mt-0.5">Need a hint without full spoiler</span>
                             </button>
                             <button
@@ -574,7 +576,9 @@ export function PeerStudyTab({ onChallengePvp }: PeerStudyTabProps) {
                                         : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400'
                                 }`}
                             >
-                                🚀 Share Solution Pattern
+                                <span className="flex items-center gap-1.5">
+                                    <Sparkles className="w-4 h-4 text-emerald-500" /> Share Solution Pattern
+                                </span>
                                 <span className="block font-normal text-[10px] text-zinc-400 mt-0.5">Core pattern & complexity</span>
                             </button>
                         </div>

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReactActivityRequest {
-    private String reaction; // e.g. "🔥", "🚀", "💡", "👏", "❤️"
+    private String reaction; // e.g. "fire", "rocket", "insight", "clap", "heart", "kudos"
 }

@@ -113,7 +113,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             };
 
             await SocialService.createPvpChallenge(req);
-            setFeedback({ text: '⚔️ Challenge sent! Waiting for your friend to accept.', type: 'success' });
+            setFeedback({ text: 'Challenge sent! Waiting for your friend to accept.', type: 'success' });
             setCreateDialogOpen(false);
             setCustomTitle('');
             setCustomLink('');
@@ -132,7 +132,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
     const handleAcceptMatch = async (matchId: string) => {
         try {
             await SocialService.acceptPvpMatch(matchId);
-            setFeedback({ text: '⚔️ Duel started! Both clocks are ticking. Good luck!', type: 'success' });
+            setFeedback({ text: 'Duel started! Both clocks are ticking. Good luck!', type: 'success' });
             void loadData();
         } catch (err: any) {
             setFeedback({
@@ -158,7 +158,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             const res = await SocialService.verifyPvpMatch(matchId, subUrl);
             const isWinner = res.data.winnerId === user?.id;
             if (isWinner) {
-                setFeedback({ text: '🏆 VICTORY! You solved the duel problem first! Congratulations!', type: 'success' });
+                setFeedback({ text: 'VICTORY! You solved the duel problem first! Congratulations!', type: 'success' });
             } else if (res.data.status === 'COMPLETED') {
                 setFeedback({ text: 'The match has been completed.', type: 'success' });
             } else {
@@ -304,7 +304,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                                         : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25'
                                                 }`}
                                             >
-                                                {match.status === 'IN_PROGRESS' ? '⚔️ DUEL IN PROGRESS' : '📨 INVITATION PENDING'}
+                                                {match.status === 'IN_PROGRESS' ? 'DUEL IN PROGRESS' : 'INVITATION PENDING'}
                                             </Badge>
                                             <span className="text-xs font-medium text-zinc-500">
                                                 Topic: <strong className="text-zinc-900 dark:text-white font-bold">{match.problemTopic}</strong>
@@ -464,7 +464,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                                 </Button>
                                             </div>
                                             <p className="text-[10px] text-zinc-400">
-                                                💡 Tip: Submit on LeetCode, then click Verify. MentorSync will scan your recent submissions or verify your URL in seconds!
+                                                Tip: Submit on LeetCode, then click Verify. MentorSync will scan your recent submissions or verify your URL in seconds!
                                             </p>
                                         </div>
                                     )}
@@ -501,7 +501,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                             return (
                                 <div
                                     key={m.id}
-                                    className="p-4 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 flex items-center justify-between gap-3 text-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                                    className="p-4 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 flex items-center justify-between gap-3 text-xs hover:border-zinc-300 dark:border-zinc-700 transition-colors"
                                 >
                                     <div className="flex items-center gap-3 min-w-0">
                                         <Badge
@@ -513,7 +513,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                                     : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
                                             }`}
                                         >
-                                            {isWinner ? 'VICTORY 🏆' : isDraw ? 'DRAW 🤝' : 'DEFEAT'}
+                                            {isWinner ? 'VICTORY' : isDraw ? 'DRAW' : 'DEFEAT'}
                                         </Badge>
                                         <div className="truncate">
                                             <p className="font-bold text-zinc-900 dark:text-white truncate">

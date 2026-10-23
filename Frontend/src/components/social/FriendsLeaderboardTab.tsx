@@ -7,7 +7,8 @@ import {
     SpinnerIcon as Loader2,
     EyeIcon as Eye,
     UsersIcon as Users,
-    SparkleIcon as Sparkles
+    SparkleIcon as Sparkles,
+    MedalIcon as Medal
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -150,7 +151,7 @@ export function FriendsLeaderboardTab({ onViewDashboard }: FriendsLeaderboardTab
                             {topThree[1] && (
                                 <div className="p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-300 dark:border-zinc-700 text-center space-y-3 shadow-sm sm:order-1 hover:border-zinc-400 transition-all">
                                     <div className="w-9 h-9 rounded-full bg-zinc-200 dark:bg-zinc-800 font-black text-sm text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto shadow-xs border border-zinc-300 dark:border-zinc-600">
-                                        🥈 2
+                                        <Medal className="w-4 h-4 text-zinc-400 mr-0.5" /> 2
                                     </div>
                                     <Avatar className="w-14 h-14 mx-auto border-2 border-zinc-300 dark:border-zinc-600 shadow-md">
                                         <AvatarImage src={topThree[1].avatarUrl} />
@@ -186,7 +187,7 @@ export function FriendsLeaderboardTab({ onViewDashboard }: FriendsLeaderboardTab
                             {topThree[0] && (
                                 <div className="p-6 rounded-3xl bg-linear-to-b from-amber-500/15 via-yellow-500/10 to-white dark:to-[#111111] border-2 border-amber-400 dark:border-amber-500/60 ring-4 ring-amber-400/10 text-center space-y-3.5 shadow-xl shadow-amber-500/10 sm:order-2 hover:scale-[1.02] transition-transform">
                                     <div className="w-11 h-11 rounded-full bg-linear-to-br from-amber-400 to-yellow-500 text-amber-950 font-black text-base flex items-center justify-center mx-auto shadow-md">
-                                        🥇 1
+                                        <Trophy className="w-5 h-5 text-amber-950 mr-0.5" /> 1
                                     </div>
                                     <Avatar className="w-16 h-16 mx-auto border-3 border-amber-400 shadow-lg ring-4 ring-amber-400/20">
                                         <AvatarImage src={topThree[0].avatarUrl} />
@@ -228,7 +229,7 @@ export function FriendsLeaderboardTab({ onViewDashboard }: FriendsLeaderboardTab
                             {topThree[2] && (
                                 <div className="p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-amber-700/30 dark:border-amber-700/40 text-center space-y-3 shadow-sm sm:order-3 hover:border-amber-700/60 transition-all">
                                     <div className="w-9 h-9 rounded-full bg-amber-700/20 text-amber-800 dark:text-amber-300 font-black text-sm flex items-center justify-center mx-auto shadow-xs border border-amber-700/30">
-                                        🥉 3
+                                        <Medal className="w-4 h-4 text-amber-800 dark:text-amber-300 mr-0.5" /> 3
                                     </div>
                                     <Avatar className="w-14 h-14 mx-auto border-2 border-amber-700/40 shadow-md">
                                         <AvatarImage src={topThree[2].avatarUrl} />
@@ -288,7 +289,16 @@ export function FriendsLeaderboardTab({ onViewDashboard }: FriendsLeaderboardTab
                                             }`}
                                         >
                                             <td className="py-4 px-5 font-black text-sm">
-                                                {e.rank === 1 ? '🥇 1' : e.rank === 2 ? '🥈 2' : e.rank === 3 ? '🥉 3' : `#${e.rank}`}
+                                                <span className="flex items-center gap-1.5">
+                                                    {e.rank === 1 ? (
+                                                        <Trophy className="w-4 h-4 text-amber-500" />
+                                                    ) : e.rank === 2 ? (
+                                                        <Medal className="w-4 h-4 text-zinc-400" />
+                                                    ) : e.rank === 3 ? (
+                                                        <Medal className="w-4 h-4 text-amber-700" />
+                                                    ) : null}
+                                                    <span>#{e.rank}</span>
+                                                </span>
                                             </td>
                                             <td className="py-4 px-5">
                                                 <div className="flex items-center gap-3">

@@ -191,7 +191,7 @@ public class SocialController {
             Authentication authentication
     ) {
         String studentId = resolveStudentId(currentStudent, authentication);
-        String reaction = request != null ? request.getReaction() : "🔥";
+        String reaction = (request != null && request.getReaction() != null) ? request.getReaction() : "kudos";
         return ResponseEntity.ok(socialService.reactToActivity(studentId, activityId, reaction));
     }
 
