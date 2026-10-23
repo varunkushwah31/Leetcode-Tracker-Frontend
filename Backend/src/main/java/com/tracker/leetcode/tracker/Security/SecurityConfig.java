@@ -75,6 +75,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/classrooms/**").hasAnyRole("MENTOR", "SUPER_ADMIN")
                         .requestMatchers("/api/paths/**").hasAnyRole("MENTOR", "SUPER_ADMIN")
                         .requestMatchers("/api/students/me/**").hasRole("STUDENT")
+                        .requestMatchers("/api/social/**").authenticated()
 
                         .anyRequest().authenticated()
                 )

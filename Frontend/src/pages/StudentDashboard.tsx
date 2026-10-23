@@ -1,6 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { SpinnerIcon as Loader2, SignOutIcon as LogOut, PulseIcon as Activity, DownloadSimpleIcon as Download, KeyIcon, CodeIcon } from '@phosphor-icons/react';
+import {
+    SpinnerIcon as Loader2,
+    SignOutIcon as LogOut,
+    PulseIcon as Activity,
+    DownloadSimpleIcon as Download,
+    KeyIcon,
+    CodeIcon,
+    UsersIcon as Users
+} from '@phosphor-icons/react';
+import { SocialHubView, type SocialTabType } from '../components/social/SocialHubView';
+import { QuickSocialWidget } from '../components/social/QuickSocialWidget';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ChangePasswordModal } from '../components/common/ChangePasswordModal';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -33,8 +43,10 @@ export function StudentDashboard() {
     const [isSyncing, setIsSyncing] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
+    const [mainTab, setMainTab] = useState<'overview' | 'social'>('overview');
+    const [socialInitialTab, setSocialInitialTab] = useState<SocialTabType>('friends');
 
-    // --- NEW: Specific Error States ---
+    // --- Specific Error States ---
     const [pageError, setPageError] = useState<string | null>(null);
     const [syncError, setSyncError] = useState<string | null>(null);
 
@@ -53,7 +65,7 @@ export function StudentDashboard() {
         }
     }, []);
 
-    // When a ping is received, it calls fetchDashboardData to silently update the UI.
+    // Auto-refresh on WS ping
     useClassroomWebSocket(selectedClassroomId, () => {
         console.log("Auto-refreshing Student Dashboard...");
         void fetchDashboard();
@@ -64,7 +76,6 @@ export function StudentDashboard() {
         const loadAndAutofetch = async () => {
             await fetchDashboard();
             try {
-                // Auto-fetch fresh user details in the background on sign in / mount
                 setIsSyncing(true);
                 const syncRes = await StudentService.syncProfile();
                 if (isMounted && syncRes.data) {
@@ -167,7 +178,34 @@ export function StudentDashboard() {
                         <span className="hidden sm:inline-flex text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
                             Student
                         </span>
+
+                        {/* Top-level Navigation Switcher */}
+                        <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 ml-2 border border-zinc-200/60 dark:border-zinc-700/60">
+                            <button
+                                type="button"
+                                onClick={() => setMainTab('overview')}
+                                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                    mainTab === 'overview'
+                                        ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs'
+                                        : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                                }`}
+                            >
+                                Overview
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setMainTab('social')}
+                                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                                    mainTab === 'social'
+                                        ? 'bg-[#5b4fff] text-white shadow-2xs'
+                                        : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                                }`}
+                            >
+                                <Users className="w-3.5 h-3.5" /> Social Hub & PVP
+                            </button>
+                        </div>
                     </div>
+
                     <div className="flex items-center gap-1.5 sm:gap-4">
                         {/* Mobile Quick Action Buttons */}
                         <Button
@@ -231,8 +269,6 @@ export function StudentDashboard() {
             </header>
 
             <main className="max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 w-full">
-
-                {/* 5. Render any global errors (like an initial 500 error, or a failed sync) */}
                 <ErrorBanner message={pageError} className="mb-6" />
                 <ErrorBanner message={syncError} className="mb-6" />
 
@@ -253,49 +289,87 @@ export function StudentDashboard() {
                     </div>
                 )}
 
-                <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} onProfileUpdated={fetchDashboard} />
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-8">
-                        <ErrorBoundary fallback={null}>
-                            <DailyChallengeCard
-                                classroomId={selectedClassroomId}
-                                recentSubmissions={dashboardData?.recentSubmissions}
-                            />
-                        </ErrorBoundary>
-                        <ActivityHeatmap
-                            progressHistory={dashboardData?.progressHistory}
-                            consistencyStreak={dashboardData?.consistencyStreak}
-                        />
-                        <PendingAssignments
-                            assignments={pendingAssignments}
-                            isSyncing={isSyncing}
-                            onSync={handleSync}
-                            selectedClassroomId={selectedClassroomId}
-                            onClearFilter={() => setSelectedClassroomId(null)}
-                            onValidationSuccess={fetchDashboard}
-                        />
-                        <ClassroomList classrooms={dashboardData?.classrooms} selectedClassroomId={selectedClassroomId} onSelectClassroom={setSelectedClassroomId} />
-                        <ContestRatingsSection
-                            contestHistory={dashboardData?.contestHistory}
-                            currentContestRating={dashboardData?.currentContestRating}
-                            globalRanking={dashboardData?.rank}
-                            codeforcesContestHistory={dashboardData?.codeforcesContestHistory}
-                            codeforcesRating={dashboardData?.codeforcesRating}
-                            codeforcesMaxRating={dashboardData?.codeforcesMaxRating}
-                            codeforcesRank={dashboardData?.codeforcesRank}
-                            codeforcesMaxRank={dashboardData?.codeforcesMaxRank}
-                        />
-                    </div>
-
-                    <div className="space-y-8">
-                        <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
-                        <ErrorBoundary fallback={null}>
-                            <UpcomingContestsCard />
-                        </ErrorBoundary>
-                        <BadgesList badges={dashboardData?.badges} />
-                    </div>
+                {/* Mobile View Switcher */}
+                <div className="flex md:hidden items-center gap-1.5 p-1 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/80 mb-6 border border-zinc-200 dark:border-zinc-700">
+                    <button
+                        type="button"
+                        onClick={() => setMainTab('overview')}
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            mainTab === 'overview'
+                                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs'
+                                : 'text-zinc-500 hover:text-zinc-900'
+                        }`}
+                    >
+                        Overview
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setMainTab('social')}
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                            mainTab === 'social'
+                                ? 'bg-[#5b4fff] text-white shadow-2xs'
+                                : 'text-zinc-500 hover:text-zinc-900'
+                        }`}
+                    >
+                        <Users className="w-3.5 h-3.5" /> Social Hub & PVP
+                    </button>
                 </div>
+
+                {mainTab === 'social' ? (
+                    <SocialHubView initialTab={socialInitialTab} />
+                ) : (
+                    <>
+                        <ProfileStats data={dashboardData} totalSolved={totalSolved} rating={rating} onProfileUpdated={fetchDashboard} />
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-8">
+                                <ErrorBoundary fallback={null}>
+                                    <DailyChallengeCard
+                                        classroomId={selectedClassroomId}
+                                        recentSubmissions={dashboardData?.recentSubmissions}
+                                    />
+                                </ErrorBoundary>
+                                <ActivityHeatmap
+                                    progressHistory={dashboardData?.progressHistory}
+                                    consistencyStreak={dashboardData?.consistencyStreak}
+                                />
+                                <PendingAssignments
+                                    assignments={pendingAssignments}
+                                    isSyncing={isSyncing}
+                                    onSync={handleSync}
+                                    selectedClassroomId={selectedClassroomId}
+                                    onClearFilter={() => setSelectedClassroomId(null)}
+                                    onValidationSuccess={fetchDashboard}
+                                />
+                                <ClassroomList classrooms={dashboardData?.classrooms} selectedClassroomId={selectedClassroomId} onSelectClassroom={setSelectedClassroomId} />
+                                <ContestRatingsSection
+                                    contestHistory={dashboardData?.contestHistory}
+                                    currentContestRating={dashboardData?.currentContestRating}
+                                    globalRanking={dashboardData?.rank}
+                                    codeforcesContestHistory={dashboardData?.codeforcesContestHistory}
+                                    codeforcesRating={dashboardData?.codeforcesRating}
+                                    codeforcesMaxRating={dashboardData?.codeforcesMaxRating}
+                                    codeforcesRank={dashboardData?.codeforcesRank}
+                                    codeforcesMaxRank={dashboardData?.codeforcesMaxRank}
+                                />
+                            </div>
+
+                            <div className="space-y-8">
+                                <QuickSocialWidget
+                                    onOpenSocialHub={(tab) => {
+                                        if (tab) setSocialInitialTab(tab);
+                                        setMainTab('social');
+                                    }}
+                                />
+                                <StudentRightSidebar data={dashboardData} totalSolved={totalSolved} />
+                                <ErrorBoundary fallback={null}>
+                                    <UpcomingContestsCard />
+                                </ErrorBoundary>
+                                <BadgesList badges={dashboardData?.badges} />
+                            </div>
+                        </div>
+                    </>
+                )}
             </main>
 
             {/* Footer with Contact Us */}

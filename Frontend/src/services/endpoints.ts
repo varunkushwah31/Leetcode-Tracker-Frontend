@@ -216,3 +216,73 @@ export const ContactService = {
 
 
 
+
+
+export const SocialService = {
+    searchStudents: (q: string) =>
+        api.get<import('@/types').SocialSearchStudentDTO[]>('/social/students/search', { params: { q } }),
+
+    sendFriendRequest: (targetStudentId: string) =>
+        api.post('/social/friends/request/' + targetStudentId),
+
+    acceptFriendRequest: (requestId: string) =>
+        api.post('/social/friends/accept/' + requestId),
+
+    rejectFriendRequest: (requestId: string) =>
+        api.post<{ message: string }>('/social/friends/reject/' + requestId),
+
+    removeFriend: (friendId: string) =>
+        api.delete<{ message: string }>('/social/friends/' + friendId),
+
+    getFriends: () =>
+        api.get<{
+            friends: import('@/types').FriendDTO[];
+            pendingIncoming: import('@/types').FriendRequestDTO[];
+            pendingOutgoing: import('@/types').FriendRequestDTO[];
+        }>('/social/friends'),
+
+    getFriendDashboard: (friendId: string) =>
+        api.get<import('@/types').FriendComparisonDTO>('/social/friends/' + friendId + '/dashboard'),
+
+    createPvpChallenge: (data: import('@/types').CreatePvpMatchRequest) =>
+        api.post<import('@/types').PvpMatchDTO>('/social/pvp/challenge', data),
+
+    acceptPvpMatch: (matchId: string) =>
+        api.post<import('@/types').PvpMatchDTO>('/social/pvp/' + matchId + '/accept'),
+
+    declinePvpMatch: (matchId: string) =>
+        api.post<import('@/types').PvpMatchDTO>('/social/pvp/' + matchId + '/decline'),
+
+    verifyPvpMatch: (matchId: string, submissionUrl?: string) =>
+        api.post<import('@/types').PvpMatchDTO>('/social/pvp/' + matchId + '/verify', { submissionUrl }),
+
+    getPvpMatches: () =>
+        api.get<import('@/types').PvpMatchDTO[]>('/social/pvp/matches'),
+
+    getPvpMatch: (matchId: string) =>
+        api.get<import('@/types').PvpMatchDTO>('/social/pvp/' + matchId),
+
+    getActivities: () =>
+        api.get<import('@/types').FriendActivityDTO[]>('/social/activities'),
+
+    reactToActivity: (activityId: string, reaction?: string) =>
+        api.post<import('@/types').FriendActivityDTO>('/social/activities/' + activityId + '/react', { reaction }),
+
+    getFriendsLeaderboard: (sortBy?: string) =>
+        api.get<import('@/types').FriendsLeaderboardEntryDTO[]>('/social/friends/leaderboard', { params: { sortBy } }),
+
+    getPeerStudyPosts: (topic?: string) =>
+        api.get<import('@/types').PeerStudyPostDTO[]>('/social/peer/posts', { params: topic ? { topic } : {} }),
+
+    createPeerStudyPost: (data: import('@/types').CreatePeerStudyPostRequest) =>
+        api.post<import('@/types').PeerStudyPostDTO>('/social/peer/posts', data),
+
+    addPeerStudyReply: (postId: string, content: string) =>
+        api.post<import('@/types').PeerStudyPostDTO>('/social/peer/posts/' + postId + '/replies', { content }),
+
+    likePeerStudyPost: (postId: string) =>
+        api.post<import('@/types').PeerStudyPostDTO>('/social/peer/posts/' + postId + '/like'),
+
+    getCuratedProblems: (topic?: string) =>
+        api.get<import('@/types').CuratedProblemItemDTO[]>('/social/curated-problems', { params: topic ? { topic } : {} })
+};

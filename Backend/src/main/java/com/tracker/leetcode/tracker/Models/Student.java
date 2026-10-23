@@ -58,6 +58,11 @@ public class Student implements UserDetails {
     private List<SkillStat> skills = new ArrayList<>();
     private Instant lastSyncedAt;
 
+    private List<String> friendIds = new ArrayList<>();
+    private Integer pvpWins = 0;
+    private Integer pvpLosses = 0;
+    private Integer pvpDraws = 0;
+
 
     public Student(String leetcodeUsername, String name) {
         this.leetcodeUsername = leetcodeUsername;

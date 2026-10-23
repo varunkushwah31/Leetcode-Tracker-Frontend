@@ -351,4 +351,50 @@ public class CuratedTopicCatalog {
         String lower = topicName.toLowerCase();
         return TOPIC_CATALOG.keySet().stream().anyMatch(core -> lower.contains(core) || core.contains(lower));
     }
+
+    public List<CuratedProblemDTO> getAllCuratedProblems() {
+        Set<String> seenSlugs = new HashSet<>();
+        List<CuratedProblemDTO> result = new ArrayList<>();
+        for (List<CuratedProblemDTO> list : TOPIC_CATALOG.values()) {
+            for (CuratedProblemDTO p : list) {
+                if (p.getTitleSlug() != null && seenSlugs.add(p.getTitleSlug())) {
+                    result.add(p);
+                }
+            }
+        }
+        return result;
+    }
+
+    public CuratedProblemDTO getRandomOrTopicProblem(String topic, String difficulty) {
+        List<CuratedProblemDTO> pool = new ArrayList<>();
+        if (topic != null && !topic.isBlank() && !"Any".equalsIgnoreCase(topic) && !"All".equalsIgnoreCase(topic)) {
+            pool.addAll(getCuratedProblemsForTopic(topic));
+        } else {
+            pool.addAll(getAllCuratedProblems());
+        }
+
+        if (difficulty != null && !difficulty.isBlank() && !"Any".equalsIgnoreCase(difficulty)) {
+            List<CuratedProblemDTO> filtered = pool.stream()
+                    .filter(p -> difficulty.equalsIgnoreCase(p.getDifficulty()))
+                    .toList();
+            if (!filtered.isEmpty()) {
+                pool = filtered;
+            }
+        }
+
+        if (pool.isEmpty()) {
+            return CuratedProblemDTO.builder()
+                    .title("Two Sum")
+                    .titleSlug("two-sum")
+                    .difficulty("Easy")
+                    .platform("LEETCODE")
+                    .topic("Array")
+                    .link("https://leetcode.com/problems/two-sum/")
+                    .build();
+        }
+
+        List<CuratedProblemDTO> shuffled = new ArrayList<>(pool);
+        Collections.shuffle(shuffled);
+        return shuffled.get(0);
+    }
 }

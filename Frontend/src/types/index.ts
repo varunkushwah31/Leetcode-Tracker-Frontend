@@ -370,4 +370,241 @@ export interface ContactRequest {
     subject: string;
     message: string;
     phone?: string;
-}
+}
+
+
+// ==========================================
+// Social Hub, Friends & PVP Duels Types
+// ==========================================
+
+export type FriendshipStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
+export interface FriendDTO {
+    id: string;
+    friendshipId: string;
+    name: string;
+    email: string;
+    leetcodeUsername?: string;
+    codeforcesHandle?: string;
+    avatarUrl?: string;
+    currentContestRating: number;
+    codeforcesRating?: number;
+    leetcodeSolvedCount: number;
+    codeforcesSolvedCount: number;
+    totalSolved: number;
+    streak: number;
+    pvpWins: number;
+    pvpLosses: number;
+    status: 'ACCEPTED' | 'PENDING_INCOMING' | 'PENDING_OUTGOING';
+    friendSince?: string;
+    lastActive?: string;
+}
+
+export interface FriendRequestDTO {
+    id: string;
+    requesterId: string;
+    requesterName: string;
+    requesterHandle?: string;
+    requesterAvatarUrl?: string;
+    receiverId: string;
+    receiverName?: string;
+    receiverHandle?: string;
+    receiverAvatarUrl?: string;
+    status: 'PENDING';
+    createdAt: string;
+}
+
+export interface SocialSearchStudentDTO {
+    id: string;
+    name: string;
+    email: string;
+    leetcodeUsername?: string;
+    codeforcesHandle?: string;
+    avatarUrl?: string;
+    totalSolved: number;
+    currentContestRating: number;
+    codeforcesRating?: number;
+    streak: number;
+    friendshipStatus: 'NONE' | 'PENDING_INCOMING' | 'PENDING_OUTGOING' | 'ACCEPTED';
+    friendshipId?: string;
+}
+
+export type PvpMatchStatus =
+    | 'INVITED'
+    | 'ACCEPTED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED'
+    | 'DECLINED'
+    | 'EXPIRED'
+    | 'DRAW';
+
+export interface PvpMatchDTO {
+    id: string;
+    challengerId: string;
+    challengerName: string;
+    challengerHandle?: string;
+    challengerAvatarUrl?: string;
+    opponentId: string;
+    opponentName: string;
+    opponentHandle?: string;
+    opponentAvatarUrl?: string;
+    problemTitle: string;
+    problemSlug: string;
+    problemPlatform: Platform;
+    problemDifficulty: string;
+    problemLink: string;
+    problemTopic: string;
+    durationMinutes: number;
+    status: PvpMatchStatus;
+    createdAt: string;
+    startedAt?: string;
+    expiresAt?: string;
+    completedAt?: string;
+    challengerSolved: boolean;
+    challengerSolvedAt?: string;
+    challengerSubmissionUrl?: string;
+    opponentSolved: boolean;
+    opponentSolvedAt?: string;
+    opponentSubmissionUrl?: string;
+    winnerId?: string;
+    winnerName?: string;
+    remainingSeconds?: number;
+}
+
+export interface CreatePvpMatchRequest {
+    opponentId: string;
+    problemTopic?: string;
+    problemDifficulty?: string;
+    durationMinutes?: number;
+    customProblemTitle?: string;
+    customProblemSlug?: string;
+    customProblemLink?: string;
+}
+
+export interface FriendComparisonDTO {
+    friendProfile: StudentExtendedDTO;
+    mutualSolved: string[];
+    friendOnlySolved: string[];
+    userOnlySolved: string[];
+    userSolvedCount: number;
+    friendSolvedCount: number;
+    userRating: number;
+    friendRating: number;
+    userStreak: number;
+    friendStreak: number;
+    userPvpWinsAgainstFriend: number;
+    friendPvpWinsAgainstUser: number;
+    pvpDraws: number;
+}
+
+export type FriendActivityType =
+    | 'PROBLEM_SOLVED'
+    | 'PVP_WIN'
+    | 'PVP_DRAW'
+    | 'STREAK_MILESTONE'
+    | 'CONTEST_RANK'
+    | 'BADGE_EARNED'
+    | 'PEER_NOTE'
+    | 'NEW_FRIEND';
+
+export interface FriendActivityDTO {
+    id: string;
+    studentId: string;
+    studentName: string;
+    studentHandle?: string;
+    studentAvatarUrl?: string;
+    type: FriendActivityType;
+    title: string;
+    description: string;
+    link?: string;
+    platform?: Platform;
+    difficulty?: string;
+    kudosCount: number;
+    userReacted: boolean;
+    reactionCounts?: Record<string, number>;
+    myReactions?: string[];
+    createdAt: string;
+}
+
+export interface FriendsLeaderboardEntryDTO {
+    rank: number;
+    studentId: string;
+    name: string;
+    leetcodeUsername?: string;
+    codeforcesHandle?: string;
+    avatarUrl?: string;
+    totalSolved: number;
+    leetcodeSolved: number;
+    codeforcesSolved: number;
+    currentContestRating: number;
+    codeforcesRating?: number;
+    streak: number;
+    pvpWins: number;
+    pvpLosses: number;
+    pvpWinRate: number;
+    isCurrentUser: boolean;
+}
+
+export type PeerStudyPostType =
+    | 'HINT_REQUEST'
+    | 'SOLUTION_INSIGHT'
+    | 'RECOMMENDATION'
+    | 'STUDY_NOTE';
+
+export interface PeerStudyReplyDTO {
+    id: string;
+    authorId: string;
+    authorName: string;
+    authorHandle?: string;
+    authorAvatarUrl?: string;
+    content: string;
+    createdAt: string;
+}
+
+export interface PeerStudyPostDTO {
+    id: string;
+    authorId: string;
+    authorName: string;
+    authorHandle?: string;
+    authorAvatarUrl?: string;
+    problemTitle?: string;
+    problemSlug?: string;
+    problemPlatform?: Platform;
+    problemLink?: string;
+    topic?: string;
+    difficulty?: string;
+    type: PeerStudyPostType;
+    title: string;
+    content: string;
+    approach?: string;
+    timeComplexity?: string;
+    spaceComplexity?: string;
+    replies: PeerStudyReplyDTO[];
+    likeCount: number;
+    userLiked: boolean;
+    createdAt: string;
+}
+
+export interface CreatePeerStudyPostRequest {
+    problemTitle?: string;
+    problemSlug?: string;
+    problemPlatform?: Platform;
+    problemLink?: string;
+    topic?: string;
+    difficulty?: string;
+    type?: PeerStudyPostType;
+    title: string;
+    content: string;
+    approach?: string;
+    timeComplexity?: string;
+    spaceComplexity?: string;
+}
+
+export interface CuratedProblemItemDTO {
+    title: string;
+    titleSlug: string;
+    difficulty: string;
+    platform: string;
+    topic: string;
+    link: string;
+}
