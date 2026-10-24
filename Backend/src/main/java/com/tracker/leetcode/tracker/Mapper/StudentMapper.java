@@ -174,7 +174,7 @@ public class StudentMapper {
 
         double totalBonus = (dsaScore + ratingScore + consistencyScore + pvpScore) * 0.4;
         int finalScore = (int) Math.round(500 + totalBonus);
-        return Math.min(900, Math.max(500, finalScore));
+        return Math.clamp(finalScore, 500, 900);
     }
 
     public int calculateLeetcodeSolved(List<ProblemStats> stats) {

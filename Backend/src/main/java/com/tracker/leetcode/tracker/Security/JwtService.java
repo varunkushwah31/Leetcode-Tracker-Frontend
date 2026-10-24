@@ -109,15 +109,17 @@ public class JwtService {
     }
 
     public boolean isTokenExpired(String token) {
-        Date expiration = extractExpiration(token);
-        return expiration != null && expiration.before(new Date());
+        Instant expiration = extractExpiration(token);
+        return expiration != null && expiration.isBefore(Instant.now());
     }
 
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public Instant extractExpiration(String token) {
+        Date expiration = extractClaim(token, Claims::getExpiration);
+        return expiration != null ? expiration.toInstant() : null;
     }
 
-    public Date extractIssuedAt(String token) {
-        return extractClaim(token, Claims::getIssuedAt);
+    public Instant extractIssuedAt(String token) {
+        Date issuedAt = extractClaim(token, Claims::getIssuedAt);
+        return issuedAt != null ? issuedAt.toInstant() : null;
     }
 }

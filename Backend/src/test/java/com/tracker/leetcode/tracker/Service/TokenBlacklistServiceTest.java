@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,8 +39,8 @@ class TokenBlacklistServiceTest {
     @Test
     void blacklistToken_WhenTokenValid_ShouldSetInRedis() {
         String token = "valid-jwt-token";
-        Date futureDate = new Date(System.currentTimeMillis() + 600000); // 10 mins in future
-        when(jwtService.extractExpiration(token)).thenReturn(futureDate);
+        Instant futureInstant = Instant.now().plusSeconds(600); // 10 mins in future
+        when(jwtService.extractExpiration(token)).thenReturn(futureInstant);
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
 
         tokenBlacklistService.blacklistToken(token);
@@ -56,8 +56,8 @@ class TokenBlacklistServiceTest {
     @Test
     void blacklistToken_WhenTokenExpired_ShouldNotStoreInRedis() {
         String token = "expired-token";
-        Date pastDate = new Date(System.currentTimeMillis() - 10000);
-        when(jwtService.extractExpiration(token)).thenReturn(pastDate);
+        Instant pastInstant = Instant.now().minusSeconds(10);
+        when(jwtService.extractExpiration(token)).thenReturn(pastInstant);
 
         tokenBlacklistService.blacklistToken(token);
 
@@ -105,7 +105,7 @@ class TokenBlacklistServiceTest {
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get("blacklist:user:user-123")).thenReturn(String.valueOf(revocationTimestamp));
 
-        Date tokenIssuedAt = new Date(revocationTimestamp - 5000); // Issued 5s before revocation
+        Instant tokenIssuedAt = Instant.ofEpochMilli(revocationTimestamp - 5000); // Issued 5s before revocation
         boolean revoked = tokenBlacklistService.isUserRevoked(userId, tokenIssuedAt);
 
         assertTrue(revoked);
@@ -118,7 +118,7 @@ class TokenBlacklistServiceTest {
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get("blacklist:user:user-123")).thenReturn(String.valueOf(revocationTimestamp));
 
-        Date tokenIssuedAt = new Date(System.currentTimeMillis()); // Issued now, after revocation
+        Instant tokenIssuedAt = Instant.now(); // Issued now, after revocation
         boolean revoked = tokenBlacklistService.isUserRevoked(userId, tokenIssuedAt);
 
         assertFalse(revoked);

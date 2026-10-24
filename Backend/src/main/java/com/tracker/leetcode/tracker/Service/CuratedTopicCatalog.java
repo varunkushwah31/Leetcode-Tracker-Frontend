@@ -350,7 +350,7 @@ public class CuratedTopicCatalog {
             }
         }
         // Generic fallback with search link
-        String slug = clean.replaceAll("[^a-z0-9]+", "-").replaceAll("(?:^-)|(?:-$)", "");
+        String slug = clean.replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
         return List.of(
                 CuratedProblemDTO.builder()
                         .title("Explore " + topicName + " Problems")

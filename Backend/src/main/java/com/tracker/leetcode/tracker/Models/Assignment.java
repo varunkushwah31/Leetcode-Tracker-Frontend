@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,7 +12,8 @@ import java.util.regex.Pattern;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Assignment {
+public class Assignment implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id = UUID.randomUUID().toString();
     private Platform platform = Platform.LEETCODE;
     private String problemNumber; // e.g. "1" for LeetCode #1, or "4A" for Codeforces 4A

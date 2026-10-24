@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +43,7 @@ public class TokenBlacklistService {
         }
 
         String cleanToken = token.startsWith("Bearer ") ? token.substring(7).trim() : token.trim();
-        Date expiration;
+        Instant expiration;
         try {
             expiration = jwtService.extractExpiration(cleanToken);
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class TokenBlacklistService {
             return;
         }
 
-        long remainingMillis = expiration.getTime() - System.currentTimeMillis();
+        long remainingMillis = Duration.between(Instant.now(), expiration).toMillis();
         if (remainingMillis <= 0) {
             return; // Token has already expired
         }
@@ -68,7 +68,7 @@ public class TokenBlacklistService {
             log.info("JWT token successfully blacklisted in Redis for {} ms (hash: {})", remainingMillis, tokenHash);
         } catch (Exception ex) {
             log.warn("Redis unavailable while blacklisting token. Using in-memory fallback store: {}", ex.getMessage());
-            inMemoryTokenBlacklist.put(tokenHash, expiration.getTime());
+            inMemoryTokenBlacklist.put(tokenHash, expiration.toEpochMilli());
         }
     }
 
@@ -129,7 +129,7 @@ public class TokenBlacklistService {
     /**
      * Checks if a user has been globally revoked after the token's issuedAt timestamp.
      */
-    public boolean isUserRevoked(String userId, Date issuedAt) {
+    public boolean isUserRevoked(String userId, Instant issuedAt) {
         if (userId == null || userId.isBlank() || issuedAt == null) {
             return false;
         }
@@ -139,18 +139,14 @@ public class TokenBlacklistService {
             String revocationTimeStr = stringRedisTemplate.opsForValue().get(redisKey);
             if (revocationTimeStr != null) {
                 long revocationTime = Long.parseLong(revocationTimeStr);
-                return issuedAt.getTime() <= revocationTime;
+                return issuedAt.toEpochMilli() <= revocationTime;
             }
         } catch (Exception ex) {
             log.warn("Redis unavailable during user revocation check: {}", ex.getMessage());
         }
 
         Long inMemoryExpiry = inMemoryUserBlacklist.get(userId.trim());
-        if (inMemoryExpiry != null && System.currentTimeMillis() < inMemoryExpiry) {
-            return true;
-        }
-
-        return false;
+        return inMemoryExpiry != null && System.currentTimeMillis() < inMemoryExpiry;
     }
 
     private String hashToken(String token) {

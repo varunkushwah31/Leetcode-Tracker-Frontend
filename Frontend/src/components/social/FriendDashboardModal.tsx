@@ -464,8 +464,8 @@ function FriendPeerLearningSection({
                 <div>
                     <p className="inline">
                         <strong className="font-extrabold text-[#5b4fff] dark:text-[#968fff]">
-                            Peer-to-Peer Learning Insight:&nbsp;
-                        </strong>
+                            Peer-to-Peer Learning Insight:
+                        </strong>{' '}
                         Compare what your friend has mastered that you have not solved yet. Click on any problem to practice directly or challenge your friend to a 1v1 duel!
                     </p>
                 </div>

@@ -45,7 +45,7 @@ public class SecurityConfig {
         return new RateLimitingFilter(rateLimitingService, objectMapper);
     }
 
-    @SuppressWarnings({"java:S112", "java:S1130"})
+    @SuppressWarnings({"java:S112", "java:S1130", "java:S4502"}) // CSRF disabled intentionally for stateless REST APIs using JWT
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, RateLimitingFilter rateLimitingFilter) throws Exception {
         http

@@ -137,20 +137,20 @@ public class ContestScheduleService {
         // Populate global caches for ALL, LEETCODE, and CODEFORCES simultaneously
         if (cacheManager != null) {
             try {
-                Cache cache = cacheManager.getCache("upcoming-contests");
+                Cache cache = cacheManager.getCache(CACHE_UPCOMING_CONTESTS);
                 if (cache != null) {
                     cache.put("ALL", allContests);
 
                     List<UpcomingContestDTO> lcList = allContests.stream()
-                            .filter(c -> "LEETCODE".equalsIgnoreCase(c.getPlatform()))
+                            .filter(c -> PLATFORM_LEETCODE.equalsIgnoreCase(c.getPlatform()))
                             .toList();
-                    cache.put("LEETCODE", lcList);
+                    cache.put(PLATFORM_LEETCODE, lcList);
 
                     List<UpcomingContestDTO> cfList = allContests.stream()
-                            .filter(c -> "CODEFORCES".equalsIgnoreCase(c.getPlatform()))
+                            .filter(c -> PLATFORM_CODEFORCES.equalsIgnoreCase(c.getPlatform()))
                             .toList();
-                    cache.put("CODEFORCES", cfList);
-                    log.info("Cached global upcoming contests in Redis under 'upcoming-contests' for ALL, LEETCODE, and CODEFORCES.");
+                    cache.put(PLATFORM_CODEFORCES, cfList);
+                    log.info("Cached global upcoming contests in Redis under '{}' for ALL, LEETCODE, and CODEFORCES.", CACHE_UPCOMING_CONTESTS);
                 }
             } catch (Exception e) {
                 log.warn("Error caching upcoming contests in Redis: {}", e.getMessage());

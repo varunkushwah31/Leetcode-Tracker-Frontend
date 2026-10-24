@@ -21,6 +21,7 @@ import java.util.*;
 public class SocialService {
 
     private static final String MATCH_NOT_FOUND = "Match not found";
+    private static final String UPDATE_ACTION_SEVERED = "SEVERED";
 
     private final StudentRepository studentRepository;
     private final FriendshipRepository friendshipRepository;
@@ -298,81 +299,9 @@ public class SocialService {
             }
 
             if (f.getStatus() == FriendshipStatus.ACCEPTED) {
-                String friendId = f.getRequesterId().equals(currentStudentId) ? f.getReceiverId() : f.getRequesterId();
-                if (friendId.equals(currentStudentId)) {
-                    continue;
-                }
-                Student friend = studentRepository.findById(friendId).orElse(null);
-                if (friend != null && !friend.getId().equals(currentStudentId)) {
-                    int lcSolved = studentMapper.calculateLeetcodeSolved(friend.getProblemStats());
-                    int cfSolved = friend.getCodeforcesSolvedCount() != null ? friend.getCodeforcesSolvedCount() : 0;
-                    boolean isOnline = isStudentOnline(friend.getId(), friend);
-                    boolean isBusy = isStudentBusyInPvp(friend.getId());
-
-                    acceptedFriends.add(FriendDTO.builder()
-                            .id(friend.getId())
-                            .friendshipId(f.getId())
-                            .name(friend.getName())
-                            .email(friend.getEmail())
-                            .leetcodeUsername(friend.getLeetcodeUsername())
-                            .codeforcesHandle(friend.getCodeforcesHandle())
-                            .avatarUrl(friend.getAvatarUrl())
-                            .currentContestRating(friend.getCurrentContestRating())
-                            .codeforcesRating(friend.getCodeforcesRating())
-                            .leetcodeSolvedCount(lcSolved)
-                            .codeforcesSolvedCount(cfSolved)
-                            .totalSolved(lcSolved + cfSolved)
-                            .streak(friend.getStreak() != null ? friend.getStreak() : 0)
-                            .pvpWins(friend.getPvpWins() != null ? friend.getPvpWins() : 0)
-                            .pvpLosses(friend.getPvpLosses() != null ? friend.getPvpLosses() : 0)
-                            .status("ACCEPTED")
-                            .friendSince(f.getUpdatedAt() != null ? f.getUpdatedAt() : f.getCreatedAt())
-                            .lastActive(friend.getLastSyncedAt())
-                            .isOnline(isOnline)
-                            .isBusy(isBusy)
-                            .pvpRating(friend.getPvpRating() != null ? friend.getPvpRating() : 1200)
-                            .pvpStreak(friend.getPvpStreak() != null ? friend.getPvpStreak() : 0)
-                            .cScore(studentMapper.calculateCScore(friend))
-                            .build());
-                }
+                populateAcceptedFriend(f, currentStudentId, acceptedFriends);
             } else if (f.getStatus() == FriendshipStatus.PENDING) {
-                if (f.getReceiverId().equals(currentStudentId)) {
-                    if (f.getRequesterId().equals(currentStudentId)) {
-                        continue;
-                    }
-                    // Incoming
-                    Student req = studentRepository.findById(f.getRequesterId()).orElse(null);
-                    if (req != null && !req.getId().equals(currentStudentId)) {
-                        pendingIncoming.add(FriendRequestDTO.builder()
-                                .id(f.getId())
-                                .requesterId(req.getId())
-                                .requesterName(req.getName())
-                                .requesterHandle(req.getLeetcodeUsername() != null ? req.getLeetcodeUsername() : req.getCodeforcesHandle())
-                                .requesterAvatarUrl(req.getAvatarUrl())
-                                .receiverId(currentStudentId)
-                                .status("PENDING")
-                                .createdAt(f.getCreatedAt())
-                                .build());
-                    }
-                } else {
-                    if (f.getReceiverId().equals(currentStudentId)) {
-                        continue;
-                    }
-                    // Outgoing
-                    Student rec = studentRepository.findById(f.getReceiverId()).orElse(null);
-                    if (rec != null && !rec.getId().equals(currentStudentId)) {
-                        pendingOutgoing.add(FriendRequestDTO.builder()
-                                .id(f.getId())
-                                .requesterId(currentStudentId)
-                                .receiverId(rec.getId())
-                                .receiverName(rec.getName())
-                                .receiverHandle(rec.getLeetcodeUsername() != null ? rec.getLeetcodeUsername() : rec.getCodeforcesHandle())
-                                .receiverAvatarUrl(rec.getAvatarUrl())
-                                .status("PENDING")
-                                .createdAt(f.getCreatedAt())
-                                .build());
-                    }
-                }
+                populatePendingFriendship(f, currentStudentId, pendingIncoming, pendingOutgoing);
             }
         }
 
@@ -381,6 +310,84 @@ public class SocialService {
         result.put("pendingIncoming", pendingIncoming);
         result.put("pendingOutgoing", pendingOutgoing);
         return result;
+    }
+
+    private void populateAcceptedFriend(Friendship f, String currentStudentId, List<FriendDTO> acceptedFriends) {
+        String friendId = f.getRequesterId().equals(currentStudentId) ? f.getReceiverId() : f.getRequesterId();
+        if (friendId.equals(currentStudentId)) {
+            return;
+        }
+        Student friend = studentRepository.findById(friendId).orElse(null);
+        if (friend != null && !friend.getId().equals(currentStudentId)) {
+            int lcSolved = studentMapper.calculateLeetcodeSolved(friend.getProblemStats());
+            int cfSolved = friend.getCodeforcesSolvedCount() != null ? friend.getCodeforcesSolvedCount() : 0;
+            boolean isOnline = isStudentOnline(friend.getId(), friend);
+            boolean isBusy = isStudentBusyInPvp(friend.getId());
+
+            acceptedFriends.add(FriendDTO.builder()
+                    .id(friend.getId())
+                    .friendshipId(f.getId())
+                    .name(friend.getName())
+                    .email(friend.getEmail())
+                    .leetcodeUsername(friend.getLeetcodeUsername())
+                    .codeforcesHandle(friend.getCodeforcesHandle())
+                    .avatarUrl(friend.getAvatarUrl())
+                    .currentContestRating(friend.getCurrentContestRating())
+                    .codeforcesRating(friend.getCodeforcesRating())
+                    .leetcodeSolvedCount(lcSolved)
+                    .codeforcesSolvedCount(cfSolved)
+                    .totalSolved(lcSolved + cfSolved)
+                    .streak(friend.getStreak() != null ? friend.getStreak() : 0)
+                    .pvpWins(friend.getPvpWins() != null ? friend.getPvpWins() : 0)
+                    .pvpLosses(friend.getPvpLosses() != null ? friend.getPvpLosses() : 0)
+                    .status("ACCEPTED")
+                    .friendSince(f.getUpdatedAt() != null ? f.getUpdatedAt() : f.getCreatedAt())
+                    .lastActive(friend.getLastSyncedAt())
+                    .isOnline(isOnline)
+                    .isBusy(isBusy)
+                    .pvpRating(friend.getPvpRating() != null ? friend.getPvpRating() : 1200)
+                    .pvpStreak(friend.getPvpStreak() != null ? friend.getPvpStreak() : 0)
+                    .cScore(studentMapper.calculateCScore(friend))
+                    .build());
+        }
+    }
+
+    private void populatePendingFriendship(Friendship f, String currentStudentId,
+                                           List<FriendRequestDTO> pendingIncoming,
+                                           List<FriendRequestDTO> pendingOutgoing) {
+        if (f.getReceiverId().equals(currentStudentId)) {
+            if (!f.getRequesterId().equals(currentStudentId)) {
+                // Incoming
+                Student req = studentRepository.findById(f.getRequesterId()).orElse(null);
+                if (req != null && !req.getId().equals(currentStudentId)) {
+                    pendingIncoming.add(FriendRequestDTO.builder()
+                            .id(f.getId())
+                            .requesterId(req.getId())
+                            .requesterName(req.getName())
+                            .requesterHandle(req.getLeetcodeUsername() != null ? req.getLeetcodeUsername() : req.getCodeforcesHandle())
+                            .requesterAvatarUrl(req.getAvatarUrl())
+                            .receiverId(currentStudentId)
+                            .status("PENDING")
+                            .createdAt(f.getCreatedAt())
+                            .build());
+                }
+            }
+        } else if (!f.getReceiverId().equals(currentStudentId)) {
+            // Outgoing
+            Student rec = studentRepository.findById(f.getReceiverId()).orElse(null);
+            if (rec != null && !rec.getId().equals(currentStudentId)) {
+                pendingOutgoing.add(FriendRequestDTO.builder()
+                        .id(f.getId())
+                        .requesterId(currentStudentId)
+                        .receiverId(rec.getId())
+                        .receiverName(rec.getName())
+                        .receiverHandle(rec.getLeetcodeUsername() != null ? rec.getLeetcodeUsername() : rec.getCodeforcesHandle())
+                        .receiverAvatarUrl(rec.getAvatarUrl())
+                        .status("PENDING")
+                        .createdAt(f.getCreatedAt())
+                        .build());
+            }
+        }
     }
 
     // ==========================================
@@ -412,8 +419,6 @@ public class SocialService {
 
         List<String> mutualSolved = new ArrayList<>();
         List<String> friendOnlySolved = new ArrayList<>();
-        List<String> userOnlySolved = new ArrayList<>();
-
         for (Map.Entry<String, String> entry : friendCatalog.entrySet()) {
             if (userCatalog.containsKey(entry.getKey())) {
                 mutualSolved.add(entry.getValue());
@@ -422,11 +427,10 @@ public class SocialService {
             }
         }
 
-        for (Map.Entry<String, String> entry : userCatalog.entrySet()) {
-            if (!friendCatalog.containsKey(entry.getKey())) {
-                userOnlySolved.add(entry.getValue());
-            }
-        }
+        List<String> userOnlySolved = userCatalog.entrySet().stream()
+                .filter(entry -> !friendCatalog.containsKey(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .toList();
 
         // Head-to-head PVP record
         List<PvpMatch> matches = pvpMatchRepository.findHeadToHeadCompleted(currentStudentId, friendId);
@@ -470,7 +474,7 @@ public class SocialService {
 
     private String toKebabSlug(String text) {
         if (text == null || text.isBlank()) return "";
-        return text.trim().toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("(?:^-+)|(?:-+$)", "");
+        return text.trim().toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
     }
 
     private Map<String, String> extractSolvedCatalog(Student student) {
@@ -649,7 +653,7 @@ public class SocialService {
         match.setCompletedAt(Instant.now());
         PvpMatch saved = pvpMatchRepository.save(match);
         if (webSocketBridge != null) {
-            webSocketBridge.broadcastPvpUpdate(matchId, "SEVERED", "Duel invitation was declined.");
+            webSocketBridge.broadcastPvpUpdate(matchId, UPDATE_ACTION_SEVERED, "Duel invitation was declined.");
         }
         return toPvpMatchDTO(saved);
     }
@@ -676,7 +680,7 @@ public class SocialService {
             match.setCompletedAt(now);
             PvpMatch saved = pvpMatchRepository.save(match);
             if (webSocketBridge != null) {
-                webSocketBridge.broadcastPvpUpdate(matchId, "SEVERED", forfeiterName + " cancelled the duel invitation.");
+                webSocketBridge.broadcastPvpUpdate(matchId, UPDATE_ACTION_SEVERED, forfeiterName + " cancelled the duel invitation.");
             }
             return toPvpMatchDTO(saved);
         }
@@ -708,7 +712,7 @@ public class SocialService {
         }
 
         if (webSocketBridge != null) {
-            webSocketBridge.broadcastPvpUpdate(matchId, "SEVERED", forfeiterName + " ended the duel preemptively. Duel connection severed.");
+            webSocketBridge.broadcastPvpUpdate(matchId, UPDATE_ACTION_SEVERED, forfeiterName + " ended the duel preemptively. Duel connection severed.");
         }
 
         return toPvpMatchDTO(saved);
@@ -874,8 +878,8 @@ public class SocialService {
             // Elo rating calculation
             double expectedWinner = 1.0 / (1.0 + Math.pow(10.0, (loserRating - winnerRating) / 400.0));
             int kFactor = 32;
-            int winnerGain = Math.max(15, Math.min(35, (int) Math.round(kFactor * (1.0 - expectedWinner))));
-            int loserLoss = Math.max(10, Math.min(30, (int) Math.round(kFactor * expectedWinner)));
+            int winnerGain = Math.clamp((int) Math.round(kFactor * (1.0 - expectedWinner)), 15, 35);
+            int loserLoss = Math.clamp((int) Math.round(kFactor * expectedWinner), 10, 30);
 
             if (winner != null) {
                 winner.setPvpWins((winner.getPvpWins() != null ? winner.getPvpWins() : 0) + 1);
