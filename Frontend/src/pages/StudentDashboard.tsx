@@ -30,6 +30,7 @@ import { UpcomingContestsCard } from '../components/dashboard/student/UpcomingCo
 import { ActivityHeatmap } from '../components/dashboard/student/ActivityHeatmap';
 import { PendingAssignments } from '../components/dashboard/student/PendingAssignments';
 import { ClassroomList } from '../components/dashboard/student/ClassroomList';
+import { AcademicSummaryCard } from '../components/dashboard/student/AcademicSummaryCard';
 import { ContestRatingsSection } from '../components/dashboard/student/ContestRatingsSection';
 import { BadgesList } from '../components/dashboard/student/BadgesList';
 import { DifficultyBreakdownCard } from '../components/dashboard/student/DifficultyBreakdownCard';
@@ -165,15 +166,27 @@ export function StudentDashboard() {
     const totalSolved = dashboardData?.totalSolved ?? (easyCount + medCount + hardCount);
     const rating = Math.round(dashboardData?.currentContestRating || 0);
 
-    const pendingAssignments: { classroomId: string, className: string, assignment: AssignmentDTO }[] = [];
+    const allAssignmentsList: {
+        classroomId: string;
+        className: string;
+        assignment: AssignmentDTO;
+        isCompleted: boolean;
+    }[] = [];
+
     dashboardData?.classrooms?.forEach(cls => {
-        if (selectedClassroomId && cls.id !== selectedClassroomId) return;
         cls.assignments?.forEach(assignment => {
-            if (!isAssignmentCompleted(assignment)) {
-                pendingAssignments.push({ classroomId: cls.id!, className: cls.className, assignment });
-            }
+            allAssignmentsList.push({
+                classroomId: cls.id!,
+                className: cls.className,
+                assignment,
+                isCompleted: isAssignmentCompleted(assignment),
+            });
         });
     });
+
+    const totalAssignmentsCount = allAssignmentsList.length;
+    const completedAssignmentsCount = allAssignmentsList.filter(a => a.isCompleted).length;
+    const pendingAssignmentsCount = totalAssignmentsCount - completedAssignmentsCount;
 
     return (
         <div className="min-h-screen flex flex-col bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed transition-colors duration-200 relative">
@@ -453,27 +466,20 @@ export function StudentDashboard() {
                                     </ErrorBoundary>
                                 )}
 
-                                {/* 5. Academic Focus: Assignments and Classrooms */}
+                                {/* 5. Academic Focus: Assignments */}
                                 {(activeFilter === 'all' || activeFilter === 'academic') && (
-                                    <div className={activeFilter === 'all' ? "grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch" : "space-y-6"}>
-                                        <ErrorBoundary fallback={null}>
-                                            <PendingAssignments
-                                                assignments={pendingAssignments}
-                                                isSyncing={isSyncing}
-                                                onSync={handleSync}
-                                                selectedClassroomId={selectedClassroomId}
-                                                onClearFilter={() => setSelectedClassroomId(null)}
-                                                onValidationSuccess={fetchDashboard}
-                                            />
-                                        </ErrorBoundary>
-                                        <ErrorBoundary fallback={null}>
-                                            <ClassroomList
-                                                classrooms={dashboardData?.classrooms}
-                                                selectedClassroomId={selectedClassroomId}
-                                                onSelectClassroom={setSelectedClassroomId}
-                                            />
-                                        </ErrorBoundary>
-                                    </div>
+                                    <ErrorBoundary fallback={null}>
+                                        <PendingAssignments
+                                            assignments={allAssignmentsList}
+                                            isSyncing={isSyncing}
+                                            onSync={handleSync}
+                                            selectedClassroomId={selectedClassroomId}
+                                            onClearFilter={() => setSelectedClassroomId(null)}
+                                            onValidationSuccess={fetchDashboard}
+                                            classrooms={dashboardData?.classrooms}
+                                            onSelectClassroom={setSelectedClassroomId}
+                                        />
+                                    </ErrorBoundary>
                                 )}
 
                                 {/* If in Practice Filter, show recent submissions in the main column */}
@@ -498,28 +504,53 @@ export function StudentDashboard() {
                                     </ErrorBoundary>
                                 )}
 
-                                {/* 2. Difficulty Breakdown Progress */}
-                                {(activeFilter === 'all' || activeFilter === 'daily' || activeFilter === 'practice') && (
+                                {/* 2. My Classrooms */}
+                                {(activeFilter === 'all' || activeFilter === 'academic') && (
+                                    <ErrorBoundary fallback={null}>
+                                        <ClassroomList
+                                            classrooms={dashboardData?.classrooms}
+                                            selectedClassroomId={selectedClassroomId}
+                                            onSelectClassroom={setSelectedClassroomId}
+                                            isAssignmentCompleted={isAssignmentCompleted}
+                                        />
+                                    </ErrorBoundary>
+                                )}
+
+                                {/* 3. Academic Summary KPIs (shown when activeFilter === 'academic') */}
+                                {activeFilter === 'academic' && (
+                                    <ErrorBoundary fallback={null}>
+                                        <AcademicSummaryCard
+                                            classrooms={dashboardData?.classrooms}
+                                            totalAssignments={totalAssignmentsCount}
+                                            completedCount={completedAssignmentsCount}
+                                            pendingCount={pendingAssignmentsCount}
+                                            streak={dashboardData?.consistencyStreak || 0}
+                                        />
+                                    </ErrorBoundary>
+                                )}
+
+                                {/* 4. Difficulty Breakdown Progress */}
+                                {(activeFilter === 'all' || activeFilter === 'daily' || activeFilter === 'practice' || activeFilter === 'academic') && (
                                     <ErrorBoundary fallback={null}>
                                         <DifficultyBreakdownCard data={dashboardData} totalSolved={totalSolved} />
                                     </ErrorBoundary>
                                 )}
 
-                                {/* 3. Upcoming Contests Schedule */}
+                                {/* 5. Upcoming Contests Schedule */}
                                 {(activeFilter === 'all' || activeFilter === 'contests') && (
                                     <ErrorBoundary fallback={null}>
                                         <UpcomingContestsCard />
                                     </ErrorBoundary>
                                 )}
 
-                                {/* 4. Recent Submissions Feed */}
-                                {(activeFilter === 'all' || activeFilter === 'daily') && (
+                                {/* 6. Recent Submissions Feed */}
+                                {(activeFilter === 'all' || activeFilter === 'daily' || activeFilter === 'academic') && (
                                     <ErrorBoundary fallback={null}>
                                         <RecentActivityCard data={dashboardData} />
                                     </ErrorBoundary>
                                 )}
 
-                                {/* 5. Earned Badges Showcase */}
+                                {/* 7. Earned Badges Showcase */}
                                 {(activeFilter === 'all' || activeFilter === 'practice') && (
                                     <ErrorBoundary fallback={null}>
                                         <BadgesList badges={dashboardData?.badges} />
