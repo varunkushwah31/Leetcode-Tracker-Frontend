@@ -416,6 +416,12 @@ export interface FriendRequestDTO {
     createdAt: string;
 }
 
+export interface FriendsResponseDTO {
+    friends: FriendDTO[];
+    pendingIncoming: FriendRequestDTO[];
+    pendingOutgoing: FriendRequestDTO[];
+}
+
 export interface SocialSearchStudentDTO {
     id: string;
     name: string;

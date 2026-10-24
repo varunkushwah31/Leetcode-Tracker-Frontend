@@ -43,11 +43,11 @@ describe('QuickSocialWidget Component', () => {
 
         vi.mocked(SocialService.getFriends).mockResolvedValue({
             data: { friends: mockFriends, pendingIncoming: [], pendingOutgoing: [] }
-        } as unknown as AxiosResponse<{ data: FriendsResponseDTO }>);
+        } as unknown as AxiosResponse<FriendsResponseDTO>);
 
         vi.mocked(SocialService.getPvpMatches).mockResolvedValue({
             data: []
-        } as unknown as AxiosResponse<{ data: PvpMatchDTO[] }>);
+        } as unknown as AxiosResponse<PvpMatchDTO[]>);
 
         render(<QuickSocialWidget onOpenSocialHub={mockOnOpenSocialHub} />);
 
@@ -86,11 +86,11 @@ describe('QuickSocialWidget Component', () => {
 
         vi.mocked(SocialService.getFriends).mockResolvedValue({
             data: { friends: mockFriends, pendingIncoming: [], pendingOutgoing: [] }
-        } as unknown as AxiosResponse<{ data: FriendsResponseDTO }>);
+        } as unknown as AxiosResponse<FriendsResponseDTO>);
 
         vi.mocked(SocialService.getPvpMatches).mockResolvedValue({
             data: []
-        } as unknown as AxiosResponse<{ data: PvpMatchDTO[] }>);
+        } as unknown as AxiosResponse<PvpMatchDTO[]>);
 
         render(<QuickSocialWidget onOpenSocialHub={mockOnOpenSocialHub} />);
 

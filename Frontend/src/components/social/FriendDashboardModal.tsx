@@ -30,7 +30,7 @@ import { ContestRatingsSection } from '@/components/dashboard/student/ContestRat
 import { UnifiedContestHistory } from '@/components/dashboard/student/UnifiedContestHistory';
 import { formatProblemTitle, getProblemPlatform } from '@/lib/problemFormatter';
 import { useAuth } from '../../hooks/useAuth';
-import type { FriendComparisonDTO, StudentDashboardDTO } from '@/types';
+import type { FriendComparisonDTO, StudentExtendedDTO, SkillStat, Badge, RecentSubmission } from '@/types';
 
 interface FriendDashboardModalProps {
     friendId: string | null;
@@ -40,7 +40,7 @@ interface FriendDashboardModalProps {
 }
 
 interface FriendProfileHeaderProps {
-    profile: StudentDashboardDTO;
+    profile: StudentExtendedDTO;
     totalSolved: number;
     lcSolved: number;
     cfSolved: number;
@@ -158,7 +158,7 @@ function FriendProfileHeader({
 }
 
 interface FriendAnalyticsSectionProps {
-    profile: StudentDashboardDTO;
+    profile: StudentExtendedDTO;
     cardClasses: string;
     skillGaps: { name: string; count: number }[];
     easyCount: number;
@@ -211,7 +211,7 @@ function FriendAnalyticsSection({
                     <CardContent className="pt-6">
                         <div className="flex flex-wrap gap-2.5">
                             {profile.skills && profile.skills.length > 0 ? (
-                                profile.skills.toSorted((a, b) => b.problemsSolved - a.problemsSolved).slice(0, 15).map((skill) => (
+                                profile.skills.toSorted((a: SkillStat, b: SkillStat) => b.problemsSolved - a.problemsSolved).slice(0, 15).map((skill: SkillStat) => (
                                     <div key={skill.tagName} className="flex items-center bg-zinc-100/70 dark:bg-zinc-900/40 rounded-xl px-3 py-1.5 border border-zinc-200 dark:border-zinc-800/60 shadow-xs">
                                         <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mr-2.5">{skill.tagName}</span>
                                         <span className="text-[11px] font-bold bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#b4afff] px-2 py-0.5 rounded-md">{skill.problemsSolved}</span>
@@ -355,7 +355,7 @@ function FriendAnalyticsSection({
                                 {(!profile.recentSubmissions || profile.recentSubmissions.length === 0) ? (
                                     <p className="text-xs text-zinc-500 py-6 text-center italic">No recent activity recorded.</p>
                                 ) : (
-                                    profile.recentSubmissions.slice(0, 15).map((sub) => (
+                                    profile.recentSubmissions.slice(0, 15).map((sub: RecentSubmission) => (
                                         <div key={`${sub.platform || 'LC'}-${sub.titleSlug || sub.title}-${sub.timestamp}`} className="flex items-start space-x-3 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/60 last:border-0 last:pb-0">
                                             <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mt-0.5 shrink-0" />
                                             <div className="min-w-0 flex-1">
@@ -391,7 +391,7 @@ function FriendAnalyticsSection({
                         </CardHeader>
                         <CardContent className="pt-6">
                             <div className="grid grid-cols-3 gap-3">
-                                {profile.badges.slice(0, 9).map((badge) => (
+                                {profile.badges.slice(0, 9).map((badge: Badge) => (
                                     <div key={`${badge.title}-${badge.icon}`} className="aspect-square bg-zinc-100/80 dark:bg-zinc-900/40 rounded-xl flex items-center justify-center border border-zinc-200 dark:border-zinc-800/60 p-2 shadow-xs hover:border-[#5b4fff]/40 transition-all group" title={badge.title}>
                                         <img src={badge.icon.startsWith('http') ? badge.icon : `https://leetcode.com${badge.icon}`} alt="badge" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
                                     </div>
@@ -406,7 +406,7 @@ function FriendAnalyticsSection({
 }
 
 interface FriendPeerLearningSectionProps {
-    profile: StudentDashboardDTO;
+    profile: StudentExtendedDTO;
     cardClasses: string;
     searchFilter: string;
     setSearchFilter: (val: string) => void;
@@ -657,7 +657,7 @@ function FriendPeerLearningSection({
 }
 
 interface FriendSubmissionsSectionProps {
-    profile: StudentDashboardDTO;
+    profile: StudentExtendedDTO;
     cardClasses: string;
 }
 
@@ -682,7 +682,7 @@ function FriendSubmissionsSection({ profile, cardClasses }: Readonly<FriendSubmi
                                 No submissions cataloged for this peer.
                             </p>
                         ) : (
-                            profile.recentSubmissions.map((sub, idx) => {
+                            profile.recentSubmissions.map((sub: RecentSubmission, idx: number) => {
                                 const title = sub.title || formatProblemTitle(sub.titleSlug);
                                 const targetUrl = sub.questionLink || (sub.titleSlug ? `https://leetcode.com/problems/${sub.titleSlug}/` : '#');
 

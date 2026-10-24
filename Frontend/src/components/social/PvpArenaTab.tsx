@@ -553,13 +553,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                             {formattedTitle}
                                                         </h4>
                                                         <Badge
-                                                            className={`text-[10px] font-semibold px-2 py-0.2 rounded-md border ${
-                                                                match.problemDifficulty === 'Easy'
-                                                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-                                                                    : match.problemDifficulty === 'Medium'
-                                                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                                                                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
-                                                            }`}
+                                                             className={`text-[10px] font-semibold px-2 py-0.2 rounded-md border ${getDifficultyBadgeClass(match.problemDifficulty)}`}
                                                         >
                                                             {match.problemDifficulty}
                                                         </Badge>
@@ -753,15 +747,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                         >
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <Badge
-                                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
-                                                        isWinner
-                                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-                                                            : isDraw
-                                                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                                                            : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
-                                                    }`}
+                                                     className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${getMatchResultClass(isWinner, isDraw)}`}
                                                 >
-                                                    {isWinner ? 'VICTORY' : isDraw ? 'DRAW' : 'DEFEAT'}
+                                                     {getMatchResultText(isWinner, isDraw)}
                                                 </Badge>
 
                                                 <Avatar className="w-7 h-7 border border-zinc-200 dark:border-zinc-700 shrink-0">

@@ -51,7 +51,7 @@ describe('ActivityFeedTab Component', () => {
 
         vi.mocked(SocialService.getActivities).mockResolvedValue({
             data: mockActivities
-        } as unknown as AxiosResponse<{ data: FriendActivityDTO[] }>);
+        } as unknown as AxiosResponse<FriendActivityDTO[]>);
 
         render(<ActivityFeedTab onViewFriendDashboard={mockOnViewFriendDashboard} />);
 
@@ -100,7 +100,7 @@ describe('ActivityFeedTab Component', () => {
 
         vi.mocked(SocialService.getActivities).mockResolvedValue({
             data: mockActivities
-        } as unknown as AxiosResponse<{ data: FriendActivityDTO[] }>);
+        } as unknown as AxiosResponse<FriendActivityDTO[]>);
 
         vi.mocked(SocialService.reactToActivity).mockResolvedValue({
             data: {
@@ -108,7 +108,7 @@ describe('ActivityFeedTab Component', () => {
                 reactionCounts: { fire: 1 },
                 myReactions: ['fire']
             }
-        } as unknown as AxiosResponse<{ data: FriendActivityDTO }>);
+        } as unknown as AxiosResponse<FriendActivityDTO>);
 
         render(<ActivityFeedTab onViewFriendDashboard={mockOnViewFriendDashboard} />);
 

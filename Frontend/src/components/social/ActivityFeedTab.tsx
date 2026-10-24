@@ -234,13 +234,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
 
                                             <div className="flex items-center gap-2 mt-1">
                                                 <Badge
-                                                    className={`text-[9px] font-black px-2 py-0.2 rounded-md border ${
-                                                        act.type === 'PVP_WIN'
-                                                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                                                            : act.type === 'PROBLEM_SOLVED'
-                                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-                                                            : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20'
-                                                    }`}
+                                                    className={`text-[9px] font-black px-2 py-0.2 rounded-md border ${getActivityBadgeClass(act.type)}`}
                                                 >
                                                     {act.type.replaceAll('_', ' ')}
                                                 </Badge>

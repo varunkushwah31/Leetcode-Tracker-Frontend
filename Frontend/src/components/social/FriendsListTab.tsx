@@ -233,7 +233,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             <Button
                 size="sm"
                 className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl shadow-xs"
-                onClick={() => handleSendFriendRequest(searchUser.id)}
+                onClick={() => handleSendRequest(searchUser.id)}
                 disabled={actionLoadingId === searchUser.id}
             >
                 {actionLoadingId === searchUser.id ? (
@@ -367,17 +367,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10.5 pr-10 bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 h-11 text-xs rounded-2xl shadow-inner focus-visible:ring-[#5b4fff]/30"
                     />
-                    {isSearching ? (
-                        <Loader2 className="w-4 h-4 text-zinc-400 animate-spin absolute right-4 top-1/2 -translate-y-1/2" />
-                    ) : searchQuery ? (
-                        <button
-                            type="button"
-                            onClick={() => setSearchQuery('')}
-                            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 absolute right-4 top-1/2 -translate-y-1/2"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    ) : null}
+                    {renderSearchIndicator()}
                 </div>
 
                 {/* Live Search Results Dropdown */}
@@ -403,34 +393,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 </div>
 
                                 <div className="flex items-center gap-2 shrink-0">
-                                    {user.friendshipStatus === 'ACCEPTED' ? (
-                                        <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
-                                            Friends
-                                        </Badge>
-                                    ) : user.friendshipStatus === 'PENDING_OUTGOING' ? (
-                                        <Badge variant="secondary" className="text-[10px] font-bold">
-                                            Pending
-                                        </Badge>
-                                    ) : user.friendshipStatus === 'PENDING_INCOMING' ? (
-                                        <Button
-                                            size="sm"
-                                            className="h-8 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs"
-                                            onClick={() => user.friendshipId && handleAccept(user.friendshipId)}
-                                            disabled={actionLoadingId === user.friendshipId}
-                                        >
-                                            Accept Request
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            size="sm"
-                                            className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl gap-1.5 shadow-xs"
-                                            onClick={() => handleSendRequest(user.id)}
-                                            disabled={actionLoadingId === user.id}
-                                        >
-                                            <UserPlus className="w-3.5 h-3.5" />
-                                            <span>Add Friend</span>
-                                        </Button>
-                                    )}
+                                    {renderUserSearchAction(user)}
                                 </div>
                             </div>
                         ))}
@@ -571,46 +534,10 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                                 >
                                                     {friend.name}
                                                 </button>
-                                                {friend.isBusy ? (
-                                                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.2 rounded-full shrink-0">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                                                        In Duel
-                                                    </span>
-                                                ) : friend.isOnline ? (
-                                                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 rounded-full shrink-0">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                        Live
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-[10px] text-zinc-400 font-medium shrink-0">
-                                                        Offline
-                                                    </span>
-                                                )}
+                                                {renderFriendStatusBadge(friend)}
                                             </div>
                                             <div className="flex items-center gap-1.5 text-xs text-zinc-400 truncate mt-0.5">
-                                                {friend.leetcodeUsername ? (
-                                                    <a
-                                                        href={`https://leetcode.com/${friend.leetcodeUsername}`}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="hover:text-[#ffa116] transition-colors flex items-center gap-0.5"
-                                                    >
-                                                        <span>LC: @{friend.leetcodeUsername}</span>
-                                                        <ExternalLink className="w-3 h-3" />
-                                                    </a>
-                                                ) : friend.codeforcesHandle ? (
-                                                    <a
-                                                        href={`https://codeforces.com/profile/${friend.codeforcesHandle}`}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="hover:text-blue-400 transition-colors flex items-center gap-0.5"
-                                                    >
-                                                        <span>CF: @{friend.codeforcesHandle}</span>
-                                                        <ExternalLink className="w-3 h-3" />
-                                                    </a>
-                                                ) : (
-                                                    <span>@{friend.email?.split('@')[0] || 'coder'}</span>
-                                                )}
+                                                {renderFriendHandle(friend)}
                                             </div>
                                         </div>
                                     </div>
@@ -675,13 +602,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                     <Button
                                         size="sm"
                                         disabled={!friend.isOnline || friend.isBusy}
-                                        title={
-                                            friend.isBusy
-                                                ? `${friend.name} is currently busy in another duel`
-                                                : !friend.isOnline
-                                                ? `${friend.name} is offline. Both players must be live to duel`
-                                                : `Challenge ${friend.name} to 1v1 Duel`
-                                        }
+                                        title={getDuelButtonTitle(friend)}
                                         className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                         onClick={() => onChallengePvp(friend.id, friend.name)}
                                     >
