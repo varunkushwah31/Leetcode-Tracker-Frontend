@@ -2,7 +2,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QuickSocialWidget } from './QuickSocialWidget';
 import { SocialService } from '../../services/endpoints';
-import type { FriendDTO } from '@/types';
+import type { FriendDTO, FriendsResponseDTO, PvpMatchDTO } from '@/types';
+import type { AxiosResponse } from 'axios';
 
 vi.mock('../../services/endpoints', () => ({
     SocialService: {
@@ -42,11 +43,11 @@ describe('QuickSocialWidget Component', () => {
 
         vi.mocked(SocialService.getFriends).mockResolvedValue({
             data: { friends: mockFriends, pendingIncoming: [], pendingOutgoing: [] }
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendsResponseDTO }>);
 
         vi.mocked(SocialService.getPvpMatches).mockResolvedValue({
             data: []
-        } as any);
+        } as unknown as AxiosResponse<{ data: PvpMatchDTO[] }>);
 
         render(<QuickSocialWidget onOpenSocialHub={mockOnOpenSocialHub} />);
 
@@ -85,11 +86,11 @@ describe('QuickSocialWidget Component', () => {
 
         vi.mocked(SocialService.getFriends).mockResolvedValue({
             data: { friends: mockFriends, pendingIncoming: [], pendingOutgoing: [] }
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendsResponseDTO }>);
 
         vi.mocked(SocialService.getPvpMatches).mockResolvedValue({
             data: []
-        } as any);
+        } as unknown as AxiosResponse<{ data: PvpMatchDTO[] }>);
 
         render(<QuickSocialWidget onOpenSocialHub={mockOnOpenSocialHub} />);
 

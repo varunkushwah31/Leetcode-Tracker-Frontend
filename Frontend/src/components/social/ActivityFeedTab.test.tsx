@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ActivityFeedTab } from './ActivityFeedTab';
 import { SocialService } from '../../services/endpoints';
 import type { FriendActivityDTO } from '@/types';
+import type { AxiosResponse } from 'axios';
 
 vi.mock('../../services/endpoints', () => ({
     SocialService: {
@@ -50,7 +51,7 @@ describe('ActivityFeedTab Component', () => {
 
         vi.mocked(SocialService.getActivities).mockResolvedValue({
             data: mockActivities
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendActivityDTO[] }>);
 
         render(<ActivityFeedTab onViewFriendDashboard={mockOnViewFriendDashboard} />);
 
@@ -99,7 +100,7 @@ describe('ActivityFeedTab Component', () => {
 
         vi.mocked(SocialService.getActivities).mockResolvedValue({
             data: mockActivities
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendActivityDTO[] }>);
 
         vi.mocked(SocialService.reactToActivity).mockResolvedValue({
             data: {
@@ -107,7 +108,7 @@ describe('ActivityFeedTab Component', () => {
                 reactionCounts: { fire: 1 },
                 myReactions: ['fire']
             }
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendActivityDTO }>);
 
         render(<ActivityFeedTab onViewFriendDashboard={mockOnViewFriendDashboard} />);
 

@@ -154,7 +154,7 @@ export function UpcomingContestsCard() {
 
             <CardContent className="p-4 pt-3">
                 <ScrollArea className="h-64 pr-4 custom-scrollbar">
-                    {isLoading ? (
+                    {isLoading && (
                         <div className="space-y-2.5">
                             {[1, 2, 3].map((i) => (
                                 <div
@@ -163,11 +163,13 @@ export function UpcomingContestsCard() {
                                 />
                             ))}
                         </div>
-                    ) : contests.length === 0 ? (
+                    )}
+                    {!isLoading && contests.length === 0 && (
                         <p className="text-center text-xs font-medium text-zinc-500 dark:text-zinc-400 py-8">
                             No upcoming contests found.
                         </p>
-                    ) : (
+                    )}
+                    {!isLoading && contests.length > 0 && (
                         <div className="flex flex-col gap-2.5">
                             {contests.map((contest) => {
                                 const countdown = formatCountdown(
@@ -208,7 +210,7 @@ export function UpcomingContestsCard() {
                                                 {countdown.isLive ? (
                                                     <span className="font-extrabold text-rose-500 dark:text-rose-400 flex items-center gap-1 shrink-0">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                                                        LIVE NOW
+                                                        <span>LIVE NOW</span>
                                                     </span>
                                                 ) : (
                                                     <span className="font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1 shrink-0">

@@ -34,6 +34,26 @@ interface ForgotPasswordModalProps {
 
 type Step = 'EMAIL' | 'OTP' | 'PASSWORD' | 'SUCCESS';
 
+function extractApiError(err: unknown, defaultFallback: string): string {
+    if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { message?: string } | string } };
+        if (typeof axiosErr.response?.data === 'string') return axiosErr.response.data;
+        if (axiosErr.response?.data?.message) return axiosErr.response.data.message;
+    }
+    if (err instanceof Error) return err.message;
+    return defaultFallback;
+}
+
+function validateNewPasswords(password: string, confirmation: string): string | null {
+    if (!password || password.length < 6) {
+        return 'New password must be at least 6 characters long.';
+    }
+    if (password !== confirmation) {
+        return 'New password and confirmation password do not match.';
+    }
+    return null;
+}
+
 export function ForgotPasswordModal({
     open,
     onOpenChange,
@@ -102,7 +122,7 @@ export function ForgotPasswordModal({
     };
 
     // STEP 1: Request OTP
-    const handleSendOtp = async (e?: React.FormEvent) => {
+    const handleSendOtp = async (e?: React.SyntheticEvent) => {
         if (e) e.preventDefault();
         setError(null);
         setSuccessMessage(null);
@@ -120,14 +140,14 @@ export function ForgotPasswordModal({
             setStep('OTP');
             setResendCooldown(60); // 60 seconds cooldown
         } catch (err: unknown) {
-            handleApiError(err, 'Failed to send OTP. Please verify your email.');
+            setError(extractApiError(err, 'Failed to send OTP. Please verify your email.'));
         } finally {
             setIsLoading(false);
         }
     };
 
     // STEP 2: Verify OTP
-    const handleVerifyOtp = async (e: React.FormEvent) => {
+    const handleVerifyOtp = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         setError(null);
         setSuccessMessage(null);
@@ -145,25 +165,21 @@ export function ForgotPasswordModal({
             setSuccessMessage('Code verified successfully!');
             setStep('PASSWORD');
         } catch (err: unknown) {
-            handleApiError(err, 'Invalid or expired OTP. Please check and try again.');
+            setError(extractApiError(err, 'Invalid or expired OTP. Please check and try again.'));
         } finally {
             setIsLoading(false);
         }
     };
 
     // STEP 3: Reset Password
-    const handleResetPassword = async (e: React.FormEvent) => {
+    const handleResetPassword = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         setError(null);
         setSuccessMessage(null);
 
-        if (!newPassword || newPassword.length < 6) {
-            setError('New password must be at least 6 characters long.');
-            return;
-        }
-
-        if (newPassword !== confirmPassword) {
-            setError('New password and confirmation password do not match.');
+        const passwordError = validateNewPasswords(newPassword, confirmPassword);
+        if (passwordError) {
+            setError(passwordError);
             return;
         }
 
@@ -183,26 +199,13 @@ export function ForgotPasswordModal({
                 setIsOpen(false);
             }, 2500);
         } catch (err: unknown) {
-            handleApiError(err, 'Failed to reset password. Please try again.');
+            setError(extractApiError(err, 'Failed to reset password. Please try again.'));
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleApiError = (err: unknown, defaultFallback: string) => {
-        let msg = defaultFallback;
-        if (err && typeof err === 'object' && 'response' in err) {
-            const axiosErr = err as { response?: { data?: { message?: string } | string } };
-            if (typeof axiosErr.response?.data === 'string') {
-                msg = axiosErr.response.data;
-            } else if (axiosErr.response?.data?.message) {
-                msg = axiosErr.response.data.message;
-            }
-        } else if (err instanceof Error) {
-            msg = err.message;
-        }
-        setError(msg);
-    };
+
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -251,13 +254,12 @@ export function ForgotPasswordModal({
                     <ErrorBanner message={error} className="mb-3" />
 
                     {successMessage && step !== 'SUCCESS' && (
-                        <div
-                            role="status"
+                        <output
                             className="flex items-center space-x-2.5 rounded-xl border border-emerald-200 dark:border-emerald-500/25 bg-emerald-50/90 dark:bg-emerald-500/10 p-3 text-emerald-800 dark:text-emerald-300 backdrop-blur-md transition-all shadow-xs mb-3 text-xs font-medium"
                         >
                             <CheckCircle className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" weight="fill" />
                             <span>{successMessage}</span>
-                        </div>
+                        </output>
                     )}
 
                     {/* STEP 1: EMAIL */}

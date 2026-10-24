@@ -61,7 +61,7 @@ export function StudentEmailVerificationModal({
         return () => clearInterval(interval);
     }, [open, resendCooldown]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         setError(null);
 

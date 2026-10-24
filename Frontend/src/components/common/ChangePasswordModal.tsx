@@ -28,6 +28,25 @@ interface ChangePasswordModalProps {
     trigger?: React.ReactNode;
 }
 
+function validatePasswordChange(currentPassword: string, newPassword: string, confirmPassword: string): string | null {
+    if (!currentPassword) return 'Please enter your current password.';
+    if (!newPassword) return 'Please enter a new password.';
+    if (newPassword.length < 6) return 'New password must be at least 6 characters long.';
+    if (newPassword === currentPassword) return 'New password cannot be the same as your current password.';
+    if (newPassword !== confirmPassword) return 'New password and confirmation do not match.';
+    return null;
+}
+
+function extractErrorMessage(err: unknown): string {
+    if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { message?: string } | string } };
+        if (typeof axiosErr.response?.data === 'string') return axiosErr.response.data;
+        if (axiosErr.response?.data?.message) return axiosErr.response.data.message;
+    }
+    if (err instanceof Error) return err.message;
+    return 'Failed to change password. Please check your current password.';
+}
+
 export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<ChangePasswordModalProps>) {
     const [internalOpen, setInternalOpen] = useState(false);
     const isControlled = open !== undefined;
@@ -67,33 +86,14 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
         setIsLoading(false);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         setError(null);
         setSuccessMessage(null);
 
-        if (!currentPassword) {
-            setError('Please enter your current password.');
-            return;
-        }
-
-        if (!newPassword) {
-            setError('Please enter a new password.');
-            return;
-        }
-
-        if (newPassword.length < 6) {
-            setError('New password must be at least 6 characters long.');
-            return;
-        }
-
-        if (newPassword === currentPassword) {
-            setError('New password cannot be the same as your current password.');
-            return;
-        }
-
-        if (newPassword !== confirmPassword) {
-            setError('New password and confirmation do not match.');
+        const validationError = validatePasswordChange(currentPassword, newPassword, confirmPassword);
+        if (validationError) {
+            setError(validationError);
             return;
         }
 
@@ -111,21 +111,30 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
                 setIsOpen(false);
             }, 1800);
         } catch (err: unknown) {
-            let msg = 'Failed to change password. Please check your current password.';
-            if (err && typeof err === 'object' && 'response' in err) {
-                const axiosErr = err as { response?: { data?: { message?: string } | string } };
-                if (typeof axiosErr.response?.data === 'string') {
-                    msg = axiosErr.response.data;
-                } else if (axiosErr.response?.data?.message) {
-                    msg = axiosErr.response.data.message;
-                }
-            } else if (err instanceof Error) {
-                msg = err.message;
-            }
-            setError(msg);
+            setError(extractErrorMessage(err));
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const renderSubmitContent = () => {
+        if (isLoading) {
+            return (
+                <>
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                    Updating...
+                </>
+            );
+        }
+        if (successMessage) {
+            return (
+                <>
+                    <CheckCircle className="w-4 h-4 mr-1.5" weight="fill" />
+                    Updated
+                </>
+            );
+        }
+        return 'Update Password';
     };
 
     return (
@@ -155,13 +164,12 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
                     <ErrorBanner message={error} className="mb-3" />
 
                     {successMessage && (
-                        <div
-                            role="status"
-                            className="flex items-center space-x-3 rounded-xl border border-emerald-200 dark:border-emerald-500/25 bg-emerald-50/90 dark:bg-emerald-500/10 p-3 text-emerald-800 dark:text-emerald-300 backdrop-blur-md transition-all shadow-xs mb-3"
+                        <output
+                            className="flex items-center space-x-3 rounded-xl border border-emerald-200 dark:border-emerald-500/25 bg-emerald-50/90 dark:bg-emerald-500/10 p-3 text-emerald-800 dark:text-emerald-300 backdrop-blur-md transition-all shadow-xs mb-3 block"
                         >
                             <CheckCircle className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" weight="fill" />
                             <p className="text-sm font-medium leading-snug">{successMessage}</p>
-                        </div>
+                        </output>
                     )}
 
                     {/* Current Password */}
@@ -320,19 +328,7 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
                             disabled={isLoading || !!successMessage}
                             className="rounded-xl bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] text-white text-xs font-semibold h-10 px-5 shadow-lg shadow-[#5b4fff]/25 transition-all cursor-pointer"
                         >
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-                                    Updating...
-                                </>
-                            ) : successMessage ? (
-                                <>
-                                    <CheckCircle className="w-4 h-4 mr-1.5" weight="fill" />
-                                    Updated
-                                </>
-                            ) : (
-                                'Update Password'
-                            )}
+                            {renderSubmitContent()}
                         </Button>
                     </DialogFooter>
                 </form>

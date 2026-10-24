@@ -29,6 +29,27 @@ interface FriendsListTabProps {
     onChallengePvp: (friendId: string, friendName: string) => void;
 }
 
+
+function extractErrorMessage(err: unknown, fallback: string): string {
+    if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { message?: string } | string } };
+        if (typeof axiosErr.response?.data === 'string') return axiosErr.response.data;
+        if (axiosErr.response?.data?.message) return axiosErr.response.data.message;
+    }
+    if (err instanceof Error) return err.message;
+    return fallback;
+}
+
+function getDuelButtonTitle(friend: FriendDTO): string {
+    if (friend.isBusy) {
+        return `${friend.name} is currently busy in another duel`;
+    }
+    if (!friend.isOnline) {
+        return `${friend.name} is offline. Both players must be live to duel`;
+    }
+    return `Challenge ${friend.name} to 1v1 Duel`;
+}
+
 export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<FriendsListTabProps>) {
     const { user } = useAuth();
     const [friends, setFriends] = useState<FriendDTO[]>([]);
@@ -107,9 +128,9 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                 prev.map(s => (s.id === targetId ? { ...s, friendshipStatus: 'PENDING_OUTGOING' } : s))
             );
             void loadFriendsData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             setFeedbackMessage({
-                text: err.response?.data?.message || 'Failed to send friend request.',
+                text: extractErrorMessage(err, 'Failed to send friend request.'),
                 type: 'error'
             });
         } finally {
@@ -124,9 +145,9 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             await SocialService.acceptFriendRequest(requestId);
             setFeedbackMessage({ text: 'Friend request accepted!', type: 'success' });
             void loadFriendsData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             setFeedbackMessage({
-                text: err.response?.data?.message || 'Failed to accept request.',
+                text: extractErrorMessage(err, 'Failed to accept request.'),
                 type: 'error'
             });
         } finally {
@@ -160,6 +181,124 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             setActionLoadingId(null);
             setTimeout(() => setFeedbackMessage(null), 4000);
         }
+    };
+
+
+    const renderSearchIndicator = () => {
+        if (isSearching) {
+            return <Loader2 className="w-4 h-4 text-zinc-400 animate-spin absolute right-4 top-1/2 -translate-y-1/2" />;
+        }
+        if (searchQuery) {
+            return (
+                <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 absolute right-4 top-1/2 -translate-y-1/2"
+                >
+                    <X className="w-4 h-4" />
+                </button>
+            );
+        }
+        return null;
+    };
+
+    const renderUserSearchAction = (searchUser: SocialSearchStudentDTO) => {
+        if (searchUser.friendshipStatus === 'ACCEPTED') {
+            return (
+                <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
+                    Friends
+                </Badge>
+            );
+        }
+        if (searchUser.friendshipStatus === 'PENDING_OUTGOING') {
+            return (
+                <Badge variant="secondary" className="text-[10px] font-bold">
+                    Pending
+                </Badge>
+            );
+        }
+        if (searchUser.friendshipStatus === 'PENDING_INCOMING') {
+            return (
+                <Button
+                    size="sm"
+                    className="h-8 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs"
+                    onClick={() => searchUser.friendshipId && handleAccept(searchUser.friendshipId)}
+                    disabled={actionLoadingId === searchUser.friendshipId}
+                >
+                    Accept Request
+                </Button>
+            );
+        }
+        return (
+            <Button
+                size="sm"
+                className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl shadow-xs"
+                onClick={() => handleSendFriendRequest(searchUser.id)}
+                disabled={actionLoadingId === searchUser.id}
+            >
+                {actionLoadingId === searchUser.id ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                    <>
+                        <UserPlus className="w-3.5 h-3.5 mr-1" /> Add Friend
+                    </>
+                )}
+            </Button>
+        );
+    };
+
+    const renderFriendStatusBadge = (friend: FriendDTO) => {
+        if (friend.isBusy) {
+            return (
+                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.2 rounded-full shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span>In Duel</span>
+                </span>
+            );
+        }
+        if (friend.isOnline) {
+            return (
+                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 rounded-full shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Live</span>
+                </span>
+            );
+        }
+        return (
+            <span className="text-[10px] text-zinc-400 font-medium shrink-0">
+                Offline
+            </span>
+        );
+    };
+
+    const renderFriendHandle = (friend: FriendDTO) => {
+        if (friend.leetcodeUsername) {
+            return (
+                <a
+                    href={`https://leetcode.com/${friend.leetcodeUsername}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-[#ffa116] transition-colors flex items-center gap-0.5"
+                >
+                    <span>LC: @{friend.leetcodeUsername}</span>
+                    <ExternalLink className="w-3 h-3" />
+                </a>
+            );
+        }
+        if (friend.codeforcesHandle) {
+            return (
+                <a
+                    href={`https://codeforces.com/profile/${friend.codeforcesHandle}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-blue-400 transition-colors flex items-center gap-0.5"
+                >
+                    <span>CF: @{friend.codeforcesHandle}</span>
+                    <ExternalLink className="w-3 h-3" />
+                </a>
+            );
+        }
+        return <span>@{friend.email?.split('@')[0] || 'coder'}</span>;
     };
 
     if (isLoading) {

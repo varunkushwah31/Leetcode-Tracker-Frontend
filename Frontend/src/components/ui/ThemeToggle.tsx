@@ -6,7 +6,7 @@ export interface ThemeToggleProps {
     className?: string;
 }
 
-export function ThemeToggle({ className = '' }: ThemeToggleProps) {
+export function ThemeToggle({ className = '' }: Readonly<ThemeToggleProps>) {
     const { theme, toggleTheme } = useTheme();
     const [mounted] = useState(true);
 

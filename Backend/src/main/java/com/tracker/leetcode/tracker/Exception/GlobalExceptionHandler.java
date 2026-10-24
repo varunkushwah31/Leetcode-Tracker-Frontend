@@ -138,6 +138,28 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ERROR_BAD_REQUEST, ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex, HttpServletRequest request) {
+        String msg = ex.getMessage() != null ? ex.getMessage() : "";
+        String lowerMsg = msg.toLowerCase();
+
+        HttpStatus status;
+        String errorLabel;
+        if (lowerMsg.contains("authentication") || lowerMsg.contains("logged in") || lowerMsg.contains("unauthenticated")) {
+            status = HttpStatus.UNAUTHORIZED;
+            errorLabel = ERROR_UNAUTHORIZED;
+        } else if (lowerMsg.contains("not authorized") || lowerMsg.contains("permission") || lowerMsg.contains("not a participant")) {
+            status = HttpStatus.FORBIDDEN;
+            errorLabel = "Forbidden";
+        } else {
+            status = HttpStatus.BAD_REQUEST;
+            errorLabel = ERROR_BAD_REQUEST;
+        }
+
+        log.warn("Illegal state on path [{}] (status: {}): {}", request.getRequestURI(), status, msg);
+        return buildErrorResponse(status, errorLabel, msg, request, null);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, String> fieldErrors = new LinkedHashMap<>();

@@ -32,7 +32,17 @@ const reactionDefinitions = [
     { key: 'heart', label: 'Kudos', Icon: Heart, legacy: 'heart' }
 ];
 
-export function ActivityFeedTab({ onViewFriendDashboard }: ActivityFeedTabProps) {
+function getActivityBadgeClass(type: string): string {
+    if (type === 'PVP_WIN') {
+        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+    }
+    if (type === 'PROBLEM_SOLVED') {
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+    }
+    return 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20';
+}
+
+export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeedTabProps>) {
     const { user } = useAuth();
     const [activities, setActivities] = useState<FriendActivityDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);

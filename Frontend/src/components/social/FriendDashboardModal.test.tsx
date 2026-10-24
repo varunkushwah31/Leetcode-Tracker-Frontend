@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FriendDashboardModal } from './FriendDashboardModal';
 import { SocialService } from '../../services/endpoints';
 import type { FriendComparisonDTO } from '@/types';
+import type { AxiosResponse } from 'axios';
 
 vi.mock('../../services/endpoints', () => ({
     SocialService: {
@@ -83,7 +84,7 @@ describe('FriendDashboardModal Component', () => {
     it('renders friend profile details matching mentor view when open', async () => {
         vi.mocked(SocialService.getFriendDashboard).mockResolvedValue({
             data: mockComparisonData
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendComparisonDTO }>);
 
         const handleClose = vi.fn();
         const handleChallenge = vi.fn();
@@ -124,7 +125,7 @@ describe('FriendDashboardModal Component', () => {
     it('switches between Performance, Peer Learning, and Submission History tabs', async () => {
         vi.mocked(SocialService.getFriendDashboard).mockResolvedValue({
             data: mockComparisonData
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendComparisonDTO }>);
 
         render(
             <FriendDashboardModal
@@ -161,7 +162,7 @@ describe('FriendDashboardModal Component', () => {
     it('triggers challenge PVP callback when Challenge to Duel button is clicked', async () => {
         vi.mocked(SocialService.getFriendDashboard).mockResolvedValue({
             data: mockComparisonData
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendComparisonDTO }>);
 
         const handleChallenge = vi.fn();
         const handleClose = vi.fn();

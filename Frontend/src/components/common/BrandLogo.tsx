@@ -124,12 +124,12 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 }) => {
   const textClass = sizeToTextClass[size];
 
-  const primaryTextColor =
-    theme === 'dark'
-      ? 'text-white'
-      : theme === 'light'
-      ? 'text-zinc-900'
-      : 'text-zinc-900 dark:text-white';
+  let primaryTextColor = 'text-zinc-900 dark:text-white';
+  if (theme === 'dark') {
+    primaryTextColor = 'text-white';
+  } else if (theme === 'light') {
+    primaryTextColor = 'text-zinc-900';
+  }
 
   const content = (
     <div className={`flex items-center gap-3 group select-none ${asLink ? '' : className}`}>

@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SocialHubView } from './SocialHubView';
 import { SocialService } from '../../services/endpoints';
+import type { AxiosResponse } from 'axios';
 
 vi.mock('../../services/endpoints', () => ({
     SocialService: {
@@ -47,15 +48,15 @@ describe('SocialHubView Component', () => {
                 pendingIncoming: [],
                 pendingOutgoing: []
             }
-        } as any);
+        } as unknown as AxiosResponse);
 
         vi.mocked(SocialService.getPvpMatches).mockResolvedValue({
             data: []
-        } as any);
+        } as unknown as AxiosResponse);
 
         vi.mocked(SocialService.getActivities).mockResolvedValue({
             data: []
-        } as any);
+        } as unknown as AxiosResponse);
 
         vi.mocked(SocialService.getFriendsLeaderboard).mockResolvedValue({
             data: [
@@ -84,15 +85,15 @@ describe('SocialHubView Component', () => {
                     pvpWinRate: 50
                 }
             ]
-        } as any);
+        } as unknown as AxiosResponse);
 
         vi.mocked(SocialService.getPeerStudyPosts).mockResolvedValue({
             data: []
-        } as any);
+        } as unknown as AxiosResponse);
 
         vi.mocked(SocialService.getCuratedProblems).mockResolvedValue({
             data: []
-        } as any);
+        } as unknown as AxiosResponse);
     });
 
     it('renders all 5 main navigation tabs', async () => {

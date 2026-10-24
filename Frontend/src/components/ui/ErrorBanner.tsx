@@ -5,7 +5,7 @@ interface ErrorBannerProps {
     className?: string; // Optional prop to add custom margins if needed
 }
 
-export function ErrorBanner({ message, className = "mb-4" }: ErrorBannerProps) {
+export function ErrorBanner({ message, className = "mb-4" }: Readonly<ErrorBannerProps>) {
     if (!message) return null;
 
     return (

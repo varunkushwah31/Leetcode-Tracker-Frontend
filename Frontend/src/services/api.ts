@@ -9,7 +9,12 @@ declare module "axios" {
 
 type RetryableRequest = InternalAxiosRequestConfig & { _retry?: boolean };
 
-export type ApiFormattedError = Error & { status?: number };
+export type ApiFormattedError = Error & {
+    status?: number;
+    response?: AxiosError['response'];
+    config?: AxiosError['config'];
+    isAxiosError?: boolean;
+};
 
 export function isAuthEndpoint(url?: string): boolean {
     if (!url) return false;
@@ -49,9 +54,17 @@ function requestTokenRefresh(): Promise<string> {
     return refreshPromise;
 }
 
-function toFormattedError(message: string, status?: number): ApiFormattedError {
+function toFormattedError(
+    message: string,
+    status?: number,
+    response?: AxiosError['response'],
+    config?: AxiosError['config']
+): ApiFormattedError {
     const err = new Error(message) as ApiFormattedError;
     if (typeof status === 'number') err.status = status;
+    if (response) err.response = response;
+    if (config) err.config = config;
+    err.isAxiosError = true;
     return err;
 }
 
@@ -143,7 +156,8 @@ async function handle401Refresh(originalRequest: RetryableRequest) {
         }
 
         const { message, status } = extractRefreshErrorMessage(refreshError);
-        throw toFormattedError(message, status ?? 401);
+        const refreshResponse = axios.isAxiosError(refreshError) ? refreshError.response : undefined;
+        throw toFormattedError(message, status ?? 401, refreshResponse, originalRequest);
     }
 }
 
@@ -201,7 +215,7 @@ api.interceptors.response.use(
         if (error.response?.status === 429) {
             console.warn(`[RateLimit 429] Too Many Requests for ${originalRequest?.url}:`, specificErrorMessage);
         }
-        throw toFormattedError(specificErrorMessage, error.response?.status);
+        throw toFormattedError(specificErrorMessage, error.response?.status, error.response, error.config);
     }
 );
 

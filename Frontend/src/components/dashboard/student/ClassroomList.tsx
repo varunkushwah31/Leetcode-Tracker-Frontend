@@ -8,7 +8,7 @@ interface ClassroomListProps {
     onSelectClassroom: (id: string | null) => void;
 }
 
-export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassroom }: ClassroomListProps) {
+export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassroom }: Readonly<ClassroomListProps>) {
     return (
         <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
             <CardHeader>
@@ -19,10 +19,11 @@ export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassro
             <CardContent>
                 <div className="grid gap-3 grid-cols-1 xl:grid-cols-2">
                     {classrooms?.map(cls => (
-                        <div
+                        <button
                             key={cls.id}
+                            type="button"
                             onClick={() => onSelectClassroom(selectedClassroomId === cls.id ? null : cls.id!)}
-                            className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${
+                            className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all text-left w-full ${
                                 selectedClassroomId === cls.id
                                     ? 'bg-[#5b4fff]/10 border-[#5b4fff]/50 shadow-md ring-1 ring-[#5b4fff]/50'
                                     : 'bg-zinc-50/80 dark:bg-[#1a1a1a]/40 border-zinc-200/80 dark:border-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-[#1a1a1a]/80 hover:border-zinc-300 dark:hover:border-zinc-700'
@@ -37,7 +38,7 @@ export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassro
                                 </p>
                             </div>
                             <TrendingUp className={`w-5 h-5 ${selectedClassroomId === cls.id ? 'text-[#5b4fff]' : 'text-zinc-400'}`} />
-                        </div>
+                        </button>
                     ))}
                     {(!classrooms || classrooms.length === 0) && (
                         <p className="col-span-full text-sm text-zinc-500 dark:text-zinc-400 py-4">You are not enrolled in any classrooms.</p>

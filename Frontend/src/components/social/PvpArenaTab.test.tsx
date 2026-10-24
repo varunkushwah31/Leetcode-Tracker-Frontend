@@ -2,7 +2,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PvpArenaTab } from './PvpArenaTab';
 import { SocialService } from '../../services/endpoints';
-import type { PvpMatchDTO } from '@/types';
+import type { PvpMatchDTO, FriendsResponseDTO } from '@/types';
+import type { AxiosResponse } from 'axios';
 
 vi.mock('../../services/endpoints', () => ({
     SocialService: {
@@ -55,10 +56,10 @@ describe('PvpArenaTab Component', () => {
     it('renders active in-progress match with preemptive End Duel button', async () => {
         vi.mocked(SocialService.getPvpMatches).mockResolvedValue({
             data: [activeMatch]
-        } as any);
+        } as unknown as AxiosResponse<{ data: PvpMatchDTO[] }>);
         vi.mocked(SocialService.getFriends).mockResolvedValue({
             data: { friends: [], pendingIncoming: [], pendingOutgoing: [] }
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendsResponseDTO }>);
 
         render(<PvpArenaTab />);
 
@@ -71,10 +72,10 @@ describe('PvpArenaTab Component', () => {
     it('opens confirmation modal and ends PvP duel preemptively', async () => {
         vi.mocked(SocialService.getPvpMatches).mockResolvedValue({
             data: [activeMatch]
-        } as any);
+        } as unknown as AxiosResponse<{ data: PvpMatchDTO[] }>);
         vi.mocked(SocialService.getFriends).mockResolvedValue({
             data: { friends: [], pendingIncoming: [], pendingOutgoing: [] }
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendsResponseDTO }>);
         vi.mocked(SocialService.endPvpMatch).mockResolvedValue({
             data: {
                 ...activeMatch,
@@ -82,7 +83,7 @@ describe('PvpArenaTab Component', () => {
                 winnerId: 'u_bob',
                 winnerName: 'Bob'
             }
-        } as any);
+        } as unknown as AxiosResponse<{ data: PvpMatchDTO }>);
 
         render(<PvpArenaTab />);
 
@@ -130,13 +131,13 @@ describe('PvpArenaTab Component', () => {
 
         vi.mocked(SocialService.getPvpMatches).mockResolvedValue({
             data: [invitedMatch]
-        } as any);
+        } as unknown as AxiosResponse<{ data: PvpMatchDTO[] }>);
         vi.mocked(SocialService.getFriends).mockResolvedValue({
             data: { friends: [], pendingIncoming: [], pendingOutgoing: [] }
-        } as any);
+        } as unknown as AxiosResponse<{ data: FriendsResponseDTO }>);
         vi.mocked(SocialService.declinePvpMatch).mockResolvedValue({
             data: { ...invitedMatch, status: 'DECLINED' }
-        } as any);
+        } as unknown as AxiosResponse<{ data: PvpMatchDTO }>);
 
         render(<PvpArenaTab />);
 

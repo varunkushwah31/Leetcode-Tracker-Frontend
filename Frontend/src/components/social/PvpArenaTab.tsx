@@ -31,7 +31,46 @@ interface PvpArenaTabProps {
     onClearInitialTarget?: () => void;
 }
 
-export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: PvpArenaTabProps) {
+
+function extractPvpErrorMessage(err: unknown, fallback: string): string {
+    if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { message?: string } | string } };
+        if (typeof axiosErr.response?.data === 'string') return axiosErr.response.data;
+        if (axiosErr.response?.data?.message) return axiosErr.response.data.message;
+    }
+    if (err instanceof Error) return err.message;
+    return fallback;
+}
+
+function getDifficultyBadgeClass(difficulty?: string): string {
+    if (difficulty === 'Easy') {
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+    }
+    if (difficulty === 'Medium') {
+        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+    }
+    return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+}
+
+function getMatchResultClass(isWinner: boolean, isDraw: boolean): string {
+    if (isWinner) return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+    if (isDraw) return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+    return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+}
+
+function getMatchResultText(isWinner: boolean, isDraw: boolean): string {
+    if (isWinner) return 'VICTORY';
+    if (isDraw) return 'DRAW';
+    return 'DEFEAT';
+}
+
+function getFriendStatusSuffix(f: FriendDTO): string {
+    if (f.isBusy) return '(Busy in Duel)';
+    if (f.isOnline) return '(Live & Ready)';
+    return '(Offline)';
+}
+
+export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: Readonly<PvpArenaTabProps>) {
     const { user } = useAuth();
     const [matches, setMatches] = useState<PvpMatchDTO[]>([]);
     const [friends, setFriends] = useState<FriendDTO[]>([]);
@@ -177,9 +216,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             setCustomTitle('');
             setCustomLink('');
             void loadData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             setFeedback({
-                text: err.response?.data?.message || 'Failed to create challenge.',
+                text: extractPvpErrorMessage(err, 'Failed to create challenge.'),
                 type: 'error'
             });
         } finally {
@@ -201,9 +240,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             await SocialService.acceptPvpMatch(matchId);
             setFeedback({ text: 'Duel started! Both clocks are ticking. Good luck!', type: 'success' });
             void loadData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             setFeedback({
-                text: err.response?.data?.message || 'Failed to accept duel.',
+                text: extractPvpErrorMessage(err, 'Failed to accept duel.'),
                 type: 'error'
             });
         }
@@ -235,9 +274,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                 });
             }
             void loadData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             setFeedback({
-                text: err.response?.data?.message || 'Verification error.',
+                text: extractPvpErrorMessage(err, 'Verification error.'),
                 type: 'error'
             });
         } finally {
@@ -256,9 +295,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
             });
             setConfirmEndMatchId(null);
             void loadData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             setFeedback({
-                text: err.response?.data?.message || 'Failed to end PvP duel.',
+                text: extractPvpErrorMessage(err, 'Failed to end PvP duel.'),
                 type: 'error'
             });
         } finally {
@@ -793,7 +832,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                     <option value="">Select a friend to challenge...</option>
                                     {friends.map((f) => (
                                         <option key={f.id} value={f.id} disabled={!f.isOnline || f.isBusy}>
-                                            {f.name} {f.isBusy ? '(Busy in Duel)' : f.isOnline ? '(Live & Ready)' : '(Offline)'}
+                                            {f.name} {getFriendStatusSuffix(f)}
                                         </option>
                                     ))}
                                 </select>
@@ -819,7 +858,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
                             {/* Difficulty */}
                             <div className="space-y-1">
-                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Difficulty</label>
+                                <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">Difficulty</span>
                                 <div className="grid grid-cols-4 gap-1.5">
                                     {['Easy', 'Medium', 'Hard', 'Any'].map((diff) => (
                                         <button
@@ -840,7 +879,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
                             {/* Duration */}
                             <div className="space-y-1">
-                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Time Limit</label>
+                                <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">Time Limit</span>
                                 <div className="grid grid-cols-4 gap-1.5">
                                     {[15, 30, 45, 60].map((mins) => (
                                         <button
@@ -977,7 +1016,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
                                 <option value="">Select a friend to challenge...</option>
                                 {friends.map((f) => (
                                     <option key={f.id} value={f.id} disabled={!f.isOnline || f.isBusy}>
-                                        {f.name} {f.isBusy ? '(Busy in Duel)' : f.isOnline ? '(Live & Ready)' : '(Offline)'}
+                                        {f.name} {getFriendStatusSuffix(f)}
                                     </option>
                                 ))}
                             </select>
@@ -1008,7 +1047,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
                         {/* Difficulty */}
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Difficulty</label>
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">Difficulty</span>
                             <div className="grid grid-cols-4 gap-1.5">
                                 {['Easy', 'Medium', 'Hard', 'Any'].map((diff) => (
                                     <button
@@ -1029,7 +1068,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: P
 
                         {/* Duration */}
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Time Limit</label>
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">Time Limit</span>
                             <div className="grid grid-cols-4 gap-1.5">
                                 {[15, 30, 45, 60].map((mins) => (
                                     <button

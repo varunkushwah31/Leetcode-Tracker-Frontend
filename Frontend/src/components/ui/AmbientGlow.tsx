@@ -3,7 +3,7 @@ interface AmbientGlowProps {
   variant?: 'top' | 'center' | 'subtle';
 }
 
-export function AmbientGlow({ className = '', variant = 'top' }: AmbientGlowProps) {
+export function AmbientGlow({ className = '', variant = 'top' }: Readonly<AmbientGlowProps>) {
   if (variant === 'center') {
     return (
       <div className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`} aria-hidden="true">

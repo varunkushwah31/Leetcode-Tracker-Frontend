@@ -10,7 +10,7 @@ export function StreakFlame({
     className = 'w-4 h-4',
     size,
     animated = true,
-}: StreakFlameProps) {
+}: Readonly<StreakFlameProps>) {
     const id = useId();
     const outerGradId = `flame-outer-${id}`;
     const innerGradId = `flame-inner-${id}`;
