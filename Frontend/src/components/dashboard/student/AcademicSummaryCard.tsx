@@ -42,7 +42,7 @@ export function AcademicSummaryCard({
                         <div className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mb-1">
                             <BookOpenIcon className="w-3.5 h-3.5 text-[#5b4fff]" /> Assigned
                         </div>
-                        <div className="text-lg font-black text-zinc-900 dark:text-white">
+                        <div className="text-lg font-mono font-bold text-zinc-900 dark:text-white tabular-nums">
                             {totalAssignments}
                         </div>
                     </div>
@@ -50,7 +50,7 @@ export function AcademicSummaryCard({
                         <div className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mb-1">
                             <CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> Solved
                         </div>
-                        <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
+                        <div className="text-lg font-mono font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
                             {completedCount}
                         </div>
                     </div>
@@ -58,7 +58,7 @@ export function AcademicSummaryCard({
                         <div className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 mb-1">
                             <Clock className="w-3.5 h-3.5 text-amber-500" /> Pending
                         </div>
-                        <div className="text-lg font-black text-amber-600 dark:text-amber-400">
+                        <div className="text-lg font-mono font-bold text-amber-600 dark:text-amber-400 tabular-nums">
                             {pendingCount}
                         </div>
                     </div>

@@ -132,8 +132,8 @@ export function UpcomingContestsCard() {
                         onClick={() => setPlatformFilter('CODEFORCES')}
                         className={`px-2 py-0.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                             platformFilter === 'CODEFORCES'
-                                ? 'bg-blue-500/15 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border border-blue-500/30 shadow-xs'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-zinc-200'
+                                ? 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30 shadow-xs'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-cyan-600 dark:hover:text-zinc-200'
                         }`}
                     >
                         CF
@@ -193,7 +193,7 @@ export function UpcomingContestsCard() {
                                                     className={`text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0 ${
                                                         isLeetCode
                                                             ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                                                            : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                                                            : 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20'
                                                     }`}
                                                 >
                                                     {isLeetCode ? 'LC' : 'CF'}

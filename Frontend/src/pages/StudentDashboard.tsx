@@ -207,9 +207,9 @@ export function StudentDashboard() {
                             <button
                                 type="button"
                                 onClick={() => setMainTab('overview')}
-                                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                                     mainTab === 'overview'
-                                        ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs'
+                                        ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
                                         : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                 }`}
                             >
@@ -218,13 +218,13 @@ export function StudentDashboard() {
                             <button
                                 type="button"
                                 onClick={() => setMainTab('social')}
-                                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                                     mainTab === 'social'
-                                        ? 'bg-[#5b4fff] text-white shadow-2xs'
+                                        ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
                                         : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                 }`}
                             >
-                                <Users className="w-3.5 h-3.5" /> Social Hub & PVP
+                                <Users className={`w-3.5 h-3.5 ${mainTab === 'social' ? 'text-[#5b4fff]' : ''}`} /> Social Hub & PVP
                             </button>
                         </div>
                     </div>
@@ -313,14 +313,14 @@ export function StudentDashboard() {
                 )}
 
                 {/* Mobile View Switcher */}
-                <div className="flex md:hidden items-center gap-1.5 p-1 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/80 mb-6 border border-zinc-200 dark:border-zinc-700">
+                <div className="flex md:hidden items-center gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 mb-6">
                     <button
                         type="button"
                         onClick={() => setMainTab('overview')}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                             mainTab === 'overview'
-                                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs'
-                                : 'text-zinc-500 hover:text-zinc-900'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
                         }`}
                     >
                         Overview
@@ -328,13 +328,13 @@ export function StudentDashboard() {
                     <button
                         type="button"
                         onClick={() => setMainTab('social')}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                             mainTab === 'social'
-                                ? 'bg-[#5b4fff] text-white shadow-2xs'
-                                : 'text-zinc-500 hover:text-zinc-900'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
                         }`}
                     >
-                        <Users className="w-3.5 h-3.5" /> Social Hub & PVP
+                        <Users className={`w-3.5 h-3.5 ${mainTab === 'social' ? 'text-[#5b4fff]' : ''}`} /> Social Hub & PVP
                     </button>
                 </div>
 
@@ -352,61 +352,61 @@ export function StudentDashboard() {
 
                         {/* Modular Focus Filters for Enhanced Scalability */}
                         <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
-                            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/60 overflow-x-auto custom-scrollbar">
+                            <div className="flex items-center gap-1 p-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800 overflow-x-auto custom-scrollbar">
                                 <button
                                     type="button"
                                     onClick={() => setActiveFilter('all')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'all'
-                                            ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs'
-                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
-                                    <SquaresFour className="w-3.5 h-3.5" /> All Overview
+                                    <SquaresFour className="w-3.5 h-3.5 text-zinc-400" /> All Overview
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setActiveFilter('daily')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'daily'
-                                            ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
-                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
-                                    <Flame className="w-3.5 h-3.5" /> Daily Focus
+                                    <Flame className="w-3.5 h-3.5 text-amber-500" /> Daily Focus
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setActiveFilter('academic')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'academic'
-                                            ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
-                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
-                                    <GraduationCap className="w-3.5 h-3.5" /> Academic & Classrooms
+                                    <GraduationCap className="w-3.5 h-3.5 text-[#5b4fff]" /> Academic & Classrooms
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setActiveFilter('practice')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'practice'
-                                            ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
-                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
-                                    <ChartBar className="w-3.5 h-3.5" /> Practice Analytics
+                                    <ChartBar className="w-3.5 h-3.5 text-emerald-500" /> Practice Analytics
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setActiveFilter('contests')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'contests'
-                                            ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
-                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
-                                    <Trophy className="w-3.5 h-3.5" /> Contest Arena
+                                    <Trophy className="w-3.5 h-3.5 text-amber-500" /> Contest Arena
                                 </button>
                             </div>
 

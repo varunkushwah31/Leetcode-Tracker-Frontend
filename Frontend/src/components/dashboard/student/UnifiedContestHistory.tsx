@@ -190,8 +190,8 @@ export function UnifiedContestHistory({
                             onClick={() => setPlatformFilter('CODEFORCES')}
                             className={`px-2 py-0.5 rounded-md text-xs font-semibold transition-all ${
                                 platformFilter === 'CODEFORCES'
-                                    ? 'bg-blue-500/15 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border border-blue-500/30 shadow-xs'
-                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-zinc-200'
+                                    ? 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30 shadow-xs'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-cyan-600 dark:hover:text-zinc-200'
                             }`}
                         >
                             CF ({cfCount})

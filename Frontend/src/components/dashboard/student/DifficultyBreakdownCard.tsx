@@ -27,7 +27,7 @@ export function DifficultyBreakdownCard({ data, totalSolved }: Readonly<{
                 <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                         <span className="font-bold text-zinc-700 dark:text-zinc-300">Easy</span>
-                        <span className="font-bold text-emerald-600 dark:text-emerald-500">
+                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-500 tabular-nums">
                             {easyStats.count} <span className="text-zinc-500 dark:text-zinc-400 font-medium ml-1">({easyStats.beatsPercentage}% beats)</span>
                         </span>
                     </div>
@@ -36,7 +36,7 @@ export function DifficultyBreakdownCard({ data, totalSolved }: Readonly<{
                 <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                         <span className="font-bold text-zinc-700 dark:text-zinc-300">Medium</span>
-                        <span className="font-bold text-amber-600 dark:text-amber-500">
+                        <span className="font-mono font-bold text-amber-600 dark:text-amber-500 tabular-nums">
                             {medStats.count} <span className="text-zinc-500 dark:text-zinc-400 font-medium ml-1">({medStats.beatsPercentage}% beats)</span>
                         </span>
                     </div>
@@ -45,7 +45,7 @@ export function DifficultyBreakdownCard({ data, totalSolved }: Readonly<{
                 <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                         <span className="font-bold text-zinc-700 dark:text-zinc-300">Hard</span>
-                        <span className="font-bold text-rose-600 dark:text-rose-500">
+                        <span className="font-mono font-bold text-rose-600 dark:text-rose-500 tabular-nums">
                             {hardStats.count} <span className="text-zinc-500 dark:text-zinc-400 font-medium ml-1">({hardStats.beatsPercentage}% beats)</span>
                         </span>
                     </div>

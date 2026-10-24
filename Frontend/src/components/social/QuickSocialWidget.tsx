@@ -115,7 +115,7 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                                 <div className="relative shrink-0">
                                     <Avatar className="w-8 h-8 border border-zinc-200 dark:border-zinc-700">
                                         <AvatarImage src={f.avatarUrl} className="object-cover" />
-                                        <AvatarFallback className="bg-indigo-50 dark:bg-zinc-800 text-[#5b4fff] text-[10px] font-bold">
+                                        <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] text-[10px] font-bold">
                                             {f.name.substring(0, 2)}
                                         </AvatarFallback>
                                     </Avatar>
@@ -198,7 +198,7 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                         onClick={() => onOpenSocialHub('pvp')}
                         className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/25 px-2.5 py-1 text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center gap-1 shadow-2xs"
                     >
-                        <Swords className="w-3.5 h-3.5 animate-spin" />
+                        <Swords className="w-3.5 h-3.5" />
                         <span>{activeDuelsCount} Duel{activeDuelsCount > 1 ? 's' : ''} Active</span>
                     </Badge>
                 ) : (

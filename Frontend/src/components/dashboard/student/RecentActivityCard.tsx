@@ -41,8 +41,8 @@ export function RecentActivityCard({ data }: Readonly<{
                                         {sub.platform && (
                                             <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded shrink-0 ${
                                                 sub.platform === 'CODEFORCES'
-                                                    ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
-                                                    : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20'
+                                                    ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20'
+                                                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                                             }`}>
                                                 {sub.platform === 'CODEFORCES' ? 'CF' : 'LC'}
                                             </span>

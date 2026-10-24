@@ -102,7 +102,7 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
         if (d === 'hard') {
             return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
         }
-        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
+        return 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700';
     };
 
     return (
