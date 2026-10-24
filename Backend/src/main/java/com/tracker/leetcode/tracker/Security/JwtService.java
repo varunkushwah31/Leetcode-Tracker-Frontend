@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 @Slf4j
 @Service
+@SuppressWarnings("java:S2143") // JJWT library requires java.util.Date; conversion at boundaries is unnecessary overhead
 public class JwtService {
 
     @Value("${application.security.jwt.secret-key}")

@@ -252,7 +252,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
         try {
             await SocialService.declinePvpMatch(matchId);
             void loadData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Failed to decline match:', err);
         }
     };
@@ -810,8 +810,8 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                             {/* Choose Friend */}
                             <div className="space-y-1">
-                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Friend (Live & Ready)</label>
-                                <select
+                                <label htmlFor="pvp-friend-select" className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Friend (Live & Ready)</label>
+                                <select id="pvp-friend-select"
                                     value={selectedFriendId}
                                     onChange={(e) => setSelectedFriendId(e.target.value)}
                                     disabled={isCurrentUserBusy}
@@ -828,8 +828,8 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                             {/* Choose Topic */}
                             <div className="space-y-1">
-                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Topic</label>
-                                <select
+                                <label htmlFor="pvp-topic-select" className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Topic</label>
+                                <select id="pvp-topic-select"
                                     value={selectedTopic}
                                     onChange={(e) => setSelectedTopic(e.target.value)}
                                     className="w-full h-9 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#5b4fff]"
@@ -994,8 +994,8 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                         {/* Select Opponent */}
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Choose Friend (Live & Ready)</label>
-                            <select
+                            <label htmlFor="pvp-rematch-friend-select" className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Choose Friend (Live & Ready)</label>
+                            <select id="pvp-rematch-friend-select"
                                 value={selectedFriendId}
                                 onChange={(e) => setSelectedFriendId(e.target.value)}
                                 disabled={isCurrentUserBusy}
@@ -1017,8 +1017,8 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                         {/* Topic Selection */}
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Topic</label>
-                            <select
+                            <label htmlFor="pvp-rematch-topic-select" className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Topic</label>
+                            <select id="pvp-rematch-topic-select"
                                 value={selectedTopic}
                                 onChange={(e) => setSelectedTopic(e.target.value)}
                                 className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none"

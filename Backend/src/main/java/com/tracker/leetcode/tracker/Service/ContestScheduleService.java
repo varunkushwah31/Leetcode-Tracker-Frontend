@@ -118,11 +118,11 @@ public class ContestScheduleService {
         log.info("Forcing global upcoming contests cache refresh...");
         try {
             if (cacheManager != null) {
-                Cache cache = cacheManager.getCache("upcoming-contests");
+                Cache cache = cacheManager.getCache(CACHE_UPCOMING_CONTESTS);
                 if (cache != null) {
                     cache.evict("ALL");
-                    cache.evict("LEETCODE");
-                    cache.evict("CODEFORCES");
+                    cache.evict(PLATFORM_LEETCODE);
+                    cache.evict(PLATFORM_CODEFORCES);
                 }
             }
         } catch (Exception e) {
@@ -341,14 +341,14 @@ public class ContestScheduleService {
             if (contests.isArray()) {
                 for (JsonNode c : contests) {
                     String phase = c.path("phase").asString("");
-                    if ("BEFORE".equalsIgnoreCase(phase) || "CODING".equalsIgnoreCase(phase)) {
+                    if (PHASE_BEFORE.equalsIgnoreCase(phase) || TYPE_CODING.equalsIgnoreCase(phase)) {
                         int id = c.path("id").asInt();
                         String name = c.path("name").asString("Codeforces Contest " + id);
                         long duration = c.path("durationSeconds").asLong(7200);
                         long startTime = c.path("startTimeSeconds").asLong(0);
 
                         // If upcoming (BEFORE), direct user to contest registration page
-                        String contestUrl = "BEFORE".equalsIgnoreCase(phase)
+                        String contestUrl = PHASE_BEFORE.equalsIgnoreCase(phase)
                                 ? "https://codeforces.com/contestRegistration/" + id
                                 : "https://codeforces.com/contest/" + id;
 

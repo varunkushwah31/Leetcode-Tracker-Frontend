@@ -161,7 +161,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
         try {
             await SocialService.rejectFriendRequest(requestId);
             void loadFriendsData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Failed to reject request:', err);
         } finally {
             setActionLoadingId(null);
@@ -175,7 +175,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             await SocialService.removeFriend(friendId);
             setFeedbackMessage({ text: `Removed ${name} from friends list.`, type: 'success' });
             void loadFriendsData();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Failed to remove friend:', err);
         } finally {
             setActionLoadingId(null);

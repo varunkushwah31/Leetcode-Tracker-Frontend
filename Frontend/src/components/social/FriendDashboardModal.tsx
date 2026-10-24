@@ -726,29 +726,31 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
     const { user } = useAuth();
     const isOwnProfile = Boolean(user?.id && friendId === user.id);
     const [comparison, setComparison] = useState<FriendComparisonDTO | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState<string | null>(null);
     const [activeSection, setActiveSection] = useState<'analytics' | 'peer' | 'submissions'>('analytics');
     const [searchFilter, setSearchFilter] = useState('');
+    const [prevProps, setPrevProps] = useState({ open, friendId });
+
+    if (open !== prevProps.open || friendId !== prevProps.friendId) {
+        setPrevProps({ open, friendId });
+        setComparison(null);
+        setApiError(null);
+        setSearchFilter('');
+        setActiveSection('analytics');
+    }
+
+    const isLoading = Boolean(open && friendId && !isOwnProfile && !comparison && !apiError);
 
     useEffect(() => {
         if (!open || !friendId || isOwnProfile) return;
 
         let isMounted = true;
-        setIsLoading(true);
-        setApiError(null);
-        setSearchFilter('');
-        setActiveSection('analytics');
-
         SocialService.getFriendDashboard(friendId)
             .then(res => {
                 if (isMounted) setComparison(res.data);
             })
             .catch(err => {
                 if (isMounted) setApiError(err.response?.data?.message || 'Failed to load friend profile.');
-            })
-            .finally(() => {
-                if (isMounted) setIsLoading(false);
             });
 
         return () => { isMounted = false; };

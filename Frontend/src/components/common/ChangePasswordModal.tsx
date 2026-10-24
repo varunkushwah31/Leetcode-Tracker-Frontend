@@ -165,7 +165,7 @@ export function ChangePasswordModal({ open, onOpenChange, trigger }: Readonly<Ch
 
                     {successMessage && (
                         <output
-                            className="flex items-center space-x-3 rounded-xl border border-emerald-200 dark:border-emerald-500/25 bg-emerald-50/90 dark:bg-emerald-500/10 p-3 text-emerald-800 dark:text-emerald-300 backdrop-blur-md transition-all shadow-xs mb-3 block"
+                            className="flex items-center space-x-3 rounded-xl border border-emerald-200 dark:border-emerald-500/25 bg-emerald-50/90 dark:bg-emerald-500/10 p-3 text-emerald-800 dark:text-emerald-300 backdrop-blur-md transition-all shadow-xs mb-3"
                         >
                             <CheckCircle className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" weight="fill" />
                             <p className="text-sm font-medium leading-snug">{successMessage}</p>

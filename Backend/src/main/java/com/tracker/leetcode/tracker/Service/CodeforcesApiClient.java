@@ -59,14 +59,15 @@ public class CodeforcesApiClient {
 
     private JsonNode executeGetRequest(String endpoint, String identifier) {
         synchronized (CF_REQUEST_LOCK) {
-            long now = System.currentTimeMillis();
-            long elapsed = now - lastCfRequestTime;
-            if (elapsed < 350) {
+            long elapsed = System.currentTimeMillis() - lastCfRequestTime;
+            while (elapsed < 350) {
                 try {
                     CF_REQUEST_LOCK.wait(350 - elapsed);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
+                    break;
                 }
+                elapsed = System.currentTimeMillis() - lastCfRequestTime;
             }
             lastCfRequestTime = System.currentTimeMillis();
         }
@@ -109,7 +110,6 @@ public class CodeforcesApiClient {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private <T> T getFallbackDataFromCache(String key, Class<T> type) {
         try {
             Object cached = redisTemplate.opsForValue().get(key);

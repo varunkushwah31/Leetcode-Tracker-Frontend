@@ -386,8 +386,8 @@ public class ResendEmailService {
         try {
             JsonNode root = objectMapper.readTree(responseBody);
             String message = null;
-            if (root.has("message")) {
-                message = root.get("message").asText();
+            if (root.has(MESSAGE_KEY)) {
+                message = root.get(MESSAGE_KEY).asText();
             } else if (root.has("error")) {
                 message = root.get("error").asText();
             }

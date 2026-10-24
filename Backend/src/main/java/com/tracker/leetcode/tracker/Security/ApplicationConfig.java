@@ -22,6 +22,7 @@ public class ApplicationConfig {
     private final StudentRepository studentRepository;
 
     @Bean
+    @SuppressWarnings("java:S5804") // Spring Security requires UsernameNotFoundException for authentication flow
     public UserDetailsService userDetailsService() {
         return username -> {
             // 2. Check Student collection first
@@ -57,7 +58,8 @@ public class ApplicationConfig {
 
     // 4. The Authentication Manager is the actual component that processes login requests
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception{
+    @SuppressWarnings({"java:S1130", "java:S112"}) // Spring Security API constraint: AuthenticationConfiguration.getAuthenticationManager() declares throws Exception
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 }

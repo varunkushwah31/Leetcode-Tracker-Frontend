@@ -637,10 +637,11 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
 
                         {/* Title */}
                         <div>
-                            <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
+                            <label htmlFor="peer-study-title" className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
                                 Post Title *
                             </label>
                             <Input
+                                id="peer-study-title"
                                 placeholder="E.g., How to identify state variables for 2D Grid DP?"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
@@ -651,10 +652,11 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                         {/* Optional Problem Details */}
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
+                                <label htmlFor="peer-study-problem-name" className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
                                     Problem Name (Optional)
                                 </label>
                                 <Input
+                                    id="peer-study-problem-name"
                                     placeholder="E.g., Coin Change II"
                                     value={problemTitle}
                                     onChange={(e) => setProblemTitle(e.target.value)}
@@ -662,10 +664,11 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                 />
                             </div>
                             <div>
-                                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
+                                <label htmlFor="peer-study-problem-url" className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
                                     Problem URL (Optional)
                                 </label>
                                 <Input
+                                    id="peer-study-problem-url"
                                     placeholder="https://leetcode.com/problems/..."
                                     value={problemLink}
                                     onChange={(e) => setProblemLink(e.target.value)}
@@ -676,10 +679,11 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
 
                         {/* Content */}
                         <div>
-                            <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
+                            <label htmlFor="peer-study-content" className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 mb-1 block">
                                 Explanation or Question *
                             </label>
                             <textarea
+                                id="peer-study-content"
                                 rows={3}
                                 placeholder="Describe what you tried, what edge case fails, or your key observation..."
                                 value={content}

@@ -257,7 +257,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         <div className="p-4 bg-zinc-50/80 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/80 space-y-2.5">
                             <Label className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <span className="w-5 h-5 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-black flex items-center justify-center">1</span>
-                                Add Single Student
+                                <span>Add Single Student</span>
                             </Label>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                 Enter a student's LeetCode / Codeforces username, email, or profile URL. <span className="font-semibold text-zinc-700 dark:text-zinc-300">The student must already have created an account on MentorSync through signup.</span>
@@ -311,7 +311,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                             <div className="flex items-center justify-between">
                                 <Label className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                     <span className="w-5 h-5 rounded-md bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-black flex items-center justify-center">2</span>
-                                    Bulk Import (CSV)
+                                    <span>Bulk Import (CSV)</span>
                                 </Label>
                                 <Button
                                     type="button"
