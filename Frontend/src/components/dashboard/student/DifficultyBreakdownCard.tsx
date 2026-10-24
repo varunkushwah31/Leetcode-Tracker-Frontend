@@ -15,10 +15,13 @@ export function DifficultyBreakdownCard({ data, totalSolved }: Readonly<{
 
     return (
         <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
-            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
-                <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center">
-                    <ChartBar className="w-5 h-5 mr-2 text-[#5b4fff]" /> Difficulty Breakdown
+            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-3 flex flex-row items-center justify-between">
+                <CardTitle className="text-base font-bold text-zinc-900 dark:text-white tracking-tight flex items-center">
+                    <ChartBar className="w-4.5 h-4.5 mr-2 text-[#5b4fff]" /> Difficulty Breakdown
                 </CardTitle>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                    {totalSolved} Solved
+                </span>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
                 <div className="space-y-2">

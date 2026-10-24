@@ -403,81 +403,33 @@ export function StudentDashboard() {
                             </div>
                         </div>
 
-                        {/* --- ZONE 1: Daily Focus & Live Peer Arena --- */}
-                        {(activeFilter === 'all' || activeFilter === 'daily') && (
-                            <section className="space-y-4">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                                    <div className="lg:col-span-2">
-                                        <ErrorBoundary fallback={null}>
-                                            <DailyChallengeCard
-                                                classroomId={selectedClassroomId}
-                                                recentSubmissions={dashboardData?.recentSubmissions}
-                                            />
-                                        </ErrorBoundary>
-                                    </div>
-                                    <div>
-                                        <QuickSocialWidget
-                                            onOpenSocialHub={(tab) => {
-                                                if (tab) setSocialInitialTab(tab);
-                                                setMainTab('social');
-                                            }}
+                        {/* --- Main Dashboard View: Continuous Balanced Two-Column Bento Layout --- */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            {/* Primary Column (Left - 60-65% width) */}
+                            <div className="lg:col-span-7 xl:col-span-8 space-y-8">
+                                {/* 1. Problem of the Day */}
+                                {(activeFilter === 'all' || activeFilter === 'daily') && (
+                                    <ErrorBoundary fallback={null}>
+                                        <DailyChallengeCard
+                                            classroomId={selectedClassroomId}
+                                            recentSubmissions={dashboardData?.recentSubmissions}
                                         />
-                                    </div>
-                                </div>
-                            </section>
-                        )}
+                                    </ErrorBoundary>
+                                )}
 
-                        {/* --- ZONE 2: Academic & Classroom Focus + Upcoming Contests --- */}
-                        {(activeFilter === 'all' || activeFilter === 'daily' || activeFilter === 'academic' || activeFilter === 'contests') && (
-                            <section className="space-y-4">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                                        <PendingAssignments
-                                            assignments={pendingAssignments}
-                                            isSyncing={isSyncing}
-                                            onSync={handleSync}
-                                            selectedClassroomId={selectedClassroomId}
-                                            onClearFilter={() => setSelectedClassroomId(null)}
-                                            onValidationSuccess={fetchDashboard}
-                                        />
-                                        <ClassroomList
-                                            classrooms={dashboardData?.classrooms}
-                                            selectedClassroomId={selectedClassroomId}
-                                            onSelectClassroom={setSelectedClassroomId}
-                                        />
-                                    </div>
-                                    <div>
-                                        <ErrorBoundary fallback={null}>
-                                            <UpcomingContestsCard />
-                                        </ErrorBoundary>
-                                    </div>
-                                </div>
-                            </section>
-                        )}
-
-                        {/* --- ZONE 3: Practice Analytics, Consistency & Mastery --- */}
-                        {(activeFilter === 'all' || activeFilter === 'practice') && (
-                            <section className="space-y-4">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                                    <div className="lg:col-span-2">
+                                {/* 2. Consistency & Activity Heatmap */}
+                                {(activeFilter === 'all' || activeFilter === 'daily' || activeFilter === 'practice') && (
+                                    <ErrorBoundary fallback={null}>
                                         <ActivityHeatmap
                                             progressHistory={dashboardData?.progressHistory}
                                             consistencyStreak={dashboardData?.consistencyStreak}
                                         />
-                                    </div>
-                                    <div className="space-y-6">
-                                        <DifficultyBreakdownCard data={dashboardData} totalSolved={totalSolved} />
-                                        <BadgesList badges={dashboardData?.badges} />
-                                    </div>
-                                </div>
-                            </section>
-                        )}
+                                    </ErrorBoundary>
+                                )}
 
-                        {/* --- ZONE 4: Competitive Programming Arena & Submissions Stream --- */}
-                        {(activeFilter === 'all' || activeFilter === 'contests' || activeFilter === 'practice') && (
-                            <section className="space-y-4">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                                    <div className="lg:col-span-2">
+                                {/* 3. Contest Arena Center: Rating Progression Graphs */}
+                                {(activeFilter === 'all' || activeFilter === 'contests') && (
+                                    <ErrorBoundary fallback={null}>
                                         <ContestRatingsSection
                                             contestHistory={dashboardData?.contestHistory}
                                             currentContestRating={dashboardData?.currentContestRating}
@@ -488,17 +440,93 @@ export function StudentDashboard() {
                                             codeforcesRank={dashboardData?.codeforcesRank}
                                             codeforcesMaxRank={dashboardData?.codeforcesMaxRank}
                                         />
-                                    </div>
-                                    <div className="space-y-6">
+                                    </ErrorBoundary>
+                                )}
+
+                                {/* 4. Unified Contest History (Contest results table, right below ratings) */}
+                                {(activeFilter === 'all' || activeFilter === 'contests') && (
+                                    <ErrorBoundary fallback={null}>
                                         <UnifiedContestHistory
                                             contestHistory={dashboardData?.contestHistory}
                                             codeforcesContestHistory={dashboardData?.codeforcesContestHistory}
                                         />
-                                        <RecentActivityCard data={dashboardData} />
+                                    </ErrorBoundary>
+                                )}
+
+                                {/* 5. Academic Focus: Assignments and Classrooms */}
+                                {(activeFilter === 'all' || activeFilter === 'academic') && (
+                                    <div className={activeFilter === 'all' ? "grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch" : "space-y-6"}>
+                                        <ErrorBoundary fallback={null}>
+                                            <PendingAssignments
+                                                assignments={pendingAssignments}
+                                                isSyncing={isSyncing}
+                                                onSync={handleSync}
+                                                selectedClassroomId={selectedClassroomId}
+                                                onClearFilter={() => setSelectedClassroomId(null)}
+                                                onValidationSuccess={fetchDashboard}
+                                            />
+                                        </ErrorBoundary>
+                                        <ErrorBoundary fallback={null}>
+                                            <ClassroomList
+                                                classrooms={dashboardData?.classrooms}
+                                                selectedClassroomId={selectedClassroomId}
+                                                onSelectClassroom={setSelectedClassroomId}
+                                            />
+                                        </ErrorBoundary>
                                     </div>
-                                </div>
-                            </section>
-                        )}
+                                )}
+
+                                {/* If in Practice Filter, show recent submissions in the main column */}
+                                {activeFilter === 'practice' && (
+                                    <ErrorBoundary fallback={null}>
+                                        <RecentActivityCard data={dashboardData} />
+                                    </ErrorBoundary>
+                                )}
+                            </div>
+
+                            {/* Companion Sidebar Column (Right - 35-40% width) */}
+                            <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+                                {/* 1. Quick Social Hub & 1v1 PvP Live Status */}
+                                {(activeFilter === 'all' || activeFilter === 'daily' || activeFilter === 'contests') && (
+                                    <ErrorBoundary fallback={null}>
+                                        <QuickSocialWidget
+                                            onOpenSocialHub={(tab) => {
+                                                if (tab) setSocialInitialTab(tab);
+                                                setMainTab('social');
+                                            }}
+                                        />
+                                    </ErrorBoundary>
+                                )}
+
+                                {/* 2. Difficulty Breakdown Progress */}
+                                {(activeFilter === 'all' || activeFilter === 'daily' || activeFilter === 'practice') && (
+                                    <ErrorBoundary fallback={null}>
+                                        <DifficultyBreakdownCard data={dashboardData} totalSolved={totalSolved} />
+                                    </ErrorBoundary>
+                                )}
+
+                                {/* 3. Upcoming Contests Schedule */}
+                                {(activeFilter === 'all' || activeFilter === 'contests') && (
+                                    <ErrorBoundary fallback={null}>
+                                        <UpcomingContestsCard />
+                                    </ErrorBoundary>
+                                )}
+
+                                {/* 4. Recent Submissions Feed */}
+                                {(activeFilter === 'all' || activeFilter === 'daily') && (
+                                    <ErrorBoundary fallback={null}>
+                                        <RecentActivityCard data={dashboardData} />
+                                    </ErrorBoundary>
+                                )}
+
+                                {/* 5. Earned Badges Showcase */}
+                                {(activeFilter === 'all' || activeFilter === 'practice') && (
+                                    <ErrorBoundary fallback={null}>
+                                        <BadgesList badges={dashboardData?.badges} />
+                                    </ErrorBoundary>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 )}
             </main>

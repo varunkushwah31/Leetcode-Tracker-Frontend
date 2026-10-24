@@ -1047,8 +1047,7 @@ public class SocialService {
 
         // When a student views a NEW_FRIEND activity involving themselves,
         // display the friend they made friends with instead of their own profile:
-        if (a.getType() == FriendActivityType.NEW_FRIEND) {
-            if (currentStudentId != null && currentStudentId.equals(displayStudentId) && targetId != null) {
+        if (a.getType() == FriendActivityType.NEW_FRIEND && currentStudentId != null && currentStudentId.equals(displayStudentId) && targetId != null) {
                 displayStudentId = a.getTargetStudentId();
                 displayStudentName = a.getTargetStudentName();
                 displayStudentHandle = a.getTargetStudentHandle();
@@ -1059,7 +1058,7 @@ public class SocialService {
                 targetHandle = a.getStudentHandle();
                 targetAvatarUrl = a.getStudentAvatarUrl();
             }
-        }
+        
 
         return FriendActivityDTO.builder()
                 .id(a.getId())
@@ -1213,8 +1212,7 @@ public class SocialService {
         String criterion = sortBy != null ? sortBy.toLowerCase() : "totalsolved";
         entries.sort((a, b) -> {
             switch (criterion) {
-                case "cscore":
-                case "c-score":
+                case "cscore","c-score":
                     int cmpC = Integer.compare(b.getCScore() != null ? b.getCScore() : 500, a.getCScore() != null ? a.getCScore() : 500);
                     if (cmpC != 0) return cmpC;
                     return Integer.compare(b.getTotalSolved(), a.getTotalSolved());

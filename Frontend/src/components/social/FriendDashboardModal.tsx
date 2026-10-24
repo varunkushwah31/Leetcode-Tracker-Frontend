@@ -1551,7 +1551,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                             >
                                 <Sparkles className="w-4 h-4" />
                                 <span>Peer Learning & Overlap</span>
-                                {comparison && comparison.friendOnlySolved && comparison.friendOnlySolved.length > 0 && (
+                                {comparison?.friendOnlySolved && comparison.friendOnlySolved.length > 0 && (
                                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                                         activeSection === 'peer' ? 'bg-white/20 text-white' : 'bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff]'
                                     }`}>

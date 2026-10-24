@@ -10,13 +10,13 @@ interface ClassroomListProps {
 
 export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassroom }: Readonly<ClassroomListProps>) {
     return (
-        <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg text-zinc-900 dark:text-white tracking-tight">
+        <Card className="flex flex-col h-full relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+            <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-3">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-zinc-900 dark:text-white tracking-tight">
                     <BookOpenIcon className="w-5 h-5 text-[#5b4fff]"/> My Classrooms
                 </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 p-4 sm:p-5">
                 <div className="grid gap-3 grid-cols-1 xl:grid-cols-2">
                     {classrooms?.map(cls => (
                         <button
@@ -41,7 +41,13 @@ export function ClassroomList({ classrooms, selectedClassroomId, onSelectClassro
                         </button>
                     ))}
                     {(!classrooms || classrooms.length === 0) && (
-                        <p className="col-span-full text-sm text-zinc-500 dark:text-zinc-400 py-4">You are not enrolled in any classrooms.</p>
+                        <div className="col-span-full p-8 text-center text-zinc-500">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-[#5b4fff] dark:text-[#968fff] border border-indigo-500/20 flex items-center justify-center mx-auto mb-2.5">
+                                <BookOpenIcon className="w-5 h-5" weight="bold" />
+                            </div>
+                            <h5 className="text-zinc-900 dark:text-white font-bold text-sm">No Classrooms Enrolled</h5>
+                            <p className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">Join a classroom to receive assigned problem sets from mentors.</p>
+                        </div>
                     )}
                 </div>
             </CardContent>

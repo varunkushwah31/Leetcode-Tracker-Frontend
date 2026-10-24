@@ -125,7 +125,7 @@ export function PendingAssignments({
     };
 
     return (
-        <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+        <Card className="flex flex-col h-full relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
             <CardHeader className="bg-transparent border-b border-zinc-200/80 dark:border-zinc-800/60 p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                     <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-zinc-900 dark:text-white tracking-tight">
@@ -296,10 +296,12 @@ export function PendingAssignments({
                     })}
 
                     {assignments.length === 0 && (
-                        <div className="p-12 text-center text-zinc-500">
-                            <CheckIcon className="w-12 h-12 mx-auto text-emerald-500/50 mb-3" />
-                            <h5 className="text-zinc-900 dark:text-white font-semibold">All Caught Up!</h5>
-                            <p className="text-sm mt-1 text-zinc-500 dark:text-zinc-400">You have no pending assignments on LeetCode or Codeforces.</p>
+                        <div className="p-8 text-center text-zinc-500">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center mx-auto mb-2.5">
+                                <CheckIcon className="w-5 h-5" weight="bold" />
+                            </div>
+                            <h5 className="text-zinc-900 dark:text-white font-bold text-sm">All Caught Up!</h5>
+                            <p className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">You have no pending assignments on LeetCode or Codeforces.</p>
                         </div>
                     )}
                 </div>
