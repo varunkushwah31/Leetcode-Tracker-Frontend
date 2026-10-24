@@ -144,9 +144,6 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
             {/* Social Hub Hero Command Center Banner */}
             <div className="relative group">
                 <div className="relative z-10 bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl overflow-hidden rounded-2xl transition-colors duration-200 p-5 sm:p-7">
-                    {/* Subtle gradient accent top line matching StudentDashboard */}
-                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/40 dark:via-[#5b4fff]/50 to-transparent pointer-events-none" />
-
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         {/* Title & Description */}
                         <div className="flex items-start sm:items-center gap-4">

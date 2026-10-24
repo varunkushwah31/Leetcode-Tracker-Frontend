@@ -65,9 +65,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
     return (
         <div className="space-y-6">
             {/* Sort Switcher Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-amber-500/50 to-transparent pointer-events-none" />
-
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
                 <div className="flex items-center gap-3.5">
                     <div className="p-3 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-500">
                         <Trophy className="w-6 h-6" />
@@ -168,11 +166,11 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     */}
                     {topThree.length === 1 && topThree[0] && (
                         <div className="max-w-md mx-auto">
-                            <div className="p-7 rounded-3xl bg-linear-to-b from-amber-500/15 via-yellow-500/5 to-white dark:to-[#111111] border-2 border-amber-400 dark:border-amber-500/60 ring-4 ring-amber-400/10 text-center space-y-4 shadow-xl shadow-amber-500/10">
-                                <div className="w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-yellow-500 text-amber-950 font-black text-base flex items-center justify-center mx-auto shadow-md">
-                                    <Trophy className="w-6 h-6 text-amber-950 mr-0.5" /> 1
+                            <div className="p-7 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-amber-500/30 dark:border-amber-500/25 text-center space-y-4 shadow-sm">
+                                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-bold text-sm flex items-center justify-center mx-auto shadow-2xs">
+                                    <Trophy className="w-5 h-5 text-amber-500 mr-1" /> 1
                                 </div>
-                                <Avatar className="w-20 h-20 mx-auto border-3 border-amber-400 shadow-xl ring-4 ring-amber-400/20">
+                                <Avatar className="w-20 h-20 mx-auto border-2 border-amber-500/40 shadow-sm">
                                     <AvatarImage src={topThree[0].avatarUrl} />
                                     <AvatarFallback className="bg-amber-100 text-amber-800 font-extrabold text-xl">
                                         {topThree[0].name.substring(0, 2)}
@@ -232,11 +230,11 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     {topThree.length === 2 && topThree[0] && topThree[1] && (
                         <div className="max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 items-end pt-2">
                             {/* 2nd Place Card */}
-                            <div className="p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-300 dark:border-zinc-700 text-center space-y-3.5 shadow-md hover:border-zinc-400 transition-all">
-                                <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 font-black text-sm text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto shadow-xs border border-zinc-300 dark:border-zinc-600">
-                                    <Medal className="w-5 h-5 text-zinc-400 mr-0.5" /> 2
+                            <div className="p-6 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 text-center space-y-3.5 shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
+                                <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 font-bold text-xs text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto shadow-2xs border border-zinc-200 dark:border-zinc-700">
+                                    <Medal className="w-4 h-4 text-zinc-400 mr-1" /> 2
                                 </div>
-                                <Avatar className="w-16 h-16 mx-auto border-2 border-zinc-300 dark:border-zinc-600 shadow-md">
+                                <Avatar className="w-16 h-16 mx-auto border-2 border-zinc-300 dark:border-zinc-700 shadow-sm">
                                     <AvatarImage src={topThree[1].avatarUrl} />
                                     <AvatarFallback className="bg-zinc-100 text-zinc-700 font-bold">
                                         {topThree[1].name.substring(0, 2)}
@@ -289,11 +287,11 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                             </div>
 
                             {/* 1st Place Card (Elevated Champion) */}
-                            <div className="p-7 rounded-3xl bg-linear-to-b from-amber-500/15 via-yellow-500/5 to-white dark:to-[#111111] border-2 border-amber-400 dark:border-amber-500/60 ring-4 ring-amber-400/10 text-center space-y-4 shadow-xl shadow-amber-500/10 hover:scale-[1.02] transition-transform">
-                                <div className="w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-yellow-500 text-amber-950 font-black text-base flex items-center justify-center mx-auto shadow-md">
-                                    <Trophy className="w-6 h-6 text-amber-950 mr-0.5" /> 1
+                            <div className="p-7 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-amber-500/30 dark:border-amber-500/25 text-center space-y-4 shadow-sm">
+                                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-bold text-sm flex items-center justify-center mx-auto shadow-2xs">
+                                    <Trophy className="w-5 h-5 text-amber-500 mr-1" /> 1
                                 </div>
-                                <Avatar className="w-20 h-20 mx-auto border-3 border-amber-400 shadow-xl ring-4 ring-amber-400/20">
+                                <Avatar className="w-20 h-20 mx-auto border-2 border-amber-500/40 shadow-sm">
                                     <AvatarImage src={topThree[0].avatarUrl} />
                                     <AvatarFallback className="bg-amber-100 text-amber-800 font-extrabold text-xl">
                                         {topThree[0].name.substring(0, 2)}
@@ -356,11 +354,11 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     {topThree.length >= 3 && topThree[0] && topThree[1] && topThree[2] && (
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-2 items-end">
                             {/* 2nd Place (Silver) */}
-                            <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-300 dark:border-zinc-700 text-center space-y-3.5 shadow-md sm:order-1 hover:border-zinc-400 transition-all">
-                                <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 font-black text-sm text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto shadow-xs border border-zinc-300 dark:border-zinc-600">
-                                    <Medal className="w-5 h-5 text-zinc-400 mr-0.5" /> 2
+                            <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 text-center space-y-3.5 shadow-sm sm:order-1 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
+                                <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 font-bold text-xs text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto shadow-2xs border border-zinc-200 dark:border-zinc-700">
+                                    <Medal className="w-4 h-4 text-zinc-400 mr-1" /> 2
                                 </div>
-                                <Avatar className="w-15 h-15 mx-auto border-2 border-zinc-300 dark:border-zinc-600 shadow-md">
+                                <Avatar className="w-15 h-15 mx-auto border-2 border-zinc-300 dark:border-zinc-700 shadow-sm">
                                     <AvatarImage src={topThree[1].avatarUrl} />
                                     <AvatarFallback className="bg-zinc-100 text-zinc-700 font-bold">
                                         {topThree[1].name.substring(0, 2)}
@@ -413,11 +411,11 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                             </div>
 
                             {/* 1st Place (Gold Champion) */}
-                            <div className="p-7 rounded-3xl bg-linear-to-b from-amber-500/15 via-yellow-500/5 to-white dark:to-[#111111] border-2 border-amber-400 dark:border-amber-500/60 ring-4 ring-amber-400/10 text-center space-y-4 shadow-xl shadow-amber-500/10 sm:order-2 hover:scale-[1.02] transition-transform">
-                                <div className="w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-yellow-500 text-amber-950 font-black text-base flex items-center justify-center mx-auto shadow-md">
-                                    <Trophy className="w-6 h-6 text-amber-950 mr-0.5" /> 1
+                            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-amber-500/30 dark:border-amber-500/25 text-center space-y-4 shadow-sm sm:order-2 transition-all">
+                                <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-bold text-xs flex items-center justify-center mx-auto shadow-2xs">
+                                    <Trophy className="w-4 h-4 text-amber-500 mr-1" /> 1
                                 </div>
-                                <Avatar className="w-20 h-20 mx-auto border-3 border-amber-400 shadow-xl ring-4 ring-amber-400/20">
+                                <Avatar className="w-20 h-20 mx-auto border-2 border-amber-500/40 shadow-sm">
                                     <AvatarImage src={topThree[0].avatarUrl} />
                                     <AvatarFallback className="bg-amber-100 text-amber-800 font-extrabold text-xl">
                                         {topThree[0].name.substring(0, 2)}
@@ -476,11 +474,11 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                             </div>
 
                             {/* 3rd Place (Bronze) */}
-                            <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-orange-300/80 dark:border-orange-900/50 text-center space-y-3.5 shadow-md sm:order-3 hover:border-orange-400 transition-all">
-                                <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-950/60 font-black text-sm text-orange-800 dark:text-orange-400 flex items-center justify-center mx-auto shadow-xs border border-orange-300 dark:border-orange-800">
-                                    <Medal className="w-5 h-5 text-orange-500 mr-0.5" /> 3
+                            <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-orange-500/25 dark:border-orange-500/20 text-center space-y-3.5 shadow-sm sm:order-3 hover:border-orange-500/40 transition-all">
+                                <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/25 font-bold text-xs flex items-center justify-center mx-auto shadow-2xs">
+                                    <Medal className="w-4 h-4 text-orange-500 mr-1" /> 3
                                 </div>
-                                <Avatar className="w-15 h-15 mx-auto border-2 border-orange-300 dark:border-orange-800 shadow-md">
+                                <Avatar className="w-15 h-15 mx-auto border-2 border-orange-500/30 shadow-sm">
                                     <AvatarImage src={topThree[2].avatarUrl} />
                                     <AvatarFallback className="bg-orange-50 text-orange-700 font-bold">
                                         {topThree[2].name.substring(0, 2)}

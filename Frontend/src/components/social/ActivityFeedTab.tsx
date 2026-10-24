@@ -101,8 +101,8 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
     return (
         <div className="space-y-6">
             {/* Header with filter buttons */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
+
 
                 <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
@@ -208,7 +208,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                         >
                                             <Avatar className={`w-11 h-11 border-2 ${isDisplayUserSelf ? 'border-[#5b4fff]/40' : 'border-zinc-200 dark:border-zinc-700'} shadow-sm`}>
                                                 <AvatarImage src={displayStudentAvatarUrl} />
-                                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] text-xs font-bold">
+                                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold">
                                                     {displayStudentName.substring(0, 2)}
                                                 </AvatarFallback>
                                             </Avatar>

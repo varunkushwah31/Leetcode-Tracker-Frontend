@@ -452,8 +452,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                 <div className="lg:col-span-2 space-y-8">
                     {/* Active Duels Card */}
                     <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
-                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-rose-500/40 to-transparent pointer-events-none" />
-
+                        {/* Active Duels Card Header */}
                         <div className="flex items-center justify-between mb-5">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center">
@@ -561,7 +560,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                             className={`h-full transition-all duration-1000 rounded-full ${
                                                                 isClockRunningOut
                                                                     ? 'bg-rose-500 animate-pulse'
-                                                                    : 'bg-linear-to-r from-[#5b4fff] to-emerald-500'
+                                                                    : 'bg-[#5b4fff]'
                                                             }`}
                                                             style={{ width: `${progressPercent}%` }}
                                                         />
@@ -605,7 +604,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                                                 {/* VS Badge */}
                                                 <div className="flex flex-col items-center justify-center">
-                                                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#5b4fff] to-rose-500 text-white font-black text-[11px] flex items-center justify-center shadow-xs">
+                                                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 font-bold text-[10px] flex items-center justify-center shadow-2xs">
                                                         VS
                                                     </div>
                                                     <span className="text-[10px] font-medium text-zinc-400 mt-1 uppercase tracking-wider">
@@ -762,8 +761,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                     {/* Duel Match History Card */}
                     <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
-                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-amber-500/40 to-transparent pointer-events-none" />
-
+                        {/* Match History Header */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
@@ -923,8 +921,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                 <div className="space-y-8">
                     {/* Instant Challenge Widget */}
                     <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
-                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/40 to-transparent pointer-events-none" />
-
+                        {/* Instant Challenge Header */}
                         <div className="flex items-center gap-2.5 mb-4">
                             <div className="w-8 h-8 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] border border-[#5b4fff]/20 flex items-center justify-center">
                                 <Swords className="w-4 h-4" />
@@ -1038,8 +1035,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                     {/* Combat Career Stats Card */}
                     <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
-                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/40 to-transparent pointer-events-none" />
-
+                        {/* Instant Challenge Header */}
                         <div className="flex items-center gap-2.5 mb-4">
                             <div className="w-8 h-8 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20 flex items-center justify-center">
                                 <Sparkles className="w-4 h-4" />
@@ -1090,7 +1086,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                             </div>
                             <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-linear-to-r from-[#5b4fff] to-emerald-500 rounded-full transition-all duration-500"
+                                    className="h-full bg-[#5b4fff] rounded-full transition-all duration-500"
                                     style={{ width: `${combatStats.winRate}%` }}
                                 />
                             </div>

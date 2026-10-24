@@ -457,7 +457,7 @@ function FriendPeerLearningSection({
 }: Readonly<FriendPeerLearningSectionProps>) {
     return (
         <div className="space-y-6">
-            <div className="p-4 rounded-2xl bg-linear-to-r from-[#5b4fff]/10 via-[#5b4fff]/5 to-transparent border border-[#5b4fff]/25 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-3">
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-3">
                 <span className="p-2 rounded-xl bg-[#5b4fff] text-white shrink-0 mt-0.5">
                     <Sparkles className="w-4 h-4" />
                 </span>
@@ -848,11 +848,7 @@ function FriendCoderCardSection({
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             {/* The Digital Coder Card */}
-            <div className="rounded-3xl bg-linear-to-b from-white via-zinc-50/70 to-zinc-100/60 dark:from-[#151518] dark:via-[#111114] dark:to-[#0c0c0e] border-2 border-[#5b4fff]/30 dark:border-[#5b4fff]/40 shadow-2xl p-6 sm:p-8 relative overflow-hidden space-y-8">
-                {/* Background decorative accents */}
-                <div className="absolute top-0 right-0 w-80 h-80 bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-                <div className="absolute bottom-0 left-0 w-60 h-60 bg-emerald-500/10 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
-
+            <div className="rounded-2xl bg-white dark:bg-[#0e0e11] border border-zinc-200 dark:border-zinc-800 shadow-xl p-6 sm:p-8 relative overflow-hidden space-y-6">
                 {/* Card Top Strip: Watermark & Verification */}
                 <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/80 pb-5">
                     <div className="flex items-center gap-2">
@@ -913,7 +909,7 @@ function FriendCoderCardSection({
                 </div>
 
                 {/* C-Score Composite Index Gauge Banner */}
-                <div className="p-5 rounded-2xl bg-linear-to-r from-[#5b4fff]/10 via-[#5b4fff]/5 to-transparent border border-[#5b4fff]/25 space-y-3">
+                <div className="p-5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-[#5b4fff]" />
@@ -1113,7 +1109,7 @@ function FriendComparativeSection({
     return (
         <div className="space-y-6">
             {/* Header: Duelist Faceoff */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-linear-to-r from-[#5b4fff]/15 via-zinc-100/50 dark:via-zinc-900/50 to-transparent border border-[#5b4fff]/25 relative overflow-hidden">
+            <div className="p-5 sm:p-6 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
                     {/* You */}
                     <div className="flex items-center gap-4">

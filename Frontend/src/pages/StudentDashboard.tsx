@@ -284,7 +284,7 @@ export function StudentDashboard() {
                                 </Button>
                             }
                         />
-                        <Button variant="ghost" size="icon" onClick={logout} className="h-8.5 w-8.5 sm:h-9 sm:w-9 hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 text-zinc-500 dark:text-zinc-400" title="Sign Out" aria-label="Sign Out">
+                        <Button variant="ghost" size="icon" onClick={logout} className="h-8.5 w-8.5 sm:h-9 sm:w-9 hover:bg-rose-500/10 text-zinc-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400" title="Sign Out" aria-label="Sign Out">
                             <LogOut className="w-4 h-4" />
                         </Button>
                     </div>

@@ -135,7 +135,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                             <div className="absolute inset-0 bg-[#5b4fff] rounded-full blur-2xl opacity-10 dark:opacity-20 group-hover:opacity-30 dark:group-hover:opacity-40 transition-opacity duration-700"></div>
                             <Avatar className="w-20 h-20 sm:w-28 sm:h-28 border-[3px] border-white dark:border-zinc-800 ring-4 ring-[#5b4fff]/10 dark:ring-[#5b4fff]/20 shadow-xl dark:shadow-2xl relative z-10">
                                 <AvatarImage src={data.avatarUrl} className="object-cover" />
-                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] dark:text-[#968fff] text-2xl sm:text-3xl font-bold">
+                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] text-2xl sm:text-3xl font-bold">
                                     {data.name?.substring(0, 2) || 'ST'}
                                 </AvatarFallback>
                             </Avatar>

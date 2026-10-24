@@ -1110,12 +1110,12 @@ export function ClassroomAnalytics({
                                 return (
                                 <Card
                                     key={studentKey}
-                                    className={`${cardClasses} border-l-4 ${
+                                    className={`${cardClasses} border-l-2 ${
                                         isCritical
                                             ? 'border-l-rose-500'
                                             : isWarning
                                             ? 'border-l-amber-500'
-                                            : 'border-l-blue-500'
+                                            : 'border-l-[#5b4fff]'
                                     } hover:-translate-y-0.5 transition-all`}
                                 >
                                     <CardHeader className="pb-3 border-b border-zinc-200/80 dark:border-zinc-800/60">

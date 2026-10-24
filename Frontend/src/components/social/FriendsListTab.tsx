@@ -341,8 +341,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             )}
 
             {/* Find Friends Search Card */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden space-y-4">
-                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
+            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden space-y-4">
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
@@ -499,18 +498,15 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                         {sortedFriends.map((friend) => (
                             <div
                                 key={friend.id}
-                                className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 hover:border-[#5b4fff]/50 hover:shadow-lg hover:shadow-[#5b4fff]/5 transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
+                                className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 hover:border-[#5b4fff]/50 hover:shadow-lg hover:shadow-[#5b4fff]/5 transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
                             >
-                                {/* Gradient top border accent */}
-                                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/30 to-transparent group-hover:via-[#5b4fff]/70 transition-colors" />
-
                                 {/* Friend Header */}
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3.5 min-w-0">
                                         <div className="relative shrink-0">
                                             <Avatar className="w-13 h-13 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm ring-2 ring-[#5b4fff]/10">
                                                 <AvatarImage src={friend.avatarUrl} className="object-cover" />
-                                                <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] font-bold text-sm">
+                                                <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-sm">
                                                     {friend.name.substring(0, 2)}
                                                 </AvatarFallback>
                                             </Avatar>

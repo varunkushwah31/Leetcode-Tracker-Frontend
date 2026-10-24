@@ -159,8 +159,8 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
     return (
         <div className="space-y-6">
             {/* Header with Topic Filter & Create Button */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm space-y-5 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/50 to-transparent pointer-events-none" />
+            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm space-y-5 relative overflow-hidden">
+
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3.5">
@@ -281,7 +281,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="w-10 h-10 border-2 border-zinc-200 dark:border-zinc-700">
                                                     <AvatarImage src={post.authorAvatarUrl} />
-                                                    <AvatarFallback className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 text-[#5b4fff] text-xs font-bold">
+                                                    <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold">
                                                         {post.authorName.substring(0, 2)}
                                                     </AvatarFallback>
                                                 </Avatar>
