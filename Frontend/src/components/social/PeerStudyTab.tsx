@@ -159,54 +159,55 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
     return (
         <div className="space-y-6">
             {/* Header with Topic Filter & Create Button */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/60 shadow-sm space-y-5 relative overflow-hidden">
-
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3.5">
-                        <div className="p-3 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
-                            <GraduationCap className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h3 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
-                                Peer-to-Peer Study Hub & Non-Spoiler Hints
-                            </h3>
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                Ask friends for conceptual hints without full code spoilers, master key algorithmic paradigms, and practice together.
-                            </p>
-                        </div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 border border-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] flex items-center justify-center shrink-0 shadow-sm">
+                        <GraduationCap className="w-5 h-5" />
                     </div>
-
-                    <Button
-                        onClick={() => setCreateDialogOpen(true)}
-                        className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4.5 h-10 gap-2 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all cursor-pointer shrink-0"
-                    >
-                        <Plus className="w-4 h-4" /> Share Note or Ask Hint
-                    </Button>
+                    <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                                Peer-to-Peer Study Hub & Non-Spoiler Hints
+                            </h2>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-semibold bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
+                                Collaborative
+                            </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            Ask friends for conceptual hints without full code spoilers, master key algorithmic paradigms, and practice together.
+                        </p>
+                    </div>
                 </div>
 
-                {/* Topic Selector Pills with Icons */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
-                    {topics.map((t) => {
-                        const isSelected = selectedTopic === t.name;
-                        const IconComponent = t.icon;
-                        return (
-                            <button
-                                type="button"
-                                key={t.name}
-                                onClick={() => setSelectedTopic(t.name)}
-                                className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 ${
-                                    isSelected
-                                        ? 'bg-[#5b4fff] text-white shadow-md ring-2 ring-[#5b4fff]/30'
-                                        : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700/80'
-                                }`}
-                            >
-                                <IconComponent className="w-4 h-4" />
-                                <span>{t.name}</span>
-                            </button>
-                        );
-                    })}
-                </div>
+                <Button
+                    onClick={() => setCreateDialogOpen(true)}
+                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-semibold px-4 h-9 shadow-sm hover:shadow-md transition-all gap-1.5 shrink-0 cursor-pointer self-start sm:self-auto"
+                >
+                    <Plus className="w-3.5 h-3.5" /> Share Note or Ask Hint
+                </Button>
+            </div>
+
+            {/* Topic Selector Segmented Bar */}
+            <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800 flex items-center gap-1 overflow-x-auto">
+                {topics.map((t) => {
+                    const isSelected = selectedTopic === t.name;
+                    const IconComponent = t.icon;
+                    return (
+                        <button
+                            type="button"
+                            key={t.name}
+                            onClick={() => setSelectedTopic(t.name)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                                isSelected
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                        >
+                            <IconComponent className="w-3.5 h-3.5" />
+                            <span>{t.name}</span>
+                        </button>
+                    );
+                })}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -562,7 +563,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                                 href={prob.link}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="py-2 px-2.5 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-1.5 text-center cursor-pointer shadow-xs"
+                                                className="py-1.5 px-3 rounded-lg text-xs font-semibold bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition-colors flex items-center justify-center gap-1.5 text-center cursor-pointer"
                                             >
                                                 <span>Practice</span>
                                                 <ExternalLink className="w-3.5 h-3.5" />
@@ -571,7 +572,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                                 <button
                                                     type="button"
                                                     onClick={() => onChallengePvp(undefined, undefined, formattedTitle, prob.link)}
-                                                    className="py-2 px-2.5 rounded-xl text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs hover:shadow-[#5b4fff]/20 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-center"
+                                                    className="py-1.5 px-3 rounded-lg text-xs font-semibold border border-zinc-200 dark:border-zinc-700 hover:border-[#5b4fff] text-zinc-700 dark:text-zinc-300 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-center"
                                                 >
                                                     <Swords className="w-3.5 h-3.5" />
                                                     <span>Duel</span>

@@ -983,16 +983,16 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                             {/* Difficulty */}
                             <div className="space-y-1">
                                 <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">Difficulty</span>
-                                <div className="grid grid-cols-4 gap-1.5">
+                                <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 grid grid-cols-4 gap-1">
                                     {['Easy', 'Medium', 'Hard', 'Any'].map((diff) => (
                                         <button
                                             type="button"
                                             key={diff}
                                             onClick={() => setSelectedDifficulty(diff)}
-                                            className={`py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                                            className={`py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
                                                 selectedDifficulty === diff
-                                                    ? 'bg-[#5b4fff] text-white border-[#5b4fff] shadow-2xs'
-                                                    : 'bg-zinc-50 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100'
+                                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
                                             {diff}
@@ -1004,16 +1004,16 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                             {/* Duration */}
                             <div className="space-y-1">
                                 <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">Time Limit</span>
-                                <div className="grid grid-cols-4 gap-1.5">
+                                <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 grid grid-cols-4 gap-1">
                                     {[15, 30, 45, 60].map((mins) => (
                                         <button
                                             type="button"
                                             key={mins}
                                             onClick={() => setDurationMinutes(mins)}
-                                            className={`py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                                            className={`py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
                                                 durationMinutes === mins
-                                                    ? 'bg-[#5b4fff] text-white border-[#5b4fff] shadow-2xs'
-                                                    : 'bg-zinc-50 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100'
+                                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
                                             {mins}m
@@ -1199,16 +1199,16 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                         {/* Difficulty */}
                         <div className="space-y-1">
                             <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">Difficulty</span>
-                            <div className="grid grid-cols-4 gap-1.5">
+                            <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 grid grid-cols-4 gap-1">
                                 {['Easy', 'Medium', 'Hard', 'Any'].map((diff) => (
                                     <button
                                         type="button"
                                         key={diff}
                                         onClick={() => setSelectedDifficulty(diff)}
-                                        className={`py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                                        className={`py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
                                             selectedDifficulty === diff
-                                                ? 'bg-[#5b4fff] text-white border-[#5b4fff]'
-                                                : 'bg-zinc-50 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         {diff}
@@ -1220,16 +1220,16 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                         {/* Duration */}
                         <div className="space-y-1">
                             <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">Time Limit</span>
-                            <div className="grid grid-cols-4 gap-1.5">
+                            <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 grid grid-cols-4 gap-1">
                                 {[15, 30, 45, 60].map((mins) => (
                                     <button
                                         type="button"
                                         key={mins}
                                         onClick={() => setDurationMinutes(mins)}
-                                        className={`py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                                        className={`py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center ${
                                             durationMinutes === mins
-                                                ? 'bg-[#5b4fff] text-white border-[#5b4fff]'
-                                                : 'bg-zinc-50 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         {mins}m

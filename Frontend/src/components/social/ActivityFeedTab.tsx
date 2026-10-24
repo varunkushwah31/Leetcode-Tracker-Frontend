@@ -101,24 +101,22 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
     return (
         <div className="space-y-6">
             {/* Header with filter buttons */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
-
-
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#0c0c0e]/80 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
-                        <Activity className="w-6 h-6" />
+                    <div className="p-2 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff]">
+                        <Activity className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                        <h3 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">
                             Live Peer Activity Feed
                         </h3>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
                             Real-time solved problems, duel victories, and milestones from your friend network
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800/70 p-1.5 rounded-2xl">
+                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/70 p-1 rounded-xl shrink-0">
                     <button
                         type="button"
                         onClick={() => setFilter('ALL')}
@@ -196,7 +194,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                         return (
                             <div
                                 key={act.id}
-                                className="p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs hover:border-[#5b4fff]/40 transition-all space-y-3.5"
+                                className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0c0c0e]/80 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/70 shadow-2xs hover:border-[#5b4fff]/40 transition-all space-y-3"
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3.5 min-w-0">
@@ -260,8 +258,8 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                 </div>
 
                                 {/* Content / Description */}
-                                <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800/80 text-xs text-zinc-800 dark:text-zinc-200">
-                                    <p className="font-extrabold text-zinc-900 dark:text-white mb-0.5">
+                                <div className="text-xs text-zinc-800 dark:text-zinc-200 space-y-1">
+                                    <p className="font-bold text-zinc-900 dark:text-white">
                                         {formattedTitle}
                                     </p>
                                     <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">

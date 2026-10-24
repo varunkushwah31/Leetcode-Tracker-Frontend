@@ -8,9 +8,6 @@ import {
     EyeIcon as Eye,
     SwordIcon as Swords,
     SpinnerIcon as Loader2,
-    TrophyIcon as Trophy,
-    FlameIcon as Flame,
-    CheckCircleIcon as CheckCircle2,
     UsersIcon as Users,
     ArrowSquareOutIcon as ExternalLink,
     PaperPlaneRightIcon as Send,
@@ -340,40 +337,39 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                 </div>
             )}
 
-            {/* Find Friends Search Card */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden space-y-4">
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* Find Friends Search Toolbar */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0c0c0e]/80 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs relative overflow-hidden space-y-3.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff]">
-                            <UserPlus className="w-6 h-6" />
+                        <div className="p-2 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff]">
+                            <UserPlus className="w-5 h-5" />
                         </div>
                         <div>
-                            <h3 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
-                                Discover & Add Coding Peers
+                            <h3 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">
+                                Discover & Connect
                             </h3>
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                 Search peers by full name, campus email, LeetCode handle, or Codeforces handle.
                             </p>
                         </div>
                     </div>
 
                     {outgoingRequests.length > 0 && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700/60 self-start sm:self-auto">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-medium bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700/60 self-start sm:self-auto">
                             <Send className="w-3.5 h-3.5 text-zinc-400" />
-                            <span><strong>{outgoingRequests.length}</strong> request{outgoingRequests.length > 1 ? 's' : ''} pending response</span>
+                            <span><strong>{outgoingRequests.length}</strong> request{outgoingRequests.length > 1 ? 's' : ''} sent</span>
                         </span>
                     )}
                 </div>
 
                 <div className="relative">
-                    <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <Input
                         type="text"
-                        placeholder="Type name, email, LeetCode username, or Codeforces handle..."
+                        placeholder="Search peers by name, handle, or email..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10.5 pr-10 bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 h-11 text-xs rounded-2xl shadow-inner focus-visible:ring-[#5b4fff]/30"
+                        className="pl-10 pr-10 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 h-9.5 text-xs rounded-xl shadow-2xs focus-visible:ring-[#5b4fff]/30"
                     />
                     {renderSearchIndicator()}
                 </div>
@@ -468,17 +464,16 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2.5">
-                        <h3 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
-                            <Users className="w-4 h-4 text-[#5b4fff]" /> My Coding Friends ({friends.length})
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                            <Users className="w-4 h-4 text-[#5b4fff]" /> Friends ({friends.length})
                         </h3>
                         {onlineCount > 0 && (
-                            <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 {onlineCount} Live Now
                             </span>
                         )}
                     </div>
-                    <span className="text-xs text-zinc-400 font-medium">Compete, Compare & Duel</span>
                 </div>
 
                 {friends.length === 0 ? (
@@ -558,55 +553,49 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                     </Button>
                                 </div>
 
-                                {/* Codolio C-Score Composite Metric */}
-                                <div className="flex items-center justify-between px-3.5 py-2 rounded-2xl bg-[#5b4fff]/5 dark:bg-[#5b4fff]/10 border border-[#5b4fff]/20 text-xs">
-                                    <div className="flex items-center gap-1.5 font-bold">
-                                        <Sparkles className="w-4 h-4 text-[#5b4fff]" />
-                                        <span className="text-[#5b4fff]">C-Score</span>
-                                        <span className="font-mono text-zinc-900 dark:text-white font-extrabold text-sm ml-0.5">{friend.cScore ?? 500}</span>
-                                    </div>
-                                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-lg border ${getCScoreTier(friend.cScore).badgeClass}`}>
-                                        {getCScoreTier(friend.cScore).tier}
-                                    </span>
-                                </div>
-
-                                {/* Stats metric pill box */}
-                                <div className="grid grid-cols-3 gap-2 py-3 px-3.5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800/80 text-center">
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 font-semibold flex items-center justify-center gap-1">
-                                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Solved
-                                        </p>
-                                        <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5">{friend.totalSolved}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 font-semibold flex items-center justify-center gap-1">
-                                            <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rating
-                                        </p>
-                                        <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5">
-                                            {Math.round(friend.currentContestRating || 0) || 'Unrated'}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 font-semibold flex items-center justify-center gap-1">
-                                            <Flame className="w-3.5 h-3.5 text-rose-500" /> Streak
-                                        </p>
-                                        <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5">{friend.streak}d</p>
-                                    </div>
-                                </div>
-
-                                {/* Head-to-Head duel record pill */}
-                                <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-zinc-100/60 dark:bg-zinc-800/40 text-[11px] text-zinc-500 dark:text-zinc-400">
-                                    <span className="flex items-center gap-1 font-medium">
-                                        <Swords className="w-3.5 h-3.5 text-[#5b4fff]" /> Head-to-Head
-                                    </span>
-                                    <span className="font-bold flex items-center gap-1.5">
-                                        <span className="font-mono text-zinc-600 dark:text-zinc-300">
-                                            {friend.pvpRating ?? 1200} Elo
+                                {/* C-Score & Core Metrics Grid */}
+                                <div className="rounded-xl bg-zinc-50/90 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/60 p-3 space-y-2.5">
+                                    <div className="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
+                                        <div className="flex items-center gap-1.5">
+                                            <Sparkles className="w-3.5 h-3.5 text-[#5b4fff]" />
+                                            <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">C-Score</span>
+                                            <span className="font-mono text-zinc-900 dark:text-white font-bold text-sm ml-1">{friend.cScore ?? 500}</span>
+                                        </div>
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getCScoreTier(friend.cScore).badgeClass}`}>
+                                            {getCScoreTier(friend.cScore).tier}
                                         </span>
-                                        <span className="text-zinc-400">·</span>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-1 text-center">
+                                        <div>
+                                            <p className="text-[10px] text-zinc-400 font-medium">Solved</p>
+                                            <p className="text-xs font-bold text-zinc-900 dark:text-white font-mono mt-0.5">{friend.totalSolved}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-zinc-400 font-medium">Rating</p>
+                                            <p className="text-xs font-bold text-zinc-900 dark:text-white font-mono mt-0.5">
+                                                {Math.round(friend.currentContestRating || 0) || 'Unrated'}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-zinc-400 font-medium">Streak</p>
+                                            <p className="text-xs font-bold text-amber-500 font-mono mt-0.5">{friend.streak}d</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Head-to-Head & Actions Row */}
+                                <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 px-1">
+                                    <span className="flex items-center gap-1 font-medium">
+                                        <Swords className="w-3.5 h-3.5 text-[#5b4fff]" />
+                                        <span>vs You:</span>
+                                    </span>
+                                    <span className="font-mono font-semibold">
                                         <span className="text-emerald-600 dark:text-emerald-400">{friend.pvpWins || 0}W</span>
-                                        <span className="text-zinc-400">-</span>
+                                        <span className="text-zinc-400 mx-0.5">-</span>
                                         <span className="text-rose-600 dark:text-rose-400">{friend.pvpLosses || 0}L</span>
+                                        <span className="text-zinc-400 mx-1">·</span>
+                                        <span className="text-zinc-600 dark:text-zinc-300">{friend.pvpRating ?? 1200} Elo</span>
                                     </span>
                                 </div>
 

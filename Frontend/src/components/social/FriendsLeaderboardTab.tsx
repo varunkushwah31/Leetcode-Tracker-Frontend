@@ -65,15 +65,20 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
     return (
         <div className="space-y-6">
             {/* Sort Switcher Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm relative overflow-hidden">
-                <div className="flex items-center gap-3.5">
-                    <div className="p-3 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-500">
-                        <Trophy className="w-6 h-6" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/20 text-amber-500 flex items-center justify-center shrink-0 shadow-sm">
+                        <Trophy className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
-                            Friends Network Leaderboard
-                        </h3>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                                Friends Network Leaderboard
+                            </h2>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                Live Standings
+                            </span>
+                        </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                             Real-time competitive standings among you and your accepted coding peer network.
                         </p>
@@ -81,61 +86,61 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                 </div>
 
                 {/* Filter Switcher Segmented Control */}
-                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/70 p-1.5 rounded-2xl flex-wrap">
+                <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/80 dark:border-zinc-800 flex-wrap">
                     <button
                         type="button"
                         onClick={() => setSortBy('cScore')}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'cScore'
-                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <Sparkles className="w-3.5 h-3.5 text-[#5b4fff]" /> C-Score Index
+                        <Sparkles className="w-3.5 h-3.5 text-[#5b4fff]" /> C-Score
                     </button>
                     <button
                         type="button"
                         onClick={() => setSortBy('totalSolved')}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'totalSolved'
-                                ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Total Solved
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Solved
                     </button>
                     <button
                         type="button"
                         onClick={() => setSortBy('rating')}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'rating'
-                                ? 'bg-white dark:bg-zinc-900 text-amber-500 shadow-xs'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <Trophy className="w-3.5 h-3.5" /> Rating
+                        <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rating
                     </button>
                     <button
                         type="button"
                         onClick={() => setSortBy('streak')}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'streak'
-                                ? 'bg-white dark:bg-zinc-900 text-rose-500 shadow-xs'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <Flame className="w-3.5 h-3.5" /> Streak
+                        <Flame className="w-3.5 h-3.5 text-rose-500" /> Streak
                     </button>
                     <button
                         type="button"
                         onClick={() => setSortBy('pvp')}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'pvp'
-                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <Swords className="w-3.5 h-3.5" /> PVP Rating & Wins
+                        <Swords className="w-3.5 h-3.5 text-[#5b4fff]" /> PVP Duels
                     </button>
                 </div>
             </div>
@@ -167,8 +172,8 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     {topThree.length === 1 && topThree[0] && (
                         <div className="max-w-md mx-auto">
                             <div className="p-7 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-amber-500/30 dark:border-amber-500/25 text-center space-y-4 shadow-sm">
-                                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-bold text-sm flex items-center justify-center mx-auto shadow-2xs">
-                                    <Trophy className="w-5 h-5 text-amber-500 mr-1" /> 1
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-xs font-bold font-mono">
+                                    <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rank 1 · Gold
                                 </div>
                                 <Avatar className="w-20 h-20 mx-auto border-2 border-amber-500/40 shadow-sm">
                                     <AvatarImage src={topThree[0].avatarUrl} />
@@ -187,7 +192,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         @{topThree[0].leetcodeUsername || topThree[0].codeforcesHandle || 'champion'}
                                     </p>
                                 </div>
-                                <div className="py-1.5 px-4 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-black text-amber-800 dark:text-amber-300 inline-block">
+                                <div className="py-1 px-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-xs font-mono font-bold text-amber-800 dark:text-amber-300 inline-block">
                                     {getPrimaryValue(topThree[0])}
                                 </div>
                                 <div>
@@ -231,8 +236,8 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                         <div className="max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 items-end pt-2">
                             {/* 2nd Place Card */}
                             <div className="p-6 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 text-center space-y-3.5 shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
-                                <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 font-bold text-xs text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto shadow-2xs border border-zinc-200 dark:border-zinc-700">
-                                    <Medal className="w-4 h-4 text-zinc-400 mr-1" /> 2
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 text-xs font-bold font-mono">
+                                    <Medal className="w-3.5 h-3.5 text-zinc-400" /> Rank 2 · Silver
                                 </div>
                                 <Avatar className="w-16 h-16 mx-auto border-2 border-zinc-300 dark:border-zinc-700 shadow-sm">
                                     <AvatarImage src={topThree[1].avatarUrl} />
@@ -248,7 +253,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         @{topThree[1].leetcodeUsername || topThree[1].codeforcesHandle || 'coder'}
                                     </p>
                                 </div>
-                                <div className="py-1 px-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-xs font-black text-zinc-800 dark:text-zinc-200 inline-block border border-zinc-200 dark:border-zinc-700">
+                                <div className="py-1 px-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-xs font-mono font-bold text-zinc-800 dark:text-zinc-200 inline-block border border-zinc-200/80 dark:border-zinc-700">
                                     {getPrimaryValue(topThree[1])}
                                 </div>
                                 <div>
@@ -288,8 +293,8 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
 
                             {/* 1st Place Card (Elevated Champion) */}
                             <div className="p-7 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-amber-500/30 dark:border-amber-500/25 text-center space-y-4 shadow-sm">
-                                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-bold text-sm flex items-center justify-center mx-auto shadow-2xs">
-                                    <Trophy className="w-5 h-5 text-amber-500 mr-1" /> 1
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-xs font-bold font-mono">
+                                    <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rank 1 · Gold
                                 </div>
                                 <Avatar className="w-20 h-20 mx-auto border-2 border-amber-500/40 shadow-sm">
                                     <AvatarImage src={topThree[0].avatarUrl} />
@@ -311,7 +316,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         @{topThree[0].leetcodeUsername || topThree[0].codeforcesHandle || 'champion'}
                                     </p>
                                 </div>
-                                <div className="py-1.5 px-4 rounded-xl bg-amber-500/25 border border-amber-500/40 text-xs font-black text-amber-800 dark:text-amber-300 inline-block">
+                                <div className="py-1 px-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-xs font-mono font-bold text-amber-800 dark:text-amber-300 inline-block">
                                     {getPrimaryValue(topThree[0])}
                                 </div>
                                 <div>
@@ -355,8 +360,8 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-2 items-end">
                             {/* 2nd Place (Silver) */}
                             <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 text-center space-y-3.5 shadow-sm sm:order-1 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
-                                <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 font-bold text-xs text-zinc-700 dark:text-zinc-300 flex items-center justify-center mx-auto shadow-2xs border border-zinc-200 dark:border-zinc-700">
-                                    <Medal className="w-4 h-4 text-zinc-400 mr-1" /> 2
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 text-xs font-bold font-mono">
+                                    <Medal className="w-3.5 h-3.5 text-zinc-400" /> Rank 2 · Silver
                                 </div>
                                 <Avatar className="w-15 h-15 mx-auto border-2 border-zinc-300 dark:border-zinc-700 shadow-sm">
                                     <AvatarImage src={topThree[1].avatarUrl} />
@@ -372,7 +377,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         @{topThree[1].leetcodeUsername || topThree[1].codeforcesHandle || 'coder'}
                                     </p>
                                 </div>
-                                <div className="py-1 px-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-xs font-black text-zinc-800 dark:text-zinc-200 inline-block border border-zinc-200 dark:border-zinc-700">
+                                <div className="py-1 px-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 text-xs font-mono font-bold text-zinc-800 dark:text-zinc-200 inline-block border border-zinc-200/80 dark:border-zinc-700">
                                     {getPrimaryValue(topThree[1])}
                                 </div>
                                 <div>
@@ -412,8 +417,8 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
 
                             {/* 1st Place (Gold Champion) */}
                             <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-amber-500/30 dark:border-amber-500/25 text-center space-y-4 shadow-sm sm:order-2 transition-all">
-                                <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-bold text-xs flex items-center justify-center mx-auto shadow-2xs">
-                                    <Trophy className="w-4 h-4 text-amber-500 mr-1" /> 1
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-xs font-bold font-mono">
+                                    <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rank 1 · Gold
                                 </div>
                                 <Avatar className="w-20 h-20 mx-auto border-2 border-amber-500/40 shadow-sm">
                                     <AvatarImage src={topThree[0].avatarUrl} />
@@ -435,7 +440,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         @{topThree[0].leetcodeUsername || topThree[0].codeforcesHandle || 'champion'}
                                     </p>
                                 </div>
-                                <div className="py-1.5 px-4 rounded-xl bg-amber-500/25 border border-amber-500/40 text-xs font-black text-amber-800 dark:text-amber-300 inline-block">
+                                <div className="py-1 px-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-xs font-mono font-bold text-amber-800 dark:text-amber-300 inline-block">
                                     {getPrimaryValue(topThree[0])}
                                 </div>
                                 <div>
@@ -475,8 +480,8 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
 
                             {/* 3rd Place (Bronze) */}
                             <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#111111]/90 backdrop-blur-2xl border border-orange-500/25 dark:border-orange-500/20 text-center space-y-3.5 shadow-sm sm:order-3 hover:border-orange-500/40 transition-all">
-                                <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/25 font-bold text-xs flex items-center justify-center mx-auto shadow-2xs">
-                                    <Medal className="w-4 h-4 text-orange-500 mr-1" /> 3
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-700 dark:text-orange-400 border border-orange-500/25 text-xs font-bold font-mono">
+                                    <Medal className="w-3.5 h-3.5 text-orange-500" /> Rank 3 · Bronze
                                 </div>
                                 <Avatar className="w-15 h-15 mx-auto border-2 border-orange-500/30 shadow-sm">
                                     <AvatarImage src={topThree[2].avatarUrl} />
@@ -492,7 +497,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         @{topThree[2].leetcodeUsername || topThree[2].codeforcesHandle || 'coder'}
                                     </p>
                                 </div>
-                                <div className="py-1 px-3.5 rounded-xl bg-orange-50 dark:bg-orange-950/40 text-xs font-black text-orange-800 dark:text-orange-400 inline-block border border-orange-200 dark:border-orange-900/60">
+                                <div className="py-1 px-3.5 rounded-xl bg-orange-500/10 dark:bg-orange-950/30 text-xs font-mono font-bold text-orange-800 dark:text-orange-400 inline-block border border-orange-200 dark:border-orange-900/50">
                                     {getPrimaryValue(topThree[2])}
                                 </div>
                                 <div>
@@ -614,24 +619,24 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             </td>
 
                                             <td className="py-4 px-5 text-center">
-                                                <p className="font-extrabold text-zinc-900 dark:text-white">{e.totalSolved}</p>
+                                                <p className="font-mono font-bold text-zinc-900 dark:text-white">{e.totalSolved}</p>
                                                 <p className="text-[10px] text-zinc-400">
                                                     LC: {e.leetcodeSolved} · CF: {e.codeforcesSolved}
                                                 </p>
                                             </td>
 
-                                            <td className="py-4 px-5 text-center font-extrabold text-[#5b4fff] dark:text-[#968fff]">
-                                                {Math.round(e.currentContestRating || 0) || 'Unrated'}
+                                            <td className="py-4 px-5 text-center font-mono font-bold text-zinc-900 dark:text-zinc-100">
+                                                {Math.round(e.currentContestRating || 0) ? Math.round(e.currentContestRating || 0) : <span className="text-zinc-400 font-normal">Unrated</span>}
                                             </td>
 
                                             <td className="py-4 px-5 text-center">
-                                                <span className="inline-flex items-center gap-1 font-bold text-amber-500">
+                                                <span className="inline-flex items-center gap-1 font-mono font-bold text-amber-500">
                                                     {e.streak}d <StreakFlame className="w-3.5 h-3.5" />
                                                 </span>
                                             </td>
 
                                             <td className="py-4 px-5 text-center">
-                                                <p className="font-extrabold">
+                                                <p className="font-mono font-bold">
                                                     <span className="text-emerald-600 dark:text-emerald-400">{e.pvpWins}W</span>
                                                     <span className="text-zinc-400 mx-1">-</span>
                                                     <span className="text-rose-600 dark:text-rose-400">{e.pvpLosses}L</span>
@@ -664,16 +669,17 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => onViewDashboard(e.studentId)}
-                                                            className="h-8 px-2.5 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-xl cursor-pointer gap-1.5"
+                                                            className="h-8 px-2.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-xl cursor-pointer gap-1.5"
                                                         >
                                                             <Eye className="w-3.5 h-3.5" />
-                                                            <span>View</span>
+                                                            <span>Profile</span>
                                                         </Button>
                                                         {onChallengePvp && (
                                                             <Button
+                                                                variant="outline"
                                                                 size="sm"
                                                                 onClick={() => onChallengePvp(e.studentId, e.name)}
-                                                                className="h-8 px-2.5 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer gap-1 shadow-xs"
+                                                                className="h-8 px-2.5 text-xs font-semibold border-zinc-200 dark:border-zinc-700 hover:border-[#5b4fff] hover:text-[#5b4fff] text-zinc-700 dark:text-zinc-300 rounded-xl cursor-pointer gap-1"
                                                             >
                                                                 <Swords className="w-3 h-3" />
                                                                 <span>Duel</span>
