@@ -34,7 +34,12 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
     const [dashboardModalOpen, setDashboardModalOpen] = useState(false);
 
     // Target friend when initiating a PVP challenge from another tab
-    const [challengeTarget, setChallengeTarget] = useState<{ friendId: string; friendName: string } | null>(null);
+    const [challengeTarget, setChallengeTarget] = useState<{
+        friendId: string;
+        friendName: string;
+        customProblemTitle?: string;
+        customProblemLink?: string;
+    } | null>(null);
 
     // Summary counters
     const [friendsCount, setFriendsCount] = useState(0);
@@ -115,9 +120,21 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
         setDashboardModalOpen(true);
     };
 
-    const handleChallengePvp = (friendId?: string, friendName?: string) => {
+    const handleChallengePvp = (
+        friendId?: string,
+        friendName?: string,
+        customProblemTitle?: string,
+        customProblemLink?: string
+    ) => {
         if (friendId && friendName) {
-            setChallengeTarget({ friendId, friendName });
+            setChallengeTarget({ friendId, friendName, customProblemTitle, customProblemLink });
+        } else if (customProblemTitle || customProblemLink) {
+            setChallengeTarget({
+                friendId: '',
+                friendName: '',
+                customProblemTitle,
+                customProblemLink
+            });
         }
         setActiveTab('pvp');
     };
@@ -328,7 +345,10 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                 )}
 
                 {activeTab === 'leaderboard' && (
-                    <FriendsLeaderboardTab onViewDashboard={handleViewFriendDashboard} />
+                    <FriendsLeaderboardTab
+                        onViewDashboard={handleViewFriendDashboard}
+                        onChallengePvp={handleChallengePvp}
+                    />
                 )}
 
                 {activeTab === 'peer' && (

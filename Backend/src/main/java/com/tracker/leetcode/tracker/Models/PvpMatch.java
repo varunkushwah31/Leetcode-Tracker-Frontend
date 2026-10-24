@@ -59,4 +59,9 @@ public class PvpMatch {
 
     private String winnerId; // null if draw or in progress
     private String winnerName;
+
+    private Integer challengerRating;
+    private Integer opponentRating;
+    private Integer challengerRatingDelta;
+    private Integer opponentRatingDelta;
 }

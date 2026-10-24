@@ -117,6 +117,11 @@ export interface StudentExtendedDTO extends StudentSummaryDTO {
     progressHistory?: ProgressRecord[];
     codeforcesMaxRank?: string;
     codeforcesAvatarUrl?: string;
+    pvpWins?: number;
+    pvpLosses?: number;
+    pvpDraws?: number;
+    pvpRating?: number;
+    pvpStreak?: number;
 }
 
 export interface LoginRequest {
@@ -395,6 +400,8 @@ export interface FriendDTO {
     streak: number;
     pvpWins: number;
     pvpLosses: number;
+    pvpRating?: number;
+    pvpStreak?: number;
     status: 'ACCEPTED' | 'PENDING_INCOMING' | 'PENDING_OUTGOING';
     friendSince?: string;
     lastActive?: string;
@@ -477,6 +484,10 @@ export interface PvpMatchDTO {
     winnerId?: string;
     winnerName?: string;
     remainingSeconds?: number;
+    challengerRating?: number;
+    opponentRating?: number;
+    challengerRatingDelta?: number;
+    opponentRatingDelta?: number;
 }
 
 export interface CreatePvpMatchRequest {
@@ -554,6 +565,8 @@ export interface FriendsLeaderboardEntryDTO {
     pvpWins: number;
     pvpLosses: number;
     pvpWinRate: number;
+    pvpRating?: number;
+    pvpStreak?: number;
     isCurrentUser: boolean;
 }
 

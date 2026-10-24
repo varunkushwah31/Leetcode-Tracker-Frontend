@@ -19,9 +19,10 @@ import type { FriendsLeaderboardEntryDTO } from '@/types';
 
 interface FriendsLeaderboardTabProps {
     onViewDashboard: (studentId: string) => void;
+    onChallengePvp?: (friendId?: string, friendName?: string) => void;
 }
 
-export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeaderboardTabProps>) {
+export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Readonly<FriendsLeaderboardTabProps>) {
     const [entries, setEntries] = useState<FriendsLeaderboardEntryDTO[]>([]);
     const [sortBy, setSortBy] = useState<'totalSolved' | 'rating' | 'streak' | 'pvp'>('totalSolved');
     const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +52,7 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
             case 'streak':
                 return `${e.streak}d Streak`;
             case 'pvp':
-                return `${e.pvpWins}W (${e.pvpWinRate}%)`;
+                return `${e.pvpRating ?? 1200} Elo · ${e.pvpWins}W (${e.pvpWinRate}%)`;
             case 'totalSolved':
             default:
                 return `${e.totalSolved} Solved`;
@@ -122,7 +123,7 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <Swords className="w-3.5 h-3.5" /> PVP Wins
+                        <Swords className="w-3.5 h-3.5" /> PVP Rating & Wins
                     </button>
                 </div>
             </div>
@@ -189,14 +190,25 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                             <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
                                         </Button>
                                     ) : (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onViewDashboard(topThree[0].studentId)}
-                                            className="h-8 text-xs font-bold border-amber-400/60 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
-                                        >
-                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> View Champion Profile
-                                        </Button>
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => onViewDashboard(topThree[0].studentId)}
+                                                className="h-8 text-xs font-bold border-amber-400/60 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
+                                            >
+                                                <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
+                                            </Button>
+                                            {onChallengePvp && (
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
+                                                    className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                >
+                                                    <Swords className="w-3 h-3" /> Duel
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -239,14 +251,25 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                             <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
                                         </Button>
                                     ) : (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onViewDashboard(topThree[1].studentId)}
-                                            className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                                        >
-                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
-                                        </Button>
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => onViewDashboard(topThree[1].studentId)}
+                                                className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                            >
+                                                <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
+                                            </Button>
+                                            {onChallengePvp && (
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => onChallengePvp(topThree[1].studentId, topThree[1].name)}
+                                                    className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                >
+                                                    <Swords className="w-3 h-3" /> Duel
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -291,14 +314,25 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                             <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
                                         </Button>
                                     ) : (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onViewDashboard(topThree[0].studentId)}
-                                            className="h-8 text-xs font-bold border-amber-400/60 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
-                                        >
-                                            <Eye className="w-3.5 h-3.5 mr-1.5" /> View Champion Profile
-                                        </Button>
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => onViewDashboard(topThree[0].studentId)}
+                                                className="h-8 text-xs font-bold border-amber-400/60 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
+                                            >
+                                                <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
+                                            </Button>
+                                            {onChallengePvp && (
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
+                                                    className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                >
+                                                    <Swords className="w-3 h-3" /> Duel
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -341,14 +375,25 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                             <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
                                         </Button>
                                     ) : (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onViewDashboard(topThree[1].studentId)}
-                                            className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                                        >
-                                            <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
-                                        </Button>
+                                        <div className="flex items-center justify-center gap-1.5">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => onViewDashboard(topThree[1].studentId)}
+                                                className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                            >
+                                                <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
+                                            </Button>
+                                            {onChallengePvp && (
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => onChallengePvp(topThree[1].studentId, topThree[1].name)}
+                                                    className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                >
+                                                    <Swords className="w-3 h-3" /> Duel
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -393,14 +438,25 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                             <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
                                         </Button>
                                     ) : (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onViewDashboard(topThree[0].studentId)}
-                                            className="h-8 text-xs font-bold border-amber-400/60 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
-                                        >
-                                            <Eye className="w-3.5 h-3.5 mr-1" /> View Champion Profile
-                                        </Button>
+                                        <div className="flex items-center justify-center gap-1.5">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => onViewDashboard(topThree[0].studentId)}
+                                                className="h-8 text-xs font-bold border-amber-400/60 text-amber-800 dark:text-amber-300 hover:bg-amber-500/10 rounded-xl cursor-pointer"
+                                            >
+                                                <Eye className="w-3.5 h-3.5 mr-1" /> View Champion Profile
+                                            </Button>
+                                            {onChallengePvp && (
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
+                                                    className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                >
+                                                    <Swords className="w-3 h-3" /> Duel
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -439,14 +495,25 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                             <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
                                         </Button>
                                     ) : (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => onViewDashboard(topThree[2].studentId)}
-                                            className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                                        >
-                                            <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
-                                        </Button>
+                                        <div className="flex items-center justify-center gap-1.5">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => onViewDashboard(topThree[2].studentId)}
+                                                className="h-8 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                            >
+                                                <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
+                                            </Button>
+                                            {onChallengePvp && (
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => onChallengePvp(topThree[2].studentId, topThree[2].name)}
+                                                    className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                >
+                                                    <Swords className="w-3 h-3" /> Duel
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -545,9 +612,14 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                                     <span className="text-zinc-400 mx-1">-</span>
                                                     <span className="text-rose-600 dark:text-rose-400">{e.pvpLosses}L</span>
                                                 </p>
-                                                <p className="text-[10px] text-zinc-400">
-                                                    {e.pvpWinRate}% win rate
-                                                </p>
+                                                <div className="flex items-center justify-center gap-1.5 mt-0.5">
+                                                    <span className="text-[10px] font-mono font-bold text-zinc-600 dark:text-zinc-300">
+                                                        {e.pvpRating ?? 1200} Elo
+                                                    </span>
+                                                    <span className="text-[10px] text-zinc-400">
+                                                        · {e.pvpWinRate}% WR
+                                                    </span>
+                                                </div>
                                             </td>
 
                                             <td className="py-4 px-5 text-right">
@@ -563,15 +635,27 @@ export function FriendsLeaderboardTab({ onViewDashboard }: Readonly<FriendsLeade
                                                         <span>You</span>
                                                     </Button>
                                                 ) : (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => onViewDashboard(e.studentId)}
-                                                        className="h-8 px-3 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-xl cursor-pointer gap-1.5"
-                                                    >
-                                                        <Eye className="w-3.5 h-3.5" />
-                                                        <span>View</span>
-                                                    </Button>
+                                                    <div className="flex items-center justify-end gap-1.5">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => onViewDashboard(e.studentId)}
+                                                            className="h-8 px-2.5 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-xl cursor-pointer gap-1.5"
+                                                        >
+                                                            <Eye className="w-3.5 h-3.5" />
+                                                            <span>View</span>
+                                                        </Button>
+                                                        {onChallengePvp && (
+                                                            <Button
+                                                                size="sm"
+                                                                onClick={() => onChallengePvp(e.studentId, e.name)}
+                                                                className="h-8 px-2.5 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer gap-1 shadow-xs"
+                                                            >
+                                                                <Swords className="w-3 h-3" />
+                                                                <span>Duel</span>
+                                                            </Button>
+                                                        )}
+                                                    </div>
                                                 )}
                                             </td>
                                         </tr>

@@ -29,7 +29,7 @@ import { formatProblemTitle } from '@/lib/problemFormatter';
 import type { PeerStudyPostDTO, CreatePeerStudyPostRequest, CuratedProblemItemDTO, PeerStudyPostType } from '@/types';
 
 interface PeerStudyTabProps {
-    onChallengePvp?: (friendId?: string, friendName?: string) => void;
+    onChallengePvp?: (friendId?: string, friendName?: string, customProblemTitle?: string, customProblemLink?: string) => void;
 }
 
 export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
@@ -323,14 +323,25 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                                     <span className="truncate">{post.problemTitle}</span>
                                                 </span>
                                                 {post.problemLink && (
-                                                    <a
-                                                        href={post.problemLink}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="text-[#5b4fff] hover:underline flex items-center gap-1 text-[11px] font-bold shrink-0 ml-2"
-                                                    >
-                                                        Solve Problem <ExternalLink className="w-3 h-3" />
-                                                    </a>
+                                                    <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                        <a
+                                                            href={post.problemLink}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="text-[#5b4fff] hover:underline flex items-center gap-1 text-[11px] font-bold"
+                                                        >
+                                                            Solve Problem <ExternalLink className="w-3 h-3" />
+                                                        </a>
+                                                        {onChallengePvp && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => onChallengePvp(undefined, undefined, post.problemTitle, post.problemLink)}
+                                                                className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-[#5b4fff]/10 hover:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] transition-colors flex items-center gap-1 cursor-pointer"
+                                                            >
+                                                                <Swords className="w-3 h-3" /> Duel
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 )}
                                             </div>
                                         )}
@@ -559,7 +570,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                             {onChallengePvp ? (
                                                 <button
                                                     type="button"
-                                                    onClick={() => onChallengePvp()}
+                                                    onClick={() => onChallengePvp(undefined, undefined, formattedTitle, prob.link)}
                                                     className="py-2 px-2.5 rounded-xl text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs hover:shadow-[#5b4fff]/20 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-center"
                                                 >
                                                     <Swords className="w-3.5 h-3.5" />

@@ -331,6 +331,8 @@ public class SocialService {
                             .lastActive(friend.getLastSyncedAt())
                             .isOnline(isOnline)
                             .isBusy(isBusy)
+                            .pvpRating(friend.getPvpRating() != null ? friend.getPvpRating() : 1200)
+                            .pvpStreak(friend.getPvpStreak() != null ? friend.getPvpStreak() : 0)
                             .build());
                 }
             } else if (f.getStatus() == FriendshipStatus.PENDING) {
@@ -562,10 +564,12 @@ public class SocialService {
                 .challengerName(challenger.getName())
                 .challengerHandle(challenger.getLeetcodeUsername() != null ? challenger.getLeetcodeUsername() : challenger.getCodeforcesHandle())
                 .challengerAvatarUrl(challenger.getAvatarUrl())
+                .challengerRating(challenger.getPvpRating() != null ? challenger.getPvpRating() : 1200)
                 .opponentId(opponent.getId())
                 .opponentName(opponent.getName())
                 .opponentHandle(opponent.getLeetcodeUsername() != null ? opponent.getLeetcodeUsername() : opponent.getCodeforcesHandle())
                 .opponentAvatarUrl(opponent.getAvatarUrl())
+                .opponentRating(opponent.getPvpRating() != null ? opponent.getPvpRating() : 1200)
                 .problemTitle(title)
                 .problemSlug(slug)
                 .problemPlatform(platform)
@@ -684,7 +688,7 @@ public class SocialService {
         match.setWinnerId(winnerId);
         match.setWinnerName(winnerName);
 
-        updatePvpStats(winnerId, currentStudentId, false);
+        updatePvpStats(match, winnerId, currentStudentId, false);
 
         PvpMatch saved = pvpMatchRepository.save(match);
 
@@ -784,7 +788,7 @@ public class SocialService {
             match.setWinnerId(currentStudentId);
             match.setWinnerName(isChallenger ? match.getChallengerName() : match.getOpponentName());
 
-            updatePvpStats(match.getWinnerId(), isChallenger ? match.getOpponentId() : match.getChallengerId(), false);
+            updatePvpStats(match, match.getWinnerId(), isChallenger ? match.getOpponentId() : match.getChallengerId(), false);
 
             // Emit activity
             recordActivity(
@@ -812,12 +816,12 @@ public class SocialService {
             match.setStatus(PvpMatchStatus.COMPLETED);
             match.setWinnerId(match.getChallengerId());
             match.setWinnerName(match.getChallengerName());
-            updatePvpStats(match.getChallengerId(), match.getOpponentId(), false);
+            updatePvpStats(match, match.getChallengerId(), match.getOpponentId(), false);
         } else if (match.isOpponentSolved() && !match.isChallengerSolved()) {
             match.setStatus(PvpMatchStatus.COMPLETED);
             match.setWinnerId(match.getOpponentId());
             match.setWinnerName(match.getOpponentName());
-            updatePvpStats(match.getOpponentId(), match.getChallengerId(), false);
+            updatePvpStats(match, match.getOpponentId(), match.getChallengerId(), false);
         } else if (match.isChallengerSolved() && match.isOpponentSolved()) {
             match.setStatus(PvpMatchStatus.COMPLETED);
             if (match.getChallengerSolvedAt().isBefore(match.getOpponentSolvedAt())) {
@@ -831,32 +835,65 @@ public class SocialService {
             }
         } else {
             match.setStatus(PvpMatchStatus.DRAW);
-            updatePvpStats(match.getChallengerId(), match.getOpponentId(), true);
+            updatePvpStats(match, match.getChallengerId(), match.getOpponentId(), true);
         }
     }
 
     private void updatePvpStats(String winnerId, String loserId, boolean isDraw) {
+        updatePvpStats(null, winnerId, loserId, isDraw);
+    }
+
+    private void updatePvpStats(PvpMatch match, String winnerId, String loserId, boolean isDraw) {
         if (isDraw) {
             Student a = studentRepository.findById(winnerId).orElse(null);
             if (a != null) {
                 a.setPvpDraws((a.getPvpDraws() != null ? a.getPvpDraws() : 0) + 1);
+                if (a.getPvpRating() == null) a.setPvpRating(1200);
+                if (a.getPvpStreak() == null) a.setPvpStreak(0);
                 studentRepository.save(a);
             }
             Student b = studentRepository.findById(loserId).orElse(null);
             if (b != null) {
                 b.setPvpDraws((b.getPvpDraws() != null ? b.getPvpDraws() : 0) + 1);
+                if (b.getPvpRating() == null) b.setPvpRating(1200);
+                if (b.getPvpStreak() == null) b.setPvpStreak(0);
                 studentRepository.save(b);
+            }
+            if (match != null) {
+                match.setChallengerRatingDelta(0);
+                match.setOpponentRatingDelta(0);
             }
         } else {
             Student winner = studentRepository.findById(winnerId).orElse(null);
+            Student loser = studentRepository.findById(loserId).orElse(null);
+
+            int winnerRating = (winner != null && winner.getPvpRating() != null) ? winner.getPvpRating() : 1200;
+            int loserRating = (loser != null && loser.getPvpRating() != null) ? loser.getPvpRating() : 1200;
+
+            // Elo rating calculation
+            double expectedWinner = 1.0 / (1.0 + Math.pow(10.0, (loserRating - winnerRating) / 400.0));
+            int kFactor = 32;
+            int winnerGain = Math.max(15, Math.min(35, (int) Math.round(kFactor * (1.0 - expectedWinner))));
+            int loserLoss = Math.max(10, Math.min(30, (int) Math.round(kFactor * expectedWinner)));
+
             if (winner != null) {
                 winner.setPvpWins((winner.getPvpWins() != null ? winner.getPvpWins() : 0) + 1);
+                winner.setPvpRating(winnerRating + winnerGain);
+                winner.setPvpStreak((winner.getPvpStreak() != null ? winner.getPvpStreak() : 0) + 1);
                 studentRepository.save(winner);
             }
-            Student loser = studentRepository.findById(loserId).orElse(null);
+
             if (loser != null) {
                 loser.setPvpLosses((loser.getPvpLosses() != null ? loser.getPvpLosses() : 0) + 1);
+                loser.setPvpRating(Math.max(1000, loserRating - loserLoss));
+                loser.setPvpStreak(0);
                 studentRepository.save(loser);
+            }
+
+            if (match != null) {
+                boolean isWinnerChallenger = match.getChallengerId().equals(winnerId);
+                match.setChallengerRatingDelta(isWinnerChallenger ? winnerGain : -loserLoss);
+                match.setOpponentRatingDelta(isWinnerChallenger ? -loserLoss : winnerGain);
             }
         }
     }
@@ -928,6 +965,10 @@ public class SocialService {
                 .winnerId(m.getWinnerId())
                 .winnerName(m.getWinnerName())
                 .remainingSeconds(remainingSeconds)
+                .challengerRating(m.getChallengerRating())
+                .opponentRating(m.getOpponentRating())
+                .challengerRatingDelta(m.getChallengerRatingDelta())
+                .opponentRatingDelta(m.getOpponentRatingDelta())
                 .build();
     }
 
@@ -1161,6 +1202,8 @@ public class SocialService {
                     .pvpLosses(losses)
                     .pvpWinRate(Math.round(winRate * 10.0) / 10.0)
                     .isCurrentUser(s.getId().equals(currentStudentId))
+                    .pvpRating(s.getPvpRating() != null ? s.getPvpRating() : 1200)
+                    .pvpStreak(s.getPvpStreak() != null ? s.getPvpStreak() : 0)
                     .build();
         }).toList());
 
@@ -1173,8 +1216,10 @@ public class SocialService {
                 case "streak":
                     return Integer.compare(b.getStreak(), a.getStreak());
                 case "pvp":
-                    int cmp = Integer.compare(b.getPvpWins(), a.getPvpWins());
-                    if (cmp != 0) return cmp;
+                    int cmpRating = Integer.compare(b.getPvpRating() != null ? b.getPvpRating() : 1200, a.getPvpRating() != null ? a.getPvpRating() : 1200);
+                    if (cmpRating != 0) return cmpRating;
+                    int cmpWins = Integer.compare(b.getPvpWins(), a.getPvpWins());
+                    if (cmpWins != 0) return cmpWins;
                     return Double.compare(b.getPvpWinRate(), a.getPvpWinRate());
                 case "totalsolved":
                 default:

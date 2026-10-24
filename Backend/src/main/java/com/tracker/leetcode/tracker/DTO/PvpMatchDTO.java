@@ -57,4 +57,9 @@ public class PvpMatchDTO implements Serializable {
 
     // Remaining seconds computed for live duel clients
     private Long remainingSeconds;
+
+    private Integer challengerRating;
+    private Integer opponentRating;
+    private Integer challengerRatingDelta;
+    private Integer opponentRatingDelta;
 }

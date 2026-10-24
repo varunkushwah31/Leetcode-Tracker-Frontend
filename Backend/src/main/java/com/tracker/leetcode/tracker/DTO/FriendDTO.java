@@ -35,4 +35,6 @@ public class FriendDTO implements Serializable {
     private Instant lastActive;
     private boolean isOnline;
     private boolean isBusy;
+    private Integer pvpRating;
+    private Integer pvpStreak;
 }

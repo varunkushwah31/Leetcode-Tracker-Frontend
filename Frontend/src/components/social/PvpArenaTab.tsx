@@ -27,8 +27,40 @@ import { formatProblemTitle } from '@/lib/problemFormatter';
 import type { FriendDTO, PvpMatchDTO, CreatePvpMatchRequest } from '@/types';
 
 interface PvpArenaTabProps {
-    initialChallengerTarget?: { friendId: string; friendName: string } | null;
+    initialChallengerTarget?: {
+        friendId: string;
+        friendName: string;
+        customProblemTitle?: string;
+        customProblemLink?: string;
+    } | null;
     onClearInitialTarget?: () => void;
+}
+
+interface EloTierInfo {
+    name: string;
+    badgeClass: string;
+}
+
+function getPvpRankTier(elo = 1200): EloTierInfo {
+    if (elo >= 2200) {
+        return { name: 'Grandmaster', badgeClass: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30' };
+    }
+    if (elo >= 1900) {
+        return { name: 'Master', badgeClass: 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30' };
+    }
+    if (elo >= 1600) {
+        return { name: 'Diamond', badgeClass: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30' };
+    }
+    if (elo >= 1400) {
+        return { name: 'Platinum', badgeClass: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30' };
+    }
+    if (elo >= 1200) {
+        return { name: 'Gold', badgeClass: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30' };
+    }
+    if (elo >= 1050) {
+        return { name: 'Silver', badgeClass: 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30' };
+    }
+    return { name: 'Bronze', badgeClass: 'bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30' };
 }
 
 
@@ -96,10 +128,19 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
     const [submissionUrlInput, setSubmissionUrlInput] = useState<{ [key: string]: string }>({});
     const [feedback, setFeedback] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
+    const [userPvpRating, setUserPvpRating] = useState<number>(1200);
+    const [userPvpStreak, setUserPvpStreak] = useState<number>(0);
+
     // Auto-open challenge modal if passed via prop
     useEffect(() => {
         if (initialChallengerTarget) {
             setSelectedFriendId(initialChallengerTarget.friendId);
+            if (initialChallengerTarget.customProblemTitle) {
+                setCustomTitle(initialChallengerTarget.customProblemTitle);
+            }
+            if (initialChallengerTarget.customProblemLink) {
+                setCustomLink(initialChallengerTarget.customProblemLink);
+            }
             setCreateDialogOpen(true);
             onClearInitialTarget?.();
         }
@@ -107,13 +148,21 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
     const loadData = useCallback(async () => {
         try {
-            const [matchesRes, friendsRes] = await Promise.all([
+            const [matchesRes, friendsRes, leaderboardRes] = await Promise.all([
                 SocialService.getPvpMatches(),
-                SocialService.getFriends()
+                SocialService.getFriends(),
+                typeof SocialService.getFriendsLeaderboard === 'function'
+                    ? SocialService.getFriendsLeaderboard().catch(() => ({ data: [] }))
+                    : Promise.resolve({ data: [] })
             ]);
             setMatches(matchesRes.data || []);
             const rawFriends: FriendDTO[] = friendsRes.data.friends || [];
             setFriends(rawFriends.filter(f => f.id !== user?.id));
+            const myEntry = (leaderboardRes?.data || []).find((e: { isCurrentUser?: boolean }) => e.isCurrentUser);
+            if (myEntry) {
+                setUserPvpRating(myEntry.pvpRating ?? 1200);
+                setUserPvpStreak(myEntry.pvpStreak ?? 0);
+            }
         } catch (err) {
             console.error('Failed to load PVP data:', err);
         } finally {
@@ -449,6 +498,13 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     const remaining = match.remainingSeconds ?? 0;
                                     const isClockRunningOut = remaining < 300 && remaining > 0;
                                     const formattedTitle = match.problemTitle ? formatProblemTitle(match.problemTitle) : 'Duel Problem';
+                                    const totalSeconds = (match.durationMinutes || 30) * 60;
+                                    const elapsedSeconds = Math.max(0, totalSeconds - remaining);
+                                    const progressPercent = Math.min(100, Math.max(0, (elapsedSeconds / totalSeconds) * 100));
+                                    const challengerElo = match.challengerRating ?? 1200;
+                                    const opponentElo = match.opponentRating ?? 1200;
+                                    const challengerTier = getPvpRankTier(challengerElo);
+                                    const opponentTier = getPvpRankTier(opponentElo);
 
                                     return (
                                         <div
@@ -484,6 +540,35 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                 )}
                                             </div>
 
+                                            {/* Live Duel Battle Progress Bar */}
+                                            {match.status === 'IN_PROGRESS' && (
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center justify-between text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock className="w-3 h-3 text-zinc-400" />
+                                                            <span>Elapsed: {formatSeconds(elapsedSeconds)}</span>
+                                                        </span>
+                                                        <span className={`font-mono font-bold ${
+                                                            isClockRunningOut
+                                                                ? 'text-rose-600 dark:text-rose-400 animate-pulse'
+                                                                : 'text-zinc-600 dark:text-zinc-300'
+                                                        }`}>
+                                                            {formatSeconds(remaining)} remaining
+                                                        </span>
+                                                    </div>
+                                                    <div className="h-2 w-full bg-zinc-200/80 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                                        <div
+                                                            className={`h-full transition-all duration-1000 rounded-full ${
+                                                                isClockRunningOut
+                                                                    ? 'bg-rose-500 animate-pulse'
+                                                                    : 'bg-linear-to-r from-[#5b4fff] to-emerald-500'
+                                                            }`}
+                                                            style={{ width: `${progressPercent}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {/* VS Coder Dual Face-off */}
                                             <div className="grid grid-cols-3 items-center gap-2 py-1">
                                                 {/* Challenger */}
@@ -497,6 +582,14 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                     <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">
                                                         {match.challengerName} {isChallenger && <span className="text-[#5b4fff]">(You)</span>}
                                                     </p>
+                                                    <div className="flex items-center justify-center gap-1 flex-wrap">
+                                                        <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-md border ${challengerTier.badgeClass}`}>
+                                                            {challengerTier.name}
+                                                        </span>
+                                                        <span className="text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400">
+                                                            {challengerElo} Elo
+                                                        </span>
+                                                    </div>
                                                     <div>
                                                         {match.challengerSolved ? (
                                                             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
@@ -531,6 +624,14 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                     <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">
                                                         {match.opponentName} {!isChallenger && <span className="text-[#5b4fff]">(You)</span>}
                                                     </p>
+                                                    <div className="flex items-center justify-center gap-1 flex-wrap">
+                                                        <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-md border ${opponentTier.badgeClass}`}>
+                                                            {opponentTier.name}
+                                                        </span>
+                                                        <span className="text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400">
+                                                            {opponentElo} Elo
+                                                        </span>
+                                                    </div>
                                                     <div>
                                                         {match.opponentSolved ? (
                                                             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
@@ -736,9 +837,20 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                 {filteredPastMatches.slice(0, 10).map((m) => {
                                     const isWinner = m.winnerId === user?.id;
                                     const isDraw = m.status === 'DRAW';
+                                    const isChallenger = m.challengerId === user?.id;
                                     const title = m.problemTitle ? formatProblemTitle(m.problemTitle) : 'Duel Problem';
-                                    const opponentName = m.challengerId === user?.id ? m.opponentName : m.challengerName;
-                                    const opponentAvatar = m.challengerId === user?.id ? m.opponentAvatarUrl : m.challengerAvatarUrl;
+                                    const opponentName = isChallenger ? m.opponentName : m.challengerName;
+                                    const opponentAvatar = isChallenger ? m.opponentAvatarUrl : m.challengerAvatarUrl;
+                                    const ratingDelta = isChallenger ? m.challengerRatingDelta : m.opponentRatingDelta;
+
+                                    const handleRematch = (matchItem: PvpMatchDTO) => {
+                                        const oppId = matchItem.challengerId === user?.id ? matchItem.opponentId : matchItem.challengerId;
+                                        setSelectedFriendId(oppId);
+                                        setSelectedTopic(matchItem.problemTopic || 'Dynamic Programming');
+                                        setSelectedDifficulty(matchItem.problemDifficulty || 'Medium');
+                                        setDurationMinutes(matchItem.durationMinutes || 30);
+                                        setCreateDialogOpen(true);
+                                    };
 
                                     return (
                                         <div
@@ -769,8 +881,35 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                 </div>
                                             </div>
 
-                                            <div className="text-right text-[11px] text-zinc-400 shrink-0">
-                                                {m.completedAt ? new Date(m.completedAt).toLocaleDateString() : 'Completed'}
+                                            <div className="flex items-center gap-2.5 shrink-0">
+                                                {ratingDelta !== undefined && ratingDelta !== null && (
+                                                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border shrink-0 ${
+                                                        ratingDelta > 0
+                                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
+                                                            : ratingDelta < 0
+                                                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25'
+                                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'
+                                                    }`}>
+                                                        {ratingDelta > 0 ? `+${ratingDelta}` : ratingDelta} Elo
+                                                    </span>
+                                                )}
+
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => handleRematch(m)}
+                                                    disabled={isCurrentUserBusy}
+                                                    className="h-7 px-2.5 text-[10px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer gap-1"
+                                                    title={`Challenge ${opponentName} to a rematch`}
+                                                >
+                                                    <Swords className="w-3 h-3" />
+                                                    <span>Rematch</span>
+                                                </Button>
+
+                                                <div className="text-right text-[11px] text-zinc-400 hidden sm:block">
+                                                    {m.completedAt ? new Date(m.completedAt).toLocaleDateString() : 'Completed'}
+                                                </div>
                                             </div>
                                         </div>
                                     );
@@ -913,6 +1052,34 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     Head-to-head performance ratio
                                 </p>
                             </div>
+                        </div>
+
+                        {/* Elo Rating and Tier Header */}
+                        <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 mb-4">
+                            <div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+                                    Your Rank & Rating
+                                </span>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                    <span className="text-base font-black text-zinc-900 dark:text-white font-mono">
+                                        {userPvpRating} Elo
+                                    </span>
+                                    <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-md border ${getPvpRankTier(userPvpRating).badgeClass}`}>
+                                        {getPvpRankTier(userPvpRating).name}
+                                    </span>
+                                </div>
+                            </div>
+                            {userPvpStreak > 0 && (
+                                <div className="text-right">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+                                        Win Streak
+                                    </span>
+                                    <span className="inline-flex items-center gap-1 text-xs font-black text-amber-500 mt-0.5">
+                                        <Flame className="w-3.5 h-3.5 fill-current" />
+                                        {userPvpStreak} in a row
+                                    </span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Win Rate Bar */}

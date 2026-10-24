@@ -133,6 +133,11 @@ public class StudentMapper {
                 .progressHistory(student.getProgressHistory())
                 .avatarUrl(student.getAvatarUrl())
                 .authProvider(student.getAuthProvider())
+                .pvpWins(student.getPvpWins() != null ? student.getPvpWins() : 0)
+                .pvpLosses(student.getPvpLosses() != null ? student.getPvpLosses() : 0)
+                .pvpDraws(student.getPvpDraws() != null ? student.getPvpDraws() : 0)
+                .pvpRating(student.getPvpRating() != null ? student.getPvpRating() : 1200)
+                .pvpStreak(student.getPvpStreak() != null ? student.getPvpStreak() : 0)
                 .build();
     }
 

@@ -34,4 +34,6 @@ public class FriendsLeaderboardEntryDTO implements Serializable {
     private double pvpWinRate;
 
     private boolean isCurrentUser;
+    private Integer pvpRating;
+    private Integer pvpStreak;
 }

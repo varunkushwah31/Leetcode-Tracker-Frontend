@@ -13,7 +13,8 @@ vi.mock('../../services/endpoints', () => ({
         declinePvpMatch: vi.fn(),
         verifyPvpMatch: vi.fn(),
         endPvpMatch: vi.fn(),
-        createPvpChallenge: vi.fn()
+        createPvpChallenge: vi.fn(),
+        getFriendsLeaderboard: vi.fn().mockResolvedValue({ data: [] })
     }
 }));
 

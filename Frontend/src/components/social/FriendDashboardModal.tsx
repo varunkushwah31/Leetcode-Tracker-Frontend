@@ -36,7 +36,7 @@ interface FriendDashboardModalProps {
     friendId: string | null;
     open: boolean;
     onClose: () => void;
-    onChallengePvp?: (friendId: string, friendName: string) => void;
+    onChallengePvp?: (friendId: string, friendName: string, customProblemTitle?: string, customProblemLink?: string) => void;
 }
 
 interface FriendProfileHeaderProps {
@@ -413,7 +413,7 @@ interface FriendPeerLearningSectionProps {
     filteredFriendOnly: string[];
     filteredMutual: string[];
     filteredUserOnly: string[];
-    onChallengePvp?: (friendId: string, friendName: string) => void;
+    onChallengePvp?: (friendId: string, friendName: string, customProblemTitle?: string, customProblemLink?: string) => void;
     onClose: () => void;
 }
 
@@ -516,7 +516,7 @@ function FriendPeerLearningSection({
                                                     variant="ghost"
                                                     onClick={() => {
                                                         onClose();
-                                                        onChallengePvp(profile.id!, profile.name);
+                                                        onChallengePvp(profile.id!, profile.name, title, url);
                                                     }}
                                                     className="h-7 px-2 text-[10px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer"
                                                 >
@@ -577,14 +577,30 @@ function FriendPeerLearningSection({
                                                 {title}
                                             </span>
                                         </a>
-                                        <a
-                                            href={url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="text-zinc-400 hover:text-[#5b4fff] p-1"
-                                        >
-                                            <ExternalLink className="w-3 h-3" />
-                                        </a>
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            <a
+                                                href={url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="text-zinc-400 hover:text-[#5b4fff] p-1"
+                                                title="Open problem in new tab"
+                                            >
+                                                <ExternalLink className="w-3.5 h-3.5" />
+                                            </a>
+                                            {onChallengePvp && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => {
+                                                        onClose();
+                                                        onChallengePvp(profile.id!, profile.name, title, url);
+                                                    }}
+                                                    className="h-7 px-2 text-[10px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer"
+                                                >
+                                                    Duel
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -637,14 +653,30 @@ function FriendPeerLearningSection({
                                                 {title}
                                             </span>
                                         </a>
-                                        <a
-                                            href={url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="text-zinc-400 hover:text-[#5b4fff] p-1"
-                                        >
-                                            <ExternalLink className="w-3 h-3" />
-                                        </a>
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            <a
+                                                href={url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="text-zinc-400 hover:text-[#5b4fff] p-1"
+                                                title="Open problem in new tab"
+                                            >
+                                                <ExternalLink className="w-3.5 h-3.5" />
+                                            </a>
+                                            {onChallengePvp && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => {
+                                                        onClose();
+                                                        onChallengePvp(profile.id!, profile.name, title, url);
+                                                    }}
+                                                    className="h-7 px-2 text-[10px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer"
+                                                >
+                                                    Duel
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
                                 );
                             })}

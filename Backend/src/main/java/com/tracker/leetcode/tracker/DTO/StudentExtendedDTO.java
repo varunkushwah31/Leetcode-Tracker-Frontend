@@ -46,4 +46,9 @@ public class StudentExtendedDTO implements Serializable {
     private List<Classroom> classrooms;
     private List<SkillStat> skills;
     private AuthProvider authProvider;
+    private Integer pvpWins;
+    private Integer pvpLosses;
+    private Integer pvpDraws;
+    private Integer pvpRating;
+    private Integer pvpStreak;
 }

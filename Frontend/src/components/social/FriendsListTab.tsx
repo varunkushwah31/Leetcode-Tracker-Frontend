@@ -582,9 +582,13 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                     <span className="flex items-center gap-1 font-medium">
                                         <Swords className="w-3.5 h-3.5 text-[#5b4fff]" /> Head-to-Head
                                     </span>
-                                    <span className="font-bold">
+                                    <span className="font-bold flex items-center gap-1.5">
+                                        <span className="font-mono text-zinc-600 dark:text-zinc-300">
+                                            {friend.pvpRating ?? 1200} Elo
+                                        </span>
+                                        <span className="text-zinc-400">·</span>
                                         <span className="text-emerald-600 dark:text-emerald-400">{friend.pvpWins || 0}W</span>
-                                        <span className="text-zinc-400 mx-1">-</span>
+                                        <span className="text-zinc-400">-</span>
                                         <span className="text-rose-600 dark:text-rose-400">{friend.pvpLosses || 0}L</span>
                                     </span>
                                 </div>
