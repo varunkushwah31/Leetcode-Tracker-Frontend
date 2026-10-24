@@ -98,10 +98,10 @@ function FriendProfileHeader({
                             </span>
                             {hasLinkedAccount && (
                                 <span
-                                    className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/25"
                                     title="Verified Coding Platform Sync"
                                 >
-                                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                                    <ShieldCheck className="w-3.5 h-3.5 text-[#5b4fff] dark:text-[#968fff]" />
                                     <span>Verified Sync</span>
                                 </span>
                             )}
@@ -126,7 +126,7 @@ function FriendProfileHeader({
                                     href={`https://codeforces.com/profile/${profile.codeforcesHandle}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors inline-flex items-center text-xs font-medium bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-500/20"
+                                    className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition-colors inline-flex items-center text-xs font-medium bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20"
                                 >
                                     CF: @{profile.codeforcesHandle} ({cfSolved} solved • {cfRating > 0 ? `${cfRating} rating` : 'Unrated'}) <ExternalLink className="h-3 w-3 ml-1.5" />
                                 </a>
@@ -391,7 +391,7 @@ function FriendAnalyticsSection({
                                                     {sub.platform && (
                                                         <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded shrink-0 ${
                                                             sub.platform === 'CODEFORCES'
-                                                                ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
+                                                                ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20'
                                                                 : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20'
                                                         }`}>
                                                             {sub.platform === 'CODEFORCES' ? 'CF' : 'LC'}
@@ -457,7 +457,7 @@ function FriendPeerLearningSection({
 }: Readonly<FriendPeerLearningSectionProps>) {
     return (
         <div className="space-y-6">
-            <div className="p-4 rounded-2xl bg-linear-to-r from-[#5b4fff]/10 via-indigo-500/10 to-purple-500/10 border border-[#5b4fff]/25 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-3">
+            <div className="p-4 rounded-2xl bg-linear-to-r from-[#5b4fff]/10 via-[#5b4fff]/5 to-transparent border border-[#5b4fff]/25 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-3">
                 <span className="p-2 rounded-xl bg-[#5b4fff] text-white shrink-0 mt-0.5">
                     <Sparkles className="w-4 h-4" />
                 </span>
@@ -486,12 +486,12 @@ function FriendPeerLearningSection({
                 <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2">
-                            <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                            <BookOpen className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" />
                             <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white">
                                 Solved by {profile.name.split(' ')[0]} (Learn from Friend)
                             </CardTitle>
                         </div>
-                        <span className="bg-indigo-600 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                        <span className="bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/25 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
                             {filteredFriendOnly.length} questions to try
                         </span>
                     </div>
@@ -519,7 +519,11 @@ function FriendPeerLearningSection({
                                             className="flex items-center gap-2 min-w-0 flex-1"
                                             title={`Solve ${title}`}
                                         >
-                                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
+                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
+                                                platform === 'LeetCode'
+                                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                                    : 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20'
+                                            }`}>
                                                 {platform === 'LeetCode' ? 'LC' : 'CF'}
                                             </span>
                                             <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-[#5b4fff] truncate">
@@ -641,12 +645,12 @@ function FriendPeerLearningSection({
                 <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                            <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                             <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white">
                                 Solved by You (Help {profile.name.split(' ')[0]} Learn)
                             </CardTitle>
                         </div>
-                        <span className="bg-purple-600 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                        <span className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
                             {filteredUserOnly.length} questions
                         </span>
                     </div>
@@ -673,7 +677,11 @@ function FriendPeerLearningSection({
                                             rel="noreferrer"
                                             className="flex items-center gap-2 min-w-0 flex-1 hover:text-[#5b4fff]"
                                         >
-                                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 shrink-0">
+                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
+                                                platform === 'LeetCode'
+                                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                                    : 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20'
+                                            }`}>
                                                 {platform === 'LeetCode' ? 'LC' : 'CF'}
                                             </span>
                                             <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">
@@ -897,7 +905,7 @@ function FriendCoderCardSection({
                             )}
                             {profile.codeforcesHandle && (
                                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700/80">
-                                    <span className="font-bold text-blue-500">CF:</span> @{profile.codeforcesHandle}
+                                    <span className="font-bold text-cyan-600 dark:text-cyan-400">CF:</span> @{profile.codeforcesHandle}
                                 </span>
                             )}
                         </div>
@@ -905,7 +913,7 @@ function FriendCoderCardSection({
                 </div>
 
                 {/* C-Score Composite Index Gauge Banner */}
-                <div className="p-5 rounded-2xl bg-linear-to-r from-[#5b4fff]/10 via-purple-500/10 to-indigo-500/10 border border-[#5b4fff]/25 space-y-3">
+                <div className="p-5 rounded-2xl bg-linear-to-r from-[#5b4fff]/10 via-[#5b4fff]/5 to-transparent border border-[#5b4fff]/25 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-[#5b4fff]" />
@@ -960,7 +968,7 @@ function FriendCoderCardSection({
                     </div>
                     <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
                         <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">1v1 PvP Elo</p>
-                        <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
+                        <p className="text-2xl font-black text-[#5b4fff] dark:text-[#968fff] mt-1">
                             {profile.pvpRating ?? 1200}
                         </p>
                         <p className="text-[10px] text-zinc-500 mt-0.5">{profile.pvpWins || 0}W - {profile.pvpLosses || 0}L</p>
@@ -1105,7 +1113,7 @@ function FriendComparativeSection({
     return (
         <div className="space-y-6">
             {/* Header: Duelist Faceoff */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-linear-to-r from-indigo-500/10 via-[#5b4fff]/10 to-purple-500/10 border border-[#5b4fff]/25 relative overflow-hidden">
+            <div className="p-6 sm:p-7 rounded-3xl bg-linear-to-r from-[#5b4fff]/15 via-zinc-100/50 dark:via-zinc-900/50 to-transparent border border-[#5b4fff]/25 relative overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
                     {/* You */}
                     <div className="flex items-center gap-4">
@@ -1210,7 +1218,7 @@ function FriendComparativeSection({
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                         <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center justify-between">
                             <span className="flex items-center gap-2">
-                                <BookOpen className="w-4 h-4 text-indigo-500" /> Problem Overlap & Catalog Gap
+                                <BookOpen className="w-4 h-4 text-[#5b4fff]" /> Problem Overlap & Catalog Gap
                             </span>
                             <span className="text-[11px] font-bold text-zinc-500">
                                 {totalCatalog} Total Explored
@@ -1224,14 +1232,14 @@ function FriendComparativeSection({
                                 <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{mutualCount}</p>
                                 <p className="text-[9px] text-zinc-500 mt-0.5">Both Solved</p>
                             </div>
-                            <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                                <p className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400">Friend Only</p>
-                                <p className="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{friendOnlyCount}</p>
+                            <div className="p-3 rounded-xl bg-[#5b4fff]/10 border border-[#5b4fff]/25">
+                                <p className="text-[10px] font-bold text-[#5b4fff] dark:text-[#968fff]">Friend Only</p>
+                                <p className="text-xl font-black text-[#5b4fff] dark:text-[#968fff] mt-1">{friendOnlyCount}</p>
                                 <p className="text-[9px] text-zinc-500 mt-0.5">Learn from Peer</p>
                             </div>
-                            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                                <p className="text-[10px] font-bold text-purple-700 dark:text-purple-400">You Only</p>
-                                <p className="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">{userOnlyCount}</p>
+                            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25">
+                                <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400">You Only</p>
+                                <p className="text-xl font-black text-amber-600 dark:text-amber-400 mt-1">{userOnlyCount}</p>
                                 <p className="text-[9px] text-zinc-500 mt-0.5">Your Edge</p>
                             </div>
                         </div>

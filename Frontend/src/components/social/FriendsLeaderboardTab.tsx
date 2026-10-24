@@ -133,7 +133,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                         onClick={() => setSortBy('pvp')}
                         className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'pvp'
-                                ? 'bg-white dark:bg-zinc-900 text-indigo-500 shadow-xs'
+                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >

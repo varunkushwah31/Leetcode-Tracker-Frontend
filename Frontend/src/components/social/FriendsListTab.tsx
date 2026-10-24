@@ -298,7 +298,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                         href={`https://codeforces.com/profile/${friend.codeforcesHandle}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="hover:text-blue-400 transition-colors flex items-center gap-0.5 truncate"
+                        className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors flex items-center gap-0.5 truncate"
                     >
                         <span>CF: @{friend.codeforcesHandle}</span>
                         <ExternalLink className="w-3 h-3 shrink-0" />

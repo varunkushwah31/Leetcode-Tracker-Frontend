@@ -49,7 +49,7 @@ function getPvpRankTier(elo = 1200): EloTierInfo {
         return { name: 'Master', badgeClass: 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30' };
     }
     if (elo >= 1600) {
-        return { name: 'Diamond', badgeClass: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30' };
+        return { name: 'Diamond', badgeClass: 'bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/30' };
     }
     if (elo >= 1400) {
         return { name: 'Platinum', badgeClass: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30' };
@@ -605,7 +605,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                                                 {/* VS Badge */}
                                                 <div className="flex flex-col items-center justify-center">
-                                                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-rose-500 via-purple-600 to-[#5b4fff] text-white font-black text-[11px] flex items-center justify-center shadow-xs">
+                                                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#5b4fff] to-rose-500 text-white font-black text-[11px] flex items-center justify-center shadow-xs">
                                                         VS
                                                     </div>
                                                     <span className="text-[10px] font-medium text-zinc-400 mt-1 uppercase tracking-wider">
@@ -615,9 +615,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                                                 {/* Opponent */}
                                                 <div className="text-center space-y-1">
-                                                    <Avatar className="w-11 h-11 mx-auto border-2 border-purple-500/40 shadow-xs">
+                                                    <Avatar className="w-11 h-11 mx-auto border-2 border-rose-500/40 shadow-xs">
                                                         <AvatarImage src={match.opponentAvatarUrl} />
-                                                        <AvatarFallback className="bg-purple-500/10 text-purple-600 font-bold text-xs">
+                                                        <AvatarFallback className="bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold text-xs">
                                                             {match.opponentName.substring(0, 2)}
                                                         </AvatarFallback>
                                                     </Avatar>
@@ -1038,10 +1038,10 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                     {/* Combat Career Stats Card */}
                     <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
-                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-indigo-500/40 to-transparent pointer-events-none" />
+                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#5b4fff]/40 to-transparent pointer-events-none" />
 
                         <div className="flex items-center gap-2.5 mb-4">
-                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20 flex items-center justify-center">
                                 <Sparkles className="w-4 h-4" />
                             </div>
                             <div>
@@ -1086,7 +1086,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                         <div className="space-y-2 mb-4">
                             <div className="flex items-center justify-between text-xs font-bold">
                                 <span className="text-zinc-500">Win Rate</span>
-                                <span className="text-indigo-600 dark:text-indigo-400">{combatStats.winRate}%</span>
+                                <span className="text-[#5b4fff] dark:text-[#968fff]">{combatStats.winRate}%</span>
                             </div>
                             <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                                 <div

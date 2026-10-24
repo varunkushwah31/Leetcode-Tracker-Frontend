@@ -185,7 +185,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             {/* PVP Record */}
                             <div className="p-3 sm:px-4 sm:py-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-center min-w-22.5 sm:min-w-26.25">
                                 <p className="text-[10px] font-bold tracking-wider uppercase text-zinc-400 flex items-center justify-center gap-1">
-                                    <Swords className="w-3 h-3 text-indigo-400" /> Duel Record
+                                    <Swords className="w-3 h-3 text-[#5b4fff]" /> Duel Record
                                 </p>
                                 <p className="text-lg sm:text-xl font-bold mt-0.5 flex items-center justify-center gap-1">
                                     <span className="text-emerald-600 dark:text-emerald-400">{pvpStats.wins}W</span>
