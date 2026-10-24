@@ -122,6 +122,7 @@ export interface StudentExtendedDTO extends StudentSummaryDTO {
     pvpDraws?: number;
     pvpRating?: number;
     pvpStreak?: number;
+    cScore?: number;
 }
 
 export interface LoginRequest {
@@ -402,6 +403,7 @@ export interface FriendDTO {
     pvpLosses: number;
     pvpRating?: number;
     pvpStreak?: number;
+    cScore?: number;
     status: 'ACCEPTED' | 'PENDING_INCOMING' | 'PENDING_OUTGOING';
     friendSince?: string;
     lastActive?: string;
@@ -514,6 +516,8 @@ export interface FriendComparisonDTO {
     userPvpWinsAgainstFriend: number;
     friendPvpWinsAgainstUser: number;
     pvpDraws: number;
+    userCScore?: number;
+    friendCScore?: number;
 }
 
 export type FriendActivityType =
@@ -567,6 +571,7 @@ export interface FriendsLeaderboardEntryDTO {
     pvpWinRate: number;
     pvpRating?: number;
     pvpStreak?: number;
+    cScore?: number;
     isCurrentUser: boolean;
 }
 

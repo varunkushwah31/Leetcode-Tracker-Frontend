@@ -132,6 +132,7 @@ describe('FriendDashboardModal Component', () => {
                 friendId="friend-1"
                 open={true}
                 onClose={vi.fn()}
+                onChallengePvp={vi.fn()}
             />
         );
 
@@ -185,6 +186,64 @@ describe('FriendDashboardModal Component', () => {
 
         expect(handleClose).toHaveBeenCalled();
         expect(handleChallenge).toHaveBeenCalledWith('friend-1', 'Pranav Dhar Dwivedi');
+    });
+
+    it('renders Codolio Coder Card with C-Score, tier, problem difficulty distribution, and copy snapshot', async () => {
+        vi.mocked(SocialService.getFriendDashboard).mockResolvedValue({
+            data: mockComparisonData
+        } as unknown as AxiosResponse<FriendComparisonDTO>);
+
+        render(
+            <FriendDashboardModal
+                friendId="friend-1"
+                open={true}
+                onClose={vi.fn()}
+                onChallengePvp={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Pranav Dhar Dwivedi')).toBeDefined();
+        });
+
+        const coderCardTab = screen.getByText(/Coder Card/i);
+        fireEvent.click(coderCardTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Codolio Certified Developer Card')).toBeDefined();
+            expect(screen.getByText('Codolio C-Score Composite Index')).toBeDefined();
+            expect(screen.getByText('Algorithmic Difficulty Distribution')).toBeDefined();
+            expect(screen.getByText('Copy Coder Snapshot')).toBeDefined();
+        });
+    });
+
+    it('renders Head-to-Head Comparative Benchmark with delta and problem overlap', async () => {
+        vi.mocked(SocialService.getFriendDashboard).mockResolvedValue({
+            data: mockComparisonData
+        } as unknown as AxiosResponse<FriendComparisonDTO>);
+
+        render(
+            <FriendDashboardModal
+                friendId="friend-1"
+                open={true}
+                onClose={vi.fn()}
+                onChallengePvp={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Pranav Dhar Dwivedi')).toBeDefined();
+        });
+
+        const compareTab = screen.getByText(/Head-to-Head Benchmark/i);
+        fireEvent.click(compareTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Head-to-Head Duel Record')).toBeDefined();
+            expect(screen.getByText(/C-Score Composite Delta/i)).toBeDefined();
+            expect(screen.getByText(/Problem Overlap & Catalog Gap/i)).toBeDefined();
+            expect(screen.getByText('Launch 1v1 Challenge')).toBeDefined();
+        });
     });
 
     it('prevents viewing own profile and displays an error message', async () => {

@@ -15,6 +15,7 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { StreakFlame } from '../ui/StreakFlame';
 import { SocialService } from '../../services/endpoints';
+import { getCScoreTier } from '../../lib/cScoreCalculator';
 import type { FriendsLeaderboardEntryDTO } from '@/types';
 
 interface FriendsLeaderboardTabProps {
@@ -24,7 +25,7 @@ interface FriendsLeaderboardTabProps {
 
 export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Readonly<FriendsLeaderboardTabProps>) {
     const [entries, setEntries] = useState<FriendsLeaderboardEntryDTO[]>([]);
-    const [sortBy, setSortBy] = useState<'totalSolved' | 'rating' | 'streak' | 'pvp'>('totalSolved');
+    const [sortBy, setSortBy] = useState<'cScore' | 'totalSolved' | 'rating' | 'streak' | 'pvp'>('cScore');
     const [isLoading, setIsLoading] = useState(true);
 
     const loadLeaderboard = useCallback(async () => {
@@ -47,6 +48,8 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
 
     const getPrimaryValue = (e: FriendsLeaderboardEntryDTO) => {
         switch (sortBy) {
+            case 'cScore':
+                return `${e.cScore ?? 500} C-Score · ${getCScoreTier(e.cScore).tier}`;
             case 'rating':
                 return `${Math.round(e.currentContestRating || 0)} Rating`;
             case 'streak':
@@ -83,10 +86,21 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                 <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/70 p-1.5 rounded-2xl flex-wrap">
                     <button
                         type="button"
+                        onClick={() => setSortBy('cScore')}
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                            sortBy === 'cScore'
+                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                        }`}
+                    >
+                        <Sparkles className="w-3.5 h-3.5 text-[#5b4fff]" /> C-Score Index
+                    </button>
+                    <button
+                        type="button"
                         onClick={() => setSortBy('totalSolved')}
                         className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'totalSolved'
-                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
+                                ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -528,6 +542,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                     <tr className="border-b border-zinc-200/80 dark:border-zinc-800/70 bg-zinc-50/70 dark:bg-zinc-900/40 text-[11px] font-extrabold uppercase tracking-wider text-zinc-500">
                                         <th className="py-3.5 px-5 w-16 text-center">Rank</th>
                                         <th className="py-3.5 px-5">Student / Peer</th>
+                                        <th className="py-3.5 px-5 text-center">C-Score</th>
                                         <th className="py-3.5 px-5 text-center">Total Solved</th>
                                         <th className="py-3.5 px-5 text-center">Contest Rating</th>
                                         <th className="py-3.5 px-5 text-center">Streak</th>
@@ -586,6 +601,17 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                             @{e.leetcodeUsername || e.codeforcesHandle || 'coder'}
                                                         </p>
                                                     </div>
+                                                </div>
+                                            </td>
+
+                                            <td className="py-4 px-5 text-center">
+                                                <div className="inline-flex flex-col items-center">
+                                                    <span className="font-mono font-black text-sm text-[#5b4fff] dark:text-[#968fff]">
+                                                        {e.cScore ?? 500}
+                                                    </span>
+                                                    <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${getCScoreTier(e.cScore).badgeClass}`}>
+                                                        {getCScoreTier(e.cScore).tier}
+                                                    </span>
                                                 </div>
                                             </td>
 

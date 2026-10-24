@@ -13,7 +13,9 @@ import {
     CheckCircleIcon as CheckCircle2,
     UsersIcon as Users,
     ArrowSquareOutIcon as ExternalLink,
-    PaperPlaneRightIcon as Send
+    PaperPlaneRightIcon as Send,
+    SparkleIcon as Sparkles,
+    ShieldCheckIcon as ShieldCheck
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -22,6 +24,7 @@ import { Badge } from '../ui/badge';
 import { StreakFlame } from '../ui/StreakFlame';
 import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
+import { getCScoreTier } from '../../lib/cScoreCalculator';
 import type { FriendDTO, FriendRequestDTO, SocialSearchStudentDTO } from '@/types';
 
 interface FriendsListTabProps {
@@ -272,33 +275,39 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
     };
 
     const renderFriendHandle = (friend: FriendDTO) => {
-        if (friend.leetcodeUsername) {
-            return (
-                <a
-                    href={`https://leetcode.com/${friend.leetcodeUsername}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-[#ffa116] transition-colors flex items-center gap-0.5"
-                >
-                    <span>LC: @{friend.leetcodeUsername}</span>
-                    <ExternalLink className="w-3 h-3" />
-                </a>
-            );
-        }
-        if (friend.codeforcesHandle) {
-            return (
-                <a
-                    href={`https://codeforces.com/profile/${friend.codeforcesHandle}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-blue-400 transition-colors flex items-center gap-0.5"
-                >
-                    <span>CF: @{friend.codeforcesHandle}</span>
-                    <ExternalLink className="w-3 h-3" />
-                </a>
-            );
-        }
-        return <span>@{friend.email?.split('@')[0] || 'coder'}</span>;
+        const isVerified = Boolean(friend.leetcodeUsername || friend.codeforcesHandle);
+        return (
+            <div className="flex items-center gap-1.5">
+                {isVerified && (
+                    <span title="Verified Platform Sync">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    </span>
+                )}
+                {friend.leetcodeUsername ? (
+                    <a
+                        href={`https://leetcode.com/${friend.leetcodeUsername}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-[#ffa116] transition-colors flex items-center gap-0.5 truncate"
+                    >
+                        <span>LC: @{friend.leetcodeUsername}</span>
+                        <ExternalLink className="w-3 h-3 shrink-0" />
+                    </a>
+                ) : friend.codeforcesHandle ? (
+                    <a
+                        href={`https://codeforces.com/profile/${friend.codeforcesHandle}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-blue-400 transition-colors flex items-center gap-0.5 truncate"
+                    >
+                        <span>CF: @{friend.codeforcesHandle}</span>
+                        <ExternalLink className="w-3 h-3 shrink-0" />
+                    </a>
+                ) : (
+                    <span>@{friend.email?.split('@')[0] || 'coder'}</span>
+                )}
+            </div>
+        );
     };
 
     if (isLoading) {
@@ -551,6 +560,18 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
+                                </div>
+
+                                {/* Codolio C-Score Composite Metric */}
+                                <div className="flex items-center justify-between px-3.5 py-2 rounded-2xl bg-[#5b4fff]/5 dark:bg-[#5b4fff]/10 border border-[#5b4fff]/20 text-xs">
+                                    <div className="flex items-center gap-1.5 font-bold">
+                                        <Sparkles className="w-4 h-4 text-[#5b4fff]" />
+                                        <span className="text-[#5b4fff]">C-Score</span>
+                                        <span className="font-mono text-zinc-900 dark:text-white font-extrabold text-sm ml-0.5">{friend.cScore ?? 500}</span>
+                                    </div>
+                                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-lg border ${getCScoreTier(friend.cScore).badgeClass}`}>
+                                        {getCScoreTier(friend.cScore).tier}
+                                    </span>
                                 </div>
 
                                 {/* Stats metric pill box */}

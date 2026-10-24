@@ -138,10 +138,44 @@ public class StudentMapper {
                 .pvpDraws(student.getPvpDraws() != null ? student.getPvpDraws() : 0)
                 .pvpRating(student.getPvpRating() != null ? student.getPvpRating() : 1200)
                 .pvpStreak(student.getPvpStreak() != null ? student.getPvpStreak() : 0)
+                .cScore(calculateCScore(student))
                 .build();
     }
 
     // --- Helper Methods ---
+
+    public int calculateCScore(Student student) {
+        if (student == null) return 500;
+        int easy = 0;
+        int medium = 0;
+        int hard = 0;
+        if (student.getProblemStats() != null) {
+            for (ProblemStats ps : student.getProblemStats()) {
+                if ("Easy".equalsIgnoreCase(ps.getDifficulty())) {
+                    easy += ps.getCount();
+                } else if ("Medium".equalsIgnoreCase(ps.getDifficulty())) {
+                    medium += ps.getCount();
+                } else if ("Hard".equalsIgnoreCase(ps.getDifficulty())) {
+                    hard += ps.getCount();
+                }
+            }
+        }
+        int cfSolved = student.getCodeforcesSolvedCount() != null ? student.getCodeforcesSolvedCount() : 0;
+        double lcRating = student.getCurrentContestRating();
+        double cfRating = student.getCodeforcesRating() != null ? student.getCodeforcesRating() : 0;
+        int streak = student.getStreak() != null ? student.getStreak() : 0;
+        int pvpRating = student.getPvpRating() != null ? student.getPvpRating() : 1200;
+        int pvpWins = student.getPvpWins() != null ? student.getPvpWins() : 0;
+
+        double dsaScore = Math.min(300.0, (easy * 0.5) + (medium * 1.5) + (hard * 3.0) + (cfSolved * 1.0));
+        double ratingScore = Math.min(350.0, Math.max(lcRating - 1000.0, 0.0) * 0.2 + Math.max(cfRating - 800.0, 0.0) * 0.15);
+        double consistencyScore = Math.min(100.0, streak * 5.0);
+        double pvpScore = Math.min(150.0, Math.max(pvpRating - 1000.0, 0.0) * 0.25 + (pvpWins * 5.0));
+
+        double totalBonus = (dsaScore + ratingScore + consistencyScore + pvpScore) * 0.4;
+        int finalScore = (int) Math.round(500 + totalBonus);
+        return Math.min(900, Math.max(500, finalScore));
+    }
 
     public int calculateLeetcodeSolved(List<ProblemStats> stats) {
         if (stats == null || stats.isEmpty()) return 0;

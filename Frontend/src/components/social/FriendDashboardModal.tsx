@@ -21,7 +21,13 @@ import {
     UsersIcon as Users,
     ChartLineIcon,
     BookOpenIcon as BookOpen,
-    XIcon
+    XIcon,
+    ShieldCheckIcon as ShieldCheck,
+    CopyIcon,
+    CheckIcon as Check,
+    IdentificationCardIcon as IdCard,
+    ScalesIcon as Scales,
+    TrophyIcon as Trophy
 } from '@phosphor-icons/react';
 import { SocialService } from '../../services/endpoints';
 import { StreakFlame } from '../ui/StreakFlame';
@@ -29,6 +35,7 @@ import { ActivityHeatmap } from '@/components/dashboard/student/ActivityHeatmap'
 import { ContestRatingsSection } from '@/components/dashboard/student/ContestRatingsSection';
 import { UnifiedContestHistory } from '@/components/dashboard/student/UnifiedContestHistory';
 import { formatProblemTitle, getProblemPlatform } from '@/lib/problemFormatter';
+import { getCScoreTier } from '../../lib/cScoreCalculator';
 import { useAuth } from '../../hooks/useAuth';
 import type { FriendComparisonDTO, StudentExtendedDTO, SkillStat, Badge, RecentSubmission } from '@/types';
 
@@ -41,6 +48,7 @@ interface FriendDashboardModalProps {
 
 interface FriendProfileHeaderProps {
     profile: StudentExtendedDTO;
+    cScore: number;
     totalSolved: number;
     lcSolved: number;
     cfSolved: number;
@@ -55,6 +63,7 @@ interface FriendProfileHeaderProps {
 
 function FriendProfileHeader({
     profile,
+    cScore,
     totalSolved,
     lcSolved,
     cfSolved,
@@ -66,6 +75,9 @@ function FriendProfileHeader({
     pvpDraws,
     cardClasses
 }: Readonly<FriendProfileHeaderProps>) {
+    const cScoreTier = getCScoreTier(cScore);
+    const hasLinkedAccount = Boolean(profile.leetcodeUsername || profile.codeforcesHandle);
+
     return (
         <Card className={`p-4 sm:p-8 ${cardClasses}`}>
             <div className="flex flex-col xl:flex-row items-center justify-between gap-6">
@@ -84,6 +96,15 @@ function FriendProfileHeader({
                             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                 Friend
                             </span>
+                            {hasLinkedAccount && (
+                                <span
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                                    title="Verified Coding Platform Sync"
+                                >
+                                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                                    <span>Verified Sync</span>
+                                </span>
+                            )}
                         </div>
                         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-3">
                             {profile.leetcodeUsername ? (
@@ -119,7 +140,14 @@ function FriendProfileHeader({
                 </div>
 
                 {/* Stat Metric Summary Pill */}
-                <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-7 bg-zinc-50/80 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
+                <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6 bg-zinc-50/80 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
+                    <div className="text-center min-w-18">
+                        <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">C-Score</p>
+                        <p className="text-2xl font-black text-[#5b4fff] dark:text-[#968fff]">{cScore}</p>
+                        <p className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded border inline-block mt-0.5 ${cScoreTier.badgeClass}`}>
+                            {cScoreTier.tier}
+                        </p>
+                    </div>
                     <div className="text-center min-w-17.5">
                         <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rank</p>
                         <p className="text-2xl font-bold text-zinc-900 dark:text-white">
@@ -156,7 +184,6 @@ function FriendProfileHeader({
         </Card>
     );
 }
-
 interface FriendAnalyticsSectionProps {
     profile: StudentExtendedDTO;
     cardClasses: string;
@@ -754,12 +781,519 @@ function FriendSubmissionsSection({ profile, cardClasses }: Readonly<FriendSubmi
     );
 }
 
+interface FriendCoderCardSectionProps {
+    profile: StudentExtendedDTO;
+    cScore: number;
+    easyCount: number;
+    medCount: number;
+    hardCount: number;
+    totalSolved: number;
+    lcSolved: number;
+    cfSolved: number;
+    lcRating: number;
+    cfRating: number;
+    maxRating: number;
+    onChallengePvp?: (friendId: string, friendName: string) => void;
+    onClose: () => void;
+}
+
+function FriendCoderCardSection({
+    profile,
+    cScore,
+    easyCount,
+    medCount,
+    hardCount,
+    totalSolved,
+    lcSolved,
+    cfSolved,
+    lcRating,
+    cfRating,
+    maxRating,
+    onChallengePvp,
+    onClose
+}: Readonly<FriendCoderCardSectionProps>) {
+    const [copied, setCopied] = useState(false);
+    const tier = getCScoreTier(cScore);
+    const cScoreProgress = Math.min(Math.max(((cScore - 500) / 400) * 100, 0), 100);
+
+    const handleCopySnapshot = async () => {
+        const text = [
+            `Coder Snapshot: ${profile.name}`,
+            `C-Score: ${cScore} (${tier.tier})`,
+            `Solved: ${totalSolved} (Easy: ${easyCount}, Med: ${medCount}, Hard: ${hardCount})`,
+            `Contest Rating: ${maxRating > 0 ? maxRating : 'Unrated'} | 1v1 PvP Elo: ${profile.pvpRating ?? 1200}`,
+            `Consistency Streak: ${profile.consistencyStreak || 0} Days`,
+            `Verified on MentorSync Social Hub`
+        ].join('\n');
+
+        try {
+            if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                await navigator.clipboard.writeText(text);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            }
+        } catch {
+            // clipboard access restricted
+        }
+    };
+
+    return (
+        <div className="max-w-4xl mx-auto space-y-6">
+            {/* The Digital Coder Card */}
+            <div className="rounded-3xl bg-linear-to-b from-white via-zinc-50/70 to-zinc-100/60 dark:from-[#151518] dark:via-[#111114] dark:to-[#0c0c0e] border-2 border-[#5b4fff]/30 dark:border-[#5b4fff]/40 shadow-2xl p-6 sm:p-8 relative overflow-hidden space-y-8">
+                {/* Background decorative accents */}
+                <div className="absolute top-0 right-0 w-80 h-80 bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+                <div className="absolute bottom-0 left-0 w-60 h-60 bg-emerald-500/10 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
+
+                {/* Card Top Strip: Watermark & Verification */}
+                <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/80 pb-5">
+                    <div className="flex items-center gap-2">
+                        <span className="p-2 rounded-xl bg-[#5b4fff]/15 text-[#5b4fff]">
+                            <IdCard className="w-5 h-5" />
+                        </span>
+                        <div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-[#5b4fff]">
+                                Codolio Certified Developer Card
+                            </span>
+                            <p className="text-xs text-zinc-500 font-medium">Digital Algorithmic Portfolio</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+                        <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                        <span>Verified Live Profile</span>
+                    </div>
+                </div>
+
+                {/* Profile Identity Row */}
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                    <div className="relative">
+                        <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-3 border-[#5b4fff]/40 shadow-xl ring-4 ring-[#5b4fff]/10">
+                            <AvatarImage src={profile.avatarUrl} />
+                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] text-2xl font-bold">
+                                {profile.name?.substring(0, 2).toUpperCase() || 'FR'}
+                            </AvatarFallback>
+                        </Avatar>
+                        <span className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-[#111114]" />
+                    </div>
+
+                    <div className="text-center sm:text-left flex-1 min-w-0">
+                        <div className="flex items-center justify-center sm:justify-start gap-2.5 flex-wrap">
+                            <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
+                                {profile.name}
+                            </h2>
+                            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                                {profile.rank ? `#${Number.parseInt(profile.rank, 10).toLocaleString()} Global` : 'Active Competitor'}
+                            </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                            @{profile.leetcodeUsername || profile.codeforcesHandle || 'developer'} · Competitive Algorithmic Coder
+                        </p>
+
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-3">
+                            {profile.leetcodeUsername && (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700/80">
+                                    <span className="font-bold text-amber-500">LC:</span> @{profile.leetcodeUsername}
+                                </span>
+                            )}
+                            {profile.codeforcesHandle && (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700/80">
+                                    <span className="font-bold text-blue-500">CF:</span> @{profile.codeforcesHandle}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* C-Score Composite Index Gauge Banner */}
+                <div className="p-5 rounded-2xl bg-linear-to-r from-[#5b4fff]/10 via-purple-500/10 to-indigo-500/10 border border-[#5b4fff]/25 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-[#5b4fff]" />
+                            <span className="text-xs font-extrabold uppercase tracking-wider text-[#5b4fff]">
+                                Codolio C-Score Composite Index
+                            </span>
+                        </div>
+                        <span className={`text-xs font-extrabold px-3 py-1 rounded-xl border self-start sm:self-auto ${tier.badgeClass}`}>
+                            {tier.tier} Tier
+                        </span>
+                    </div>
+
+                    <div className="flex items-baseline gap-3">
+                        <span className="text-4xl sm:text-5xl font-black text-zinc-900 dark:text-white font-mono">
+                            {cScore}
+                        </span>
+                        <span className="text-xs text-zinc-500 font-semibold">/ 900 Index Scale</span>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <Progress value={cScoreProgress} className="h-3 bg-zinc-200 dark:bg-zinc-800" />
+                        <div className="flex justify-between text-[10px] text-zinc-500 font-bold">
+                            <span>Developing (500)</span>
+                            <span>Proficient (560)</span>
+                            <span>Advanced (620)</span>
+                            <span>Expert (680)</span>
+                            <span>Master (750)</span>
+                            <span>Grandmaster (820+)</span>
+                        </div>
+                    </div>
+
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                        {tier.description}
+                    </p>
+                </div>
+
+                {/* Core Metric Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Total Solved</p>
+                        <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{totalSolved}</p>
+                        <p className="text-[10px] text-zinc-500 mt-0.5">LC: {lcSolved} · CF: {cfSolved}</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 flex items-center justify-center gap-1">
+                            <Trophy className="w-3.5 h-3.5 text-amber-500" /> Peak Rating
+                        </p>
+                        <p className="text-2xl font-black text-[#5b4fff] dark:text-[#968fff] mt-1">
+                            {maxRating > 0 ? maxRating : 'Unrated'}
+                        </p>
+                        <p className="text-[10px] text-zinc-500 mt-0.5">LC: {lcRating || 'N/A'} · CF: {cfRating || 'N/A'}</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">1v1 PvP Elo</p>
+                        <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
+                            {profile.pvpRating ?? 1200}
+                        </p>
+                        <p className="text-[10px] text-zinc-500 mt-0.5">{profile.pvpWins || 0}W - {profile.pvpLosses || 0}L</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Streak Record</p>
+                        <p className="text-2xl font-black text-amber-500 mt-1 flex items-center justify-center gap-1">
+                            {profile.consistencyStreak || 0}d <StreakFlame className="w-5 h-5" />
+                        </p>
+                        <p className="text-[10px] text-zinc-500 mt-0.5">Consistent Problem Solver</p>
+                    </div>
+                </div>
+
+                {/* DSA Problem Difficulty Breakdown Progress */}
+                <div className="p-5 rounded-2xl bg-zinc-100/60 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 space-y-4">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                        Algorithmic Difficulty Distribution
+                    </h4>
+                    <div className="space-y-3">
+                        <div>
+                            <div className="flex justify-between text-xs font-bold mb-1">
+                                <span className="text-emerald-600 dark:text-emerald-400">Easy Problems</span>
+                                <span className="text-zinc-900 dark:text-white font-mono">{easyCount} solved</span>
+                            </div>
+                            <Progress value={Math.min((easyCount / Math.max(totalSolved, 1)) * 100, 100)} className="h-2 bg-zinc-200 dark:bg-zinc-800" />
+                        </div>
+                        <div>
+                            <div className="flex justify-between text-xs font-bold mb-1">
+                                <span className="text-amber-500">Medium Problems</span>
+                                <span className="text-zinc-900 dark:text-white font-mono">{medCount} solved</span>
+                            </div>
+                            <Progress value={Math.min((medCount / Math.max(totalSolved, 1)) * 100, 100)} className="h-2 bg-zinc-200 dark:bg-zinc-800" />
+                        </div>
+                        <div>
+                            <div className="flex justify-between text-xs font-bold mb-1">
+                                <span className="text-rose-500">Hard Problems</span>
+                                <span className="text-zinc-900 dark:text-white font-mono">{hardCount} solved</span>
+                            </div>
+                            <Progress value={Math.min((hardCount / Math.max(totalSolved, 1)) * 100, 100)} className="h-2 bg-zinc-200 dark:bg-zinc-800" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Top Algorithmic Strengths */}
+                {profile.skills && profile.skills.length > 0 && (
+                    <div className="space-y-2.5">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                            <BrainCircuit className="w-4 h-4 text-[#5b4fff]" /> Top Algorithmic Competencies
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                            {profile.skills
+                                .toSorted((a: SkillStat, b: SkillStat) => b.problemsSolved - a.problemsSolved)
+                                .slice(0, 8)
+                                .map((skill: SkillStat) => (
+                                    <span
+                                        key={skill.tagName}
+                                        className="px-3 py-1 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-bold text-zinc-800 dark:text-zinc-200 shadow-xs flex items-center gap-1.5"
+                                    >
+                                        <span>{skill.tagName}</span>
+                                        <span className="text-[10px] text-[#5b4fff] font-mono">({skill.problemsSolved})</span>
+                                    </span>
+                                ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Shareable Card Footer Actions */}
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200/80 dark:border-zinc-800/80">
+                    <Button
+                        onClick={handleCopySnapshot}
+                        variant="outline"
+                        className="rounded-xl text-xs font-bold border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer gap-2"
+                    >
+                        {copied ? (
+                            <>
+                                <Check className="w-4 h-4 text-emerald-500" />
+                                <span className="text-emerald-600 dark:text-emerald-400">Snapshot Copied!</span>
+                            </>
+                        ) : (
+                            <>
+                                <CopyIcon className="w-4 h-4" />
+                                <span>Copy Coder Snapshot</span>
+                            </>
+                        )}
+                    </Button>
+
+                    {onChallengePvp && (
+                        <Button
+                            onClick={() => {
+                                onClose();
+                                onChallengePvp(profile.id!, profile.name);
+                            }}
+                            className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-9 px-4 cursor-pointer gap-2 shadow-xs"
+                        >
+                            <Swords className="w-4 h-4" />
+                            <span>Challenge in 1v1 Arena</span>
+                        </Button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+interface FriendComparativeSectionProps {
+    comparison: FriendComparisonDTO;
+    profile: StudentExtendedDTO;
+    cardClasses: string;
+    userCScore: number;
+    friendCScore: number;
+    userWins: number;
+    friendWins: number;
+    pvpDraws: number;
+    onChallengePvp?: (friendId: string, friendName: string) => void;
+    onClose: () => void;
+    onSwitchToPeer: () => void;
+}
+
+function FriendComparativeSection({
+    comparison,
+    profile,
+    cardClasses,
+    userCScore,
+    friendCScore,
+    userWins,
+    friendWins,
+    pvpDraws,
+    onChallengePvp,
+    onClose,
+    onSwitchToPeer
+}: Readonly<FriendComparativeSectionProps>) {
+    const userTier = getCScoreTier(userCScore);
+    const friendTier = getCScoreTier(friendCScore);
+    const cScoreDiff = Math.abs(userCScore - friendCScore);
+    const userLeadsCScore = userCScore >= friendCScore;
+
+    const mutualCount = comparison.mutualSolved?.length || 0;
+    const friendOnlyCount = comparison.friendOnlySolved?.length || 0;
+    const userOnlyCount = comparison.userOnlySolved?.length || 0;
+    const totalCatalog = mutualCount + friendOnlyCount + userOnlyCount;
+
+    return (
+        <div className="space-y-6">
+            {/* Header: Duelist Faceoff */}
+            <div className="p-6 sm:p-7 rounded-3xl bg-linear-to-r from-indigo-500/10 via-[#5b4fff]/10 to-purple-500/10 border border-[#5b4fff]/25 relative overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
+                    {/* You */}
+                    <div className="flex items-center gap-4">
+                        <Avatar className="w-14 h-14 border-2 border-[#5b4fff] shadow-md shrink-0">
+                            <AvatarFallback className="bg-[#5b4fff]/15 text-[#5b4fff] font-bold">
+                                You
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#5b4fff]">You</span>
+                            <h3 className="text-base font-extrabold text-zinc-900 dark:text-white truncate">Your Standing</h3>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="font-mono font-black text-sm text-[#5b4fff]">{userCScore} C-Score</span>
+                                <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${userTier.badgeClass}`}>
+                                    {userTier.tier}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* VS Arena Token */}
+                    <div className="text-center space-y-1.5 py-2 px-4 rounded-2xl bg-white/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs">
+                        <div className="w-9 h-9 rounded-full bg-[#5b4fff] text-white flex items-center justify-center mx-auto shadow-md">
+                            <Swords className="w-4 h-4" />
+                        </div>
+                        <p className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-wider">
+                            Head-to-Head Duel Record
+                        </p>
+                        <p className="text-sm font-black">
+                            <span className="text-emerald-600 dark:text-emerald-400">{userWins}W</span>
+                            <span className="text-zinc-400 mx-1.5">-</span>
+                            <span className="text-rose-600 dark:text-rose-400">{friendWins}L</span>
+                            {pvpDraws > 0 && (
+                                <span className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold ml-1.5">
+                                    ({pvpDraws}D)
+                                </span>
+                            )}
+                        </p>
+                    </div>
+
+                    {/* Friend */}
+                    <div className="flex items-center justify-start md:justify-end gap-4">
+                        <div className="text-left md:text-right min-w-0 order-2 md:order-1">
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500">Friend</span>
+                            <h3 className="text-base font-extrabold text-zinc-900 dark:text-white truncate">{profile.name}</h3>
+                            <div className="flex items-center justify-start md:justify-end gap-1.5 mt-0.5">
+                                <span className="font-mono font-black text-sm text-zinc-800 dark:text-zinc-200">{friendCScore} C-Score</span>
+                                <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${friendTier.badgeClass}`}>
+                                    {friendTier.tier}
+                                </span>
+                            </div>
+                        </div>
+                        <Avatar className="w-14 h-14 border-2 border-zinc-300 dark:border-zinc-700 shadow-md shrink-0 order-1 md:order-2">
+                            <AvatarImage src={profile.avatarUrl} />
+                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] font-bold">
+                                {profile.name?.substring(0, 2).toUpperCase() || 'FR'}
+                            </AvatarFallback>
+                        </Avatar>
+                    </div>
+                </div>
+            </div>
+
+            {/* Benchmarking Comparison Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Benchmark 1: C-Score Composite Gauge */}
+                <Card className={cardClasses}>
+                    <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
+                        <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-[#5b4fff]" /> C-Score Composite Delta
+                            </span>
+                            <span className="text-[11px] font-bold text-[#5b4fff]">
+                                {userLeadsCScore ? `+${cScoreDiff} in your favor` : `-${cScoreDiff} peer lead`}
+                            </span>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-4">
+                        <div className="space-y-1.5">
+                            <div className="flex justify-between text-xs font-bold">
+                                <span>You ({userTier.tier})</span>
+                                <span className="font-mono text-[#5b4fff]">{userCScore} pts</span>
+                            </div>
+                            <Progress value={Math.min(Math.max(((userCScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <div className="flex justify-between text-xs font-bold">
+                                <span>{profile.name} ({friendTier.tier})</span>
+                                <span className="font-mono text-zinc-700 dark:text-zinc-300">{friendCScore} pts</span>
+                            </div>
+                            <Progress value={Math.min(Math.max(((friendCScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
+                        </div>
+
+                        <p className="text-[11px] text-zinc-500 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                            C-Score aggregates algorithm volume, difficulty weighting (Hard/Medium), contest ratings, and daily streaks.
+                        </p>
+                    </CardContent>
+                </Card>
+
+                {/* Benchmark 2: Problem Overlap & Gap Matrix */}
+                <Card className={cardClasses}>
+                    <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
+                        <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                                <BookOpen className="w-4 h-4 text-indigo-500" /> Problem Overlap & Catalog Gap
+                            </span>
+                            <span className="text-[11px] font-bold text-zinc-500">
+                                {totalCatalog} Total Explored
+                            </span>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-4">
+                        <div className="grid grid-cols-3 gap-2.5 text-center">
+                            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                                <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">Mutual Solves</p>
+                                <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{mutualCount}</p>
+                                <p className="text-[9px] text-zinc-500 mt-0.5">Both Solved</p>
+                            </div>
+                            <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                                <p className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400">Friend Only</p>
+                                <p className="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{friendOnlyCount}</p>
+                                <p className="text-[9px] text-zinc-500 mt-0.5">Learn from Peer</p>
+                            </div>
+                            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                                <p className="text-[10px] font-bold text-purple-700 dark:text-purple-400">You Only</p>
+                                <p className="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">{userOnlyCount}</p>
+                                <p className="text-[9px] text-zinc-500 mt-0.5">Your Edge</p>
+                            </div>
+                        </div>
+
+                        <div className="pt-2 flex items-center justify-between">
+                            <span className="text-xs text-zinc-500">
+                                {friendOnlyCount > 0 ? `${friendOnlyCount} problems available for peer practice` : 'All friend problems solved!'}
+                            </span>
+                            {friendOnlyCount > 0 && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={onSwitchToPeer}
+                                    className="h-7 text-[11px] font-bold rounded-lg cursor-pointer text-[#5b4fff] border-[#5b4fff]/30 hover:bg-[#5b4fff]/10"
+                                >
+                                    Explore Gap List
+                                </Button>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Duel History & Action Prompt */}
+            <div className="p-5 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <span className="p-2.5 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] shrink-0">
+                        <Scales className="w-5 h-5" />
+                    </span>
+                    <div>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-white">
+                            Ready to settle the score in real-time?
+                        </h4>
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                            Challenge {profile.name} to a 15-minute 1v1 live coding duel in the PvP Arena.
+                        </p>
+                    </div>
+                </div>
+
+                {onChallengePvp && (
+                    <Button
+                        onClick={() => {
+                            onClose();
+                            onChallengePvp(profile.id!, profile.name);
+                        }}
+                        className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-9 px-4 cursor-pointer gap-2 shadow-xs shrink-0"
+                    >
+                        <Swords className="w-4 h-4" />
+                        <span>Launch 1v1 Challenge</span>
+                    </Button>
+                )}
+            </div>
+        </div>
+    );
+}
+
 export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }: Readonly<FriendDashboardModalProps>) {
     const { user } = useAuth();
     const isOwnProfile = Boolean(user?.id && friendId === user.id);
     const [comparison, setComparison] = useState<FriendComparisonDTO | null>(null);
     const [apiError, setApiError] = useState<string | null>(null);
-    const [activeSection, setActiveSection] = useState<'analytics' | 'peer' | 'submissions'>('analytics');
+    const [activeSection, setActiveSection] = useState<'coder-card' | 'compare' | 'analytics' | 'peer' | 'submissions'>('analytics');
     const [searchFilter, setSearchFilter] = useState('');
     const [prevProps, setPrevProps] = useState({ open, friendId });
 
@@ -805,6 +1339,9 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
     const lcRating = Math.round(profile?.currentContestRating || profile?.contestRating || 0);
     const cfRating = (profile?.codeforcesRating && profile.codeforcesRating > 0) ? profile.codeforcesRating : 0;
     const maxRating = Math.max(lcRating, cfRating);
+
+    const userCScore = comparison?.userCScore ?? 500;
+    const friendCScore = comparison?.friendCScore ?? profile?.cScore ?? 500;
 
     // Head-to-head calculations
     const userWins = comparison?.userPvpWinsAgainstFriend ?? 0;
@@ -952,6 +1489,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                         {/* Top Banner (Identical to Mentor Student Details Banner) */}
                         <FriendProfileHeader
                             profile={profile}
+                            cScore={friendCScore}
                             totalSolved={totalSolved}
                             lcSolved={lcSolved}
                             cfSolved={cfSolved}
@@ -966,6 +1504,30 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
 
                         {/* Navigation Section Tabs */}
                         <div className="flex items-center gap-2 border-b border-zinc-200/80 dark:border-zinc-800/80 pb-2 overflow-x-auto custom-scrollbar">
+                            <button
+                                type="button"
+                                onClick={() => setActiveSection('coder-card')}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                                    activeSection === 'coder-card'
+                                        ? 'bg-[#5b4fff] text-white shadow-xs'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60'
+                                }`}
+                            >
+                                <IdCard className="w-4 h-4" />
+                                <span>Coder Card (Snapshot)</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setActiveSection('compare')}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                                    activeSection === 'compare'
+                                        ? 'bg-[#5b4fff] text-white shadow-xs'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60'
+                                }`}
+                            >
+                                <Scales className="w-4 h-4" />
+                                <span>Head-to-Head Benchmark</span>
+                            </button>
                             <button
                                 type="button"
                                 onClick={() => setActiveSection('analytics')}
@@ -989,7 +1551,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                             >
                                 <Sparkles className="w-4 h-4" />
                                 <span>Peer Learning & Overlap</span>
-                                {comparison && comparison.friendOnlySolved?.length > 0 && (
+                                {comparison && comparison.friendOnlySolved && comparison.friendOnlySolved.length > 0 && (
                                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
                                         activeSection === 'peer' ? 'bg-white/20 text-white' : 'bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff]'
                                     }`}>
@@ -1011,7 +1573,43 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                             </button>
                         </div>
 
-                        {/* SECTION 1: PERFORMANCE & ANALYTICS */}
+                        {/* SECTION 1: CODER CARD (CODOLIO DIGITAL PORTFOLIO SNAPSHOT) */}
+                        {activeSection === 'coder-card' && (
+                            <FriendCoderCardSection
+                                profile={profile}
+                                cScore={friendCScore}
+                                easyCount={easyCount}
+                                medCount={medCount}
+                                hardCount={hardCount}
+                                totalSolved={totalSolved}
+                                lcSolved={lcSolved}
+                                cfSolved={cfSolved}
+                                lcRating={lcRating}
+                                cfRating={cfRating}
+                                maxRating={maxRating}
+                                onChallengePvp={onChallengePvp}
+                                onClose={onClose}
+                            />
+                        )}
+
+                        {/* SECTION 2: HEAD-TO-HEAD COMPARATIVE BENCHMARKING */}
+                        {activeSection === 'compare' && comparison && (
+                            <FriendComparativeSection
+                                comparison={comparison}
+                                profile={profile}
+                                cardClasses={cardClasses}
+                                userCScore={userCScore}
+                                friendCScore={friendCScore}
+                                userWins={userWins}
+                                friendWins={friendWins}
+                                pvpDraws={pvpDraws}
+                                onChallengePvp={onChallengePvp}
+                                onClose={onClose}
+                                onSwitchToPeer={() => setActiveSection('peer')}
+                            />
+                        )}
+
+                        {/* SECTION 3: PERFORMANCE & ANALYTICS */}
                         {activeSection === 'analytics' && (
                             <FriendAnalyticsSection
                                 profile={profile}
@@ -1032,7 +1630,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                             />
                         )}
 
-                        {/* SECTION 2: PEER LEARNING & PROBLEM OVERLAP */}
+                        {/* SECTION 4: PEER LEARNING & PROBLEM OVERLAP */}
                         {activeSection === 'peer' && (
                             <FriendPeerLearningSection
                                 profile={profile}
@@ -1047,7 +1645,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                             />
                         )}
 
-                        {/* SECTION 3: RECENT SUBMISSIONS CATALOG */}
+                        {/* SECTION 5: RECENT SUBMISSIONS CATALOG */}
                         {activeSection === 'submissions' && (
                             <FriendSubmissionsSection
                                 profile={profile}

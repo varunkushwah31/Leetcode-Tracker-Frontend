@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -333,6 +332,7 @@ public class SocialService {
                             .isBusy(isBusy)
                             .pvpRating(friend.getPvpRating() != null ? friend.getPvpRating() : 1200)
                             .pvpStreak(friend.getPvpStreak() != null ? friend.getPvpStreak() : 0)
+                            .cScore(studentMapper.calculateCScore(friend))
                             .build());
                 }
             } else if (f.getStatus() == FriendshipStatus.PENDING) {
@@ -463,6 +463,8 @@ public class SocialService {
                 .userPvpWinsAgainstFriend(userWins)
                 .friendPvpWinsAgainstUser(friendWins)
                 .pvpDraws(draws)
+                .userCScore(studentMapper.calculateCScore(user))
+                .friendCScore(studentMapper.calculateCScore(friend))
                 .build();
     }
 
@@ -764,11 +766,10 @@ public class SocialService {
         }
 
         // If manual submission URL was provided and contains slug/title or leetcode.com
-        if (!solved && submissionUrl != null && !submissionUrl.isBlank()) {
-            if (submissionUrl.toLowerCase().contains("leetcode.com") || submissionUrl.toLowerCase().contains("codeforces.com")) {
+        if (!solved && submissionUrl != null && !submissionUrl.isBlank() && (submissionUrl.toLowerCase().contains("leetcode.com") || submissionUrl.toLowerCase().contains("codeforces.com"))) {
                 solved = true;
             }
-        }
+        
 
         if (solved) {
             boolean isChallenger = match.getChallengerId().equals(currentStudentId);
@@ -1204,6 +1205,7 @@ public class SocialService {
                     .isCurrentUser(s.getId().equals(currentStudentId))
                     .pvpRating(s.getPvpRating() != null ? s.getPvpRating() : 1200)
                     .pvpStreak(s.getPvpStreak() != null ? s.getPvpStreak() : 0)
+                    .cScore(studentMapper.calculateCScore(s))
                     .build();
         }).toList());
 
@@ -1211,6 +1213,11 @@ public class SocialService {
         String criterion = sortBy != null ? sortBy.toLowerCase() : "totalsolved";
         entries.sort((a, b) -> {
             switch (criterion) {
+                case "cscore":
+                case "c-score":
+                    int cmpC = Integer.compare(b.getCScore() != null ? b.getCScore() : 500, a.getCScore() != null ? a.getCScore() : 500);
+                    if (cmpC != 0) return cmpC;
+                    return Integer.compare(b.getTotalSolved(), a.getTotalSolved());
                 case "rating":
                     return Double.compare(b.getCurrentContestRating(), a.getCurrentContestRating());
                 case "streak":
@@ -1351,7 +1358,7 @@ public class SocialService {
                 .authorAvatarUrl(r.getAuthorAvatarUrl())
                 .content(r.getContent())
                 .createdAt(r.getCreatedAt())
-                .build()).collect(Collectors.toList()) : Collections.emptyList();
+                .build()).toList(): Collections.emptyList();
 
         int likeCount = p.getLikes() != null ? p.getLikes().size() : 0;
         boolean userLiked = p.getLikes() != null && p.getLikes().contains(currentStudentId);

@@ -64,6 +64,7 @@ public class Student implements UserDetails {
     private Integer pvpDraws = 0;
     private Integer pvpRating = 1200;
     private Integer pvpStreak = 0;
+    private Integer cScore = 500;
 
 
     public Student(String leetcodeUsername, String name) {

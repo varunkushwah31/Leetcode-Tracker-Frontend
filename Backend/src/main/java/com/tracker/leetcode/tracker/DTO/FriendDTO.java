@@ -37,4 +37,5 @@ public class FriendDTO implements Serializable {
     private boolean isBusy;
     private Integer pvpRating;
     private Integer pvpStreak;
+    private Integer cScore;
 }
