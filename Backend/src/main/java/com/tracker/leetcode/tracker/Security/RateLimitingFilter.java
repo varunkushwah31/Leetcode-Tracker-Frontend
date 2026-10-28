@@ -42,7 +42,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
 
         // 2. Skip health endpoint & WebSocket handshake
-        if ("/health".equals(path) || path.startsWith("/ws-endpoint")) {
+        if ("/health".equals(path) || "/api/health".equals(path) || "/ping".equals(path) || path.startsWith("/ws-endpoint")) {
             return true;
         }
 

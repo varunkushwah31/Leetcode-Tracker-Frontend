@@ -53,7 +53,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         // Avoid logging noisy health checks
-        boolean isHealth = "/health".equals(uri);
+        boolean isHealth = "/health".equals(uri) || "/api/health".equals(uri) || "/ping".equals(uri);
         if (!isHealth) {
             log.info("[HTTP IN ] {} {} from IP [{}] (traceId: {})", method, uri, clientIp, traceId);
         }

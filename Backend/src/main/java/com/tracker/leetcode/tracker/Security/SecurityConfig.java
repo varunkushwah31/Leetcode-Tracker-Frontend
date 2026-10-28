@@ -64,7 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Health check endpoint for Render monitoring
-                        .requestMatchers("/health").permitAll()
+                        .requestMatchers("/health", "/api/health", "/ping").permitAll()
 
                         // Auth endpoints
                         .requestMatchers("/api/v1/auth/change-password").authenticated()
