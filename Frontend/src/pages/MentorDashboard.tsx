@@ -602,11 +602,11 @@ export function MentorDashboard() {
                                             setError(null);
                                         }
                                     }}
-                                    className="bg-white dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-800 dark:text-zinc-200 rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-[#5b4fff] focus:outline-none transition-colors cursor-pointer"
+                                    className="bg-white dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-800 dark:text-zinc-200 rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-[#5b4fff] focus:outline-none transition-colors cursor-pointer scheme-light-dark"
                                 >
-                                    <option value="" disabled>Switch Classroom...</option>
+                                    <option value="" disabled className="bg-white dark:bg-zinc-900 text-zinc-500 font-medium">Switch Classroom...</option>
                                     {classrooms.map(c => (
-                                        <option key={c.classroomId} value={c.classroomId}>
+                                        <option key={c.classroomId} value={c.classroomId} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">
                                             {c.className} ({c.enrolledStudents?.length || 0})
                                         </option>
                                     ))}

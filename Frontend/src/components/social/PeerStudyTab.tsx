@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-    BookOpenIcon as BookOpen,
+    GraphIcon as Graph,
     LightbulbIcon as Lightbulb,
     ChatCircleDotsIcon as ChatCircleDots,
     ThumbsUpIcon as ThumbsUp,
@@ -17,7 +17,9 @@ import {
     TreeStructureIcon as TreeStructure,
     LightningIcon as Lightning,
     MagnifyingGlassIcon as Search,
-    ArrowsLeftRightIcon as ArrowsLeftRight
+    ArrowsLeftRightIcon as ArrowsLeftRight,
+    CodeIcon,
+    BooksIcon,
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -144,7 +146,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
     const topics = [
         { name: 'Dynamic Programming', icon: Brain },
         { name: 'Tree', icon: TreeStructure },
-        { name: 'Graph', icon: BookOpen },
+        { name: 'Graph', icon: Graph },
         { name: 'Binary Search', icon: Search },
         { name: 'Two Pointers', icon: ArrowsLeftRight },
         { name: 'Greedy', icon: Lightning }
@@ -161,15 +163,15 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
             {/* Header with Topic Filter & Create Button */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 border border-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] flex items-center justify-center shrink-0 shadow-sm">
+                    <div className="w-11 h-11 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 border border-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] flex items-center justify-center shrink-0 shadow-sm ring-4 ring-[#5b4fff]/10">
                         <GraduationCap className="w-5 h-5" />
                     </div>
                     <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                            <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                            <h2 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white tracking-tight">
                                 Peer-to-Peer Study Hub & Non-Spoiler Hints
                             </h2>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-semibold bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
                                 Collaborative
                             </span>
                         </div>
@@ -181,14 +183,14 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
 
                 <Button
                     onClick={() => setCreateDialogOpen(true)}
-                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-semibold px-4 h-9 shadow-sm hover:shadow-md transition-all gap-1.5 shrink-0 cursor-pointer self-start sm:self-auto"
+                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4 h-9 shadow-sm hover:shadow-md transition-all gap-1.5 shrink-0 cursor-pointer self-start sm:self-auto"
                 >
                     <Plus className="w-3.5 h-3.5" /> Share Note or Ask Hint
                 </Button>
             </div>
 
             {/* Topic Selector Segmented Bar */}
-            <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800 flex items-center gap-1 overflow-x-auto">
+            <div className="p-1 rounded-2xl bg-zinc-100 dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 flex items-center gap-1 overflow-x-auto custom-scrollbar shadow-2xs">
                 {topics.map((t) => {
                     const isSelected = selectedTopic === t.name;
                     const IconComponent = t.icon;
@@ -197,9 +199,9 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                             type="button"
                             key={t.name}
                             onClick={() => setSelectedTopic(t.name)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                            className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                                 isSelected
-                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
                                     : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                         >
@@ -217,16 +219,16 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                         <h4 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
                             <ChatCircleDots className="w-4 h-4 text-[#5b4fff]" /> Discussions & Non-Spoiler Notes ({posts.length})
                         </h4>
-                        <span className="text-xs text-zinc-400 font-medium">Topic: {selectedTopic}</span>
+                        <span className="text-xs font-semibold text-zinc-400">Topic: <strong className="text-zinc-700 dark:text-zinc-300">{selectedTopic}</strong></span>
                     </div>
 
                     {isLoading ? (
-                        <div className="flex flex-col items-center justify-center py-20 gap-3">
-                            <Loader2 className="w-8 h-8 animate-spin text-[#5b4fff]" />
-                            <p className="text-xs font-semibold text-zinc-500">Loading study discussions...</p>
+                        <div className="flex flex-col items-center justify-center py-24 gap-3">
+                            <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
+                            <p className="text-xs font-bold text-zinc-500">Loading study discussions...</p>
                         </div>
                     ) : posts.length === 0 ? (
-                        <div className="p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-sm text-center space-y-5">
+                        <div className="p-10 sm:p-12 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm text-center space-y-5">
                             <div className="w-14 h-14 rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center mx-auto shadow-inner">
                                 <Lightbulb className="w-7 h-7" />
                             </div>
@@ -244,14 +246,14 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                 <button
                                     type="button"
                                     onClick={() => openCreateWithSuggestion('HINT_REQUEST', `Hint needed for ${selectedTopic} state definition`)}
-                                    className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-[#5b4fff]/10 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 hover:text-[#5b4fff] border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
+                                    className="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-[#5b4fff]/10 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-[#5b4fff] border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
                                 >
                                     Ask for a hint without full code
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => openCreateWithSuggestion('SOLUTION_INSIGHT', `Key algorithmic pattern for ${selectedTopic}`)}
-                                    className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-[#5b4fff]/10 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 hover:text-[#5b4fff] border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
+                                    className="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-[#5b4fff]/10 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-[#5b4fff] border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
                                 >
                                     Share key pattern insight
                                 </button>
@@ -260,7 +262,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                             <div>
                                 <Button
                                     onClick={() => setCreateDialogOpen(true)}
-                                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-5 h-10 gap-2 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all cursor-pointer"
+                                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-5 h-9.5 gap-2 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all cursor-pointer"
                                 >
                                     <Plus className="w-4 h-4" /> Start First Discussion
                                 </Button>
@@ -275,25 +277,25 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                 return (
                                     <div
                                         key={post.id}
-                                        className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs space-y-4 hover:border-[#5b4fff]/40 transition-all"
+                                        className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#111114]/90 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-xs space-y-4 hover:border-[#5b4fff]/40 transition-all"
                                     >
                                         {/* Post Author & Type Badge */}
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex items-center gap-3">
-                                                <Avatar className="w-10 h-10 border-2 border-zinc-200 dark:border-zinc-700">
+                                                <Avatar className="w-10 h-10 border-2 border-zinc-200 dark:border-zinc-700 shadow-xs">
                                                     <AvatarImage src={post.authorAvatarUrl} />
                                                     <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold">
                                                         {post.authorName.substring(0, 2)}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div>
-                                                    <p className="text-xs font-bold text-zinc-900 dark:text-white">
+                                                    <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
                                                         {post.authorName}{' '}
-                                                        <span className="font-medium text-zinc-400">
+                                                        <span className="text-zinc-500 dark:text-zinc-400">
                                                             @{post.authorHandle || 'coder'}
                                                         </span>
                                                     </p>
-                                                    <p className="text-[10px] text-zinc-400">
+                                                    <p className="text-[11px] text-zinc-400">
                                                         {new Date(post.createdAt).toLocaleDateString(undefined, {
                                                             month: 'short',
                                                             day: 'numeric',
@@ -304,12 +306,12 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                             </div>
 
                                             <Badge
-                                                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-lg border ${
+                                                className={`text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-md border ${
                                                     post.type === 'HINT_REQUEST'
-                                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/25'
                                                         : post.type === 'SOLUTION_INSIGHT'
-                                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-                                                        : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20'
+                                                        ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25'
+                                                        : 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/25'
                                                 }`}
                                             >
                                                 {post.type.replaceAll('_', ' ')}
@@ -318,8 +320,8 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
 
                                         {/* Problem Context Banner */}
                                         {post.problemTitle && (
-                                            <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 text-xs">
-                                                <span className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 truncate">
+                                            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 text-xs">
+                                                <span className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 truncate tracking-tight">
                                                     <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" />
                                                     <span className="truncate">{post.problemTitle}</span>
                                                 </span>
@@ -349,7 +351,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
 
                                         {/* Title & Content */}
                                         <div className="space-y-1.5">
-                                            <h4 className="font-extrabold text-zinc-900 dark:text-white text-sm">
+                                            <h4 className="font-bold text-zinc-900 dark:text-zinc-50 text-sm tracking-tight leading-snug">
                                                 {post.title}
                                             </h4>
                                             <p className="text-xs text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
@@ -359,9 +361,9 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
 
                                         {/* Non-Spoiler Guard for Approach & Complexity */}
                                         {(post.approach || post.timeComplexity) && (
-                                            <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-2">
+                                            <div className="p-4 rounded-2xl bg-zinc-50/90 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-2.5">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                                                    <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
                                                         <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                                                         Algorithm Approach & Complexity
                                                     </span>
@@ -382,8 +384,8 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                                     </button>
                                                 </div>
 
-                                                <div className={`transition-all duration-300 ${!isSpoilerRevealed ? 'blur-xs select-none' : ''}`}>
-                                                    <div className="flex flex-wrap gap-2 text-[11px]">
+                                                <div className={`transition-all duration-300 ${!isSpoilerRevealed ? 'blur-xs select-none opacity-40' : ''}`}>
+                                                    <div className="flex flex-wrap gap-2 text-xs">
                                                         {post.approach && (
                                                             <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 font-medium">
                                                                 Approach:{' '}
@@ -507,14 +509,14 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                 <div className="space-y-4">
                     <div className="flex items-center justify-between px-1">
                         <h4 className="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-                            <Sparkles className="w-4 h-4 text-amber-500" /> Curated {selectedTopic} Problems
+                            <CodeIcon  className="w-4 h-4 text-amber-500" /> Curated {selectedTopic} Problems
                         </h4>
                         <span className="text-xs text-zinc-400 font-medium">{curatedProblems.length} available</span>
                     </div>
 
                     <div className="space-y-3">
                         {curatedProblems.length === 0 ? (
-                            <div className="p-8 rounded-2xl bg-white dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 text-center text-xs text-zinc-500">
+                            <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 text-center text-xs text-zinc-500">
                                 No practice problems cataloged for this topic.
                             </div>
                         ) : (
@@ -526,7 +528,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                 return (
                                     <div
                                         key={prob.titleSlug}
-                                        className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#111111]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs hover:border-[#5b4fff]/50 hover:shadow-lg dark:hover:shadow-[#5b4fff]/10 transition-all space-y-3.5 group"
+                                        className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#111114]/80 backdrop-blur-3xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs hover:border-[#5b4fff]/50 hover:shadow-lg dark:hover:shadow-[#5b4fff]/10 transition-all space-y-3.5 group"
                                     >
                                         <div className="flex items-start justify-between gap-2">
                                             <div className="space-y-1.5 min-w-0">
@@ -587,7 +589,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                         {/* Educational Companion Card */}
                         <div className="p-5 rounded-3xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 text-xs space-y-2 text-zinc-500 dark:text-zinc-400">
                             <p className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-                                <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Non-Spoiler Study Tip
+                                <BooksIcon  className="w-3.5 h-3.5 text-amber-500" /> Non-Spoiler Study Tip
                             </p>
                             <p className="text-[11px] leading-relaxed">
                                 Struggling on a problem? Post the subproblem transition or recurrence relation you are stuck on. Peers can suggest base case adjustments without spoiling the full implementation!
@@ -599,7 +601,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
 
             {/* Create Peer Study Post Modal */}
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-                <DialogContent className="max-w-lg bg-white dark:bg-[#111111] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl">
+                <DialogContent className="max-w-lg bg-white dark:bg-[#111114] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold text-zinc-900 dark:text-white">
                             Share Note or Ask Non-Spoiler Hint

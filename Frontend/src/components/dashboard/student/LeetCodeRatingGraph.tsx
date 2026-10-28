@@ -389,7 +389,7 @@ export function LeetCodeRatingGraph({
                                                 fill="#f4f4f5"
                                                 fontSize="11"
                                                 fontWeight="bold"
-                                                fontFamily="monospace"
+                                                fontFamily="inherit"
                                             >
                                                 {Math.round(activePoint.contest.rating).toLocaleString()}
                                             </text>

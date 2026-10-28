@@ -590,6 +590,19 @@ export function PendingAssignments({
                                     ? 'You have completed all pending problem sets for this selection.'
                                     : 'Try adjusting your classroom or search filters.'}
                             </p>
+                            {statusFilter === 'pending' && counts.completed > 0 && (
+                                <div className="mt-4">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setStatusFilter('completed')}
+                                        className="h-8 text-xs border-[#5b4fff]/30 bg-[#5b4fff]/5 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/15 rounded-xl font-bold cursor-pointer"
+                                    >
+                                        <CheckIcon className="w-3.5 h-3.5 mr-1 text-emerald-500" />
+                                        View {counts.completed} Completed Problem{counts.completed > 1 ? 's' : ''}
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

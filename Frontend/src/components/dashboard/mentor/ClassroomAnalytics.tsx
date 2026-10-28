@@ -12,7 +12,7 @@ import {
     WarningIcon as AlertTriangle,
     TrendUpIcon as TrendingUp,
     UsersIcon,
-    FlameIcon,
+    FireIcon as FlameIcon,
     SparkleIcon,
     CheckCircleIcon,
     ArrowSquareOutIcon as ExternalLink,

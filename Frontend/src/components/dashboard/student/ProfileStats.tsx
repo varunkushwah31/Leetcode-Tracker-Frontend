@@ -231,7 +231,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 <div className="bg-zinc-50/90 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 p-3.5 sm:p-5 rounded-2xl hover:bg-zinc-100/90 dark:hover:bg-zinc-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 group relative overflow-hidden shadow-xs dark:shadow-none">
                                     <div className="absolute inset-0 bg-linear-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1.5 sm:mb-2">LeetCode Rank</p>
-                                    <p className="text-lg sm:text-2xl lg:text-3xl font-mono font-black text-zinc-900 dark:text-white tracking-tight flex items-center transition-transform duration-300 group-hover:scale-105 origin-left truncate tabular-nums">
+                                    <p className="text-lg sm:text-2xl lg:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center transition-transform duration-300 group-hover:scale-105 origin-left truncate tabular-nums">
                                         <TrophyIcon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 mr-1.5 sm:mr-2 shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]" />
                                         {data.rank ? `#${Number.parseInt(data.rank).toLocaleString()}` : 'N/A'}
                                     </p>
@@ -243,7 +243,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                         <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Total Solved</p>
                                         <span className="text-[9px] sm:text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Unified</span>
                                     </div>
-                                    <p className="text-lg sm:text-2xl lg:text-3xl font-mono font-black text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left tabular-nums">
+                                    <p className="text-lg sm:text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left tabular-nums">
                                         {totalSolved}
                                     </p>
                                     <p className="text-[11px] sm:text-xs text-zinc-500 mt-1 truncate">
@@ -255,7 +255,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     <div className="absolute inset-0 bg-linear-to-br from-[#5b4fff]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">LeetCode Rating</p>
                                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                                        <p className="text-lg sm:text-2xl lg:text-3xl font-mono font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left tabular-nums">
+                                        <p className="text-lg sm:text-2xl lg:text-3xl font-black text-[#5b4fff] dark:text-[#968fff] drop-shadow-[0_0_12px_rgba(150,143,255,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left tabular-nums">
                                             {rating}
                                         </p>
                                         {lcDelta !== null && (
@@ -282,7 +282,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                     <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                     <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">Codeforces Rating</p>
                                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                                        <p className="text-lg sm:text-2xl lg:text-3xl font-mono font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left tabular-nums">
+                                        <p className="text-lg sm:text-2xl lg:text-3xl font-black text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.25)] tracking-tight transition-transform duration-300 group-hover:scale-105 origin-left tabular-nums">
                                             {cfRating > 0 ? cfRating : 'N/A'}
                                         </p>
                                         {cfDelta !== null && (

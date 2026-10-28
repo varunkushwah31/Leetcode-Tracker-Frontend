@@ -1073,7 +1073,7 @@ export function LandingPage() {
                                 <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block hover:opacity-100 transition-opacity" />
                                 <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block hover:opacity-100 transition-opacity" />
                                 <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block hover:opacity-100 transition-opacity" />
-                                <span className="ml-3 font-mono text-[11px] text-zinc-500 dark:text-zinc-400 hidden sm:inline">
+                                <span className="ml-3 text-[11px] text-zinc-500 dark:text-zinc-400 hidden sm:inline">
                                     mentorsync.dev/classroom/super-42/leaderboard
                                 </span>
                             </div>
@@ -1251,7 +1251,7 @@ export function LandingPage() {
                                         <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Try Submission Checker</p>
                                         <p className="text-[11px] text-zinc-500">Click a problem below to test how automatic verification works</p>
                                     </div>
-                                    <span className="px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-mono border border-zinc-200 dark:border-zinc-700/60">
+                                    <span className="px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-bold border border-zinc-200 dark:border-zinc-700/60">
                                         POST /api/verify
                                     </span>
                                 </div>
@@ -1280,7 +1280,7 @@ export function LandingPage() {
 
                                 {/* Run Simulation Trigger Bar */}
                                 <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mb-4">
-                                    <div className="min-w-0 font-mono text-[11px] text-zinc-600 dark:text-zinc-400 truncate">
+                                    <div className="min-w-0 font-medium text-[11px] text-zinc-600 dark:text-zinc-400 truncate">
                                         https://{activeVerification.platform.toLowerCase()}.com/problems/{activeVerification.title.toLowerCase().replace(/\s+/g, '-')}
                                     </div>
                                     <button
@@ -1295,7 +1295,7 @@ export function LandingPage() {
                                 </div>
 
                                 {/* Terminal Console Output */}
-                                <div className="p-4 rounded-2xl bg-zinc-950 font-mono text-xs text-emerald-400 border border-zinc-800 space-y-2 relative overflow-hidden">
+                                <div className="p-4 rounded-2xl bg-zinc-950 font-medium text-xs text-emerald-400 border border-zinc-800 space-y-2 relative overflow-hidden">
                                     <div className="flex items-center justify-between text-zinc-500 pb-2 border-b border-zinc-800/80">
                                         <span className="flex items-center gap-1.5">
                                             <TerminalIcon className="w-4 h-4 text-emerald-400" />
@@ -1605,7 +1605,7 @@ export function LandingPage() {
                                     High-speed in-memory caching ensures student leaderboards, submissions, and profiles load instantly, even with large classes.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 w-max group-hover:bg-emerald-500/20 transition-colors">
+                            <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 w-max group-hover:bg-emerald-500/20 transition-colors">
                                 Sub-10ms Response Time
                             </span>
                         </div>
@@ -1621,7 +1621,7 @@ export function LandingPage() {
                                     Import your whole classroom in seconds using a CSV file from Google Sheets or Excel. Usernames and profile links are organized automatically.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-bold text-[#5b4fff] dark:text-[#968fff] bg-[#5b4fff]/10 px-3 py-1.5 rounded-xl border border-[#5b4fff]/20 w-max group-hover:bg-[#5b4fff]/20 transition-colors">
+                            <span className="text-xs font-bold text-[#5b4fff] dark:text-[#968fff] bg-[#5b4fff]/10 px-3 py-1.5 rounded-xl border border-[#5b4fff]/20 w-max group-hover:bg-[#5b4fff]/20 transition-colors">
                                 Google Sheets &amp; Excel Ready
                             </span>
                         </div>
@@ -1642,18 +1642,18 @@ export function LandingPage() {
                                             <CalendarBlankIcon className="w-3.5 h-3.5 text-amber-500" />
                                             <span>LC Weekly Contest 525</span>
                                         </span>
-                                        <span className="font-mono font-semibold text-amber-500">in 2d 14h</span>
+                                        <span className="font-semibold text-amber-500">in 2d 14h</span>
                                     </div>
                                     <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                                         <span className="flex items-center gap-1.5">
                                             <CalendarBlankIcon className="w-3.5 h-3.5 text-sky-500" />
                                             <span>CF Round 1129 (Div. 2)</span>
                                         </span>
-                                        <span className="font-mono font-semibold text-sky-500">in 4d 08h</span>
+                                        <span className="font-semibold text-sky-500">in 4d 08h</span>
                                     </div>
                                 </div>
                             </div>
-                            <span className="font-mono text-xs font-bold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 w-max group-hover:bg-amber-500/20 transition-colors">
+                            <span className="text-xs font-bold text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 w-max group-hover:bg-amber-500/20 transition-colors">
                                 Live Contest Calendar
                             </span>
                         </div>

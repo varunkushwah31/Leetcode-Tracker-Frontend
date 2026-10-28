@@ -5,7 +5,7 @@ import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
 import {
-    FlameIcon,
+    FireIcon as FlameIcon,
     DownloadSimpleIcon as Download,
     MagnifyingGlassIcon as Search,
     BellIcon,

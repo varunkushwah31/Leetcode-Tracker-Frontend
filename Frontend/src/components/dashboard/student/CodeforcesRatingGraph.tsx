@@ -419,7 +419,7 @@ export function CodeforcesRatingGraph({
                                                 fill="#38bdf8"
                                                 fontSize="11"
                                                 fontWeight="bold"
-                                                fontFamily="monospace"
+                                                fontFamily="inherit"
                                             >
                                                 {activePoint.contest.newRating.toLocaleString()}
                                             </text>

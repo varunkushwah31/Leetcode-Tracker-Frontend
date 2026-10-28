@@ -292,7 +292,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 return (
                                     <div className="flex items-center gap-2 pt-1 text-xs text-zinc-500 dark:text-zinc-400">
                                         <span className="font-semibold text-zinc-500">Auto-extracted:</span>
-                                        <span className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] px-2 py-0.5 rounded-md font-mono text-[11px] border border-zinc-200 dark:border-zinc-700 font-semibold">
+                                        <span className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] px-2 py-0.5 rounded-md text-[11px] border border-zinc-200 dark:border-zinc-700 font-semibold">
                                             {isLC ? `LeetCode: @${extracted}` : (isCF ? `Codeforces: @${extracted}` : `@${extracted}`)}
                                         </span>
                                     </div>
@@ -326,7 +326,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 </Button>
                             </div>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                Upload a CSV file containing students. <span className="font-semibold text-zinc-700 dark:text-zinc-300">Only students who have already created an account on MentorSync through signup will be added.</span> Supports columns: <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">Name, Email, LeetCode Username, Codeforces Handle</code> or handles/URLs.
+                                Upload a CSV file containing students. <span className="font-semibold text-zinc-700 dark:text-zinc-300">Only students who have already created an account on MentorSync through signup will be added.</span> Supports columns: <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-semibold">Name, Email, LeetCode Username, Codeforces Handle</code> or handles/URLs.
                             </p>
 
                             <ErrorBanner message={bulkUploadError} className="mb-2" />
@@ -377,7 +377,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                             <div>
                                                 <p className="font-bold">Added {bulkResult.addedCount} student{bulkResult.addedCount > 1 ? 's' : ''} successfully!</p>
                                                 {bulkResult.addedStudents?.length > 0 && (
-                                                    <p className="text-[11px] opacity-90 mt-0.5 font-mono">
+                                                    <p className="text-[11px] opacity-90 mt-0.5 font-medium">
                                                         {bulkResult.addedStudents.slice(0, 10).join(', ')}{bulkResult.addedStudents.length > 10 ? ` and ${bulkResult.addedStudents.length - 10} more` : ''}
                                                     </p>
                                                 )}
@@ -391,7 +391,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                             <div>
                                                 <p className="font-semibold">{bulkResult.alreadyEnrolledCount} student{bulkResult.alreadyEnrolledCount > 1 ? 's were' : ' was'} already enrolled in this classroom.</p>
                                                 {bulkResult.alreadyEnrolledStudents?.length > 0 && (
-                                                    <p className="text-[11px] opacity-80 mt-0.5 font-mono">
+                                                    <p className="text-[11px] opacity-80 mt-0.5 font-medium">
                                                         {bulkResult.alreadyEnrolledStudents.slice(0, 8).join(', ')}{bulkResult.alreadyEnrolledStudents.length > 8 ? ` and ${bulkResult.alreadyEnrolledStudents.length - 8} more` : ''}
                                                     </p>
                                                 )}
@@ -501,7 +501,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 return (
                                     <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-zinc-500 dark:text-zinc-400">
                                         <span className="font-semibold text-zinc-500">Extracted:</span>
-                                        <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300 px-2 py-0.5 rounded-md font-mono text-[11px] border border-zinc-200 dark:border-zinc-700">
+                                        <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300 px-2 py-0.5 rounded-md text-[11px] border border-zinc-200 dark:border-zinc-700 font-semibold">
                                             {parsed.detectedPlatform === 'CODEFORCES'
                                                 ? `CF Problem #${parsed.problemNumber || parsed.slug}`
                                                 : `LeetCode: ${parsed.slug}`}

@@ -90,7 +90,7 @@ function FriendProfileHeader({
                     </Avatar>
                     <div>
                         <div className="flex items-center justify-center sm:justify-start gap-2.5 flex-wrap mb-1">
-                            <h1 className="text-xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                            <h1 className="text-xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
                                 {profile.name}
                             </h1>
                             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
@@ -98,7 +98,7 @@ function FriendProfileHeader({
                             </span>
                             {hasLinkedAccount && (
                                 <span
-                                    className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/25"
+                                    className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/25"
                                     title="Verified Coding Platform Sync"
                                 >
                                     <ShieldCheck className="w-3.5 h-3.5 text-[#5b4fff] dark:text-[#968fff]" />
@@ -142,37 +142,37 @@ function FriendProfileHeader({
                 {/* Stat Metric Summary Pill */}
                 <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6 bg-zinc-50/80 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
                     <div className="text-center min-w-18">
-                        <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">C-Score</p>
-                        <p className="text-2xl font-black text-[#5b4fff] dark:text-[#968fff]">{cScore}</p>
-                        <p className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded border inline-block mt-0.5 ${cScoreTier.badgeClass}`}>
+                        <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">C-Score</p>
+                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#968fff]">{cScore}</p>
+                        <p className={`text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded border inline-block mt-0.5 ${cScoreTier.badgeClass}`}>
                             {cScoreTier.tier}
                         </p>
                     </div>
                     <div className="text-center min-w-17.5">
-                        <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rank</p>
-                        <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+                        <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">Rank</p>
+                        <p className="text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
                             {profile.rank ? `#${Number.parseInt(profile.rank, 10).toLocaleString()}` : (profile.codeforcesRank || 'N/A')}
                         </p>
                     </div>
                     <div className="text-center min-w-20">
-                        <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Solved</p>
-                        <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{totalSolved}</p>
+                        <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">Solved</p>
+                        <p className="text-2xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">{totalSolved}</p>
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcSolved} • CF: {cfSolved}</p>
                     </div>
                     <div className="text-center min-w-20">
-                        <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Rating</p>
-                        <p className="text-2xl font-bold text-[#5b4fff] dark:text-[#b4afff]">{maxRating > 0 ? maxRating : 'Unrated'}</p>
+                        <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">Rating</p>
+                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#b4afff]">{maxRating > 0 ? maxRating : 'Unrated'}</p>
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcRating > 0 ? lcRating : 'Unrated'} • CF: {cfRating > 0 ? cfRating : 'Unrated'}</p>
                     </div>
                     <div className="text-center min-w-17.5">
-                        <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Streak</p>
-                        <p className="text-2xl font-bold text-amber-500 flex justify-center items-center">
+                        <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">Streak</p>
+                        <p className="text-2xl font-bold tabular-nums text-amber-500 flex justify-center items-center">
                             {profile.consistencyStreak || 0} <StreakFlame className="w-5 h-5 ml-1.5" />
                         </p>
                     </div>
                     <div className="text-center min-w-21.25 sm:border-l sm:border-zinc-200 sm:dark:border-zinc-800 sm:pl-5">
-                        <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Head-to-Head</p>
-                        <p className="text-2xl font-bold flex items-center justify-center gap-1">
+                        <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">Head-to-Head</p>
+                        <p className="text-2xl font-bold tabular-nums flex items-center justify-center gap-1">
                             <span className="text-emerald-600 dark:text-emerald-400">{userWins}W</span>
                             <span className="text-zinc-400 text-sm font-normal">-</span>
                             <span className="text-rose-600 dark:text-rose-400">{friendWins}L</span>
@@ -923,7 +923,7 @@ function FriendCoderCardSection({
                     </div>
 
                     <div className="flex items-baseline gap-3">
-                        <span className="text-4xl sm:text-5xl font-black text-zinc-900 dark:text-white font-mono">
+                        <span className="text-4xl sm:text-5xl font-black text-zinc-900 dark:text-white">
                             {cScore}
                         </span>
                         <span className="text-xs text-zinc-500 font-semibold">/ 900 Index Scale</span>
@@ -949,59 +949,59 @@ function FriendCoderCardSection({
                 {/* Core Metric Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                     <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Total Solved</p>
-                        <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{totalSolved}</p>
-                        <p className="text-[10px] text-zinc-500 mt-0.5">LC: {lcSolved} · CF: {cfSolved}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Total Solved</p>
+                        <p className="text-2xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400 tracking-tight mt-1">{totalSolved}</p>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcSolved} · CF: {cfSolved}</p>
                     </div>
                     <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 flex items-center justify-center gap-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center justify-center gap-1">
                             <Trophy className="w-3.5 h-3.5 text-amber-500" /> Peak Rating
                         </p>
-                        <p className="text-2xl font-black text-[#5b4fff] dark:text-[#968fff] mt-1">
+                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#968fff] tracking-tight mt-1">
                             {maxRating > 0 ? maxRating : 'Unrated'}
                         </p>
-                        <p className="text-[10px] text-zinc-500 mt-0.5">LC: {lcRating || 'N/A'} · CF: {cfRating || 'N/A'}</p>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcRating || 'N/A'} · CF: {cfRating || 'N/A'}</p>
                     </div>
                     <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">1v1 PvP Elo</p>
-                        <p className="text-2xl font-black text-[#5b4fff] dark:text-[#968fff] mt-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">1v1 PvP Elo</p>
+                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#968fff] tracking-tight mt-1">
                             {profile.pvpRating ?? 1200}
                         </p>
-                        <p className="text-[10px] text-zinc-500 mt-0.5">{profile.pvpWins || 0}W - {profile.pvpLosses || 0}L</p>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{profile.pvpWins || 0}W - {profile.pvpLosses || 0}L</p>
                     </div>
                     <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Streak Record</p>
-                        <p className="text-2xl font-black text-amber-500 mt-1 flex items-center justify-center gap-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Streak Record</p>
+                        <p className="text-2xl font-bold tabular-nums text-amber-500 tracking-tight mt-1 flex items-center justify-center gap-1">
                             {profile.consistencyStreak || 0}d <StreakFlame className="w-5 h-5" />
                         </p>
-                        <p className="text-[10px] text-zinc-500 mt-0.5">Consistent Problem Solver</p>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Consistent Problem Solver</p>
                     </div>
                 </div>
 
                 {/* DSA Problem Difficulty Breakdown Progress */}
                 <div className="p-5 rounded-2xl bg-zinc-100/60 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/80 space-y-4">
-                    <h4 className="text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
                         Algorithmic Difficulty Distribution
                     </h4>
                     <div className="space-y-3">
                         <div>
                             <div className="flex justify-between text-xs font-bold mb-1">
                                 <span className="text-emerald-600 dark:text-emerald-400">Easy Problems</span>
-                                <span className="text-zinc-900 dark:text-white font-mono">{easyCount} solved</span>
+                                <span className="text-zinc-900 dark:text-white font-semibold">{easyCount} solved</span>
                             </div>
                             <Progress value={Math.min((easyCount / Math.max(totalSolved, 1)) * 100, 100)} className="h-2 bg-zinc-200 dark:bg-zinc-800" />
                         </div>
                         <div>
                             <div className="flex justify-between text-xs font-bold mb-1">
                                 <span className="text-amber-500">Medium Problems</span>
-                                <span className="text-zinc-900 dark:text-white font-mono">{medCount} solved</span>
+                                <span className="text-zinc-900 dark:text-white font-semibold">{medCount} solved</span>
                             </div>
                             <Progress value={Math.min((medCount / Math.max(totalSolved, 1)) * 100, 100)} className="h-2 bg-zinc-200 dark:bg-zinc-800" />
                         </div>
                         <div>
                             <div className="flex justify-between text-xs font-bold mb-1">
                                 <span className="text-rose-500">Hard Problems</span>
-                                <span className="text-zinc-900 dark:text-white font-mono">{hardCount} solved</span>
+                                <span className="text-zinc-900 dark:text-white font-semibold">{hardCount} solved</span>
                             </div>
                             <Progress value={Math.min((hardCount / Math.max(totalSolved, 1)) * 100, 100)} className="h-2 bg-zinc-200 dark:bg-zinc-800" />
                         </div>
@@ -1024,7 +1024,7 @@ function FriendCoderCardSection({
                                         className="px-3 py-1 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-bold text-zinc-800 dark:text-zinc-200 shadow-xs flex items-center gap-1.5"
                                     >
                                         <span>{skill.tagName}</span>
-                                        <span className="text-[10px] text-[#5b4fff] font-mono">({skill.problemsSolved})</span>
+                                        <span className="text-[10px] text-[#5b4fff] font-bold">({skill.problemsSolved})</span>
                                     </span>
                                 ))}
                         </div>
@@ -1122,7 +1122,7 @@ function FriendComparativeSection({
                             <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#5b4fff]">You</span>
                             <h3 className="text-base font-extrabold text-zinc-900 dark:text-white truncate">Your Standing</h3>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="font-mono font-black text-sm text-[#5b4fff]">{userCScore} C-Score</span>
+                                <span className="font-black text-sm text-[#5b4fff]">{userCScore} C-Score</span>
                                 <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${userTier.badgeClass}`}>
                                     {userTier.tier}
                                 </span>
@@ -1156,7 +1156,7 @@ function FriendComparativeSection({
                             <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500">Friend</span>
                             <h3 className="text-base font-extrabold text-zinc-900 dark:text-white truncate">{profile.name}</h3>
                             <div className="flex items-center justify-start md:justify-end gap-1.5 mt-0.5">
-                                <span className="font-mono font-black text-sm text-zinc-800 dark:text-zinc-200">{friendCScore} C-Score</span>
+                                <span className="font-black text-sm text-zinc-800 dark:text-zinc-200">{friendCScore} C-Score</span>
                                 <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${friendTier.badgeClass}`}>
                                     {friendTier.tier}
                                 </span>
@@ -1190,7 +1190,7 @@ function FriendComparativeSection({
                         <div className="space-y-1.5">
                             <div className="flex justify-between text-xs font-bold">
                                 <span>You ({userTier.tier})</span>
-                                <span className="font-mono text-[#5b4fff]">{userCScore} pts</span>
+                                <span className="font-semibold text-[#5b4fff]">{userCScore} pts</span>
                             </div>
                             <Progress value={Math.min(Math.max(((userCScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
                         </div>
@@ -1198,7 +1198,7 @@ function FriendComparativeSection({
                         <div className="space-y-1.5">
                             <div className="flex justify-between text-xs font-bold">
                                 <span>{profile.name} ({friendTier.tier})</span>
-                                <span className="font-mono text-zinc-700 dark:text-zinc-300">{friendCScore} pts</span>
+                                <span className="font-semibold text-zinc-700 dark:text-zinc-300">{friendCScore} pts</span>
                             </div>
                             <Progress value={Math.min(Math.max(((friendCScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
                         </div>
@@ -1448,7 +1448,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                             </Button>
                         )}
                         <span className="text-xs text-zinc-500 font-medium hidden sm:inline-flex items-center gap-1.5">
-                            Press <kbd className="bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-300 font-mono text-xs border border-zinc-200 dark:border-zinc-700">Esc</kbd> to return
+                            Press <kbd className="bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-300 font-semibold text-xs border border-zinc-200 dark:border-zinc-700">Esc</kbd> to return
                         </span>
                         <Button
                             variant="ghost"

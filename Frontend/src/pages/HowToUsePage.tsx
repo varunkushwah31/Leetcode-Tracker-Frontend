@@ -380,8 +380,8 @@ https://codeforces.com/profile/petr`;
                                         Click <strong className="text-zinc-900 dark:text-white">Assign Question</strong>. You can paste:
                                     </p>
                                     <ul className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 pl-12 space-y-1.5 list-disc">
-                                        <li>Full LeetCode URL: <code className="text-xs bg-zinc-200 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] px-1.5 py-0.5 rounded font-mono">https://leetcode.com/problems/two-sum/</code> or slug: <code className="text-xs bg-zinc-200 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] px-1.5 py-0.5 rounded font-mono">two-sum</code></li>
-                                        <li>Full Codeforces URL: <code className="text-xs bg-zinc-200 dark:bg-zinc-800 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded font-mono">https://codeforces.com/problemset/problem/4/A</code> or ID: <code className="text-xs bg-zinc-200 dark:bg-zinc-800 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded font-mono">4A</code></li>
+                                        <li>Full LeetCode URL: <code className="text-xs bg-zinc-200 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] px-1.5 py-0.5 rounded font-semibold">https://leetcode.com/problems/two-sum/</code> or slug: <code className="text-xs bg-zinc-200 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] px-1.5 py-0.5 rounded font-semibold">two-sum</code></li>
+                                        <li>Full Codeforces URL: <code className="text-xs bg-zinc-200 dark:bg-zinc-800 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded font-semibold">https://codeforces.com/problemset/problem/4/A</code> or ID: <code className="text-xs bg-zinc-200 dark:bg-zinc-800 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded font-semibold">4A</code></li>
                                     </ul>
                                     <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 pl-8.5 leading-relaxed pt-1">
                                         The platform switches automatically between LeetCode and Codeforces based on the URL you paste. Pick a deadline with custom date/time or click the quick presets (<code className="text-[11px] bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded">+1 Day</code>, <code className="text-[11px] bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded">+3 Days</code>, <code className="text-[11px] bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded">+1 Week</code>).
@@ -448,7 +448,7 @@ https://codeforces.com/profile/petr`;
                                         <CheckCircle className="w-4 h-4" /> Delimiter Auto-Detection
                                     </div>
                                     <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                        Supports comma (<code className="font-mono text-emerald-600 dark:text-emerald-300">,</code>), semicolon (<code className="font-mono text-emerald-600 dark:text-emerald-300">;</code>), or tab-delimited (<code className="font-mono text-emerald-600 dark:text-emerald-300">\t</code>) CSV exports directly from Google Sheets or Excel.
+                                        Supports comma (<code className="font-semibold text-emerald-600 dark:text-emerald-300">,</code>), semicolon (<code className="font-semibold text-emerald-600 dark:text-emerald-300">;</code>), or tab-delimited (<code className="font-semibold text-emerald-600 dark:text-emerald-300">\t</code>) CSV exports directly from Google Sheets or Excel.
                                     </p>
                                 </div>
 
@@ -466,7 +466,7 @@ https://codeforces.com/profile/petr`;
                                         <CheckCircle className="w-4 h-4" /> Auto URL & Handle Extraction
                                     </div>
                                     <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                        Paste raw handles (e.g. <code className="font-mono text-cyan-600 dark:text-cyan-300">tourist</code>) or full URLs (e.g. <code className="font-mono text-cyan-600 dark:text-cyan-300">https://leetcode.com/u/user</code> or <code className="font-mono text-cyan-600 dark:text-cyan-300">https://codeforces.com/profile/handle</code>). Queries, hashes, and slashes are cleaned automatically with cross-platform column detection.
+                                        Paste raw handles (e.g. <code className="font-semibold text-cyan-600 dark:text-cyan-300">tourist</code>) or full URLs (e.g. <code className="font-semibold text-cyan-600 dark:text-cyan-300">https://leetcode.com/u/user</code> or <code className="font-semibold text-cyan-600 dark:text-cyan-300">https://codeforces.com/profile/handle</code>). Queries, hashes, and slashes are cleaned automatically with cross-platform column detection.
                                     </p>
                                 </div>
                             </div>
@@ -495,25 +495,25 @@ https://codeforces.com/profile/petr`;
                                         </thead>
                                         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/60 text-zinc-600 dark:text-zinc-400">
                                             <tr>
-                                                <td className="py-3 px-4 font-mono font-semibold text-zinc-900 dark:text-white">Name</td>
+                                                <td className="py-3 px-4 font-semibold text-zinc-900 dark:text-white">Name</td>
                                                 <td className="py-3 px-4"><code className="text-zinc-700 dark:text-zinc-300">Name</code>, <code className="text-zinc-700 dark:text-zinc-300">Student Name</code>, <code className="text-zinc-700 dark:text-zinc-300">Full Name</code></td>
                                                 <td className="py-3 px-4"><span className="text-zinc-500">Optional</span></td>
                                                 <td className="py-3 px-4">Full display name. Falls back to username if empty.</td>
                                             </tr>
                                             <tr>
-                                                <td className="py-3 px-4 font-mono font-semibold text-zinc-900 dark:text-white">Email</td>
+                                                <td className="py-3 px-4 font-semibold text-zinc-900 dark:text-white">Email</td>
                                                 <td className="py-3 px-4"><code className="text-zinc-700 dark:text-zinc-300">Email</code>, <code className="text-zinc-700 dark:text-zinc-300">Email Address</code></td>
                                                 <td className="py-3 px-4"><span className="text-zinc-500">Optional</span></td>
                                                 <td className="py-3 px-4">Student email. Auto-generated mock email if omitted.</td>
                                             </tr>
                                             <tr>
-                                                <td className="py-3 px-4 font-mono font-semibold text-zinc-900 dark:text-white">LeetCode Username</td>
+                                                <td className="py-3 px-4 font-semibold text-zinc-900 dark:text-white">LeetCode Username</td>
                                                 <td className="py-3 px-4"><code className="text-emerald-600 dark:text-emerald-400">LeetCode Username</code>, <code className="text-emerald-600 dark:text-emerald-400">LeetCode</code>, <code className="text-emerald-600 dark:text-emerald-400">LC</code>, <code className="text-emerald-600 dark:text-emerald-400">Username</code></td>
                                                 <td className="py-3 px-4"><span className="text-emerald-600 dark:text-emerald-400 font-bold">Recommended</span></td>
                                                 <td className="py-3 px-4">Public LeetCode profile handle or URL.</td>
                                             </tr>
                                             <tr>
-                                                <td className="py-3 px-4 font-mono font-semibold text-zinc-900 dark:text-white">Codeforces Handle</td>
+                                                <td className="py-3 px-4 font-semibold text-zinc-900 dark:text-white">Codeforces Handle</td>
                                                 <td className="py-3 px-4"><code className="text-cyan-600 dark:text-cyan-400">Codeforces Handle</code>, <code className="text-cyan-600 dark:text-cyan-400">Codeforces</code>, <code className="text-cyan-600 dark:text-cyan-400">CF</code>, <code className="text-cyan-600 dark:text-cyan-400">CF Handle</code></td>
                                                 <td className="py-3 px-4"><span className="text-zinc-500">Optional</span></td>
                                                 <td className="py-3 px-4">Public Codeforces handle or profile URL.</td>
@@ -525,7 +525,7 @@ https://codeforces.com/profile/petr`;
                                 {/* Code Snippet Multi-Column */}
                                 <div className="relative mt-3">
                                     <div className="flex items-center justify-between bg-zinc-800 px-4 py-2.5 rounded-t-2xl border border-zinc-700">
-                                        <span className="text-[12px] font-mono text-zinc-300 font-semibold">sample_students.csv (Multi-column)</span>
+                                        <span className="text-[12px] text-zinc-300 font-semibold">sample_students.csv (Multi-column)</span>
                                         <button
                                             onClick={() => handleCopy(csvSampleMultiColumn, 1)}
                                             className="text-xs text-zinc-400 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors interactive-press"
@@ -534,7 +534,7 @@ https://codeforces.com/profile/petr`;
                                             {copiedIndex === 1 ? 'Copied' : 'Copy'}
                                         </button>
                                     </div>
-                                    <pre className="p-4 bg-zinc-900 text-emerald-400 font-mono text-xs rounded-b-2xl overflow-x-auto border-x border-b border-zinc-700 leading-relaxed">
+                                    <pre className="p-4 bg-zinc-900 text-emerald-400 text-xs rounded-b-2xl overflow-x-auto border-x border-b border-zinc-700 leading-relaxed">
 {csvSampleMultiColumn}
                                     </pre>
                                 </div>
@@ -552,7 +552,7 @@ https://codeforces.com/profile/petr`;
 
                                 <div className="relative mt-2">
                                     <div className="flex items-center justify-between bg-zinc-800 px-4 py-2.5 rounded-t-2xl border border-zinc-700">
-                                        <span className="text-[12px] font-mono text-zinc-300 font-semibold">handles_only.csv</span>
+                                        <span className="text-[12px] text-zinc-300 font-semibold">handles_only.csv</span>
                                         <button
                                             onClick={() => handleCopy(csvSampleSingleColumn, 2)}
                                             className="text-xs text-zinc-400 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors interactive-press"
@@ -561,7 +561,7 @@ https://codeforces.com/profile/petr`;
                                             {copiedIndex === 2 ? 'Copied' : 'Copy'}
                                         </button>
                                     </div>
-                                    <pre className="p-4 bg-zinc-900 text-cyan-400 font-mono text-xs rounded-b-2xl overflow-x-auto border-x border-b border-zinc-700 leading-relaxed">
+                                    <pre className="p-4 bg-zinc-900 text-cyan-400 text-xs rounded-b-2xl overflow-x-auto border-x border-b border-zinc-700 leading-relaxed">
 {csvSampleSingleColumn}
                                     </pre>
                                 </div>
@@ -604,7 +604,7 @@ https://codeforces.com/profile/petr`;
                                         <h3 className="font-bold text-zinc-900 dark:text-white text-base">Connect Your Coding Handles</h3>
                                     </div>
                                     <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed pl-8.5">
-                                        During signup or in your Student Dashboard, enter your LeetCode username and Codeforces handle, or paste your profile URLs directly (e.g. <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">leetcode.com/u/alice</code>). MentorSync automatically cleans URLs and extracts handles. Make sure your profiles are public so statistics can be scraped.
+                                        During signup or in your Student Dashboard, enter your LeetCode username and Codeforces handle, or paste your profile URLs directly (e.g. <code className="text-[11px] bg-zinc-200/70 dark:bg-zinc-800 px-1 py-0.5 rounded font-semibold">leetcode.com/u/alice</code>). MentorSync automatically cleans URLs and extracts handles. Make sure your profiles are public so statistics can be scraped.
                                     </p>
                                 </div>
 
@@ -673,7 +673,7 @@ https://codeforces.com/profile/petr`;
                                     </div>
                                     <h3 className="font-bold text-base text-zinc-900 dark:text-white">Assignment Completion Matrix</h3>
                                     <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                        Exported by clicking <strong>Export Matrix</strong> in the Leaderboard tab. Produces a 2D grid of students × assignments, with each cell marked as <code className="font-mono text-purple-600 dark:text-purple-300">COMPLETED</code> or <code className="font-mono text-purple-600 dark:text-purple-300">PENDING</code>.
+                                        Exported by clicking <strong>Export Matrix</strong> in the Leaderboard tab. Produces a 2D grid of students × assignments, with each cell marked as <code className="font-semibold text-purple-600 dark:text-purple-300">COMPLETED</code> or <code className="font-semibold text-purple-600 dark:text-purple-300">PENDING</code>.
                                     </p>
                                 </div>
 

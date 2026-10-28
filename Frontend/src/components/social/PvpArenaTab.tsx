@@ -10,10 +10,11 @@ import {
     CheckIcon as Check,
     SpinnerIcon as Loader2,
     FlameIcon as Flame,
-    SparkleIcon as Sparkles,
+    BoxingGloveIcon,
     ShieldCheckIcon as ShieldCheck,
     SignOutIcon as SignOut,
-    WarningCircleIcon as AlertCircle
+    WarningCircleIcon as AlertCircle,
+    ArrowsClockwiseIcon as ArrowsClockwise
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -62,7 +63,6 @@ function getPvpRankTier(elo = 1200): EloTierInfo {
     }
     return { name: 'Bronze', badgeClass: 'bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30' };
 }
-
 
 function extractPvpErrorMessage(err: unknown, fallback: string): string {
     if (err && typeof err === 'object' && 'response' in err) {
@@ -390,9 +390,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-[#5b4fff]" />
-                <p className="text-xs font-semibold text-zinc-500">Loading PVP Arena...</p>
+            <div className="flex flex-col items-center justify-center py-24 gap-3">
+                <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
+                <p className="text-xs font-bold text-zinc-500">Loading PVP Arena...</p>
             </div>
         );
     }
@@ -401,7 +401,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
         <div className="space-y-6">
             {feedback && (
                 <div
-                    className={`p-4 rounded-xl text-xs font-bold flex items-center justify-between shadow-sm animate-in fade-in duration-200 ${
+                    className={`p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm animate-in fade-in duration-200 ${
                         feedback.type === 'success'
                             ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30'
                             : 'bg-rose-50 dark:bg-rose-500/15 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30'
@@ -420,61 +420,61 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
             {/* PVP Arena Header Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 border border-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] flex items-center justify-center shrink-0 shadow-sm">
+                    <div className="w-11 h-11 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 border border-[#5b4fff]/20 text-[#5b4fff] dark:text-[#968fff] flex items-center justify-center shrink-0 shadow-sm ring-4 ring-[#5b4fff]/10">
                         <Swords className="w-5 h-5" />
                     </div>
                     <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                            <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                            <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
                                 PVP Problem-Solving Arena
                             </h2>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                                <Flame className="w-3 h-3" /> Live Duels
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                <Flame className="w-3 h-3 text-rose-500" /> Live Duels
                             </span>
                         </div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                            Challenge your peers to 1v1 speed duels on identical algorithmic problems.
+                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-normal">
+                            Challenge your peers to 1v1 speed duels on identical algorithmic problems with real-time countdown clocks.
                         </p>
                     </div>
                 </div>
 
                 <Button
                     onClick={() => setCreateDialogOpen(true)}
-                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-semibold px-4 h-9 shadow-sm hover:shadow-md transition-all gap-1.5 shrink-0 cursor-pointer self-start sm:self-auto"
+                    className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold px-4 h-9 shadow-sm hover:shadow-md transition-all gap-1.5 shrink-0 cursor-pointer self-start sm:self-auto"
                 >
                     <Play className="w-3.5 h-3.5" /> Launch 1v1 Duel
                 </Button>
             </div>
 
-            {/* Balanced 2-Column + 1-Column Responsive Grid matching StudentDashboard */}
+            {/* Balanced 2-Column + 1-Column Responsive Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content Column (Left) */}
+                {/* Main Content Column (Left - 2 Cols) */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* Active Duels Card */}
-                    <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
+                    <div className="relative bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm dark:shadow-xl rounded-3xl overflow-hidden p-6 transition-colors duration-200">
                         {/* Active Duels Card Header */}
                         <div className="flex items-center justify-between mb-5">
                             <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center">
                                     <Flame className="w-4 h-4" />
                                 </div>
-                                <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
+                                <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white">
                                     Active Duels & In-Progress Battles
                                 </h3>
                             </div>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
                                 {activeMatches.length} Active
                             </span>
                         </div>
 
                         {activeMatches.length === 0 ? (
-                            <div className="p-8 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-dashed border-zinc-200 dark:border-zinc-800 text-center space-y-2.5">
-                                <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 flex items-center justify-center mx-auto text-zinc-400">
-                                    <Swords className="w-5 h-5" />
+                            <div className="p-10 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-dashed border-zinc-200 dark:border-zinc-800 text-center space-y-3">
+                                <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80 flex items-center justify-center mx-auto text-zinc-400">
+                                    <Swords className="w-6 h-6" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">No active duels right now</p>
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+                                    <p className="text-sm font-extrabold text-zinc-800 dark:text-zinc-200">No active duels right now</p>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto leading-relaxed">
                                         Pick a friend from your network, set the difficulty and time limit, and battle in real time!
                                     </p>
                                 </div>
@@ -482,7 +482,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     onClick={() => setCreateDialogOpen(true)}
                                     variant="outline"
                                     size="sm"
-                                    className="rounded-xl text-xs font-semibold mt-1 border-zinc-200 dark:border-zinc-700 hover:border-[#5b4fff]"
+                                    className="rounded-xl text-xs font-bold mt-1 border-zinc-200 dark:border-zinc-700 hover:border-[#5b4fff] cursor-pointer"
                                 >
                                     <Play className="w-3.5 h-3.5 mr-1 text-[#5b4fff]" /> Start First Duel
                                 </Button>
@@ -508,13 +508,13 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     return (
                                         <div
                                             key={match.id}
-                                            className="p-5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 shadow-xs space-y-4 hover:border-[#5b4fff]/40 transition-all"
+                                            className="p-5 sm:p-6 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/50 border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs space-y-4 hover:border-[#5b4fff]/40 transition-all"
                                         >
                                             {/* Match Status Bar & Timer */}
                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/80 dark:border-zinc-800">
                                                 <div className="flex items-center gap-2.5">
                                                     <Badge
-                                                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-md border ${
+                                                        className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md border ${
                                                             match.status === 'IN_PROGRESS'
                                                                 ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25 animate-pulse'
                                                                 : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25'
@@ -528,7 +528,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                 </div>
 
                                                 {match.status === 'IN_PROGRESS' && (
-                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-mono text-xs font-bold border ${
+                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
                                                         isClockRunningOut
                                                             ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30 animate-pulse'
                                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700'
@@ -547,7 +547,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                             <Clock className="w-3 h-3 text-zinc-400" />
                                                             <span>Elapsed: {formatSeconds(elapsedSeconds)}</span>
                                                         </span>
-                                                        <span className={`font-mono font-bold ${
+                                                        <span className={`font-bold ${
                                                             isClockRunningOut
                                                                 ? 'text-rose-600 dark:text-rose-400 animate-pulse'
                                                                 : 'text-zinc-600 dark:text-zinc-300'
@@ -572,20 +572,20 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                             <div className="grid grid-cols-3 items-center gap-2 py-1">
                                                 {/* Challenger */}
                                                 <div className="text-center space-y-1">
-                                                    <Avatar className="w-11 h-11 mx-auto border-2 border-[#5b4fff]/40 shadow-xs">
+                                                    <Avatar className="w-12 h-12 mx-auto border-2 border-[#5b4fff]/40 shadow-xs ring-2 ring-[#5b4fff]/10">
                                                         <AvatarImage src={match.challengerAvatarUrl} />
                                                         <AvatarFallback className="bg-[#5b4fff]/10 text-[#5b4fff] font-bold text-xs">
                                                             {match.challengerName.substring(0, 2)}
                                                         </AvatarFallback>
                                                     </Avatar>
-                                                    <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">
-                                                        {match.challengerName} {isChallenger && <span className="text-[#5b4fff]">(You)</span>}
+                                                    <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
+                                                        {match.challengerName} {isChallenger && <span className="text-[#5b4fff] font-extrabold">(You)</span>}
                                                     </p>
                                                     <div className="flex items-center justify-center gap-1 flex-wrap">
                                                         <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-md border ${challengerTier.badgeClass}`}>
                                                             {challengerTier.name}
                                                         </span>
-                                                        <span className="text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400">
+                                                        <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
                                                             {challengerElo} Elo
                                                         </span>
                                                     </div>
@@ -604,30 +604,30 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                                                 {/* VS Badge */}
                                                 <div className="flex flex-col items-center justify-center">
-                                                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 font-bold text-[10px] flex items-center justify-center shadow-2xs">
+                                                    <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-black text-[11px] flex items-center justify-center shadow-xs">
                                                         VS
                                                     </div>
-                                                    <span className="text-[10px] font-medium text-zinc-400 mt-1 uppercase tracking-wider">
+                                                    <span className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-wider">
                                                         {match.durationMinutes}m Duel
                                                     </span>
                                                 </div>
 
                                                 {/* Opponent */}
                                                 <div className="text-center space-y-1">
-                                                    <Avatar className="w-11 h-11 mx-auto border-2 border-rose-500/40 shadow-xs">
+                                                    <Avatar className="w-12 h-12 mx-auto border-2 border-rose-500/40 shadow-xs ring-2 ring-rose-500/10">
                                                         <AvatarImage src={match.opponentAvatarUrl} />
                                                         <AvatarFallback className="bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold text-xs">
                                                             {match.opponentName.substring(0, 2)}
                                                         </AvatarFallback>
                                                     </Avatar>
-                                                    <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">
-                                                        {match.opponentName} {!isChallenger && <span className="text-[#5b4fff]">(You)</span>}
+                                                    <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
+                                                        {match.opponentName} {!isChallenger && <span className="text-[#5b4fff] font-extrabold">(You)</span>}
                                                     </p>
                                                     <div className="flex items-center justify-center gap-1 flex-wrap">
                                                         <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-md border ${opponentTier.badgeClass}`}>
                                                             {opponentTier.name}
                                                         </span>
-                                                        <span className="text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400">
+                                                        <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
                                                             {opponentElo} Elo
                                                         </span>
                                                     </div>
@@ -646,14 +646,14 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                             </div>
 
                                             {/* Problem Target Box */}
-                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-white dark:bg-[#111111]/80 border border-zinc-200/80 dark:border-zinc-800">
-                                                <div className="space-y-0.5">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-[#121215] border border-zinc-200/90 dark:border-zinc-800 shadow-2xs">
+                                                <div className="space-y-1">
                                                     <div className="flex items-center gap-2 flex-wrap">
                                                         <h4 className="text-xs font-bold text-zinc-900 dark:text-white">
                                                             {formattedTitle}
                                                         </h4>
                                                         <Badge
-                                                             className={`text-[10px] font-semibold px-2 py-0.2 rounded-md border ${getDifficultyBadgeClass(match.problemDifficulty)}`}
+                                                             className={`text-[10px] font-bold px-2 py-0.2 rounded-md border ${getDifficultyBadgeClass(match.problemDifficulty)}`}
                                                         >
                                                             {match.problemDifficulty}
                                                         </Badge>
@@ -667,7 +667,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                     href={match.problemLink}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs transition-all shrink-0"
+                                                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-xs transition-all shrink-0 cursor-pointer"
                                                 >
                                                     <span>Open Problem</span>
                                                     <ExternalLink className="w-3.5 h-3.5" />
@@ -681,7 +681,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                         onClick={() => handleAcceptMatch(match.id)}
                                                         disabled={isCurrentUserBusy}
                                                         title={isCurrentUserBusy ? "Cannot accept while already in an active duel" : ""}
-                                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold h-9 gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold h-9 gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                                                     >
                                                         <Check className="w-3.5 h-3.5" /> Accept Duel Challenge
                                                     </Button>
@@ -696,7 +696,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                             )}
 
                                             {match.status === 'IN_PROGRESS' && (
-                                                <div className="pt-1 space-y-1.5">
+                                                <div className="pt-1 space-y-2">
                                                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                                         <Input
                                                             type="text"
@@ -705,12 +705,12 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                             onChange={(e) =>
                                                                 setSubmissionUrlInput(prev => ({ ...prev, [match.id]: e.target.value }))
                                                             }
-                                                            className="bg-white dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9 text-xs rounded-xl flex-1"
+                                                            className="bg-white dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 h-9.5 text-xs rounded-xl flex-1"
                                                         />
                                                         <Button
                                                             onClick={() => handleVerifySubmission(match.id)}
                                                             disabled={verifyingMatchId === match.id || isEndingDuel}
-                                                            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold px-4 h-9 gap-1.5 shrink-0 cursor-pointer shadow-xs"
+                                                            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold px-4 h-9.5 gap-1.5 shrink-0 cursor-pointer shadow-xs"
                                                         >
                                                             {verifyingMatchId === match.id ? (
                                                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -725,7 +725,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                             variant="outline"
                                                             onClick={() => setConfirmEndMatchId(match.id)}
                                                             disabled={isEndingDuel || verifyingMatchId === match.id}
-                                                            className="border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-semibold px-3 h-9 gap-1.5 shrink-0 cursor-pointer"
+                                                            className="border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold px-3.5 h-9.5 gap-1.5 shrink-0 cursor-pointer"
                                                             title="End this PvP duel preemptively and sever connection"
                                                         >
                                                             <SignOut className="w-3.5 h-3.5" />
@@ -733,20 +733,20 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                         </Button>
                                                     </div>
                                                     <p className="text-[10px] text-zinc-400">
-                                                        Tip: Submit on LeetCode, then click Verify. You can also end the duel preemptively if you wish to forfeit and sever the connection.
+                                                        Tip: Submit your code on LeetCode, then click Verify. You can also end the duel preemptively if you wish to forfeit and sever the connection.
                                                     </p>
                                                 </div>
                                             )}
 
                                             {isInvitedPending && isChallenger && (
-                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 p-2.5 rounded-lg bg-zinc-100/70 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800 text-xs text-zinc-500">
+                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 p-3 rounded-xl bg-zinc-100/70 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800 text-xs text-zinc-500">
                                                     <span>Waiting for {opponentName} to accept your duel invitation...</span>
                                                     <Button
                                                         type="button"
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleDeclineMatch(match.id)}
-                                                        className="text-xs font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 h-7 px-2.5 rounded-lg cursor-pointer"
+                                                        className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 h-7.5 px-3 rounded-lg cursor-pointer"
                                                     >
                                                         Cancel Invitation
                                                     </Button>
@@ -760,15 +760,15 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                     </div>
 
                     {/* Duel Match History Card */}
-                    <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
+                    <div className="relative bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm dark:shadow-xl rounded-3xl overflow-hidden p-6 transition-colors duration-200">
                         {/* Match History Header */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                             <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
                                     <Trophy className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
+                                    <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white">
                                         Duel Match History & Past Battles
                                     </h3>
                                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -784,7 +784,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     onClick={() => setHistoryFilter('ALL')}
                                     className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                                         historyFilter === 'ALL'
-                                            ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs'
+                                            ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs font-bold'
                                             : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                     }`}
                                 >
@@ -795,7 +795,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     onClick={() => setHistoryFilter('WON')}
                                     className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                                         historyFilter === 'WON'
-                                            ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-2xs'
+                                            ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-2xs font-bold'
                                             : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                     }`}
                                 >
@@ -806,7 +806,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     onClick={() => setHistoryFilter('LOST')}
                                     className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                                         historyFilter === 'LOST'
-                                            ? 'bg-white dark:bg-zinc-900 text-rose-600 dark:text-rose-400 shadow-2xs'
+                                            ? 'bg-white dark:bg-zinc-900 text-rose-600 dark:text-rose-400 shadow-2xs font-bold'
                                             : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                     }`}
                                 >
@@ -817,7 +817,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     onClick={() => setHistoryFilter('DRAWS')}
                                     className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                                         historyFilter === 'DRAWS'
-                                            ? 'bg-white dark:bg-zinc-900 text-amber-600 dark:text-amber-400 shadow-2xs'
+                                            ? 'bg-white dark:bg-zinc-900 text-amber-600 dark:text-amber-400 shadow-2xs font-bold'
                                             : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                     }`}
                                 >
@@ -827,7 +827,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                         </div>
 
                         {filteredPastMatches.length === 0 ? (
-                            <div className="p-8 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500 dark:text-zinc-400">
+                            <div className="p-8 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500 dark:text-zinc-400">
                                 No completed duels yet. Complete your first match to build your head-to-head record!
                             </div>
                         ) : (
@@ -853,16 +853,16 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     return (
                                         <div
                                             key={m.id}
-                                            className="p-3.5 rounded-xl bg-zinc-50/60 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800/60 flex items-center justify-between gap-3 text-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                                            className="p-3.5 rounded-2xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/60 flex items-center justify-between gap-3 text-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors shadow-2xs"
                                         >
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <Badge
-                                                     className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${getMatchResultClass(isWinner, isDraw)}`}
+                                                     className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border shrink-0 ${getMatchResultClass(isWinner, isDraw)}`}
                                                 >
                                                      {getMatchResultText(isWinner, isDraw)}
                                                 </Badge>
 
-                                                <Avatar className="w-7 h-7 border border-zinc-200 dark:border-zinc-700 shrink-0">
+                                                <Avatar className="w-8 h-8 border border-zinc-200 dark:border-zinc-700 shrink-0">
                                                     <AvatarImage src={opponentAvatar} />
                                                     <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-bold">
                                                         {opponentName?.substring(0, 2) || 'OP'}
@@ -870,10 +870,10 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                 </Avatar>
 
                                                 <div className="truncate">
-                                                    <p className="font-semibold text-zinc-900 dark:text-white truncate">
+                                                    <p className="font-bold text-zinc-900 dark:text-white truncate">
                                                         {title}
                                                     </p>
-                                                    <p className="text-[10px] text-zinc-400">
+                                                    <p className="text-[11px] text-zinc-400">
                                                         vs {opponentName} · {m.problemDifficulty} · {m.problemTopic}
                                                     </p>
                                                 </div>
@@ -881,7 +881,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                                             <div className="flex items-center gap-2.5 shrink-0">
                                                 {ratingDelta !== undefined && ratingDelta !== null && (
-                                                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border shrink-0 ${
+                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
                                                         ratingDelta > 0
                                                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
                                                             : ratingDelta < 0
@@ -898,14 +898,14 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                                     variant="ghost"
                                                     onClick={() => handleRematch(m)}
                                                     disabled={isCurrentUserBusy}
-                                                    className="h-7 px-2.5 text-[10px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer gap-1"
+                                                    className="h-7 px-2.5 text-[11px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-xl cursor-pointer gap-1"
                                                     title={`Challenge ${opponentName} to a rematch`}
                                                 >
-                                                    <Swords className="w-3 h-3" />
+                                                    <ArrowsClockwise className="w-3.5 h-3.5" />
                                                     <span>Rematch</span>
                                                 </Button>
 
-                                                <div className="text-right text-[11px] text-zinc-400 hidden sm:block">
+                                                <div className="text-right text-[11px] text-zinc-400 hidden sm:block font-medium">
                                                     {m.completedAt ? new Date(m.completedAt).toLocaleDateString() : 'Completed'}
                                                 </div>
                                             </div>
@@ -917,17 +917,17 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                     </div>
                 </div>
 
-                {/* Sidebar Column (Right) */}
+                {/* Sidebar Column (Right - 1 Col) */}
                 <div className="space-y-8">
                     {/* Instant Challenge Widget */}
-                    <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
+                    <div className="relative bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm dark:shadow-xl rounded-3xl overflow-hidden p-6 transition-colors duration-200">
                         {/* Instant Challenge Header */}
                         <div className="flex items-center gap-2.5 mb-4">
-                            <div className="w-8 h-8 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] border border-[#5b4fff]/20 flex items-center justify-center">
-                                <Swords className="w-4 h-4" />
+                            <div className="w-9 h-9 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] border border-[#5b4fff]/20 flex items-center justify-center">
+                                <Swords className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
+                                <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white">
                                     Instant 1v1 Challenge
                                 </h3>
                                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -938,7 +938,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                         <div className="space-y-3.5">
                             {isCurrentUserBusy && (
-                                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-semibold flex items-center gap-2">
+                                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-400 text-xs font-semibold flex items-center gap-2">
                                     <Clock className="w-4 h-4 shrink-0" />
                                     <span>You are currently in an active duel. Complete your duel before challenging others!</span>
                                 </div>
@@ -951,11 +951,11 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     value={selectedFriendId}
                                     onChange={(e) => setSelectedFriendId(e.target.value)}
                                     disabled={isCurrentUserBusy}
-                                    className="w-full h-9 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#5b4fff] disabled:opacity-50"
+                                    className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-[#5b4fff] disabled:opacity-50 cursor-pointer scheme-light-dark"
                                 >
-                                    <option value="">Select a friend to challenge...</option>
+                                    <option value="" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Select a friend to challenge...</option>
                                     {friends.map((f) => (
-                                        <option key={f.id} value={f.id} disabled={!f.isOnline || f.isBusy}>
+                                        <option key={f.id} value={f.id} disabled={!f.isOnline || f.isBusy} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 disabled:text-zinc-400 dark:disabled:text-zinc-600 font-medium">
                                             {f.name} {getFriendStatusSuffix(f)}
                                         </option>
                                     ))}
@@ -968,15 +968,15 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                 <select id="pvp-topic-select"
                                     value={selectedTopic}
                                     onChange={(e) => setSelectedTopic(e.target.value)}
-                                    className="w-full h-9 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#5b4fff]"
+                                    className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-[#5b4fff] cursor-pointer scheme-light-dark"
                                 >
-                                    <option value="Dynamic Programming">Dynamic Programming</option>
-                                    <option value="Tree">Tree / Binary Tree</option>
-                                    <option value="Graph">Graph / BFS / DFS</option>
-                                    <option value="Binary Search">Binary Search</option>
-                                    <option value="Two Pointers">Two Pointers</option>
-                                    <option value="Greedy">Greedy</option>
-                                    <option value="Any">Random Core Topic</option>
+                                    <option value="Dynamic Programming" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Dynamic Programming</option>
+                                    <option value="Tree" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Tree / Binary Tree</option>
+                                    <option value="Graph" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Graph / BFS / DFS</option>
+                                    <option value="Binary Search" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Binary Search</option>
+                                    <option value="Two Pointers" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Two Pointers</option>
+                                    <option value="Greedy" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Greedy</option>
+                                    <option value="Any" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Random Core Topic</option>
                                 </select>
                             </div>
 
@@ -1025,7 +1025,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                             <Button
                                 onClick={handleCreateDuel}
                                 disabled={isCreating || !selectedFriendId || isCurrentUserBusy}
-                                className="w-full bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-9.5 gap-1.5 shadow-sm cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-10 gap-1.5 shadow-sm cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isCreating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                                 Send 1v1 Challenge
@@ -1034,44 +1034,44 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                     </div>
 
                     {/* Combat Career Stats Card */}
-                    <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
-                        {/* Instant Challenge Header */}
+                    <div className="relative bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm dark:shadow-xl rounded-3xl overflow-hidden p-6 transition-colors duration-200">
+                        {/* Combat Career Header */}
                         <div className="flex items-center gap-2.5 mb-4">
-                            <div className="w-8 h-8 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20 flex items-center justify-center">
-                                <Sparkles className="w-4 h-4" />
+                            <div className="w-9 h-9 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20 flex items-center justify-center">
+                                <BoxingGloveIcon  className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
+                                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
                                     PVP Combat Record
                                 </h3>
-                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-normal">
                                     Head-to-head performance ratio
                                 </p>
                             </div>
                         </div>
 
                         {/* Elo Rating and Tier Header */}
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 mb-4">
+                        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 mb-4">
                             <div>
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+                                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
                                     Your Rank & Rating
                                 </span>
                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                    <span className="text-base font-black text-zinc-900 dark:text-white font-mono">
+                                    <span className="text-base font-bold text-zinc-900 dark:text-zinc-100 tabular-nums tracking-tight">
                                         {userPvpRating} Elo
                                     </span>
-                                    <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-md border ${getPvpRankTier(userPvpRating).badgeClass}`}>
+                                    <span className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded-md border ${getPvpRankTier(userPvpRating).badgeClass}`}>
                                         {getPvpRankTier(userPvpRating).name}
                                     </span>
                                 </div>
                             </div>
                             {userPvpStreak > 0 && (
                                 <div className="text-right">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+                                    <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
                                         Win Streak
                                     </span>
-                                    <span className="inline-flex items-center gap-1 text-xs font-black text-amber-500 mt-0.5">
-                                        <Flame className="w-3.5 h-3.5 fill-current" />
+                                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-500 tabular-nums mt-0.5">
+                                        <Flame className="w-3.5 h-3.5" />
                                         {userPvpStreak} in a row
                                     </span>
                                 </div>
@@ -1080,13 +1080,13 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                         {/* Win Rate Bar */}
                         <div className="space-y-2 mb-4">
-                            <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-zinc-500">Win Rate</span>
-                                <span className="text-[#5b4fff] dark:text-[#968fff]">{combatStats.winRate}%</span>
+                            <div className="flex items-center justify-between text-xs font-semibold">
+                                <span className="text-zinc-500 dark:text-zinc-400">Win Rate</span>
+                                <span className="text-[#5b4fff] dark:text-[#968fff] tabular-nums font-bold">{combatStats.winRate}%</span>
                             </div>
                             <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-[#5b4fff] rounded-full transition-all duration-500"
+                                    className="h-full bg-linear-to-r from-[#5b4fff] to-[#877fff] rounded-full transition-all duration-500"
                                     style={{ width: `${combatStats.winRate}%` }}
                                 />
                             </div>
@@ -1094,30 +1094,30 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                         {/* 3 Metric Tiles */}
                         <div className="grid grid-cols-3 gap-2 text-center">
-                            <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800/60">
-                                <p className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Wins</p>
-                                <p className="text-base font-bold text-zinc-900 dark:text-white mt-0.5">{combatStats.won}</p>
+                            <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800/60 shadow-2xs">
+                                <p className="text-[10px] uppercase font-semibold tracking-wider text-emerald-600 dark:text-emerald-400">Wins</p>
+                                <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 tabular-nums">{combatStats.won}</p>
                             </div>
-                            <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800/60">
-                                <p className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400">Losses</p>
-                                <p className="text-base font-bold text-zinc-900 dark:text-white mt-0.5">{combatStats.lost}</p>
+                            <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800/60 shadow-2xs">
+                                <p className="text-[10px] uppercase font-semibold tracking-wider text-rose-600 dark:text-rose-400">Losses</p>
+                                <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 tabular-nums">{combatStats.lost}</p>
                             </div>
-                            <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800/60">
-                                <p className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400">Draws</p>
-                                <p className="text-base font-bold text-zinc-900 dark:text-white mt-0.5">{combatStats.draws}</p>
+                            <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800/60 shadow-2xs">
+                                <p className="text-[10px] uppercase font-semibold tracking-wider text-amber-600 dark:text-amber-400">Draws</p>
+                                <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 tabular-nums">{combatStats.draws}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* PVP Rules & Protocol Card */}
-                    <div className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden p-6 transition-colors duration-200">
+                    <div className="relative bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm dark:shadow-xl rounded-3xl overflow-hidden p-6 transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-3">
                             <ShieldCheck className="w-4 h-4 text-[#5b4fff]" />
-                            <h4 className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">
+                            <h4 className="text-xs font-extrabold text-zinc-900 dark:text-white uppercase tracking-wider">
                                 How 1v1 Duels Work
                             </h4>
                         </div>
-                        <ul className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+                        <ul className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400">
                             <li className="flex items-start gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[#5b4fff] mt-1.5 shrink-0" />
                                 <span>Both coders receive the exact same problem simultaneously.</span>
@@ -1137,7 +1137,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
             {/* Create Challenge Dialog */}
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-                <DialogContent className="max-w-md bg-white dark:bg-[#0c0c0e]/95 backdrop-blur-2xl border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
+                <DialogContent className="max-w-md bg-white dark:bg-[#111114] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl">
                     <DialogHeader>
                         <DialogTitle className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                             <Swords className="w-4 h-4 text-[#5b4fff]" /> Launch 1v1 PVP Duel
@@ -1149,7 +1149,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                     <div className="space-y-3.5 pt-2">
                         {isCurrentUserBusy && (
-                            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-semibold flex items-center gap-2">
+                            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-400 text-xs font-semibold flex items-center gap-2">
                                 <Clock className="w-4 h-4 shrink-0" />
                                 <span>You are currently in an active duel. Complete your duel before issuing new challenges!</span>
                             </div>
@@ -1162,11 +1162,11 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                 value={selectedFriendId}
                                 onChange={(e) => setSelectedFriendId(e.target.value)}
                                 disabled={isCurrentUserBusy}
-                                className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none disabled:opacity-50"
+                                className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none disabled:opacity-50 cursor-pointer scheme-light-dark"
                             >
-                                <option value="">Select a friend to challenge...</option>
+                                <option value="" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Select a friend to challenge...</option>
                                 {friends.map((f) => (
-                                    <option key={f.id} value={f.id} disabled={!f.isOnline || f.isBusy}>
+                                    <option key={f.id} value={f.id} disabled={!f.isOnline || f.isBusy} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 disabled:text-zinc-400 dark:disabled:text-zinc-600 font-medium">
                                         {f.name} {getFriendStatusSuffix(f)}
                                     </option>
                                 ))}
@@ -1184,15 +1184,16 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                             <select id="pvp-rematch-topic-select"
                                 value={selectedTopic}
                                 onChange={(e) => setSelectedTopic(e.target.value)}
-                                className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-medium text-zinc-900 dark:text-white focus:outline-none"
+                                className="w-full h-9.5 px-3 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none cursor-pointer 
+                                "
                             >
-                                <option value="Dynamic Programming">Dynamic Programming</option>
-                                <option value="Tree">Tree / Binary Tree</option>
-                                <option value="Graph">Graph / BFS / DFS</option>
-                                <option value="Binary Search">Binary Search</option>
-                                <option value="Two Pointers">Two Pointers</option>
-                                <option value="Greedy">Greedy</option>
-                                <option value="Any">Random Core Topic</option>
+                                <option value="Dynamic Programming" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Dynamic Programming</option>
+                                <option value="Tree" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Tree / Binary Tree</option>
+                                <option value="Graph" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Graph / BFS / DFS</option>
+                                <option value="Binary Search" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Binary Search</option>
+                                <option value="Two Pointers" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Two Pointers</option>
+                                <option value="Greedy" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Greedy</option>
+                                <option value="Any" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium">Random Core Topic</option>
                             </select>
                         </div>
 
@@ -1240,7 +1241,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
                         {/* Custom problem optional */}
                         <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
-                            <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+                            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
                                 Optional: Custom Problem
                             </span>
                             <Input
@@ -1280,9 +1281,9 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
 
             {/* Confirmation Dialog for Ending PvP Duel Preemptively */}
             <Dialog open={!!confirmEndMatchId} onOpenChange={(open) => !open && setConfirmEndMatchId(null)}>
-                <DialogContent className="sm:max-w-110 bg-white dark:bg-[#0d0d0d] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
+                <DialogContent className="sm:max-w-110 bg-white dark:bg-[#111114] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl">
                     <DialogHeader>
-                        <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center mb-2">
+                        <div className="w-11 h-11 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center mb-2 ring-4 ring-rose-500/10">
                             <AlertCircle className="w-5 h-5" />
                         </div>
                         <DialogTitle className="text-base font-bold text-zinc-900 dark:text-white">
@@ -1299,7 +1300,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                             variant="outline"
                             onClick={() => setConfirmEndMatchId(null)}
                             disabled={isEndingDuel}
-                            className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-9 cursor-pointer"
+                            className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs font-semibold h-9.5 cursor-pointer"
                         >
                             Keep Playing
                         </Button>
@@ -1307,7 +1308,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                             type="button"
                             onClick={() => confirmEndMatchId && handleEndDuelPreemptively(confirmEndMatchId)}
                             disabled={isEndingDuel}
-                            className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold h-9 gap-1.5 shadow-xs cursor-pointer"
+                            className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold h-9.5 gap-1.5 shadow-xs cursor-pointer"
                         >
                             {isEndingDuel ? (
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />

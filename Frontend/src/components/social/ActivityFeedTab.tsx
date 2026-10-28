@@ -6,11 +6,13 @@ import {
     ClockIcon as Clock,
     TrophyIcon as Trophy,
     CheckCircleIcon as CheckCircle2,
-    FlameIcon as Flame,
+    FireIcon as Flame,
     RocketLaunchIcon as RocketLaunch,
     LightbulbIcon as Lightbulb,
     HandsClappingIcon as HandsClapping,
-    HeartIcon as Heart
+    HeartIcon as Heart,
+    UsersIcon as Users,
+    SwordIcon as Swords
 } from '@phosphor-icons/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -34,12 +36,45 @@ const reactionDefinitions = [
 
 function getActivityBadgeClass(type: string): string {
     if (type === 'PVP_WIN') {
-        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+        return 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/25';
     }
     if (type === 'PROBLEM_SOLVED') {
-        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+        return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25';
     }
-    return 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20';
+    if (type === 'NEW_FRIEND') {
+        return 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/25';
+    }
+    if (type === 'PVP_DRAW') {
+        return 'bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 border-zinc-500/25';
+    }
+    return 'bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/25';
+}
+
+function getActivityTypeIcon(type: string) {
+    if (type === 'PVP_WIN') return Trophy;
+    if (type === 'PROBLEM_SOLVED') return CheckCircle2;
+    if (type === 'NEW_FRIEND') return Users;
+    if (type === 'PVP_DRAW') return Swords;
+    return Activity;
+}
+
+function formatRelativeTime(dateString: string): string {
+    try {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffSecs = Math.floor(diffMs / 1000);
+        if (diffSecs < 60) return 'Just now';
+        const diffMins = Math.floor(diffSecs / 60);
+        if (diffMins < 60) return `${diffMins}m ago`;
+        const diffHours = Math.floor(diffMins / 60);
+        if (diffHours < 24) return `${diffHours}h ago`;
+        const diffDays = Math.floor(diffHours / 24);
+        if (diffDays < 7) return `${diffDays}d ago`;
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    } catch {
+        return 'Recently';
+    }
 }
 
 export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeedTabProps>) {
@@ -91,9 +126,9 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-[#5b4fff]" />
-                <p className="text-xs font-semibold text-zinc-500">Loading friend activity stream...</p>
+            <div className="flex flex-col items-center justify-center py-24 gap-3">
+                <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
+                <p className="text-xs font-bold text-zinc-500">Loading friend activity stream...</p>
             </div>
         );
     }
@@ -101,28 +136,34 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
     return (
         <div className="space-y-6">
             {/* Header with filter buttons */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#0c0c0e]/80 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/70 shadow-xs">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-3xl bg-white/90 dark:bg-[#0c0c0e]/85 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm">
+                <div className="flex items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] flex items-center justify-center shrink-0 ring-4 ring-[#5b4fff]/10">
                         <Activity className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">
-                            Live Peer Activity Feed
-                        </h3>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                            Real-time solved problems, duel victories, and milestones from your friend network
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                                Live Peer Activity Feed
+                            </h3>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Live Stream
+                            </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            Real-time solved problems, duel victories, and milestones from your friend network.
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/70 p-1 rounded-xl shrink-0">
+                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-900/90 p-1 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shrink-0 shadow-2xs">
                     <button
                         type="button"
                         onClick={() => setFilter('ALL')}
                         className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                             filter === 'ALL'
-                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
+                                ? 'bg-white dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -131,9 +172,9 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                     <button
                         type="button"
                         onClick={() => setFilter('SOLVES')}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 ${
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             filter === 'SOLVES'
-                                ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -142,9 +183,9 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                     <button
                         type="button"
                         onClick={() => setFilter('DUELS')}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 ${
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             filter === 'DUELS'
-                                ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-xs'
+                                ? 'bg-white dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -155,14 +196,14 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
 
             {/* Activities List */}
             {filteredActivities.length === 0 ? (
-                <div className="p-12 rounded-3xl bg-white dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400">
-                        <Activity className="w-6 h-6" />
+                <div className="p-12 sm:p-16 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-3xl border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-4 shadow-xs">
+                    <div className="w-14 h-14 rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center mx-auto shadow-inner">
+                        <Activity className="w-7 h-7" />
                     </div>
-                    <div className="space-y-1">
-                        <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">No activity logged yet</p>
-                        <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-                            Add friends and solve problems or complete duels to see real-time updates here!
+                    <div className="space-y-1.5 max-w-md mx-auto">
+                        <h4 className="text-base font-extrabold text-zinc-900 dark:text-white">No Activity Logged Yet</h4>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                            Add friends and solve problems or complete 1v1 duels to see real-time algorithmic updates and celebrate victories here!
                         </p>
                     </div>
                 </div>
@@ -190,21 +231,22 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                             : act.studentAvatarUrl;
 
                         const isDisplayUserSelf = Boolean(user?.id && displayStudentId === user.id);
+                        const TypeIcon = getActivityTypeIcon(act.type);
 
                         return (
                             <div
                                 key={act.id}
-                                className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0c0c0e]/80 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/70 shadow-2xs hover:border-[#5b4fff]/40 transition-all space-y-3"
+                                className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-xs hover:border-[#5b4fff]/40 hover:shadow-lg dark:hover:shadow-[#5b4fff]/5 transition-all space-y-4"
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3.5 min-w-0">
                                         <button
                                             type="button"
                                             onClick={() => onViewFriendDashboard(displayStudentId)}
-                                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                                            className="cursor-pointer hover:opacity-85 transition-opacity shrink-0"
                                             title={isDisplayUserSelf ? "Your profile notice" : `View ${displayStudentName}'s profile`}
                                         >
-                                            <Avatar className={`w-11 h-11 border-2 ${isDisplayUserSelf ? 'border-[#5b4fff]/40' : 'border-zinc-200 dark:border-zinc-700'} shadow-sm`}>
+                                            <Avatar className={`w-12 h-12 border-2 ${isDisplayUserSelf ? 'border-[#5b4fff]/40 ring-2 ring-[#5b4fff]/20' : 'border-zinc-200 dark:border-zinc-700'} shadow-sm`}>
                                                 <AvatarImage src={displayStudentAvatarUrl} />
                                                 <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold">
                                                     {displayStudentName.substring(0, 2)}
@@ -213,11 +255,11 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                         </button>
 
                                         <div className="min-w-0">
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 flex-wrap">
                                                 <button
                                                     type="button"
                                                     onClick={() => onViewFriendDashboard(displayStudentId)}
-                                                    className="text-xs font-extrabold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
+                                                    className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight hover:text-[#5b4fff] transition-colors truncate text-left cursor-pointer"
                                                     title={isDisplayUserSelf ? "Your profile notice" : `View ${displayStudentName}'s profile`}
                                                 >
                                                     {displayStudentName}
@@ -225,20 +267,24 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                                 {isDisplayUserSelf && (
                                                     <span className="text-[#5b4fff] text-xs font-bold">(You)</span>
                                                 )}
-                                                <span className="text-[11px] text-zinc-400">
+                                                <span className="text-xs text-zinc-500 dark:text-zinc-400">
                                                     @{displayStudentHandle || 'coder'}
                                                 </span>
                                             </div>
 
                                             <div className="flex items-center gap-2 mt-1">
                                                 <Badge
-                                                    className={`text-[9px] font-black px-2 py-0.2 rounded-md border ${getActivityBadgeClass(act.type)}`}
+                                                    className={`text-[9px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-md border flex items-center gap-1 ${getActivityBadgeClass(act.type)}`}
                                                 >
-                                                    {act.type.replaceAll('_', ' ')}
+                                                    <TypeIcon className="w-3 h-3" />
+                                                    <span>{act.type.replaceAll('_', ' ')}</span>
                                                 </Badge>
-                                                <span className="text-[10px] text-zinc-400 flex items-center gap-1 font-medium">
-                                                    <Clock className="w-3 h-3" />
-                                                    {new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · {new Date(act.createdAt).toLocaleDateString()}
+                                                <span
+                                                    className="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1 tabular-nums font-medium"
+                                                    title={`${new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · ${new Date(act.createdAt).toLocaleDateString()}`}
+                                                >
+                                                    <Clock className="w-3 h-3 text-zinc-400" />
+                                                    {formatRelativeTime(act.createdAt)}
                                                 </span>
                                             </div>
                                         </div>
@@ -249,26 +295,26 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                             href={act.link}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="text-zinc-400 hover:text-[#5b4fff] transition-colors p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                                            title="View Problem on LeetCode"
+                                            className="text-zinc-400 hover:text-[#5b4fff] transition-colors p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent hover:border-zinc-200 dark:border-zinc-700"
+                                            title="View Problem on Platform"
                                         >
                                             <ExternalLink className="w-4 h-4" />
                                         </a>
                                     )}
                                 </div>
 
-                                {/* Content / Description */}
-                                <div className="text-xs text-zinc-800 dark:text-zinc-200 space-y-1">
-                                    <p className="font-bold text-zinc-900 dark:text-white">
+                                {/* Content / Description Box */}
+                                <div className="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800/60 space-y-1 text-xs">
+                                    <p className="font-bold text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm tracking-tight leading-snug">
                                         {formattedTitle}
                                     </p>
-                                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed text-xs">
                                         {act.description}
                                     </p>
                                 </div>
 
                                 {/* Reactions / Kudos Row */}
-                                <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800/60">
+                                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-zinc-100 dark:border-zinc-800/70">
                                     <div className="flex items-center gap-2 flex-wrap">
                                         {reactionDefinitions.map((item) => {
                                             const count = (act.reactionCounts?.[item.key] || 0) + (act.reactionCounts?.[item.legacy] || 0);
@@ -280,15 +326,15 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                                     key={item.key}
                                                     onClick={() => handleReact(act.id, item.key)}
                                                     disabled={reactingActivityId === act.id}
-                                                    className={`px-3 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1.5 ${
+                                                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
                                                         isSelected
                                                             ? 'bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/40 font-bold scale-105 shadow-xs'
-                                                            : 'bg-zinc-50 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                                                            : 'bg-zinc-50 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                                     }`}
                                                 >
                                                     <item.Icon className="w-3.5 h-3.5" />
                                                     <span className="text-[11px] font-bold">{item.label}</span>
-                                                    {count > 0 && <span className="text-[11px] font-bold">({count})</span>}
+                                                    {count > 0 && <span className="text-[11px] tabular-nums font-bold">({count})</span>}
                                                 </button>
                                             );
                                         })}
@@ -309,7 +355,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => onViewFriendDashboard(displayStudentId)}
-                                            className="text-xs h-8 text-zinc-500 hover:text-[#5b4fff] cursor-pointer rounded-xl font-bold"
+                                            className="text-xs h-8 text-zinc-500 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 cursor-pointer rounded-xl font-bold"
                                         >
                                             {isNewFriend ? 'View Friend Profile →' : 'View Profile & Overlap →'}
                                         </Button>

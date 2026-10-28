@@ -448,7 +448,7 @@ export function AuthPage() {
                         {isLeetCodeUrl(formData.leetcodeUsername) && (
                           <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 pt-0.5">
                             <span className="font-semibold text-zinc-500">Auto-extracted:</span>
-                            <span className="font-mono bg-zinc-200/80 dark:bg-zinc-800 text-[#ffa116] px-1.5 py-0.5 rounded text-[10px] border border-zinc-300 dark:border-zinc-700/60 font-bold">
+                            <span className="bg-zinc-200/80 dark:bg-zinc-800 text-[#ffa116] px-1.5 py-0.5 rounded text-[10px] border border-zinc-300 dark:border-zinc-700/60 font-bold">
                               @{extractLeetcodeUsername(formData.leetcodeUsername)}
                             </span>
                           </div>
@@ -478,7 +478,7 @@ export function AuthPage() {
                         {isCodeforcesUrl(formData.codeforcesHandle) && (
                           <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 pt-0.5">
                             <span className="font-semibold text-zinc-500">Auto-extracted:</span>
-                            <span className="font-mono bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded text-[10px] border border-cyan-200 dark:border-cyan-800/60 font-bold">
+                            <span className="bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 px-1.5 py-0.5 rounded text-[10px] border border-cyan-200 dark:border-cyan-800/60 font-bold">
                               @{extractCodeforcesHandle(formData.codeforcesHandle)}
                             </span>
                           </div>

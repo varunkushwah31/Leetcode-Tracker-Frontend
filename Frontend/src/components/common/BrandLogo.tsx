@@ -145,7 +145,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
             MentorSync
           </span>
           {subtext && (
-            <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-500 dark:text-zinc-400 mt-1">
+            <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-500 dark:text-zinc-400 mt-1">
               {subtext}
             </span>
           )}

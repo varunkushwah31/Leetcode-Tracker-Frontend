@@ -201,7 +201,7 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                         </Button>
                     )}
                     <span className="text-xs text-zinc-500 font-medium hidden sm:inline-flex items-center gap-1.5">
-                        Press <kbd className="bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-300 font-mono text-xs border border-zinc-200 dark:border-zinc-700">Esc</kbd> to return
+                        Press <kbd className="bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-300 font-semibold text-xs border border-zinc-200 dark:border-zinc-700">Esc</kbd> to return
                     </span>
                     <Button
                         variant="ghost"
