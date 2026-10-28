@@ -11,7 +11,7 @@ import {
     UsersIcon as Users,
     ArrowSquareOutIcon as ExternalLink,
     PaperPlaneRightIcon as Send,
-    SparkleIcon as Sparkles,
+    ChartLineUpIcon as ChartLineUp,
     ShieldCheckIcon as ShieldCheck,
     ArrowsDownUpIcon as ArrowsDownUp
 } from '@phosphor-icons/react';
@@ -730,7 +730,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 <div className="rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/60 p-3 space-y-2.5 shadow-2xs">
                                     <div className="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
                                         <div className="flex items-center gap-1.5">
-                                            <Sparkles className="w-3.5 h-3.5 text-[#5b4fff]" />
+                                            <ChartLineUp className="w-3.5 h-3.5 text-[#5b4fff]" />
                                             <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">C-Score</span>
                                             <span className="text-zinc-900 dark:text-zinc-100 font-bold text-sm ml-1">{friend.cScore ?? 500}</span>
                                         </div>

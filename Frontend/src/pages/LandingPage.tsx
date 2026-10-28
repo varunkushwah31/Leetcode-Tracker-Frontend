@@ -17,7 +17,8 @@ import {
     ArrowUpRightIcon,
     MagnifyingGlassIcon,
     LightningIcon,
-    SparkleIcon,
+    TargetIcon,
+    HeartIcon,
     ShieldCheckIcon,
     ArrowsClockwiseIcon,
     PaperPlaneTiltIcon,
@@ -731,7 +732,7 @@ function AnalyticsTabContent({
             <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-0.5">
                     <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5">
-                        <SparkleIcon className="w-4 h-4 text-[#5b4fff]" weight="fill" />
+                        <TargetIcon className="w-4 h-4 text-[#5b4fff]" weight="bold" />
                         Recommended Practice Set
                     </p>
                     <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
@@ -1057,7 +1058,7 @@ export function LandingPage() {
                             <span>No student passwords needed</span>
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs hover:border-[#5b4fff]/40 transition-colors cursor-default group">
-                            <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 group-hover:scale-110 transition-transform" weight="fill" />
+                            <HeartIcon className="w-4 h-4 text-[#5b4fff] shrink-0 group-hover:scale-110 transition-transform" weight="fill" />
                             <span>100% free for teachers & mentors</span>
                         </div>
                     </div>

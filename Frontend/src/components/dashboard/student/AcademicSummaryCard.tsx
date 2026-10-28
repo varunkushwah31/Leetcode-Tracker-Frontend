@@ -4,7 +4,7 @@ import {
     CheckCircleIcon as CheckCircle,
     ClockIcon as Clock,
     BookOpenIcon,
-    SparkleIcon as Sparkle,
+    ShieldCheckIcon as ShieldCheck,
     ListChecksIcon as ListChecks,
     UsersIcon as Users,
 } from '@phosphor-icons/react';
@@ -131,7 +131,7 @@ export function AcademicSummaryCard({
                     </div>
 
                     <div className="lg:col-span-5 p-3 rounded-xl bg-[#5b4fff]/5 dark:bg-[#5b4fff]/10 border border-[#5b4fff]/20 text-xs text-zinc-600 dark:text-zinc-400 flex items-start gap-2.5">
-                        <Sparkle className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff] shrink-0 mt-0.5" />
+                        <ShieldCheck className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff] shrink-0 mt-0.5" />
                         <div>
                             <strong className="text-zinc-900 dark:text-white font-semibold">Automatic Verification:</strong>{' '}
                             Solved on LeetCode or Codeforces? Click Auto-Verify on any assignment to instantly credit your submission.

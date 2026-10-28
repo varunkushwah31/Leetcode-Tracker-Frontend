@@ -13,7 +13,7 @@ import {
     TrendUpIcon as TrendingUp,
     UsersIcon,
     FireIcon as FlameIcon,
-    SparkleIcon,
+    LightbulbIcon,
     CheckCircleIcon,
     ArrowSquareOutIcon as ExternalLink,
     MagnifyingGlassIcon,
@@ -287,7 +287,7 @@ export function ClassroomAnalytics({
                 <Card className={`${cardClasses} hover:-translate-y-0.5 transition-transform duration-200`}>
                     <CardContent className="p-5 flex items-center gap-4">
                         <div className="p-3 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-xl shadow-inner shrink-0">
-                            <SparkleIcon className="w-6 h-6" />
+                            <TargetIcon className="w-6 h-6" />
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Interview Readiness</p>
@@ -841,7 +841,7 @@ export function ClassroomAnalytics({
                                         <CardContent className="pt-4 space-y-4">
                                             {/* Diagnostic Recommendation */}
                                             <div className="p-3 bg-zinc-50 dark:bg-[#18181b] rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2.5">
-                                                <SparkleIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
+                                                <LightbulbIcon className="w-4 h-4 text-[#5b4fff] shrink-0 mt-0.5" />
                                                 <div className="min-w-0">
                                                     <span className="font-bold text-zinc-900 dark:text-white mr-1.5">Diagnostic Recommendation:</span>
                                                     <span className="leading-relaxed">{topic.recommendation || `Schedule focused practice sessions covering ${formattedTitle} patterns.`}</span>

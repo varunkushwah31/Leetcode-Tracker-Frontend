@@ -16,7 +16,7 @@ import {
     InfoIcon,
     BellIcon,
     CodeIcon as Code2Icon,
-    SparkleIcon as Sparkles,
+    UserPlusIcon as UserPlus,
     CaretRightIcon as ChevronRight,
     ListIcon as MenuIcon,
     XIcon
@@ -454,7 +454,7 @@ https://codeforces.com/profile/petr`;
 
                                 <div className="p-5 bg-[#5b4fff]/5 dark:bg-[#5b4fff]/10 border border-[#5b4fff]/20 rounded-2xl">
                                     <div className="flex items-center gap-2 text-[#5b4fff] dark:text-[#968fff] font-bold text-sm mb-2">
-                                        <Sparkles className="w-4 h-4" /> Zero-Friction Auto-Provisioning
+                                        <UserPlus className="w-4 h-4" /> Zero-Friction Auto-Provisioning
                                     </div>
                                     <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                                         Students do not need to register beforehand! MentorSync automatically provisions their accounts and enqueues background profile scraping immediately.

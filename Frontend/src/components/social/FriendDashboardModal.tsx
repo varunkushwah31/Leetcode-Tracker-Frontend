@@ -16,7 +16,9 @@ import {
     MedalIcon as Award,
     SwordIcon as Swords,
     WarningIcon as AlertTriangle,
-    SparkleIcon as Sparkles,
+    LightbulbIcon as Lightbulb,
+    ChartLineUpIcon as ChartLineUp,
+    GraduationCapIcon as GraduationCap,
     MagnifyingGlassIcon as Search,
     UsersIcon as Users,
     ChartLineIcon,
@@ -459,7 +461,7 @@ function FriendPeerLearningSection({
         <div className="space-y-6">
             <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-3">
                 <span className="p-2 rounded-xl bg-[#5b4fff] text-white shrink-0 mt-0.5">
-                    <Sparkles className="w-4 h-4" />
+                    <Lightbulb className="w-4 h-4" />
                 </span>
                 <div>
                     <p className="inline">
@@ -645,7 +647,7 @@ function FriendPeerLearningSection({
                 <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+                            <GraduationCap className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                             <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white">
                                 Solved by You (Help {profile.name.split(' ')[0]} Learn)
                             </CardTitle>
@@ -912,7 +914,7 @@ function FriendCoderCardSection({
                 <div className="p-5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-[#5b4fff]" />
+                            <ChartLineUp className="w-5 h-5 text-[#5b4fff]" />
                             <span className="text-xs font-extrabold uppercase tracking-wider text-[#5b4fff]">
                                 Codolio C-Score Composite Index
                             </span>
@@ -1179,7 +1181,7 @@ function FriendComparativeSection({
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                         <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center justify-between">
                             <span className="flex items-center gap-2">
-                                <Sparkles className="w-4 h-4 text-[#5b4fff]" /> C-Score Composite Delta
+                                <ChartLineUp className="w-4 h-4 text-[#5b4fff]" /> C-Score Composite Delta
                             </span>
                             <span className="text-[11px] font-bold text-[#5b4fff]">
                                 {userLeadsCScore ? `+${cScoreDiff} in your favor` : `-${cScoreDiff} peer lead`}
@@ -1553,7 +1555,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                         : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60'
                                 }`}
                             >
-                                <Sparkles className="w-4 h-4" />
+                                <GraduationCap className="w-4 h-4" />
                                 <span>Peer Learning & Overlap</span>
                                 {comparison?.friendOnlySolved && comparison.friendOnlySolved.length > 0 && (
                                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${

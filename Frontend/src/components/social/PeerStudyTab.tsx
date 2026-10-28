@@ -9,7 +9,6 @@ import {
     ArrowSquareOutIcon as ExternalLink,
     SpinnerIcon as Loader2,
     SwordIcon as Swords,
-    SparkleIcon as Sparkles,
     EyeIcon as Eye,
     EyeSlashIcon as EyeSlash,
     GraduationCapIcon as GraduationCap,
@@ -364,7 +363,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                                             <div className="p-4 rounded-2xl bg-zinc-50/90 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-2.5">
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-                                                        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                                                        <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
                                                         Algorithm Approach & Complexity
                                                     </span>
                                                     <button

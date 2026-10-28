@@ -7,7 +7,8 @@ import {
     SpinnerIcon as Loader2,
     EyeIcon as Eye,
     UsersIcon as Users,
-    SparkleIcon as Sparkles,
+    ChartLineUpIcon as ChartLineUp,
+    StarIcon as Star,
     MedalIcon as Medal,
     MagnifyingGlassIcon as Search,
     CrownIcon as Crown
@@ -110,7 +111,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-500" /> C-Score
+                        <ChartLineUp className="w-3.5 h-3.5 text-emerald-500" /> C-Score
                     </button>
                     <button
                         type="button"
@@ -205,7 +206,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         <p className="text-base font-black text-zinc-900 dark:text-white truncate">
                                             {topThree[0].name}
                                         </p>
-                                        <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                                        <Star className="w-4 h-4 text-amber-500 shrink-0" weight="fill" />
                                     </div>
                                     <p className="text-xs text-zinc-500 truncate mt-0.5">
                                         @{topThree[0].leetcodeUsername || topThree[0].codeforcesHandle || 'champion'}
@@ -326,7 +327,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         <p className="text-base font-bold text-zinc-900 dark:text-zinc-50 tracking-tight truncate">
                                             {topThree[0].name}
                                         </p>
-                                        <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                                        <Star className="w-4 h-4 text-amber-500 shrink-0" weight="fill" />
                                     </div>
                                     {topThree[0].isCurrentUser && (
                                         <span className="text-[#5b4fff] text-xs font-bold">(You)</span>
@@ -450,7 +451,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         <p className="text-base font-bold text-zinc-900 dark:text-zinc-50 tracking-tight truncate">
                                             {topThree[0].name}
                                         </p>
-                                        <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                                        <Star className="w-4 h-4 text-amber-500 shrink-0" weight="fill" />
                                     </div>
                                     {topThree[0].isCurrentUser && (
                                         <span className="text-[#5b4fff] text-xs font-bold">(You)</span>
