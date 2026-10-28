@@ -9,13 +9,15 @@ interface DottedBackgroundProps {
 export function DottedBackground({
     className = '',
     spacing = 24,
-    hoverRadius = 180,
+    hoverRadius = 75,
 }: Readonly<DottedBackgroundProps>) {
+    const containerRef = useRef<HTMLDivElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
+        const container = containerRef.current;
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!container || !canvas) return;
 
         const ctx = canvas.getContext('2d', { alpha: true });
         if (!ctx) return;
@@ -34,9 +36,12 @@ export function DottedBackground({
         };
 
         const updateSize = () => {
+            if (!container || !canvas || !ctx) return;
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            width = window.innerWidth;
-            height = window.innerHeight;
+            width = container.clientWidth;
+            height = container.clientHeight;
+            if (width === 0 || height === 0) return;
+
             canvas.width = Math.floor(width * dpr);
             canvas.height = Math.floor(height * dpr);
             canvas.style.width = `${width}px`;
@@ -56,13 +61,29 @@ export function DottedBackground({
         });
 
         const handleMouseMove = (e: MouseEvent) => {
-            mouse.targetX = e.clientX;
-            mouse.targetY = e.clientY;
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            const isInside =
+                e.clientX >= rect.left &&
+                e.clientX <= rect.right &&
+                e.clientY >= rect.top &&
+                e.clientY <= rect.bottom;
+
+            if (!isInside) {
+                isHovering = false;
+                return;
+            }
+
+            const localX = e.clientX - rect.left;
+            const localY = e.clientY - rect.top;
+
+            mouse.targetX = localX;
+            mouse.targetY = localY;
             if (!isHovering) {
                 isHovering = true;
                 if (mouse.currentX < 0) {
-                    mouse.currentX = e.clientX;
-                    mouse.currentY = e.clientY;
+                    mouse.currentX = localX;
+                    mouse.currentY = localY;
                 }
             }
         };
@@ -73,7 +94,13 @@ export function DottedBackground({
 
         window.addEventListener('mousemove', handleMouseMove, { passive: true });
         document.addEventListener('mouseleave', handleMouseLeave, { passive: true });
-        window.addEventListener('resize', updateSize, { passive: true });
+
+        const resizeObserver = typeof ResizeObserver !== 'undefined'
+            ? new ResizeObserver(updateSize)
+            : null;
+        if (resizeObserver && container) {
+            resizeObserver.observe(container);
+        }
 
         const prefersReducedMotion =
             typeof window.matchMedia === 'function'
@@ -82,14 +109,14 @@ export function DottedBackground({
 
         const render = (timestamp: number) => {
             // Smooth mouse interpolation (spring glide)
-            mouse.currentX += (mouse.targetX - mouse.currentX) * 0.18;
-            mouse.currentY += (mouse.targetY - mouse.currentY) * 0.18;
+            mouse.currentX += (mouse.targetX - mouse.currentX) * 0.22;
+            mouse.currentY += (mouse.targetY - mouse.currentY) * 0.22;
 
             // Smooth hover transition in/out
             if (isHovering && !prefersReducedMotion) {
-                hoverTransition = Math.min(1, hoverTransition + 0.08);
+                hoverTransition = Math.min(1, hoverTransition + 0.12);
             } else {
-                hoverTransition = Math.max(0, hoverTransition - 0.05);
+                hoverTransition = Math.max(0, hoverTransition - 0.08);
             }
 
             ctx.clearRect(0, 0, width, height);
@@ -98,24 +125,22 @@ export function DottedBackground({
             const baseDotRadius = isDark ? 1.0 : 1.1;
             const baseDotColor = isDark
                 ? 'rgba(255, 255, 255, 0.08)'
-                : 'rgba(16, 185, 129, 0.45)';
+                : 'rgba(16, 185, 129, 0.35)';
             const zoomedDotColor = isDark
-                ? 'rgba(255, 255, 255, 0.75)'
-                : 'rgba(16, 185, 129, 0.95)';
-            const glowColor = isDark
-                ? 'rgba(110, 231, 183, 0.22)'
-                : 'rgba(5, 150, 105, 0.28)';
+                ? 'rgba(255, 255, 255, 0.85)'
+                : 'rgba(16, 185, 129, 0.9)';
+            const auraColor = isDark
+                ? 'rgba(255, 255, 255, 0.12)'
+                : 'rgba(16, 185, 129, 0.18)';
 
             // Subtle breathing pulse wave for zoomed dots while hovering
-            const pulse = prefersReducedMotion ? 0 : Math.sin(timestamp * 0.005) * 0.35;
+            const pulse = prefersReducedMotion ? 0 : Math.sin(timestamp * 0.005) * 0.15;
             const effectiveHoverRadius = hoverRadius * hoverTransition;
 
-            // Separate base stationary dots from active zoomed dots for performance
             const zoomedDots: Array<{
                 x: number;
                 y: number;
                 radius: number;
-                ease: number;
             }> = [];
 
             ctx.fillStyle = baseDotColor;
@@ -134,20 +159,15 @@ export function DottedBackground({
                         if (distSq < effectiveHoverRadius * effectiveHoverRadius) {
                             const dist = Math.sqrt(distSq);
                             const t = 1 - dist / effectiveHoverRadius;
-                            // Smoothstep cubic interpolation
+                            // Cubic smoothstep for tight, focused falloff
                             const ease = t * t * (3 - 2 * t) * hoverTransition;
-
-                            // Gentle lens magnification displacement
-                            const lensPush = ease * 3.5;
-                            const renderX = dist > 0.01 ? x + (dx / dist) * lensPush : x;
-                            const renderY = dist > 0.01 ? y + (dy / dist) * lensPush : y;
-                            const radius = baseDotRadius + ease * (2.0 + pulse);
+                            // Clean zoom (dots stay firmly on grid coordinates)
+                            const radius = baseDotRadius + ease * (1.1 + pulse);
 
                             zoomedDots.push({
-                                x: renderX,
-                                y: renderY,
+                                x,
+                                y,
                                 radius,
-                                ease,
                             });
                             continue;
                         }
@@ -160,15 +180,15 @@ export function DottedBackground({
             }
             ctx.fill();
 
-            // Render zoomed dots with luminous aura and enhanced contrast
+            // Render zoomed dots crisply without thick halo rings
             if (zoomedDots.length > 0) {
-                // Soft glow halo layer for zoomed dots
-                ctx.fillStyle = glowColor;
+                // Subtle soft aura layer
+                ctx.fillStyle = auraColor;
                 ctx.beginPath();
                 for (const dot of zoomedDots) {
-                    const glowRadius = dot.radius * 2.2;
-                    ctx.moveTo(dot.x + glowRadius, dot.y);
-                    ctx.arc(dot.x, dot.y, glowRadius, 0, Math.PI * 2);
+                    const auraRadius = dot.radius * 1.35;
+                    ctx.moveTo(dot.x + auraRadius, dot.y);
+                    ctx.arc(dot.x, dot.y, auraRadius, 0, Math.PI * 2);
                 }
                 ctx.fill();
 
@@ -191,14 +211,15 @@ export function DottedBackground({
             cancelAnimationFrame(animationFrameId);
             window.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseleave', handleMouseLeave);
-            window.removeEventListener('resize', updateSize);
+            if (resizeObserver) resizeObserver.disconnect();
             themeObserver.disconnect();
         };
     }, [spacing, hoverRadius]);
 
     return (
         <div
-            className={`pointer-events-none fixed inset-0 overflow-hidden z-0 transition-opacity duration-500 ${className}`}
+            ref={containerRef}
+            className={`pointer-events-none absolute inset-0 overflow-hidden z-0 ${className}`}
             aria-hidden="true"
         >
             <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />

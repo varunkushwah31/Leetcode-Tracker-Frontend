@@ -16,6 +16,17 @@ describe('DottedBackground component', () => {
         };
 
         HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(mockContext) as unknown as typeof HTMLCanvasElement.prototype.getContext;
+        Element.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
+            left: 500,
+            top: 0,
+            right: 1000,
+            bottom: 800,
+            width: 500,
+            height: 800,
+            x: 500,
+            y: 0,
+            toJSON: () => {},
+        });
     });
 
     afterEach(() => {
@@ -36,10 +47,15 @@ describe('DottedBackground component', () => {
         expect(cancelAnimationFrameSpy).toHaveBeenCalled();
     });
 
-    it('responds to mouse movement by updating coordinates', () => {
-        render(<DottedBackground spacing={30} hoverRadius={150} />);
+    it('responds to mouse movement inside canvas bounds and ignores events outside', () => {
+        render(<DottedBackground spacing={24} hoverRadius={75} />);
 
-        window.dispatchEvent(new MouseEvent('mousemove', { clientX: 200, clientY: 300 }));
+        // Mouse outside bounds (e.g. over a grid panel on the left at x = 100)
+        window.dispatchEvent(new MouseEvent('mousemove', { clientX: 100, clientY: 200 }));
+        expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalled();
+
+        // Mouse inside bounds (x = 600)
+        window.dispatchEvent(new MouseEvent('mousemove', { clientX: 600, clientY: 200 }));
         expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalled();
     });
 });
