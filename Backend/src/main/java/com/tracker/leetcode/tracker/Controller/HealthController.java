@@ -33,7 +33,7 @@ public class HealthController {
             method = {RequestMethod.GET, RequestMethod.HEAD},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<?> health(
+    public ResponseEntity<Object> health(
             @RequestParam(name = "format", required = false) String format,
             @RequestHeader(name = "Accept", required = false) String acceptHeader
     ) {

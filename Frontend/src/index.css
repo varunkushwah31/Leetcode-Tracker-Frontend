@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
-@variant dark (&:where(.dark, .dark *));
 @layer base {
   html, body {
     -webkit-tap-highlight-color: transparent;
@@ -241,31 +240,33 @@ body {
   50% { opacity: 0.9; box-shadow: 0 0 12px 2px rgba(91, 79, 255, 0.25); }
 }
 
-.animate-flame {
-  animation: flame-breathe 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  transform-origin: 50% 90%;
-  will-change: transform, filter;
-  display: inline-block;
-}
+@media (prefers-reduced-motion: no-preference) {
+  .animate-flame {
+    animation: flame-breathe 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-origin: 50% 90%;
+    will-change: transform, filter;
+    display: inline-block;
+  }
 
-.animate-pulse-slow {
-  animation: pulse-slow 8s ease-in-out infinite;
-}
+  .animate-pulse-slow {
+    animation: pulse-slow 8s ease-in-out infinite;
+  }
 
-.animate-float-subtle {
-  animation: float-subtle 4s ease-in-out infinite;
-}
+  .animate-float-subtle {
+    animation: float-subtle 4s ease-in-out infinite;
+  }
 
-.animate-bell-ring {
-  animation: bell-ring 0.6s ease-in-out;
-}
+  .animate-bell-ring {
+    animation: bell-ring 0.6s ease-in-out;
+  }
 
-.animate-scale-bounce {
-  animation: scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+  .animate-scale-bounce {
+    animation: scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 
-.animate-badge-glow {
-  animation: badge-glow 3s ease-in-out infinite;
+  .animate-badge-glow {
+    animation: badge-glow 3s ease-in-out infinite;
+  }
 }
 
 @keyframes fade-slide-up {
@@ -301,57 +302,61 @@ body {
   50% { opacity: 0; }
 }
 
-.animate-fade-slide-up {
-  animation: fade-slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
+@media (prefers-reduced-motion: no-preference) {
+  .animate-fade-slide-up {
+    animation: fade-slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 
-.animate-tab-enter {
-  animation: tab-fade-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
+  .animate-tab-enter {
+    animation: tab-fade-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 
-.animate-pulse-ring {
-  animation: pulse-ring 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-}
+  .animate-pulse-ring {
+    animation: pulse-ring 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  }
 
-.animate-live-cursor {
-  animation: live-cursor 1s step-start infinite;
+  .animate-live-cursor {
+    animation: live-cursor 1s step-start infinite;
+  }
 }
 
 /* Micro-interaction interactive card utilities */
-.interactive-card {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
-}
-
-.interactive-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
-}
-
-.dark .interactive-card:hover {
-  box-shadow: 0 12px 30px -8px rgba(91, 79, 255, 0.12), 0 4px 14px -2px rgba(0, 0, 0, 0.4);
-}
-
-.interactive-press {
-  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.interactive-press:active {
-  transform: scale(0.97);
-}
-
 .shimmer-sweep {
   position: relative;
   overflow: hidden;
 }
 
-.shimmer-sweep::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
-  animation: shimmer-sweep 3.5s ease-in-out infinite;
-  pointer-events: none;
+@media (prefers-reduced-motion: no-preference) {
+  .interactive-card {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+  }
+
+  .interactive-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark .interactive-card:hover {
+    box-shadow: 0 12px 30px -8px rgba(91, 79, 255, 0.12), 0 4px 14px -2px rgba(0, 0, 0, 0.4);
+  }
+
+  .interactive-press {
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .interactive-press:active {
+    transform: scale(0.97);
+  }
+
+  .shimmer-sweep::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+    animation: shimmer-sweep 3.5s ease-in-out infinite;
+    pointer-events: none;
+  }
 }
 
 /* Respect reduced motion preferences */
@@ -377,9 +382,9 @@ button:not(:disabled):active,
 
 /* Global sleek scrollbar - eliminate ugly legacy Windows white scrollbars with arrow buttons */
 *::-webkit-scrollbar-button {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 ::-webkit-scrollbar {
@@ -388,7 +393,7 @@ button:not(:disabled):active,
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent !important;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -427,12 +432,12 @@ button:not(:disabled):active,
   height: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-button {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  display: none;
+  width: 0;
+  height: 0;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent !important;
+  background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(156, 163, 175, 0.35);
@@ -454,13 +459,13 @@ button:not(:disabled):active,
 
 /* Hide scrollbar completely utility (keeps smooth scrolling enabled) */
 .no-scrollbar::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  display: none;
+  width: 0;
+  height: 0;
 }
 .no-scrollbar {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Animated Dotted Background Utilities */
@@ -468,11 +473,15 @@ button:not(:disabled):active,
   background-image: radial-gradient(rgba(50, 205, 50, 0.6) 1px, transparent 1px);
   background-size: 24px 24px;
   background-attachment: fixed;
-  transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 :where(.dark) .dotted-bg-zoom {
   background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
 }
-.dotted-bg-zoom:hover {
-  background-size: 32px 32px;
+@media (prefers-reduced-motion: no-preference) {
+  .dotted-bg-zoom {
+    transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .dotted-bg-zoom:hover {
+    background-size: 32px 32px;
+  }
 }
