@@ -462,3 +462,17 @@ button:not(:disabled):active,
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* Animated Dotted Background Utilities */
+.dotted-bg-zoom {
+  background-image: radial-gradient(rgba(50, 205, 50, 0.6) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-attachment: fixed;
+  transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+:where(.dark) .dotted-bg-zoom {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+}
+.dotted-bg-zoom:hover {
+  background-size: 32px 32px;
+}

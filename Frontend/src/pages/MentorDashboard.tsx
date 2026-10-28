@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useKeyboardScroll } from '../hooks/useKeyboardScroll';
+import { DottedBackground } from '../components/ui/DottedBackground';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
@@ -350,8 +351,11 @@ export function MentorDashboard() {
 
     if (isLoading && classrooms.length === 0) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
-                <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
+            <div className="flex h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#0a0a0a] relative overflow-hidden">
+                <DottedBackground />
+                <div className="relative z-10">
+                    <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
+                </div>
             </div>
         );
     }
@@ -524,8 +528,9 @@ export function MentorDashboard() {
                 ref={mainContentRef}
                 tabIndex={0}
                 aria-label="Mentor dashboard content"
-                className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col w-full min-w-0 focus:outline-none"
+                className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative bg-[#f1f3f7] dark:bg-[#0a0a0a] flex flex-col w-full min-w-0 focus:outline-none"
             >
+                <DottedBackground />
                 {/* Luminous Multi-Layer Ambient Glow */}
                 <div className="hidden dark:block">
                     <AmbientGlow />

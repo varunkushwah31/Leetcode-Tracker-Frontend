@@ -15,6 +15,7 @@ import {
 } from '@phosphor-icons/react';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { DottedBackground } from '../components/ui/DottedBackground';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { ContactService } from '../services/endpoints';
@@ -228,7 +229,7 @@ export function ContactPage() {
 
             {/* Right Panel - Form */}
             <div className="w-full lg:w-1/2 min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 relative bg-[#f8fafc] dark:bg-[#0a0a0a] overflow-y-auto no-scrollbar transition-colors duration-200">
-                <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none"></div>
+                <DottedBackground />
                 <div className="hidden dark:block">
                     <AmbientGlow variant="center" />
                 </div>

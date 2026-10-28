@@ -7,6 +7,7 @@ import { TerminalIcon, PulseIcon as Activity, WarningCircleIcon as AlertCircle, 
 import { useAuth } from '../hooks/useAuth';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { DottedBackground } from '../components/ui/DottedBackground';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { ForgotPasswordModal } from '../components/common/ForgotPasswordModal';
@@ -313,7 +314,7 @@ export function AuthPage() {
 
         {/* Right Panel - Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative bg-[#f8fafc] dark:bg-[#0a0a0a] min-h-screen overflow-y-auto no-scrollbar transition-colors duration-200">
-          <div className="absolute inset-0 bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none"></div>
+          <DottedBackground />
           <div className="hidden dark:block">
             <AmbientGlow variant="center" />
           </div>

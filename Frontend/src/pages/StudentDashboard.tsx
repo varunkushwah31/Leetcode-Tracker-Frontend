@@ -42,6 +42,7 @@ import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
 import { useKeyboardScroll } from '../hooks/useKeyboardScroll';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
+import { DottedBackground } from '../components/ui/DottedBackground';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 
 type DashboardViewFilter = 'all' | 'daily' | 'academic' | 'practice' | 'contests';
@@ -154,8 +155,9 @@ export function StudentDashboard() {
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed">
-                <div className="flex flex-col items-center space-y-4">
+            <div className="flex min-h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#0a0a0a] relative overflow-hidden">
+                <DottedBackground />
+                <div className="flex flex-col items-center space-y-4 relative z-10">
                     <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
                     <p className="font-medium text-zinc-600 dark:text-zinc-400">Loading your stats...</p>
                 </div>
@@ -192,7 +194,8 @@ export function StudentDashboard() {
     const pendingAssignmentsCount = totalAssignmentsCount - completedAssignmentsCount;
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed transition-colors duration-200 relative">
+        <div className="min-h-screen flex flex-col bg-[#f1f3f7] dark:bg-[#0a0a0a] transition-colors duration-200 relative">
+            <DottedBackground />
             <div className="hidden dark:block">
                 <AmbientGlow />
             </div>
