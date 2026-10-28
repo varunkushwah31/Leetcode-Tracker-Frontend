@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useKeyboardScroll } from '../hooks/useKeyboardScroll';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
@@ -201,6 +202,8 @@ function EmptyClassroomState({
 
 export function MentorDashboard() {
     const { user, logout } = useAuth();
+    const mainContentRef = useRef<HTMLElement | null>(null);
+    useKeyboardScroll({ targetRef: mainContentRef });
 
     // Data States
     const [classrooms, setClassrooms] = useState<ClassroomDashboardDTO[]>([]);
@@ -517,7 +520,12 @@ export function MentorDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col w-full min-w-0">
+            <main
+                ref={mainContentRef}
+                tabIndex={0}
+                aria-label="Mentor dashboard content"
+                className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative bg-[#f1f3f7] dark:bg-[#0a0a0a] bg-[radial-gradient(rgba(50,205,50,0.6)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[24px_24px] bg-fixed flex flex-col w-full min-w-0 focus:outline-none"
+            >
                 {/* Luminous Multi-Layer Ambient Glow */}
                 <div className="hidden dark:block">
                     <AmbientGlow />

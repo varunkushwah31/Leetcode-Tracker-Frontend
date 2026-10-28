@@ -75,11 +75,6 @@ export function ClassroomList({
                                             }`}>
                                                 {cls.className}
                                             </p>
-                                            {isSelected && (
-                                                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs">
-                                                    Filter Active
-                                                </span>
-                                            )}
                                         </div>
                                         <div className="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                                             <span className="flex items-center gap-1">

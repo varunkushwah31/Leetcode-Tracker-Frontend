@@ -39,6 +39,7 @@ import { RecentActivityCard } from '../components/dashboard/student/RecentActivi
 import { UnifiedContestHistory } from '../components/dashboard/student/UnifiedContestHistory';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useClassroomWebSocket } from "@/hooks/useClassroomWebSocket.ts";
+import { useKeyboardScroll } from '../hooks/useKeyboardScroll';
 import { ErrorBanner } from '../components/ui/ErrorBanner';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { ErrorBoundary } from '../components/ErrorBoundary';
@@ -47,6 +48,7 @@ type DashboardViewFilter = 'all' | 'daily' | 'academic' | 'practice' | 'contests
 
 export function StudentDashboard() {
     const { logout, user } = useAuth();
+    useKeyboardScroll();
     const [dashboardData, setDashboardData] = useState<StudentExtendedDTO | null>(null);
 
     // UI States
@@ -199,9 +201,6 @@ export function StudentDashboard() {
                 <div className="max-w-360 mx-auto px-3.5 sm:px-6 lg:px-8 py-3 sm:py-3.5 flex items-center justify-between">
                     <div className="flex items-center gap-2.5 sm:gap-3">
                         <BrandLogo size="responsive" />
-                        <span className="hidden sm:inline-flex text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
-                            Student
-                        </span>
 
                         {/* Top-level Navigation Switcher */}
                         <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 ml-2 border border-zinc-200/60 dark:border-zinc-700/60">
@@ -292,7 +291,11 @@ export function StudentDashboard() {
                 </div>
             </header>
 
-            <main className="max-w-360 mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 w-full">
+            <main
+                tabIndex={0}
+                aria-label="Student dashboard content"
+                className="max-w-360 mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 w-full focus:outline-none"
+            >
                 <ErrorBanner message={pageError} className="mb-6" />
                 <ErrorBanner message={syncError} className="mb-6" />
 
