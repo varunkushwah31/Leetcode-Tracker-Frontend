@@ -359,7 +359,7 @@ export function StudentDashboard() {
                                     onClick={() => setActiveFilter('all')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'all'
-                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-bold border border-emerald-500/30'
                                             : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -370,7 +370,7 @@ export function StudentDashboard() {
                                     onClick={() => setActiveFilter('daily')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'daily'
-                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-bold border border-emerald-500/30'
                                             : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -381,18 +381,18 @@ export function StudentDashboard() {
                                     onClick={() => setActiveFilter('academic')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'academic'
-                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-bold border border-emerald-500/30'
                                             : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
-                                    <GraduationCap className="w-3.5 h-3.5 text-[#5b4fff]" /> Academic & Classrooms
+                                    <GraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> Academic & Classrooms
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setActiveFilter('practice')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'practice'
-                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-bold border border-emerald-500/30'
                                             : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -403,7 +403,7 @@ export function StudentDashboard() {
                                     onClick={() => setActiveFilter('contests')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                                         activeFilter === 'contests'
-                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/60 dark:border-zinc-700/60'
+                                            ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-bold border border-emerald-500/30'
                                             : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >

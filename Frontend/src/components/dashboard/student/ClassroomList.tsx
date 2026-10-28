@@ -25,7 +25,7 @@ export function ClassroomList({
         <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
             <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-3 flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-zinc-900 dark:text-white tracking-tight">
-                    <BookOpenIcon className="w-5 h-5 text-[#5b4fff] dark:text-[#968fff]" /> My Classrooms
+                    <BookOpenIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> My Classrooms
                 </CardTitle>
                 <div className="flex items-center gap-2">
                     {selectedClassroomId && (
@@ -33,14 +33,14 @@ export function ClassroomList({
                             variant="ghost"
                             size="sm"
                             onClick={() => onSelectClassroom(null)}
-                            className="h-7 px-2 text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1 cursor-pointer"
+                            className="h-7 px-2.5 text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 rounded-lg flex items-center gap-1 cursor-pointer transition-all"
                         >
                             <XCircle className="w-3.5 h-3.5" /> Show All
                         </Button>
                     )}
                     <Badge
                         variant="outline"
-                        className="bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border-[#5b4fff]/20 text-[11px] font-bold"
+                        className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[11px] font-bold"
                     >
                         {classrooms.length} Enrolled
                     </Badge>
@@ -61,7 +61,7 @@ export function ClassroomList({
                                 onClick={() => onSelectClassroom(isSelected ? null : cls.id!)}
                                 className={`w-full p-4 border rounded-xl cursor-pointer transition-all text-left block group ${
                                     isSelected
-                                        ? 'bg-[#5b4fff]/10 border-[#5b4fff]/50 shadow-md ring-1 ring-[#5b4fff]/50'
+                                        ? 'bg-emerald-500/10 border-emerald-500/50 shadow-md ring-1 ring-emerald-500/50 dark:bg-emerald-950/20 dark:border-emerald-500/40 dark:ring-emerald-500/40'
                                         : 'bg-zinc-50/80 dark:bg-[#1a1a1a]/40 border-zinc-200/80 dark:border-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-[#1a1a1a]/80 hover:border-zinc-300 dark:hover:border-zinc-700'
                                 }`}
                             >
@@ -70,13 +70,13 @@ export function ClassroomList({
                                         <div className="flex items-center gap-2">
                                             <p className={`font-bold text-sm truncate ${
                                                 isSelected
-                                                    ? 'text-[#5b4fff] dark:text-[#968fff]'
+                                                    ? 'text-emerald-600 dark:text-emerald-400'
                                                     : 'text-zinc-900 dark:text-white tracking-tight'
                                             }`}>
                                                 {cls.className}
                                             </p>
                                             {isSelected && (
-                                                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#5b4fff] text-white">
+                                                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs">
                                                     Filter Active
                                                 </span>
                                             )}
@@ -105,7 +105,7 @@ export function ClassroomList({
                                     <div className="w-full bg-zinc-200 dark:bg-zinc-800/80 rounded-full h-1.5 mt-2.5 overflow-hidden">
                                         <div
                                             className={`h-full rounded-full transition-all duration-300 ${
-                                                pct === 100 ? 'bg-emerald-500' : 'bg-[#5b4fff]'
+                                                pct === 100 ? 'bg-emerald-500' : isSelected ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-emerald-600 dark:bg-emerald-500'
                                             }`}
                                             style={{ width: `${pct}%` }}
                                         />

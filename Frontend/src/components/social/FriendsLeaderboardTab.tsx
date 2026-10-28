@@ -106,18 +106,18 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                         onClick={() => setSortBy('cScore')}
                         className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'cScore'
-                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
+                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <Sparkles className="w-3.5 h-3.5 text-[#5b4fff]" /> C-Score
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-500" /> C-Score
                     </button>
                     <button
                         type="button"
                         onClick={() => setSortBy('totalSolved')}
                         className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'totalSolved'
-                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
+                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -128,7 +128,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                         onClick={() => setSortBy('rating')}
                         className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'rating'
-                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
+                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -139,7 +139,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                         onClick={() => setSortBy('streak')}
                         className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             sortBy === 'streak'
-                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
+                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >

@@ -756,8 +756,7 @@ export function ClassroomAnalytics({
                                     type="button"
                                     onClick={() => setWeaknessFilter('ALL')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                                        weaknessFilter === 'ALL'
-                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                        weaknessFilter === 'ALL' ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-semibold'
                                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -767,8 +766,7 @@ export function ClassroomAnalytics({
                                     type="button"
                                     onClick={() => setWeaknessFilter('CRITICAL')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                                        weaknessFilter === 'CRITICAL'
-                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                        weaknessFilter === 'CRITICAL' ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-semibold'
                                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -778,8 +776,7 @@ export function ClassroomAnalytics({
                                     type="button"
                                     onClick={() => setWeaknessFilter('WITH_PROBLEMS')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                                        weaknessFilter === 'WITH_PROBLEMS'
-                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                        weaknessFilter === 'WITH_PROBLEMS' ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-semibold'
                                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -951,8 +948,7 @@ export function ClassroomAnalytics({
                                 <button
                                     onClick={() => setSelectedMasteryFilter('ALL')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                                        selectedMasteryFilter === 'ALL'
-                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                        selectedMasteryFilter === 'ALL' ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-semibold'
                                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -961,8 +957,7 @@ export function ClassroomAnalytics({
                                 <button
                                     onClick={() => setSelectedMasteryFilter('CRITICAL_WEAKNESS')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                                        selectedMasteryFilter === 'CRITICAL_WEAKNESS'
-                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                        selectedMasteryFilter === 'CRITICAL_WEAKNESS' ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-semibold'
                                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -971,8 +966,7 @@ export function ClassroomAnalytics({
                                 <button
                                     onClick={() => setSelectedMasteryFilter('DEVELOPING')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                                        selectedMasteryFilter === 'DEVELOPING'
-                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                        selectedMasteryFilter === 'DEVELOPING' ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-semibold'
                                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -981,8 +975,7 @@ export function ClassroomAnalytics({
                                 <button
                                     onClick={() => setSelectedMasteryFilter('STRONG')}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all ${
-                                        selectedMasteryFilter === 'STRONG'
-                                            ? 'bg-zinc-900 text-white dark:bg-[#2a2a2a] dark:text-white shadow-sm border border-zinc-800 dark:border-zinc-700/50'
+                                        selectedMasteryFilter === 'STRONG' ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-semibold'
                                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >

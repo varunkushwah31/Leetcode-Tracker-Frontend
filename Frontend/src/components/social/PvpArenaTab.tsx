@@ -784,7 +784,7 @@ export function PvpArenaTab({ initialChallengerTarget, onClearInitialTarget }: R
                                     onClick={() => setHistoryFilter('ALL')}
                                     className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                                         historyFilter === 'ALL'
-                                            ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs font-bold'
+                                            ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-2xs font-bold'
                                             : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                     }`}
                                 >

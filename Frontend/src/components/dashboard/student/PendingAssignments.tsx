@@ -212,12 +212,16 @@ export function PendingAssignments({
             <CardHeader className="bg-transparent border-b border-zinc-200/80 dark:border-zinc-800/60 p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                     <CardTitle className="flex items-center gap-2 text-base sm:text-lg text-zinc-900 dark:text-white tracking-tight">
-                        <BookOpenIcon className="w-5 h-5 text-[#5b4fff] dark:text-[#968fff]" /> Classroom Assignments
+                        <BookOpenIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> Classroom Assignments
                     </CardTitle>
                     <CardDescription className="mt-1 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
-                        {activeClassName
-                            ? `Filtered to ${activeClassName} (${counts.pending} pending, ${counts.completed} completed)`
-                            : 'Problem assignments issued by mentors across your enrolled classrooms'}
+                        {activeClassName ? (
+                            <span>
+                                Filtered to <strong className="text-emerald-600 dark:text-emerald-400 font-semibold">{activeClassName}</strong> ({counts.pending} pending, {counts.completed} completed)
+                            </span>
+                        ) : (
+                            'Problem assignments issued by mentors across your enrolled classrooms'
+                        )}
                     </CardDescription>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -226,7 +230,7 @@ export function PendingAssignments({
                             onClick={onClearFilter}
                             variant="ghost"
                             size="sm"
-                            className="h-8 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1 cursor-pointer"
+                            className="h-8 text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 rounded-lg flex items-center gap-1 cursor-pointer transition-all"
                         >
                             <XCircle className="w-3.5 h-3.5" /> Clear Filter
                         </Button>
@@ -264,7 +268,7 @@ export function PendingAssignments({
                             onClick={() => onSelectClassroom(null)}
                             className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                                 !selectedClassroomId
-                                    ? 'bg-[#5b4fff] text-white shadow-xs'
+                                    ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-bold'
                                     : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                         >
@@ -280,7 +284,7 @@ export function PendingAssignments({
                                     onClick={() => onSelectClassroom(isSelected ? null : cls.id!)}
                                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                                         isSelected
-                                            ? 'bg-[#5b4fff] text-white shadow-xs'
+                                            ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs font-bold'
                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -324,7 +328,7 @@ export function PendingAssignments({
                                 onClick={() => setStatusFilter('pending')}
                                 className={`px-2.5 py-1 rounded-md font-bold transition-all cursor-pointer ${
                                     statusFilter === 'pending'
-                                        ? 'bg-white dark:bg-zinc-900 text-[#5b4fff] dark:text-[#968fff] shadow-2xs'
+                                        ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-2xs'
                                         : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                 }`}
                             >
@@ -346,7 +350,7 @@ export function PendingAssignments({
                                 onClick={() => setStatusFilter('all')}
                                 className={`px-2.5 py-1 rounded-md font-bold transition-all cursor-pointer ${
                                     statusFilter === 'all'
-                                        ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs'
+                                        ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-2xs'
                                         : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                 }`}
                             >
@@ -575,7 +579,7 @@ export function PendingAssignments({
 
                     {filteredAssignments.length === 0 && (
                         <div className="p-8 text-center text-zinc-500">
-                            <div className="w-10 h-10 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20 flex items-center justify-center mx-auto mb-2.5">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center mx-auto mb-2.5">
                                 <CheckIcon className="w-5 h-5" weight="bold" />
                             </div>
                             <h5 className="text-zinc-900 dark:text-white font-bold text-sm">
@@ -596,7 +600,7 @@ export function PendingAssignments({
                                         variant="outline"
                                         size="sm"
                                         onClick={() => setStatusFilter('completed')}
-                                        className="h-8 text-xs border-[#5b4fff]/30 bg-[#5b4fff]/5 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/15 rounded-xl font-bold cursor-pointer"
+                                        className="h-8 text-xs border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 rounded-xl font-bold cursor-pointer"
                                     >
                                         <CheckIcon className="w-3.5 h-3.5 mr-1 text-emerald-500" />
                                         View {counts.completed} Completed Problem{counts.completed > 1 ? 's' : ''}
@@ -619,7 +623,7 @@ export function PendingAssignments({
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setDisplayLimit((prev) => prev + 5)}
-                                    className="h-7 text-xs text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/10 cursor-pointer"
+                                    className="h-7 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 cursor-pointer"
                                 >
                                     Show More ({filteredAssignments.length - displayLimit} remaining)
                                 </Button>

@@ -441,7 +441,7 @@ function LeaderboardTabContent({
                         onClick={() => setLeaderboardSort('total')}
                         className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
                             leaderboardSort === 'total' 
-                                ? 'bg-[#5b4fff] text-white shadow-xs' 
+                                ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs' 
                                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                         }`}
                     >
@@ -572,7 +572,7 @@ function ProfileTabContent({
                             onClick={() => setSelectedStudentId(student.id)}
                             className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all duration-150 ${
                                 selectedStudentId === student.id
-                                    ? 'bg-[#5b4fff] text-white shadow-xs'
+                                    ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs'
                                     : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                             }`}
                         >
@@ -708,7 +708,7 @@ function AnalyticsTabContent({
                         onClick={() => setTopicFilter('all')}
                         className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer active:scale-95 transition-all duration-150 ${
                             topicFilter === 'all'
-                                ? 'bg-[#5b4fff] text-white shadow-xs'
+                                ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs'
                                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                         }`}
                     >

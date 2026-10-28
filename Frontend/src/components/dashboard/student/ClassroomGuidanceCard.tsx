@@ -20,13 +20,13 @@ export function ClassroomGuidanceCard({ onSync, isSyncing = false }: Readonly<Cl
         <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
             <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-3">
                 <CardTitle className="flex items-center gap-2 text-base font-bold text-zinc-900 dark:text-white tracking-tight">
-                    <ShieldCheck className="w-5 h-5 text-[#5b4fff] dark:text-[#968fff]" /> Coursework Guidelines
+                    <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> Coursework Guidelines
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-4 sm:p-5 space-y-4 text-xs text-zinc-600 dark:text-zinc-400">
                 <div className="space-y-3.5">
                     <div className="flex items-start gap-2.5">
-                        <div className="p-1.5 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] shrink-0 mt-0.5">
+                        <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5">
                             <LightningAIcon className="w-4 h-4" />
                         </div>
                         <div>
@@ -85,11 +85,11 @@ export function ClassroomGuidanceCard({ onSync, isSyncing = false }: Readonly<Cl
                         >
                             {isSyncing ? (
                                 <>
-                                    <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin text-[#5b4fff]" /> Syncing...
+                                    <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin text-emerald-600 dark:text-emerald-400" /> Syncing...
                                 </>
                             ) : (
                                 <>
-                                    <RefreshCw className="w-3.5 h-3.5 mr-1.5 text-[#5b4fff] dark:text-[#968fff]" /> Sync Profile & Coursework
+                                    <RefreshCw className="w-3.5 h-3.5 mr-1.5 text-emerald-600 dark:text-emerald-400" /> Sync Profile & Coursework
                                 </>
                             )}
                         </Button>

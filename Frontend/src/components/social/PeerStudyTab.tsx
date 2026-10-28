@@ -201,7 +201,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                             onClick={() => setSelectedTopic(t.name)}
                             className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                                 isSelected
-                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
+                                    ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                     : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                         >

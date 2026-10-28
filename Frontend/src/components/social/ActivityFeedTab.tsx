@@ -163,7 +163,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                         onClick={() => setFilter('ALL')}
                         className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                             filter === 'ALL'
-                                ? 'bg-white dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
+                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -174,7 +174,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                         onClick={() => setFilter('SOLVES')}
                         className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             filter === 'SOLVES'
-                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
+                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -185,7 +185,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                         onClick={() => setFilter('DUELS')}
                         className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
                             filter === 'DUELS'
-                                ? 'bg-white dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] shadow-xs font-black border border-zinc-200/60 dark:border-zinc-700/60'
+                                ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >

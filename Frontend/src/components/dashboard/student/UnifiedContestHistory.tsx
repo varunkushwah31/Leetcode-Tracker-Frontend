@@ -168,7 +168,7 @@ export function UnifiedContestHistory({
                             onClick={() => setPlatformFilter('ALL')}
                             className={`px-2.5 py-0.5 rounded-md text-xs font-semibold transition-all ${
                                 platformFilter === 'ALL'
-                                    ? 'bg-[#5b4fff] text-white shadow-xs'
+                                    ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                             }`}
                         >

@@ -567,7 +567,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 onClick={() => setFriendsFilter('ALL')}
                                 className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                                     friendsFilter === 'ALL'
-                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-2xs font-bold'
+                                        ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-2xs font-bold'
                                         : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }`}
                             >
