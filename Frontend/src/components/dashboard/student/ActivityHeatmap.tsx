@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { CalendarBlankIcon as Calendar, LightningIcon } from '@phosphor-icons/react';
 import type { ProgressRecord } from '@/types';
@@ -47,7 +48,7 @@ export function ActivityHeatmap({
     title,
 }: Readonly<ActivityHeatmapProps>) {
     const [range, setRange] = useState<ActivityRange>(defaultRange);
-    const [hoveredCell, setHoveredCell] = useState<{ day: HeatmapDay; x: number; y: number } | null>(null);
+    const [hoveredCell, setHoveredCell] = useState<{ day: HeatmapDay; x: number; y: number; placement: 'top' | 'bottom' } | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
     // 1. Process progressHistory map and streaks
@@ -223,6 +224,17 @@ export function ActivityHeatmap({
         }
     }, [range, weeks]);
 
+    // Dismiss floating tooltip on window scroll or resize
+    useEffect(() => {
+        const handleScrollOrResize = () => setHoveredCell(null);
+        window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+        window.addEventListener('resize', handleScrollOrResize, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', handleScrollOrResize);
+            window.removeEventListener('resize', handleScrollOrResize);
+        };
+    }, []);
+
     const rangeLabel = range === '12weeks' ? 'past 12 weeks' : range === '6months' ? 'past 6 months' : 'past one year';
 
     const defaultCardClass = "relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200";
@@ -319,6 +331,9 @@ export function ActivityHeatmap({
                     {/* Scrollable Grid Container */}
                     <div
                         ref={scrollContainerRef}
+                        onScroll={() => {
+                            if (hoveredCell) setHoveredCell(null);
+                        }}
                         className="flex-1 min-w-0 pb-2 overflow-x-auto custom-scrollbar"
                     >
                         <div className="flex gap-1 min-w-fit select-none">
@@ -340,13 +355,18 @@ export function ActivityHeatmap({
                                                 key={day.dateKey}
                                                 tabIndex={day.isFuture ? -1 : 0}
                                                 aria-label={day.isFuture ? undefined : `${day.formattedDate}: ${day.count} solved`}
+                                                title={day.isFuture ? undefined : `${day.formattedDate}: ${day.count === 0 ? 'No problems' : `${day.count} ${day.count === 1 ? 'problem' : 'problems'}`} solved`}
                                                 onMouseEnter={(e) => {
                                                     if (day.isFuture) return;
                                                     const rect = e.currentTarget.getBoundingClientRect();
+                                                    const placement = rect.top < 65 ? 'bottom' : 'top';
+                                                    const targetY = placement === 'top' ? rect.top - 6 : rect.bottom + 6;
+                                                    const targetX = Math.max(80, Math.min(window.innerWidth - 80, rect.left + rect.width / 2));
                                                     setHoveredCell({
                                                         day,
-                                                        x: rect.left + rect.width / 2,
-                                                        y: rect.top - 6,
+                                                        x: targetX,
+                                                        y: targetY,
+                                                        placement,
                                                     });
                                                 }}
                                                 onMouseLeave={() => setHoveredCell(null)}
@@ -364,10 +384,12 @@ export function ActivityHeatmap({
                     </div>
                 </div>
 
-                {/* Single Shared Floating Tooltip Overlay */}
-                {hoveredCell && (
+                {/* Single Shared Floating Tooltip Overlay - Portaled directly to document.body to avoid card overflow-hidden & backdrop-filter clipping */}
+                {hoveredCell && typeof document !== 'undefined' && createPortal(
                     <div
-                        className="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full bg-zinc-900 text-white border border-zinc-800 text-xs py-1.5 px-3 rounded-lg shadow-xl animate-in fade-in zoom-in-95 duration-100"
+                        className={`fixed z-[9999] pointer-events-none -translate-x-1/2 ${
+                            hoveredCell.placement === 'top' ? '-translate-y-full' : 'translate-y-0'
+                        } bg-zinc-900/95 dark:bg-zinc-900/95 backdrop-blur-md text-white border border-zinc-700/80 dark:border-zinc-800 text-xs py-1.5 px-3 rounded-lg shadow-2xl animate-in fade-in zoom-in-95 duration-100`}
                         style={{ left: hoveredCell.x, top: hoveredCell.y }}
                     >
                         <p className="font-semibold text-zinc-100 whitespace-nowrap">{hoveredCell.day.formattedDate}</p>
@@ -376,7 +398,8 @@ export function ActivityHeatmap({
                                 ? 'No problems solved'
                                 : `${hoveredCell.day.count} ${hoveredCell.day.count === 1 ? 'problem' : 'problems'} solved`}
                         </p>
-                    </div>
+                    </div>,
+                    document.body
                 )}
 
                 {/* Legend & Synced Indicator Footer */}
