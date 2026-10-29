@@ -4,12 +4,14 @@ interface StreakFlameProps {
     className?: string;
     size?: number | string;
     animated?: boolean;
+    variant?: 'amber' | 'violet';
 }
 
 export function StreakFlame({
     className = 'w-4 h-4',
     size,
     animated = true,
+    variant = 'amber',
 }: Readonly<StreakFlameProps>) {
     const id = useId();
     const outerGradId = `flame-outer-${id}`;
@@ -32,20 +34,41 @@ export function StreakFlame({
             aria-hidden="true"
         >
             <defs>
-                <linearGradient id={outerGradId} x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stopColor="#ea580c" />
-                    <stop offset="45%" stopColor="#f97316" />
-                    <stop offset="100%" stopColor="#f59e0b" />
-                </linearGradient>
-                <linearGradient id={innerGradId} x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stopColor="#f97316" />
-                    <stop offset="55%" stopColor="#facc15" />
-                    <stop offset="100%" stopColor="#fef08a" />
-                </linearGradient>
-                <linearGradient id={coreGradId} x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stopColor="#fde047" />
-                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0.95" />
-                </linearGradient>
+                {variant === 'violet' ? (
+                    <>
+                        <linearGradient id={outerGradId} x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#4f46e5" />
+                            <stop offset="45%" stopColor="#5b4fff" />
+                            <stop offset="100%" stopColor="#8f84ff" />
+                        </linearGradient>
+                        <linearGradient id={innerGradId} x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#6366f1" />
+                            <stop offset="55%" stopColor="#a59bff" />
+                            <stop offset="100%" stopColor="#dedbff" />
+                        </linearGradient>
+                        <linearGradient id={coreGradId} x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#dedbff" />
+                            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.95" />
+                        </linearGradient>
+                    </>
+                ) : (
+                    <>
+                        <linearGradient id={outerGradId} x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#ea580c" />
+                            <stop offset="45%" stopColor="#f97316" />
+                            <stop offset="100%" stopColor="#f59e0b" />
+                        </linearGradient>
+                        <linearGradient id={innerGradId} x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#f97316" />
+                            <stop offset="55%" stopColor="#facc15" />
+                            <stop offset="100%" stopColor="#fef08a" />
+                        </linearGradient>
+                        <linearGradient id={coreGradId} x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="#fde047" />
+                            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.95" />
+                        </linearGradient>
+                    </>
+                )}
             </defs>
 
             {/* Outer Dancing Flame Silhouette */}

@@ -1,0 +1,33 @@
+# fly.toml app configuration file for MentorSync Backend
+# Reference: https://fly.io/docs/reference/configuration/
+
+app = "mentorsync-backend"
+primary_region = "sin" # Singapore region (closest to India/Asia); adjust as desired (e.g. "iad", "ord", "fra")
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  SERVER_FORWARD_HEADERS_STRATEGY = "framework"
+  COOKIE_SECURE = "true"
+  COOKIE_SAME_SITE = "None"
+  JAVA_OPTS = "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop" # Set to "off" if you want 24/7 background cron / websockets without cold starts
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    grace_period = "40s"
+    interval = "15s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb" # 512MB RAM minimum for Spring Boot + Java 25 virtual threads; use 1024mb if needed

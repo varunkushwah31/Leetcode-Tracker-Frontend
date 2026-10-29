@@ -266,9 +266,10 @@ export function StudentDetailsView({ username, classroomName, classroomId, mento
                             </div>
                             <div className="text-center">
                                 <p className="text-[11px] font-bold tracking-widest uppercase text-zinc-500 mb-1">Streak</p>
-                                <p className="text-2xl font-bold text-amber-500 flex justify-center items-center">
-                                    {data.consistencyStreak || 0} <StreakFlame className="w-5 h-5 ml-1.5" />
+                                <p className="text-2xl font-bold text-zinc-900 dark:text-white flex justify-center items-center gap-1.5">
+                                    {data.consistencyStreak || 0} <StreakFlame className="w-5 h-5 ml-1" />
                                 </p>
+                                <p className="text-[10px] text-zinc-500 font-medium mt-0.5">days active</p>
                             </div>
                         </div>
                     </div>

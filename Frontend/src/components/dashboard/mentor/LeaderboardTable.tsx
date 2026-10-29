@@ -5,7 +5,6 @@ import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
 import {
-    FireIcon as FlameIcon,
     DownloadSimpleIcon as Download,
     MagnifyingGlassIcon as Search,
     BellIcon,
@@ -504,9 +503,9 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                                 {Boolean(student.consistencyStreak && student.consistencyStreak > 0) && (
                                                     <>
                                                         <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                                                        <span className="font-semibold text-amber-500 flex items-center gap-0.5">
+                                                        <span className="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
                                                             <StreakFlame className="w-3 h-3" />
-                                                            {student.consistencyStreak}d
+                                                            <span>{student.consistencyStreak}d</span>
                                                         </span>
                                                     </>
                                                 )}
@@ -515,14 +514,24 @@ export function LeaderboardTable({ students, sortBy, onSortChange, onExportCSV, 
                                     </div>
                                 </td>
                                 <td className="hidden sm:table-cell py-3 px-3 sm:py-4 sm:px-6 text-center">
-                                    <div className="flex items-center justify-center gap-1.5">
-                                        {(student.consistencyStreak ?? 0) > 0 ? (
-                                            <StreakFlame className="w-4 h-4" />
-                                        ) : (
-                                            <FlameIcon className="w-4 h-4 text-zinc-300 dark:text-zinc-700" />
-                                        )}
-                                        <span className={`font-bold ${(student.consistencyStreak ?? 0) > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-600'}`}>{student.consistencyStreak || 0}</span>
-                                    </div>
+                                    {(student.consistencyStreak ?? 0) > 0 ? (
+                                        <div className="flex flex-col items-center">
+                                            <div className="font-bold text-zinc-800 dark:text-zinc-200 text-base flex items-center justify-center gap-1.5">
+                                                <StreakFlame className="w-3.5 h-3.5" />
+                                                <span>{student.consistencyStreak}</span>
+                                            </div>
+                                            <div className="text-[10px] text-zinc-500 font-medium">
+                                                days active
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center">
+                                            <span className="font-bold text-zinc-400 dark:text-zinc-600 text-base">0</span>
+                                            <div className="text-[10px] text-zinc-500/70 dark:text-zinc-600 font-medium">
+                                                inactive
+                                            </div>
+                                        </div>
+                                    )}
                                 </td>
                                 <td className="hidden sm:table-cell py-3 px-3 sm:py-4 sm:px-6 text-center">
                                     <span className="font-bold text-zinc-800 dark:text-zinc-200 text-base">{student.totalSolved || 0}</span>

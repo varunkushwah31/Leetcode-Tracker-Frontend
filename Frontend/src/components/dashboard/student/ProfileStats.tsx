@@ -231,14 +231,14 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
 
                                 {/* Combined Streak Pill */}
                                 <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/90 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs self-center md:self-auto">
-                                    <div className="p-1 rounded-lg bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20 shrink-0">
+                                    <div className="p-1 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20 shrink-0">
                                         <StreakFlame className="w-3.5 h-3.5" />
                                     </div>
                                     <div className="flex items-baseline gap-1.5">
                                         <span className="text-sm sm:text-base font-black text-zinc-900 dark:text-white tabular-nums tracking-tight">
                                             {data.consistencyStreak || 0}
                                         </span>
-                                        <span className="text-xs font-bold text-amber-600 dark:text-amber-400 tracking-wide">
+                                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 tracking-wide">
                                             Day Streak
                                         </span>
                                         <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hidden sm:inline-block">

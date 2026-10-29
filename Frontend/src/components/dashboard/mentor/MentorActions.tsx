@@ -184,14 +184,17 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                 const effectivePlatform = parsed.detectedPlatform || p;
                 const autoTitle = extractTitleFromUrlOrSlug(titleSlug, effectivePlatform) ||
                     extractTitleFromUrlOrSlug(parsed.slug, effectivePlatform);
+                const days = typeof daysToComplete === 'number' && daysToComplete > 0
+                    ? daysToComplete
+                    : (Number.parseInt(String(daysToComplete)) || 3);
                 return {
                     platform: effectivePlatform,
                     title: title?.trim() || autoTitle || undefined,
                     titleSlug: parsed.slug,
-                    daysToComplete: daysToComplete || 3
+                    daysToComplete: Math.max(1, days)
                 };
             });
-            await PathService.createPath({ mentorId, title: newPath.title, description: newPath.description, questions: sanitizedQuestions });
+            await PathService.createPath({ mentorId, title: newPath.title.trim(), description: newPath.description?.trim(), questions: sanitizedQuestions });
             setCreatePathOpen(false);
             setNewPath({ title: '', description: '' });
             setPathQuestions([{ tempId: `question-reset-${Date.now()}`, platform: 'LEETCODE', title: '', titleSlug: '', daysToComplete: 3 }]);
@@ -277,8 +280,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 />
                                 <Button
                                     onClick={handleAddStudent}
-                                    disabled={!newStudentUsername || isAdding}
-                                    className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl px-5 font-semibold shrink-0 shadow-sm cursor-pointer"
+                                    disabled={!newStudentUsername.trim() || isAdding}
+                                    className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white dark:text-white disabled:opacity-100 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-500 disabled:border-transparent disabled:shadow-none disabled:cursor-not-allowed rounded-xl px-5 font-semibold shrink-0 shadow-sm cursor-pointer"
                                 >
                                     {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
                                 </Button>
@@ -362,7 +365,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                 <Button
                                     onClick={handleBulkUpload}
                                     disabled={isUploading}
-                                    className="w-full bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl h-10 font-semibold shadow-sm cursor-pointer"
+                                    className="w-full bg-[#5b4fff] hover:bg-[#4a3fdf] text-white dark:text-white disabled:opacity-100 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-500 disabled:border-transparent disabled:shadow-none disabled:cursor-not-allowed rounded-xl h-10 font-semibold shadow-sm cursor-pointer"
                                 >
                                     {isUploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UploadCloud className="w-4 h-4 mr-2" />}
                                     Import {uploadFile.name}
@@ -576,7 +579,13 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                     </div>
                     <DialogFooter>
                         <Button variant="outline" className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-transparent text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl" onClick={() => setAssignQuestionOpen(false)}>Cancel</Button>
-                        <Button onClick={handleAssignQuestion} className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white rounded-xl">Assign</Button>
+                        <Button
+                            onClick={handleAssignQuestion}
+                            disabled={!assignmentData.titleSlug.trim()}
+                            className="bg-[#5b4fff] hover:bg-[#4a3fdf] text-white dark:text-white disabled:opacity-100 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-500 disabled:border-transparent disabled:shadow-none disabled:cursor-not-allowed rounded-xl font-semibold"
+                        >
+                            Assign
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -619,7 +628,11 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         )}
                     </div>
                     <DialogFooter>
-                        <Button onClick={handleAssignPath} disabled={!selectedPathId} className="w-full sm:w-auto bg-[#5b4fff] hover:bg-[#4a3fdf] text-white disabled:opacity-50 rounded-xl">
+                        <Button
+                            onClick={handleAssignPath}
+                            disabled={!selectedPathId}
+                            className="w-full sm:w-auto bg-[#5b4fff] hover:bg-[#4a3fdf] text-white dark:text-white disabled:opacity-100 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-500 disabled:border-transparent disabled:shadow-none disabled:cursor-not-allowed rounded-xl font-semibold"
+                        >
                             Assign to All Students
                         </Button>
                     </DialogFooter>
@@ -756,11 +769,19 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                     type="number"
                                                     min="1"
                                                     className="w-10 bg-transparent text-sm font-semibold text-center text-zinc-900 dark:text-white focus:outline-none"
-                                                    value={q.daysToComplete}
+                                                    value={q.daysToComplete === 0 ? '' : q.daysToComplete}
                                                     onChange={e => {
+                                                        const val = e.target.value;
                                                         const newQs = [...pathQuestions];
-                                                        newQs[idx].daysToComplete = Number.parseInt(e.target.value) || 1;
+                                                        newQs[idx].daysToComplete = val === '' ? ('' as any) : Math.max(1, Number.parseInt(val) || 1);
                                                         setPathQuestions(newQs);
+                                                    }}
+                                                    onBlur={() => {
+                                                        if (!q.daysToComplete || Number(q.daysToComplete) < 1) {
+                                                            const newQs = [...pathQuestions];
+                                                            newQs[idx].daysToComplete = 1;
+                                                            setPathQuestions(newQs);
+                                                        }
                                                     }}
                                                 />
                                                 <span className="text-xs text-zinc-500 font-medium">days</span>
@@ -768,12 +789,13 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
 
                                             {/* Trash button */}
                                             <Button
+                                                type="button"
                                                 variant="ghost"
                                                 size="icon"
-                                                className="text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300 shrink-0 rounded-xl"
+                                                className="text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300 disabled:opacity-40 disabled:text-zinc-400 dark:disabled:text-zinc-600 disabled:hover:bg-transparent disabled:cursor-not-allowed shrink-0 rounded-xl"
                                                 onClick={() => setPathQuestions(prev => prev.filter(item => item.tempId !== q.tempId))}
                                                 disabled={pathQuestions.length === 1}
-                                                title="Remove question"
+                                                title={pathQuestions.length === 1 ? "Path must have at least one question" : "Remove question"}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -782,7 +804,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                         {/* Optional Title Input */}
                                         <div>
                                             <Input
-                                                placeholder={q.title ? q.title : "Title (auto-assigned from URL/slug)"}
+                                                placeholder="Title (auto-assigned from URL/slug)"
                                                 className={`h-9 text-xs ${inputClasses}`}
                                                 value={q.title ?? ''}
                                                 onChange={e => {
@@ -808,8 +830,8 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                         </Button>
                         <Button
                             onClick={handleCreatePath}
-                            disabled={!newPath.title || !pathQuestions[0].titleSlug}
-                            className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white disabled:opacity-50 rounded-xl font-semibold shadow-md shadow-[#5b4fff]/20"
+                            disabled={!newPath.title.trim() || pathQuestions.length === 0 || pathQuestions.some(q => !q.titleSlug.trim())}
+                            className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white dark:text-white disabled:opacity-100 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-500 disabled:border-transparent disabled:shadow-none disabled:cursor-not-allowed rounded-xl font-semibold shadow-md shadow-[#5b4fff]/20 transition-all cursor-pointer"
                         >
                             Save Learning Path
                         </Button>

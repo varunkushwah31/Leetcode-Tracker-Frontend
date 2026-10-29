@@ -256,7 +256,7 @@ export function ActivityHeatmap({
                         <span className="text-zinc-300 dark:text-zinc-700">•</span>
                         <span className="flex items-center gap-1">
                             <StreakFlame className="w-3.5 h-3.5" />
-                            Streak: <strong className="text-amber-600 dark:text-amber-400 font-bold">{effectiveCurrentStreak}d</strong>
+                            Streak: <strong className="text-zinc-900 dark:text-white font-bold">{effectiveCurrentStreak}d</strong>
                         </span>
                         <span className="text-zinc-300 dark:text-zinc-700">•</span>
                         <span>

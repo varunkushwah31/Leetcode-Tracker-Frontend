@@ -671,9 +671,20 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             </td>
 
                                             <td className="py-4 px-5 text-center">
-                                                <span className="inline-flex items-center gap-1 font-bold text-amber-500">
-                                                    {e.streak}d <StreakFlame className="w-3.5 h-3.5" />
-                                                </span>
+                                                {(e.streak ?? 0) > 0 ? (
+                                                    <div className="flex flex-col items-center">
+                                                        <div className="font-bold text-zinc-900 dark:text-white text-sm flex items-center justify-center gap-1.5">
+                                                            <StreakFlame className="w-3.5 h-3.5" />
+                                                            <span>{e.streak}</span>
+                                                        </div>
+                                                        <div className="text-[10px] text-zinc-500 font-medium">days active</div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-col items-center">
+                                                        <span className="font-bold text-zinc-400 dark:text-zinc-600 text-sm">0</span>
+                                                        <div className="text-[10px] text-zinc-500/70 dark:text-zinc-600 font-medium">inactive</div>
+                                                    </div>
+                                                )}
                                             </td>
 
                                             <td className="py-4 px-5 text-center">

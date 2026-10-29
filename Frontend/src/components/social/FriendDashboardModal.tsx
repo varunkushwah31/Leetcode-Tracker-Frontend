@@ -168,8 +168,8 @@ function FriendProfileHeader({
                     </div>
                     <div className="text-center min-w-17.5">
                         <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">Streak</p>
-                        <p className="text-2xl font-bold tabular-nums text-amber-500 flex justify-center items-center">
-                            {profile.consistencyStreak || 0} <StreakFlame className="w-5 h-5 ml-1.5" />
+                        <p className="text-2xl font-bold tabular-nums text-zinc-900 dark:text-white flex justify-center items-center gap-1.5">
+                            {profile.consistencyStreak || 0} <StreakFlame className="w-5 h-5 ml-1" />
                         </p>
                     </div>
                     <div className="text-center min-w-21.25 sm:border-l sm:border-zinc-200 sm:dark:border-zinc-800 sm:pl-5">
@@ -973,7 +973,7 @@ function FriendCoderCardSection({
                     </div>
                     <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Streak Record</p>
-                        <p className="text-2xl font-bold tabular-nums text-amber-500 tracking-tight mt-1 flex items-center justify-center gap-1">
+                        <p className="text-2xl font-bold tabular-nums text-zinc-900 dark:text-white tracking-tight mt-1 flex items-center justify-center gap-1.5">
                             {profile.consistencyStreak || 0}d <StreakFlame className="w-5 h-5" />
                         </p>
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Consistent Problem Solver</p>
