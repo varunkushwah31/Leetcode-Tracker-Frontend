@@ -19,15 +19,19 @@ import {
     UserPlusIcon as UserPlus,
     CaretRightIcon as ChevronRight,
     ListIcon as MenuIcon,
-    XIcon
+    XIcon,
+    ArrowRightIcon,
+    SignOutIcon
 } from '@phosphor-icons/react';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { DottedBackground } from '../components/ui/DottedBackground';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { ClassroomService } from '@/services/endpoints';
+import { useAuth } from '../hooks/useAuth';
 
 export function HowToUsePage() {
+    const { user, isAuthenticated, logout } = useAuth();
     const [activeSection, setActiveSection] = useState<'all' | 'mentor' | 'student' | 'csv' | 'reports' | 'faq'>('all');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -106,7 +110,7 @@ https://codeforces.com/profile/petr`;
                 <div className="flex items-center justify-between w-full">
                     <BrandLogo size="responsive" theme="auto" />
 
-                    <nav className="hidden md:flex items-center gap-5">
+                    <nav className="hidden md:flex items-center gap-4 lg:gap-5">
                         <Link
                             to="/#features"
                             className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
@@ -125,30 +129,82 @@ https://codeforces.com/profile/petr`;
                         >
                             Contact
                         </Link>
-                        <Link
-                            to="/login"
-                            className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff]"
-                        >
-                            Sign In
-                        </Link>
-                        <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10" />
-                        <Link
-                            to="/login"
-                            className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-5 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 shimmer-sweep interactive-press"
-                        >
-                            Get Started
-                        </Link>
+
+                        {isAuthenticated ? (
+                            <div className="flex items-center gap-3">
+                                <Link 
+                                    to="/dashboard" 
+                                    className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/5 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all text-left group"
+                                    title="Go to Dashboard"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#5b4fff] to-[#7928ca] text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0">
+                                        {(user?.name || 'U').substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div className="hidden lg:flex flex-col">
+                                        <span className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors max-w-[120px] truncate leading-tight">
+                                            {user?.name || 'Account'}
+                                        </span>
+                                        <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 leading-tight">
+                                            {user?.role === 'SUPER_ADMIN' ? 'Admin' : user?.role === 'MENTOR' ? 'Mentor' : user?.role === 'STUDENT' ? 'Student' : 'Member'}
+                                        </span>
+                                    </div>
+                                </Link>
+                                <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10" />
+                                <Link 
+                                    to="/dashboard" 
+                                    className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-4 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 shimmer-sweep interactive-press"
+                                >
+                                    <span>Dashboard</span>
+                                    <ArrowRightIcon className="w-4 h-4" />
+                                </Link>
+                                <button
+                                    type="button"
+                                    onClick={() => void logout()}
+                                    className="p-2.5 rounded-xl text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer min-h-11 min-w-11 flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                    title="Sign Out"
+                                    aria-label="Sign out"
+                                >
+                                    <SignOutIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <Link
+                                    to="/login"
+                                    className="text-[14px] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff]"
+                                >
+                                    Sign In
+                                </Link>
+                                <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10" />
+                                <Link
+                                    to="/login"
+                                    className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[14px] font-medium px-5 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 shimmer-sweep interactive-press"
+                                >
+                                    Get Started
+                                </Link>
+                            </>
+                        )}
                     </nav>
 
                     {/* Mobile Controls */}
                     <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
                         <ThemeToggle className="bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 h-8.5 w-8.5 sm:h-9 sm:w-9" />
-                        <Link
-                            to="/login"
-                            className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-xl whitespace-nowrap shrink-0 transition-colors"
-                        >
-                            Get Started
-                        </Link>
+                        {isAuthenticated ? (
+                            <Link
+                                to="/dashboard"
+                                className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-xl whitespace-nowrap shrink-0 transition-colors flex items-center gap-1.5"
+                            >
+                                <span>Dashboard</span>
+                                <ArrowRightIcon className="w-3.5 h-3.5" />
+                            </Link>
+                        ) : (
+                            <Link
+                                to="/login"
+                                className="bg-[#5b4fff] hover:bg-[#4a3ecc] text-white text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-xl whitespace-nowrap shrink-0 transition-colors"
+                            >
+                                Get Started
+                            </Link>
+                        )}
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(prev => !prev)}
@@ -163,6 +219,22 @@ https://codeforces.com/profile/petr`;
                 {/* Mobile Dropdown Panel */}
                 {mobileMenuOpen && (
                     <div className="md:hidden mt-3 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                        {isAuthenticated && user && (
+                            <div className="flex items-center gap-3 px-3 py-2.5 mb-1 rounded-xl bg-zinc-100/80 dark:bg-zinc-900/80 border border-zinc-200/70 dark:border-zinc-800/70">
+                                <div className="w-9 h-9 rounded-full bg-linear-to-br from-[#5b4fff] to-[#7928ca] text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0">
+                                    {(user.name || 'U').substring(0, 2).toUpperCase()}
+                                </div>
+                                <div className="flex flex-col min-w-0 flex-1">
+                                    <span className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
+                                        {user.name}
+                                    </span>
+                                    <span className="text-xs text-zinc-500 dark:text-zinc-400 capitalize">
+                                        {user.role === 'SUPER_ADMIN' ? 'Admin' : user.role === 'MENTOR' ? 'Mentor' : user.role === 'STUDENT' ? 'Student' : 'Member'}
+                                        {user.email && ` • ${user.email}`}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                         <Link
                             to="/#features"
                             onClick={() => setMobileMenuOpen(false)}
@@ -187,22 +259,46 @@ https://codeforces.com/profile/petr`;
                             <span>Contact & Support</span>
                             <ChevronRight className="w-4 h-4 text-zinc-400" />
                         </Link>
-                        <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2">
-                            <Link
-                                to="/login"
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
-                            >
-                                Sign In
-                            </Link>
-                            <Link
-                                to="/register"
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl bg-[#5b4fff] text-white hover:bg-[#4d40ef] transition-colors shadow-sm"
-                            >
-                                Create Account
-                            </Link>
-                        </div>
+                        {isAuthenticated ? (
+                            <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2">
+                                <Link
+                                    to="/dashboard"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl bg-[#5b4fff] text-white hover:bg-[#4a3ecc] transition-colors shadow-sm flex items-center justify-center gap-2"
+                                >
+                                    <span>Dashboard</span>
+                                    <ArrowRightIcon className="w-4 h-4" />
+                                </Link>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        void logout();
+                                    }}
+                                    className="py-2.5 px-3.5 text-center text-sm font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                                >
+                                    <SignOutIcon className="w-4 h-4" />
+                                    <span>Sign Out</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2">
+                                <Link
+                                    to="/login"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+                                >
+                                    Sign In
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="flex-1 py-2.5 text-center text-sm font-semibold rounded-xl bg-[#5b4fff] text-white hover:bg-[#4d40ef] transition-colors shadow-sm"
+                                >
+                                    Create Account
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
             </header>
@@ -753,10 +849,10 @@ https://codeforces.com/profile/petr`;
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-4">
                         <Link
-                            to="/login"
+                            to={isAuthenticated ? "/dashboard" : "/login"}
                             className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.1)_inset,0_0_20px_rgba(91,79,255,0.2)] text-white text-[15px] font-medium px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 flex items-center gap-2"
                         >
-                            Get Started Now <ChevronRight className="w-4 h-4" />
+                            {isAuthenticated ? "Go to Dashboard" : "Get Started Now"} <ChevronRight className="w-4 h-4" />
                         </Link>
                         <Link
                             to="/contact"
@@ -792,7 +888,9 @@ https://codeforces.com/profile/petr`;
                                     <Link to="/contact" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Support & Contact</Link>
                                 </li>
                                 <li>
-                                    <Link to="/login" className="hover:text-zinc-900 dark:hover:text-white transition-colors">Sign In</Link>
+                                    <Link to={isAuthenticated ? "/dashboard" : "/login"} className="hover:text-zinc-900 dark:hover:text-white transition-colors">
+                                        {isAuthenticated ? "Dashboard" : "Sign In"}
+                                    </Link>
                                 </li>
                             </ul>
                         </div>
