@@ -88,10 +88,7 @@ export function StudentDashboard() {
 
     useEffect(() => {
         void SocialService.pingPresence().catch(() => {});
-        const presenceInterval = setInterval(() => {
-            void SocialService.pingPresence().catch(() => {});
-        }, 30000);
-        return () => clearInterval(presenceInterval);
+        
     }, []);
 
     useEffect(() => {
@@ -524,7 +521,7 @@ export function StudentDashboard() {
                                     {/* 4. Unified Contest History */}
                                     {(activeFilter === 'all' || activeFilter === 'contests') && (
                                         <ErrorBoundary fallback={null}>
-                                            <UnifiedContestHistory
+                                            <UnifiedContestHistory className="defer-offscreen"
                                                 contestHistory={dashboardData?.contestHistory}
                                                 codeforcesContestHistory={dashboardData?.codeforcesContestHistory}
                                             />
@@ -591,7 +588,7 @@ export function StudentDashboard() {
                                     {/* 4. Upcoming Contests Schedule */}
                                     {(activeFilter === 'all' || activeFilter === 'contests') && (
                                         <ErrorBoundary fallback={null}>
-                                            <UpcomingContestsCard />
+                                            <div className="defer-offscreen"><UpcomingContestsCard /></div>
                                         </ErrorBoundary>
                                     )}
 
@@ -605,7 +602,7 @@ export function StudentDashboard() {
                                     {/* 6. Earned Badges Showcase */}
                                     {(activeFilter === 'all' || activeFilter === 'practice') && (
                                         <ErrorBoundary fallback={null}>
-                                            <BadgesList badges={dashboardData?.badges} />
+                                            <div className="defer-offscreen"><BadgesList badges={dashboardData?.badges} /></div>
                                         </ErrorBoundary>
                                     )}
                                 </div>

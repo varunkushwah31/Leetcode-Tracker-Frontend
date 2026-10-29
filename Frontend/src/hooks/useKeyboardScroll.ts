@@ -59,9 +59,8 @@ export function useKeyboardScroll({
             }
 
             // Determine scroll container
-            // 1. If an active dialog modal exists and is open, prioritize scrolling the dialog
-            const dialog = document.querySelector('[role="dialog"], [data-slot="dialog-content"]');
             let scrollEl: HTMLElement | Window | null = null;
+            const dialog = document.querySelector('[role="dialog"], [data-slot="dialog-content"]');
 
             if (dialog instanceof HTMLElement) {
                 if (dialog.scrollHeight > dialog.clientHeight) {
@@ -83,40 +82,40 @@ export function useKeyboardScroll({
             if (!scrollEl) return;
 
             const isWindow = scrollEl === window;
-            const clientHeight = isWindow ? window.innerHeight : (scrollEl as HTMLElement).clientHeight;
-            const scrollHeight = isWindow
-                ? Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
-                : (scrollEl as HTMLElement).scrollHeight;
-            const pageStep = Math.max(250, Math.floor(clientHeight * 0.75));
-
             let delta = 0;
             let scrollToTop: number | null = null;
 
-            switch (key) {
-                case 'ArrowDown':
-                    delta = step;
-                    break;
-                case 'ArrowUp':
-                    delta = -step;
-                    break;
-                case 'PageDown':
-                    delta = pageStep;
-                    break;
-                case 'PageUp':
-                    delta = -pageStep;
-                    break;
-                case ' ':
-                case 'Spacebar':
-                    delta = e.shiftKey ? -pageStep : pageStep;
-                    break;
-                case 'Home':
-                    scrollToTop = 0;
-                    break;
-                case 'End':
-                    scrollToTop = scrollHeight;
-                    break;
-                default:
-                    return;
+            // Only compute heavy layout geometry (scrollHeight, clientHeight) when Page/Space/Home/End is pressed
+            if (key === 'ArrowDown') {
+                delta = step;
+            } else if (key === 'ArrowUp') {
+                delta = -step;
+            } else if (key === 'Home') {
+                scrollToTop = 0;
+            } else {
+                const clientHeight = isWindow ? window.innerHeight : (scrollEl as HTMLElement).clientHeight;
+                const scrollHeight = isWindow
+                    ? Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
+                    : (scrollEl as HTMLElement).scrollHeight;
+                const pageStep = Math.max(250, Math.floor(clientHeight * 0.75));
+
+                switch (key) {
+                    case 'PageDown':
+                        delta = pageStep;
+                        break;
+                    case 'PageUp':
+                        delta = -pageStep;
+                        break;
+                    case ' ':
+                    case 'Spacebar':
+                        delta = e.shiftKey ? -pageStep : pageStep;
+                        break;
+                    case 'End':
+                        scrollToTop = scrollHeight;
+                        break;
+                    default:
+                        return;
+                }
             }
 
             e.preventDefault();

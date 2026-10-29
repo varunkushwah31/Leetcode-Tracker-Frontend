@@ -7,7 +7,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 antialiased transition-colors duration-300;
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 antialiased 
   }
 }
 @layer base{
@@ -328,6 +328,8 @@ body {
 
 @media (prefers-reduced-motion: no-preference) {
   .interactive-card {
+    will-change: transform;
+    transform: translateZ(0);
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
   }
 
@@ -484,4 +486,11 @@ button:not(:disabled):active,
   .dotted-bg-zoom:hover {
     background-size: 32px 32px;
   }
+}
+
+
+/* Modern Content-Visibility Optimization for offscreen cards */
+.defer-offscreen {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 400px;
 }

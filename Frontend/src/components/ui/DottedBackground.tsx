@@ -22,8 +22,9 @@ export function DottedBackground({
         const ctx = canvas.getContext('2d', { alpha: true });
         if (!ctx) return;
 
-        let animationFrameId: number;
+        let animationFrameId: number | null = null;
         let isHovering = false;
+        let isAnimating = false;
         let hoverTransition = 0; // 0 to 1 smooth fade
         let width = 0;
         let height = 0;
@@ -33,6 +34,32 @@ export function DottedBackground({
             currentY: -1000,
             targetX: -1000,
             targetY: -1000,
+        };
+
+        let isDark = document.documentElement.classList.contains('dark');
+
+        const drawStaticFrame = () => {
+            if (width === 0 || height === 0) return;
+            ctx.clearRect(0, 0, width, height);
+
+            const baseDotRadius = isDark ? 1.0 : 1.1;
+            const baseDotColor = isDark
+                ? 'rgba(255, 255, 255, 0.08)'
+                : 'rgba(16, 185, 129, 0.35)';
+
+            ctx.fillStyle = baseDotColor;
+            ctx.beginPath();
+
+            const startX = Math.floor(spacing / 2);
+            const startY = Math.floor(spacing / 2);
+
+            for (let x = startX; x < width + spacing; x += spacing) {
+                for (let y = startY; y < height + spacing; y += spacing) {
+                    ctx.moveTo(x + baseDotRadius, y);
+                    ctx.arc(x, y, baseDotRadius, 0, Math.PI * 2);
+                }
+            }
+            ctx.fill();
         };
 
         const updateSize = () => {
@@ -47,13 +74,19 @@ export function DottedBackground({
             canvas.style.width = `${width}px`;
             canvas.style.height = `${height}px`;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            if (!isAnimating) {
+                drawStaticFrame();
+            }
         };
 
         updateSize();
 
-        let isDark = document.documentElement.classList.contains('dark');
         const themeObserver = new MutationObserver(() => {
             isDark = document.documentElement.classList.contains('dark');
+            if (!isAnimating) {
+                drawStaticFrame();
+            }
         });
         themeObserver.observe(document.documentElement, {
             attributes: true,
@@ -64,81 +97,43 @@ export function DottedBackground({
             if (!target) return false;
             if (target === canvas || target === container) return false;
             const uiMatch = target.closest(
-                'button, a, input, select, textarea, [role="button"], [role="tab"], [role="dialog"], [role="menu"], header, nav, footer, [data-slot], [data-card], .rounded-xl, .rounded-2xl, .rounded-3xl, .rounded-lg, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, .border-zinc-200, .dark\\:border-zinc-800, .bg-white, .dark\\:bg-zinc-900, .dark\\:bg-\\[\\#111111\\], .dark\\:bg-\\[\\#1a1a1a\\], .dark\\:bg-\\[\\#18181b\\], .dark\\:bg-\\[\\#141414\\]'
+                'button, a, input, select, textarea, [role="button"], [role="tab"], [role="dialog"], [role="menu"]'
             );
             return Boolean(uiMatch && uiMatch !== container && !container?.contains(uiMatch));
         };
-
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!canvas) return;
-            const rect = canvas.getBoundingClientRect();
-            const isInside =
-                e.clientX >= rect.left &&
-                e.clientX <= rect.right &&
-                e.clientY >= rect.top &&
-                e.clientY <= rect.bottom;
-
-            if (!isInside) {
-                isHovering = false;
-                return;
-            }
-
-            const target = typeof document.elementFromPoint === 'function'
-                ? document.elementFromPoint(e.clientX, e.clientY)
-                : null;
-            if (isOverUI(target)) {
-                isHovering = false;
-                return;
-            }
-
-            const localX = e.clientX - rect.left;
-            const localY = e.clientY - rect.top;
-
-            mouse.targetX = localX;
-            mouse.targetY = localY;
-            if (!isHovering) {
-                isHovering = true;
-                if (mouse.currentX < 0) {
-                    mouse.currentX = localX;
-                    mouse.currentY = localY;
-                }
-            }
-        };
-
-        const handleMouseLeave = () => {
-            isHovering = false;
-        };
-
-        window.addEventListener('mousemove', handleMouseMove, { passive: true });
-        document.addEventListener('mouseleave', handleMouseLeave, { passive: true });
-
-        const resizeObserver = typeof ResizeObserver !== 'undefined'
-            ? new ResizeObserver(updateSize)
-            : null;
-        if (resizeObserver && container) {
-            resizeObserver.observe(container);
-        }
 
         const prefersReducedMotion =
             typeof window.matchMedia === 'function'
                 ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
                 : false;
 
-        const render = (timestamp: number) => {
-            // Smooth mouse interpolation (spring glide)
-            mouse.currentX += (mouse.targetX - mouse.currentX) * 0.22;
-            mouse.currentY += (mouse.targetY - mouse.currentY) * 0.22;
+        const startAnimation = () => {
+            if (isAnimating) return;
+            isAnimating = true;
+            animationFrameId = requestAnimationFrame(render);
+        };
 
-            // Smooth hover transition in/out
+        const render = (timestamp: number) => {
+            // Snappy mouse interpolation tightly locked to cursor
+            const dx = mouse.targetX - mouse.currentX;
+            const dy = mouse.targetY - mouse.currentY;
+            if (Math.abs(dx) < 0.25 && Math.abs(dy) < 0.25) {
+                mouse.currentX = mouse.targetX;
+                mouse.currentY = mouse.targetY;
+            } else {
+                mouse.currentX += dx * 0.45;
+                mouse.currentY += dy * 0.45;
+            }
+
+            // Smooth hover fade in/out
             if (isHovering && !prefersReducedMotion) {
-                hoverTransition = Math.min(1, hoverTransition + 0.12);
+                hoverTransition = Math.min(1, hoverTransition + 0.15);
             } else {
                 hoverTransition = Math.max(0, hoverTransition - 0.08);
             }
 
             ctx.clearRect(0, 0, width, height);
 
-            // Styling parameters based on theme
             const baseDotRadius = isDark ? 1.0 : 1.1;
             const baseDotColor = isDark
                 ? 'rgba(255, 255, 255, 0.08)'
@@ -150,9 +145,9 @@ export function DottedBackground({
                 ? 'rgba(255, 255, 255, 0.12)'
                 : 'rgba(16, 185, 129, 0.18)';
 
-            // Subtle breathing pulse wave for zoomed dots while hovering
             const pulse = prefersReducedMotion ? 0 : Math.sin(timestamp * 0.005) * 0.15;
             const effectiveHoverRadius = hoverRadius * hoverTransition;
+            const radiusSq = effectiveHoverRadius * effectiveHoverRadius;
 
             const zoomedDots: Array<{
                 x: number;
@@ -169,16 +164,12 @@ export function DottedBackground({
             for (let x = startX; x < width + spacing; x += spacing) {
                 for (let y = startY; y < height + spacing; y += spacing) {
                     if (hoverTransition > 0.01) {
-                        const dx = x - mouse.currentX;
-                        const dy = y - mouse.currentY;
-                        const distSq = dx * dx + dy * dy;
+                        const distSq = (x - mouse.currentX) ** 2 + (y - mouse.currentY) ** 2;
 
-                        if (distSq < effectiveHoverRadius * effectiveHoverRadius) {
+                        if (distSq < radiusSq) {
                             const dist = Math.sqrt(distSq);
                             const t = 1 - dist / effectiveHoverRadius;
-                            // Cubic smoothstep for tight, focused falloff
                             const ease = t * t * (3 - 2 * t) * hoverTransition;
-                            // Clean zoom (dots stay firmly on grid coordinates)
                             const radius = baseDotRadius + ease * (1.1 + pulse);
 
                             zoomedDots.push({
@@ -197,9 +188,9 @@ export function DottedBackground({
             }
             ctx.fill();
 
-            // Render zoomed dots crisply without thick halo rings
+            // Render zoomed dots crisply directly on exact grid points
             if (zoomedDots.length > 0) {
-                // Subtle soft aura layer
+                // Soft aura layer
                 ctx.fillStyle = auraColor;
                 ctx.beginPath();
                 for (const dot of zoomedDots) {
@@ -219,13 +210,83 @@ export function DottedBackground({
                 ctx.fill();
             }
 
+            // Stop RAF loop when idle and hover is completely faded out
+            if (!isHovering && hoverTransition <= 0) {
+                isAnimating = false;
+                drawStaticFrame();
+                return;
+            }
+
             animationFrameId = requestAnimationFrame(render);
         };
 
-        animationFrameId = requestAnimationFrame(render);
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            const localX = e.clientX - rect.left;
+            const localY = e.clientY - rect.top;
+
+            const isInside =
+                e.clientX >= rect.left &&
+                e.clientX <= rect.right &&
+                e.clientY >= rect.top &&
+                e.clientY <= rect.bottom;
+
+            if (!isInside) {
+                if (isHovering) {
+                    isHovering = false;
+                    startAnimation();
+                }
+                return;
+            }
+
+            const target = typeof document.elementFromPoint === 'function'
+                ? document.elementFromPoint(e.clientX, e.clientY)
+                : null;
+            if (isOverUI(target)) {
+                if (isHovering) {
+                    isHovering = false;
+                    startAnimation();
+                }
+                return;
+            }
+
+            mouse.targetX = localX;
+            mouse.targetY = localY;
+
+            if (!isHovering) {
+                isHovering = true;
+                if (mouse.currentX < 0) {
+                    mouse.currentX = localX;
+                    mouse.currentY = localY;
+                }
+            }
+
+            startAnimation();
+        };
+
+        const handleMouseLeave = () => {
+            isHovering = false;
+            startAnimation();
+        };
+
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        document.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+
+        const resizeObserver = typeof ResizeObserver !== 'undefined'
+            ? new ResizeObserver(updateSize)
+            : null;
+        if (resizeObserver && container) {
+            resizeObserver.observe(container);
+        }
+
+        // Initial draw and initial animation kickstart
+        startAnimation();
 
         return () => {
-            cancelAnimationFrame(animationFrameId);
+            if (animationFrameId !== null) {
+                cancelAnimationFrame(animationFrameId);
+            }
             window.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseleave', handleMouseLeave);
             if (resizeObserver) resizeObserver.disconnect();

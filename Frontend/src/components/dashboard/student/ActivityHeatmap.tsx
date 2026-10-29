@@ -1,6 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip';
 import { CalendarBlankIcon as Calendar, LightningIcon } from '@phosphor-icons/react';
 import type { ProgressRecord } from '@/types';
 import { StreakFlame } from '@/components/ui/StreakFlame';
@@ -48,6 +47,7 @@ export function ActivityHeatmap({
     title,
 }: Readonly<ActivityHeatmapProps>) {
     const [range, setRange] = useState<ActivityRange>(defaultRange);
+    const [hoveredCell, setHoveredCell] = useState<{ day: HeatmapDay; x: number; y: number } | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
     // 1. Process progressHistory map and streaks
@@ -321,51 +321,63 @@ export function ActivityHeatmap({
                         ref={scrollContainerRef}
                         className="flex-1 min-w-0 pb-2 overflow-x-auto custom-scrollbar"
                     >
-                        <TooltipProvider delayDuration={100}>
-                            <div className="flex gap-1 min-w-fit select-none">
-                                {weeks.map((week) => (
-                                    <div key={week.weekIndex} className="flex flex-col shrink-0 w-3.5">
-                                        {/* Month header label positioned cleanly above week column */}
-                                        <div className="relative h-5">
-                                            {week.monthLabel && (
-                                                <span className="absolute left-0 top-0 text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 whitespace-nowrap pointer-events-none select-none">
-                                                    {week.monthLabel}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {/* 7 Days in Week Column */}
-                                        <div className="flex flex-col gap-1">
-                                            {week.days.map((day) => (
-                                                <Tooltip key={day.dateKey}>
-                                                    <TooltipTrigger asChild>
-                                                        <div
-                                                            className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count, day.isFuture)} transition-all duration-150 ${
-                                                                day.isFuture
-                                                                    ? ''
-                                                                    : 'hover:ring-2 hover:ring-emerald-400 dark:hover:ring-emerald-400 cursor-pointer hover:scale-125 hover:shadow-[0_0_8px_rgba(16,185,129,0.5)] relative hover:z-20'
-                                                            }`}
-                                                        />
-                                                    </TooltipTrigger>
-                                                    {!day.isFuture && (
-                                                        <TooltipContent className="bg-zinc-900 text-white border-zinc-800 text-xs py-1.5 px-3 shadow-xl">
-                                                            <p className="font-semibold text-zinc-100">{day.formattedDate}</p>
-                                                            <p className="text-zinc-400 text-[11px] mt-0.5">
-                                                                {day.count === 0
-                                                                    ? 'No problems solved'
-                                                                    : `${day.count} ${day.count === 1 ? 'problem' : 'problems'} solved`}
-                                                            </p>
-                                                        </TooltipContent>
-                                                    )}
-                                                </Tooltip>
-                                            ))}
-                                        </div>
+                        <div className="flex gap-1 min-w-fit select-none">
+                            {weeks.map((week) => (
+                                <div key={week.weekIndex} className="flex flex-col shrink-0 w-3.5">
+                                    {/* Month header label positioned cleanly above week column */}
+                                    <div className="relative h-5">
+                                        {week.monthLabel && (
+                                            <span className="absolute left-0 top-0 text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 whitespace-nowrap pointer-events-none select-none">
+                                                {week.monthLabel}
+                                            </span>
+                                        )}
                                     </div>
-                                ))}
-                            </div>
-                        </TooltipProvider>
+
+                                    {/* 7 Days in Week Column */}
+                                    <div className="flex flex-col gap-1">
+                                        {week.days.map((day) => (
+                                            <div
+                                                key={day.dateKey}
+                                                tabIndex={day.isFuture ? -1 : 0}
+                                                aria-label={day.isFuture ? undefined : `${day.formattedDate}: ${day.count} solved`}
+                                                onMouseEnter={(e) => {
+                                                    if (day.isFuture) return;
+                                                    const rect = e.currentTarget.getBoundingClientRect();
+                                                    setHoveredCell({
+                                                        day,
+                                                        x: rect.left + rect.width / 2,
+                                                        y: rect.top - 6,
+                                                    });
+                                                }}
+                                                onMouseLeave={() => setHoveredCell(null)}
+                                                className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count, day.isFuture)} transition-transform duration-100 ${
+                                                    day.isFuture
+                                                        ? ''
+                                                        : 'hover:ring-2 hover:ring-emerald-400 dark:hover:ring-emerald-400 cursor-pointer hover:scale-125 hover:shadow-[0_0_8px_rgba(16,185,129,0.5)] relative hover:z-20'
+                                                }`}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
+
+                {/* Single Shared Floating Tooltip Overlay */}
+                {hoveredCell && (
+                    <div
+                        className="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full bg-zinc-900 text-white border border-zinc-800 text-xs py-1.5 px-3 rounded-lg shadow-xl animate-in fade-in zoom-in-95 duration-100"
+                        style={{ left: hoveredCell.x, top: hoveredCell.y }}
+                    >
+                        <p className="font-semibold text-zinc-100 whitespace-nowrap">{hoveredCell.day.formattedDate}</p>
+                        <p className="text-zinc-400 text-[11px] mt-0.5 whitespace-nowrap">
+                            {hoveredCell.day.count === 0
+                                ? 'No problems solved'
+                                : `${hoveredCell.day.count} ${hoveredCell.day.count === 1 ? 'problem' : 'problems'} solved`}
+                        </p>
+                    </div>
+                )}
 
                 {/* Legend & Synced Indicator Footer */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-zinc-200/80 dark:border-zinc-800/60 text-xs text-zinc-500 dark:text-zinc-400 mt-2">
