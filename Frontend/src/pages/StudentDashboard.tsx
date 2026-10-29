@@ -16,6 +16,7 @@ import {
 } from '@phosphor-icons/react';
 import { SocialHubView, type SocialTabType } from '../components/social/SocialHubView';
 import { QuickSocialWidget } from '../components/social/QuickSocialWidget';
+import { SHOW_PVP_DUELS } from '../config/socialFeatureFlags';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { ChangePasswordModal } from '../components/common/ChangePasswordModal';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -232,7 +233,7 @@ export function StudentDashboard() {
                                         : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                 }`}
                             >
-                                <Users className={`w-3.5 h-3.5 ${mainTab === 'social' ? 'text-[#5b4fff]' : ''}`} /> Social Hub & PVP
+                                <Users className={`w-3.5 h-3.5 ${mainTab === 'social' ? 'text-[#5b4fff]' : ''}`} /> {SHOW_PVP_DUELS ? 'Social Hub & PVP' : 'Social Hub'}
                             </button>
                         </div>
                     </div>
@@ -346,7 +347,7 @@ export function StudentDashboard() {
                                 : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
                         }`}
                     >
-                        <Users className={`w-3.5 h-3.5 ${mainTab === 'social' ? 'text-[#5b4fff]' : ''}`} /> Social Hub & PVP
+                        <Users className={`w-3.5 h-3.5 ${mainTab === 'social' ? 'text-[#5b4fff]' : ''}`} /> {SHOW_PVP_DUELS ? 'Social Hub & PVP' : 'Social Hub'}
                     </button>
                 </div>
 

@@ -21,6 +21,7 @@ import { StreakFlame } from '../ui/StreakFlame';
 import { SocialService } from '../../services/endpoints';
 import { getDevScoreTier } from '../../lib/devScoreCalculator';
 import type { FriendsLeaderboardEntryDTO } from '@/types';
+import { SHOW_PVP_DUELS } from '../../config/socialFeatureFlags';
 
 interface FriendsLeaderboardTabProps {
     onViewDashboard: (studentId: string) => void;
@@ -146,6 +147,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     >
                         <Flame className="w-3.5 h-3.5 text-rose-500" /> Streak
                     </button>
+                    {SHOW_PVP_DUELS && (
                     <button
                         type="button"
                         onClick={() => setSortBy('pvp')}
@@ -157,6 +159,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     >
                         <Swords className="w-3.5 h-3.5 text-[#5b4fff]" /> PVP Duels
                     </button>
+                    )}
                 </div>
             </div>
 
@@ -236,7 +239,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             >
                                                 <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
                                             </Button>
-                                            {onChallengePvp && (
+                                            {SHOW_PVP_DUELS && onChallengePvp && (
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
@@ -297,7 +300,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             >
                                                 <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
                                             </Button>
-                                            {onChallengePvp && (
+                                            {SHOW_PVP_DUELS && onChallengePvp && (
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[1].studentId, topThree[1].name)}
@@ -360,7 +363,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             >
                                                 <Eye className="w-3.5 h-3.5 mr-1.5" /> View Profile
                                             </Button>
-                                            {onChallengePvp && (
+                                            {SHOW_PVP_DUELS && onChallengePvp && (
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
@@ -421,7 +424,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             >
                                                 <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
                                             </Button>
-                                            {onChallengePvp && (
+                                            {SHOW_PVP_DUELS && onChallengePvp && (
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[1].studentId, topThree[1].name)}
@@ -484,7 +487,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             >
                                                 <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
                                             </Button>
-                                            {onChallengePvp && (
+                                            {SHOW_PVP_DUELS && onChallengePvp && (
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
@@ -541,7 +544,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             >
                                                 <Eye className="w-3.5 h-3.5 mr-1" /> View Profile
                                             </Button>
-                                            {onChallengePvp && (
+                                            {SHOW_PVP_DUELS && onChallengePvp && (
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[2].studentId, topThree[2].name)}
@@ -590,7 +593,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         <th className="py-3.5 px-5 text-center">Total Solved</th>
                                         <th className="py-3.5 px-5 text-center">Contest Rating</th>
                                         <th className="py-3.5 px-5 text-center">Streak</th>
-                                        <th className="py-3.5 px-5 text-center">PVP Record</th>
+                                        {SHOW_PVP_DUELS && <th className="py-3.5 px-5 text-center">PVP Record</th>}
                                         <th className="py-3.5 px-5 text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -687,6 +690,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                 )}
                                             </td>
 
+                                            {SHOW_PVP_DUELS && (
                                             <td className="py-4 px-5 text-center">
                                                 <p className="font-semibold">
                                                     <span className="text-emerald-600 dark:text-emerald-400">{e.pvpWins}W</span>
@@ -702,6 +706,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                     </span>
                                                 </div>
                                             </td>
+                                            )}
 
                                             <td className="py-4 px-5 text-right">
                                                 {e.isCurrentUser ? (
@@ -726,7 +731,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                             <Eye className="w-3.5 h-3.5" />
                                                             <span>Profile</span>
                                                         </Button>
-                                                        {onChallengePvp && (
+                                                        {SHOW_PVP_DUELS && onChallengePvp && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"

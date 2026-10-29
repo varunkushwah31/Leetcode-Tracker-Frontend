@@ -24,7 +24,7 @@ vi.mock('../../hooks/useAuth', () => ({
     })
 }));
 
-describe('SocialHubView Component', () => {
+describe('SocialHubView Component (Showcase Mode - PVP & Peer Learning Hidden)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(SocialService.getFriends).mockResolvedValue({
@@ -97,28 +97,30 @@ describe('SocialHubView Component', () => {
         } as unknown as AxiosResponse);
     });
 
-    it('renders all 5 main navigation tabs', async () => {
+    it('renders active showcase navigation tabs (Friends Network, Activity Feed, Friends Leaderboard) and hides PVP Duels & Peer Learning Hub', async () => {
         render(<SocialHubView />);
 
         expect(screen.getByText('Friends Network')).toBeDefined();
-        expect(screen.getByText('PVP Duels')).toBeDefined();
         expect(screen.getByText('Activity Feed')).toBeDefined();
         expect(screen.getByText('Friends Leaderboard')).toBeDefined();
-        expect(screen.getByText('Peer Learning Hub')).toBeDefined();
+
+        // Half-baked tabs must NOT be visible for showcase
+        expect(screen.queryByText('PVP Duels')).toBeNull();
+        expect(screen.queryByText('Peer Learning Hub')).toBeNull();
 
         await waitFor(() => {
             expect(screen.getByText('Bob Coder')).toBeDefined();
         });
     });
 
-    it('switches to PVP Duels tab on click', async () => {
+    it('switches to Activity Feed tab on click', async () => {
         render(<SocialHubView />);
 
-        const pvpTabBtn = screen.getByText('PVP Duels');
-        fireEvent.click(pvpTabBtn);
+        const activityTabBtn = screen.getByText('Activity Feed');
+        fireEvent.click(activityTabBtn);
 
         await waitFor(() => {
-            expect(screen.getByText('PVP Problem-Solving Arena')).toBeDefined();
+            expect(screen.getByText(/Live Peer Activity Feed/i)).toBeDefined();
         });
     });
 
@@ -133,15 +135,14 @@ describe('SocialHubView Component', () => {
         });
     });
 
-    it('switches to Peer Learning Hub tab on click', async () => {
-        render(<SocialHubView />);
+    it('safely falls back to Friends Network when initialTab is set to disabled pvp or peer', async () => {
+        render(<SocialHubView initialTab="pvp" />);
 
-        const peerTabBtn = screen.getByText('Peer Learning Hub');
-        fireEvent.click(peerTabBtn);
-
+        // Should fallback to friends tab
         await waitFor(() => {
-            expect(screen.getByText(/Peer-to-Peer.*Study Hub/i)).toBeDefined();
+            expect(screen.getByText('Bob Coder')).toBeDefined();
         });
+        expect(screen.queryByText('PVP Problem-Solving Arena')).toBeNull();
     });
 
     it('warns the user when they click to view their own profile from leaderboard', async () => {

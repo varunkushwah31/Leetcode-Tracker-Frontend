@@ -18,6 +18,7 @@ import { PeerStudyTab } from './PeerStudyTab';
 import { FriendDashboardModal } from './FriendDashboardModal';
 import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
+import { SHOW_PVP_DUELS, SHOW_PEER_LEARNING } from '../../config/socialFeatureFlags';
 import type { PvpMatchDTO } from '@/types';
 
 export type SocialTabType = 'friends' | 'pvp' | 'activity' | 'leaderboard' | 'peer';
@@ -28,7 +29,21 @@ interface SocialHubViewProps {
 
 export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubViewProps>) {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<SocialTabType>(initialTab);
+    const [activeTab, setActiveTab] = useState<SocialTabType>(() => {
+        if (!SHOW_PVP_DUELS && initialTab === 'pvp') return 'friends';
+        if (!SHOW_PEER_LEARNING && initialTab === 'peer') return 'friends';
+        return initialTab;
+    });
+
+    useEffect(() => {
+        if (!SHOW_PVP_DUELS && initialTab === 'pvp') {
+            setActiveTab('friends');
+        } else if (!SHOW_PEER_LEARNING && initialTab === 'peer') {
+            setActiveTab('friends');
+        } else {
+            setActiveTab(initialTab);
+        }
+    }, [initialTab]);
 
     // Selected friend for modal viewer
     const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
@@ -135,6 +150,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
         customProblemTitle?: string,
         customProblemLink?: string
     ) => {
+        if (!SHOW_PVP_DUELS) return;
         if (friendId && friendName) {
             setChallengeTarget({ friendId, friendName, customProblemTitle, customProblemLink });
         } else if (customProblemTitle || customProblemLink) {
@@ -160,21 +176,23 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                     {/* Title, Badge & Subtitle */}
                     <div className="flex items-start sm:items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-[#5b4fff] to-[#4335e6] text-white flex items-center justify-center shadow-md shadow-[#5b4fff]/25 shrink-0 ring-4 ring-[#5b4fff]/10">
-                            <Swords className="w-6 h-6" />
+                            {SHOW_PVP_DUELS ? <Swords className="w-6 h-6" /> : <Users className="w-6 h-6" />}
                         </div>
 
                         <div>
                             <div className="flex items-center gap-2.5 flex-wrap">
                                 <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
-                                    Social Hub & Competitive Arena
+                                    {SHOW_PVP_DUELS ? 'Social Hub & Competitive Arena' : 'Social Hub & Community'}
                                 </h1>
                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
                                     <Lightning className="w-3 h-3 text-[#5b4fff] dark:text-[#968fff]" />
-                                    Live Arena
+                                    {SHOW_PVP_DUELS ? 'Live Arena' : 'Community Hub'}
                                 </span>
                             </div>
                             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed">
-                                Challenge peers to 1v1 speed duels, track real-time standings, collaborate on non-spoiler hints, and celebrate daily problem milestones.
+                                {SHOW_PVP_DUELS
+                                    ? 'Challenge peers to 1v1 speed duels, track real-time standings, collaborate on non-spoiler hints, and celebrate daily problem milestones.'
+                                    : 'Connect with friends, track real-time standings on the leaderboard, and celebrate daily problem milestones.'}
                             </p>
                         </div>
                     </div>
@@ -197,50 +215,72 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             </div>
                         </button>
 
-                        {/* PVP Combat Record Chip */}
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('pvp')}
-                            className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group"
-                            title="View PVP Duels & Career Record"
-                        >
-                            <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <Swords className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="text-left">
-                                <span className="text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 block tracking-wider leading-none mb-0.5">PVP Record</span>
-                                <span className="font-bold text-xs tabular-nums">
-                                    <span className="text-emerald-600 dark:text-emerald-400">{pvpStats.wins}W</span>
-                                    <span className="text-zinc-400 mx-0.5">-</span>
-                                    <span className="text-rose-600 dark:text-rose-400">{pvpStats.losses}L</span>
-                                    {pvpStats.total > 0 && (
-                                        <span className="text-zinc-500 dark:text-zinc-400 font-normal text-[10px] ml-1">({pvpStats.winRate}%)</span>
-                                    )}
-                                </span>
-                            </div>
-                        </button>
+                        {/* Leaderboard Chip (When PVP hidden) */}
+                        {!SHOW_PVP_DUELS && (
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('leaderboard')}
+                                className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group"
+                                title="View Friends Leaderboard"
+                            >
+                                <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Trophy className="w-3.5 h-3.5" />
+                                </div>
+                                <div className="text-left">
+                                    <span className="text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 block tracking-wider leading-none mb-0.5">Rankings</span>
+                                    <span className="font-bold text-zinc-900 dark:text-zinc-100 text-xs">Leaderboard</span>
+                                </div>
+                            </button>
+                        )}
 
-                        {/* Live Duels Status Chip */}
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('pvp')}
-                            className={`px-3.5 py-2 rounded-2xl border flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs ${
-                                activeDuelsCount > 0
-                                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'
-                                    : 'bg-zinc-50/90 dark:bg-zinc-900/60 border-zinc-200/80 dark:border-zinc-800/80 text-zinc-500 dark:text-zinc-400'
-                            }`}
-                            title="View Live Duels"
-                        >
-                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${activeDuelsCount > 0 ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-500/10 text-amber-500'}`}>
-                                <ShieldSlashIcon  className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="text-left">
-                                <span className="text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 block tracking-wider leading-none mb-0.5">Live Duels</span>
-                                <span className={`font-bold text-xs tabular-nums ${activeDuelsCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
-                                    {activeDuelsCount > 0 ? `${activeDuelsCount} Active Battle${activeDuelsCount > 1 ? 's' : ''}` : '0 Active'}
-                                </span>
-                            </div>
-                        </button>
+                        {SHOW_PVP_DUELS && (
+                            <>
+                                {/* PVP Combat Record Chip */}
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('pvp')}
+                                    className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group"
+                                    title="View PVP Duels & Career Record"
+                                >
+                                    <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <Swords className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="text-left">
+                                        <span className="text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 block tracking-wider leading-none mb-0.5">PVP Record</span>
+                                        <span className="font-bold text-xs tabular-nums">
+                                            <span className="text-emerald-600 dark:text-emerald-400">{pvpStats.wins}W</span>
+                                            <span className="text-zinc-400 mx-0.5">-</span>
+                                            <span className="text-rose-600 dark:text-rose-400">{pvpStats.losses}L</span>
+                                            {pvpStats.total > 0 && (
+                                                <span className="text-zinc-500 dark:text-zinc-400 font-normal text-[10px] ml-1">({pvpStats.winRate}%)</span>
+                                            )}
+                                        </span>
+                                    </div>
+                                </button>
+
+                                {/* Live Duels Status Chip */}
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('pvp')}
+                                    className={`px-3.5 py-2 rounded-2xl border flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs ${
+                                        activeDuelsCount > 0
+                                            ? 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'
+                                            : 'bg-zinc-50/90 dark:bg-zinc-900/60 border-zinc-200/80 dark:border-zinc-800/80 text-zinc-500 dark:text-zinc-400'
+                                    }`}
+                                    title="View Live Duels"
+                                >
+                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${activeDuelsCount > 0 ? 'bg-rose-500 text-white animate-pulse' : 'bg-amber-500/10 text-amber-500'}`}>
+                                        <ShieldSlashIcon  className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="text-left">
+                                        <span className="text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 block tracking-wider leading-none mb-0.5">Live Duels</span>
+                                        <span className={`font-bold text-xs tabular-nums ${activeDuelsCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
+                                            {activeDuelsCount > 0 ? `${activeDuelsCount} Active Battle${activeDuelsCount > 1 ? 's' : ''}` : '0 Active'}
+                                        </span>
+                                    </div>
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -271,25 +311,27 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                         )}
                     </button>
 
-                    <button
-                        type="button"
-                        onClick={() => setActiveTab('pvp')}
-                        className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-                            activeTab === 'pvp'
-                                ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
-                        }`}
-                    >
-                        <Swords className="w-4 h-4" />
-                        <span>PVP Duels</span>
-                        {activeDuelsCount > 0 && (
-                            <span className={`px-2 py-0.2 rounded-full text-[10px] tabular-nums font-bold ${
-                                activeTab === 'pvp' ? 'bg-white/20 text-white' : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25 animate-pulse'
-                            }`}>
-                                {activeDuelsCount} Live
-                            </span>
-                        )}
-                    </button>
+                    {SHOW_PVP_DUELS && (
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('pvp')}
+                            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                                activeTab === 'pvp'
+                                    ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
+                            }`}
+                        >
+                            <Swords className="w-4 h-4" />
+                            <span>PVP Duels</span>
+                            {activeDuelsCount > 0 && (
+                                <span className={`px-2 py-0.2 rounded-full text-[10px] tabular-nums font-bold ${
+                                    activeTab === 'pvp' ? 'bg-white/20 text-white' : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25 animate-pulse'
+                                }`}>
+                                    {activeDuelsCount} Live
+                                </span>
+                            )}
+                        </button>
+                    )}
 
                     <button
                         type="button"
@@ -317,18 +359,20 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                         <span>Friends Leaderboard</span>
                     </button>
 
-                    <button
-                        type="button"
-                        onClick={() => setActiveTab('peer')}
-                        className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-                            activeTab === 'peer'
-                                ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
-                        }`}
-                    >
-                        <BookOpen className="w-4 h-4" />
-                        <span>Peer Learning Hub</span>
-                    </button>
+                    {SHOW_PEER_LEARNING && (
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('peer')}
+                            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                                activeTab === 'peer'
+                                    ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
+                            }`}
+                        >
+                            <BookOpen className="w-4 h-4" />
+                            <span>Peer Learning Hub</span>
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -368,7 +412,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                     />
                 )}
 
-                {activeTab === 'pvp' && (
+                {SHOW_PVP_DUELS && activeTab === 'pvp' && (
                     <PvpArenaTab
                         initialChallengerTarget={challengeTarget}
                         onClearInitialTarget={() => setChallengeTarget(null)}
@@ -386,7 +430,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                     />
                 )}
 
-                {activeTab === 'peer' && (
+                {SHOW_PEER_LEARNING && activeTab === 'peer' && (
                     <PeerStudyTab onChallengePvp={handleChallengePvp} />
                 )}
             </div>

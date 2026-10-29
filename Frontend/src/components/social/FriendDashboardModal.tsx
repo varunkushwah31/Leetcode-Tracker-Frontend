@@ -39,6 +39,7 @@ import { UnifiedContestHistory } from '@/components/dashboard/student/UnifiedCon
 import { formatProblemTitle, getProblemPlatform } from '@/lib/problemFormatter';
 import { getDevScoreTier } from '../../lib/devScoreCalculator';
 import { useAuth } from '../../hooks/useAuth';
+import { SHOW_PVP_DUELS, SHOW_PEER_LEARNING } from '../../config/socialFeatureFlags';
 import type { FriendComparisonDTO, StudentExtendedDTO, SkillStat, Badge, RecentSubmission } from '@/types';
 
 interface FriendDashboardModalProps {
@@ -327,6 +328,8 @@ function FriendAnalyticsSection({
                     </CardContent>
                 </Card>
 
+                {SHOW_PVP_DUELS && (
+                <>
                 {/* Head-to-Head Duel Card */}
                 <Card className={cardClasses}>
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
@@ -357,7 +360,7 @@ function FriendAnalyticsSection({
                             </div>
                         </div>
 
-                        {onChallengePvp && profile && (
+                        {SHOW_PVP_DUELS && onChallengePvp && profile && (
                             <Button
                                 onClick={() => {
                                     onClose();
@@ -370,6 +373,8 @@ function FriendAnalyticsSection({
                         )}
                     </CardContent>
                 </Card>
+                </>
+                )}
 
                 {/* Recent Activity */}
                 <Card className={`flex flex-col ${cardClasses}`}>
@@ -1261,6 +1266,8 @@ function FriendComparativeSection({
                 </Card>
             </div>
 
+            {SHOW_PVP_DUELS && (
+            <>
             {/* Duel History & Action Prompt */}
             <div className="p-5 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -1290,6 +1297,8 @@ function FriendComparativeSection({
                     </Button>
                 )}
             </div>
+            </>
+            )}
         </div>
     );
 }
@@ -1422,7 +1431,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                     {profile?.name ? `${profile.name}'s Profile` : 'Friend Profile'}
                 </DialogTitle>
                 <DialogDescription className="sr-only">
-                    View detailed problem solving performance, contest ratings, peer comparisons, and challenge your friend to a duel.
+                    View detailed problem solving performance, contest ratings, and compare coding achievements.
                 </DialogDescription>
 
                 {/* Top Navigation Bar with Back button and Quick Actions */}
@@ -1437,7 +1446,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                     </Button>
 
                     <div className="flex items-center gap-2.5">
-                        {onChallengePvp && profile && (
+                        {SHOW_PVP_DUELS && onChallengePvp && profile && (
                             <Button
                                 onClick={() => {
                                     onClose();
@@ -1546,6 +1555,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                 <ChartLineIcon className="w-4 h-4" />
                                 <span>Performance & Analytics</span>
                             </button>
+                            {SHOW_PEER_LEARNING && (
                             <button
                                 type="button"
                                 onClick={() => setActiveSection('peer')}
@@ -1565,6 +1575,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                     </span>
                                 )}
                             </button>
+                            )}
                             <button
                                 type="button"
                                 onClick={() => setActiveSection('submissions')}
@@ -1637,7 +1648,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                         )}
 
                         {/* SECTION 4: PEER LEARNING & PROBLEM OVERLAP */}
-                        {activeSection === 'peer' && (
+                        {SHOW_PEER_LEARNING && activeSection === 'peer' && (
                             <FriendPeerLearningSection
                                 profile={profile}
                                 cardClasses={cardClasses}

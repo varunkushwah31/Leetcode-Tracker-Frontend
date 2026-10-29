@@ -18,6 +18,11 @@ vi.mock('../../hooks/useAuth', () => ({
     })
 }));
 
+vi.mock('../../config/socialFeatureFlags', () => ({
+    SHOW_PVP_DUELS: true,
+    SHOW_PEER_LEARNING: true,
+}));
+
 // Mock subcomponents that might use complex DOM or Canvas
 vi.mock('@/components/dashboard/student/ActivityHeatmap', () => ({
     ActivityHeatmap: () => <div data-testid="activity-heatmap">Activity Heatmap Mock</div>

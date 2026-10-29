@@ -13,6 +13,7 @@ import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
 import type { FriendDTO } from '@/types';
 import { isFriendOnline, isFriendBusy } from '../../lib/presenceHelper';
+import { SHOW_PVP_DUELS } from '../../config/socialFeatureFlags';
 
 interface QuickSocialWidgetProps {
     onOpenSocialHub: (tab?: 'friends' | 'pvp' | 'leaderboard') => void;
@@ -246,7 +247,7 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                             </div>
 
                             {/* Right Action: Duel for online, In Duel badge, or View profile for offline */}
-                            {f.isOnline ? (
+                            {SHOW_PVP_DUELS && f.isOnline ? (
                                 f.isBusy ? (
                                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 shrink-0">
                                         In Duel
@@ -254,7 +255,7 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                                 ) : (
                                     <Button
                                         size="sm"
-                                        onClick={() => onOpenSocialHub('pvp')}
+                                        onClick={() => onOpenSocialHub(SHOW_PVP_DUELS ? 'pvp' : 'friends')}
                                         className="h-7.5 px-2.5 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl cursor-pointer gap-1 transition-all shadow-2xs shrink-0"
                                         title={`Challenge ${f.name} to 1v1 Duel`}
                                     >
@@ -307,15 +308,15 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                     </div>
                     <div>
                         <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
-                            <span>Friends & Duels</span>
+                            <span>{SHOW_PVP_DUELS ? 'Friends & Duels' : 'Coding Friends'}</span>
                         </CardTitle>
                         <p className="text-[11px] text-zinc-400 font-medium">Live community presence</p>
                     </div>
                 </div>
 
-                {activeDuelsCount > 0 ? (
+                {SHOW_PVP_DUELS && activeDuelsCount > 0 ? (
                     <Badge
-                        onClick={() => onOpenSocialHub('pvp')}
+                        onClick={() => onOpenSocialHub(SHOW_PVP_DUELS ? 'pvp' : 'friends')}
                         className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/25 px-2.5 py-1 text-[11px] font-bold rounded-xl cursor-pointer transition-all flex items-center gap-1 shadow-2xs animate-pulse"
                     >
                         <Swords className="w-3.5 h-3.5" />
@@ -325,10 +326,10 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                     <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => onOpenSocialHub('pvp')}
+                        onClick={() => onOpenSocialHub(SHOW_PVP_DUELS ? 'pvp' : 'friends')}
                         className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 h-7.5 px-2.5 rounded-xl cursor-pointer"
                     >
-                        Open Arena
+                        {SHOW_PVP_DUELS ? 'Open Arena' : 'Network'}
                     </Button>
                 )}
             </CardHeader>

@@ -26,6 +26,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { getDevScoreTier } from '../../lib/devScoreCalculator';
 import { isFriendOnline, isFriendBusy } from '../../lib/presenceHelper';
 import type { FriendDTO, FriendRequestDTO, SocialSearchStudentDTO } from '@/types';
+import { SHOW_PVP_DUELS } from '../../config/socialFeatureFlags';
 
 interface FriendsListTabProps {
     onViewDashboard: (friendId: string) => void;
@@ -595,7 +596,8 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 Live ({onlineCount})
                             </button>
-                            <button
+                            {SHOW_PVP_DUELS && (
+<button
                                 type="button"
                                 onClick={() => setFriendsFilter('IN_DUEL')}
                                 className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer flex items-center gap-1 ${
@@ -607,6 +609,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                 In Duel ({inDuelCount})
                             </button>
+                        )}
                         </div>
 
                         {/* Sort Selector */}
@@ -652,7 +655,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 No Coding Friends Added Yet
                             </h4>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                Connect with your classmates, peers, and fellow algorithm enthusiasts using the search box above to track mutual milestones and battle in 1v1 duels!
+                                Connect with your classmates, peers, and fellow algorithm enthusiasts using the search box above to track mutual milestones and compare mutual progress!
                             </p>
                         </div>
                         <Button
@@ -764,6 +767,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 </div>
 
                                 {/* Head-to-Head & Actions Row */}
+                                {SHOW_PVP_DUELS && (
                                 <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 px-1">
                                     <span className="flex items-center gap-1 font-medium">
                                         <Swords className="w-3.5 h-3.5 text-[#5b4fff]" />
@@ -777,27 +781,41 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                         <span className="text-zinc-600 dark:text-zinc-300">{friend.pvpRating ?? 1200} Elo</span>
                                     </span>
                                 </div>
+                                )}
 
                                 {/* Action Buttons */}
-                                <div className="grid grid-cols-2 gap-2.5 pt-1">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-9 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer gap-1.5 shadow-xs"
-                                        onClick={() => onViewDashboard(friend.id)}
-                                    >
-                                        <Eye className="w-3.5 h-3.5 text-zinc-500" /> View Profile
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        disabled={!isFriendOnline(friend) || isFriendBusy(friend)}
-                                        title={getDuelButtonTitle(friend)}
-                                        className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        onClick={() => onChallengePvp(friend.id, friend.name)}
-                                    >
-                                        <Swords className="w-3.5 h-3.5" />
-                                        <span>{isFriendBusy(friend) ? 'In Duel' : 'PVP Duel'}</span>
-                                    </Button>
+                                <div className="pt-1">
+                                    {SHOW_PVP_DUELS ? (
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="h-9 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer gap-1.5 shadow-xs"
+                                                onClick={() => onViewDashboard(friend.id)}
+                                            >
+                                                <Eye className="w-3.5 h-3.5 text-zinc-500" /> View Profile
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                disabled={!isFriendOnline(friend) || isFriendBusy(friend)}
+                                                title={getDuelButtonTitle(friend)}
+                                                className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                onClick={() => onChallengePvp(friend.id, friend.name)}
+                                            >
+                                                <Swords className="w-3.5 h-3.5" />
+                                                <span>{isFriendBusy(friend) ? 'In Duel' : 'PVP Duel'}</span>
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full h-9 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer gap-1.5 shadow-xs"
+                                            onClick={() => onViewDashboard(friend.id)}
+                                        >
+                                            <Eye className="w-3.5 h-3.5 text-zinc-500" /> View Profile
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -813,7 +831,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                         Grow Your Coding Circle
                                     </h4>
                                     <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs leading-relaxed">
-                                        Add more peers to compete on the leaderboard, view detailed problem overlap, and duel in speed challenges.
+                                        Add more peers to compete on the leaderboard, and celebrate learning milestones.
                                     </p>
                                 </div>
                                 <Button
