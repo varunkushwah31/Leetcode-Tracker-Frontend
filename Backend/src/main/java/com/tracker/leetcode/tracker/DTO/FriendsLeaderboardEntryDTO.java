@@ -1,5 +1,6 @@
 package com.tracker.leetcode.tracker.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,7 +34,9 @@ public class FriendsLeaderboardEntryDTO implements Serializable {
     private int pvpLosses;
     private double pvpWinRate;
 
+    @JsonProperty("isCurrentUser")
     private boolean isCurrentUser;
+
     private Integer pvpRating;
     private Integer pvpStreak;
     private Integer devScore;

@@ -12,7 +12,8 @@ vi.mock('../../services/endpoints', () => ({
         getFriendsLeaderboard: vi.fn(),
         getPeerStudyPosts: vi.fn(),
         getCuratedProblems: vi.fn(),
-        searchStudents: vi.fn()
+        searchStudents: vi.fn(),
+        pingPresence: vi.fn().mockResolvedValue({ data: { status: 'ACTIVE' } })
     }
 }));
 

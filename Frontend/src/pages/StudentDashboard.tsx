@@ -21,7 +21,7 @@ import { ChangePasswordModal } from '../components/common/ChangePasswordModal';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../hooks/useAuth';
-import { StudentService } from '../services/endpoints';
+import { StudentService, SocialService } from '../services/endpoints';
 import type { StudentExtendedDTO, AssignmentDTO } from '@/types';
 
 import { ProfileStats } from '../components/dashboard/student/ProfileStats';
@@ -85,6 +85,14 @@ export function StudentDashboard() {
         console.log("Auto-refreshing Student Dashboard...");
         void fetchDashboard();
     });
+
+    useEffect(() => {
+        void SocialService.pingPresence().catch(() => {});
+        const presenceInterval = setInterval(() => {
+            void SocialService.pingPresence().catch(() => {});
+        }, 30000);
+        return () => clearInterval(presenceInterval);
+    }, []);
 
     useEffect(() => {
         let isMounted = true;

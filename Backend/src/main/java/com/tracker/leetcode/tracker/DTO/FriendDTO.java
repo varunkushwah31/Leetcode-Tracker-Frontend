@@ -1,5 +1,6 @@
 package com.tracker.leetcode.tracker.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,8 +34,13 @@ public class FriendDTO implements Serializable {
     private String status; // ACCEPTED, PENDING_INCOMING, PENDING_OUTGOING
     private Instant friendSince;
     private Instant lastActive;
+
+    @JsonProperty("isOnline")
     private boolean isOnline;
+
+    @JsonProperty("isBusy")
     private boolean isBusy;
+
     private Integer pvpRating;
     private Integer pvpStreak;
     private Integer devScore;

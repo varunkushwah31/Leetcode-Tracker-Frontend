@@ -57,6 +57,14 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
     }>({ wins: 0, losses: 0, draws: 0, total: 0, winRate: 0 });
 
     useEffect(() => {
+        void SocialService.pingPresence().catch(() => {});
+        const presenceInterval = setInterval(() => {
+            void SocialService.pingPresence().catch(() => {});
+        }, 30000);
+        return () => clearInterval(presenceInterval);
+    }, []);
+
+    useEffect(() => {
         const loadCounters = async () => {
             try {
                 const [friendsRes, pvpRes] = await Promise.all([

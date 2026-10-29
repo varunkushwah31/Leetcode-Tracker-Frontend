@@ -33,9 +33,11 @@ public class SocialService {
     private final CuratedTopicCatalog curatedTopicCatalog;
     private final StringRedisTemplate stringRedisTemplate;
     private final RedisWebSocketBridge webSocketBridge;
+    private final java.util.Map<String, Instant> inMemoryPresence = new java.util.concurrent.ConcurrentHashMap<>();
 
     public void touchPresence(String studentId) {
         if (studentId == null || studentId.isBlank()) return;
+        inMemoryPresence.put(studentId, Instant.now());
         try {
             if (stringRedisTemplate != null) {
                 stringRedisTemplate.opsForValue().set("presence:student:" + studentId, String.valueOf(System.currentTimeMillis()), Duration.ofMinutes(10));
@@ -47,6 +49,12 @@ public class SocialService {
 
     public boolean isStudentOnline(String studentId, Student student) {
         if (studentId == null || studentId.isBlank()) return false;
+        // 1. In-memory presence check
+        Instant inMem = inMemoryPresence.get(studentId);
+        if (inMem != null && inMem.isAfter(Instant.now().minus(Duration.ofMinutes(10)))) {
+            return true;
+        }
+        // 2. Redis presence check
         try {
             if (stringRedisTemplate != null) {
                 Boolean hasKey = stringRedisTemplate.hasKey("presence:student:" + studentId);
@@ -57,7 +65,7 @@ public class SocialService {
         } catch (Exception ex) {
             log.debug("Redis presence check failed: {}", ex.getMessage());
         }
-        // Fallback: If lastSyncedAt is within the last 10 minutes
+        // 3. Fallback: If lastSyncedAt is within the last 10 minutes
         if (student != null && student.getLastSyncedAt() != null) {
             Instant tenMinAgo = Instant.now().minus(Duration.ofMinutes(10));
             return student.getLastSyncedAt().isAfter(tenMinAgo);

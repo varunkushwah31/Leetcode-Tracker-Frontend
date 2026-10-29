@@ -19,12 +19,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
-import { StreakFlame } from '../ui/StreakFlame';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
 import { getDevScoreTier } from '../../lib/devScoreCalculator';
+import { isFriendOnline, isFriendBusy } from '../../lib/presenceHelper';
 import type { FriendDTO, FriendRequestDTO, SocialSearchStudentDTO } from '@/types';
 
 interface FriendsListTabProps {
@@ -43,10 +43,10 @@ function extractErrorMessage(err: unknown, fallback: string): string {
 }
 
 function getDuelButtonTitle(friend: FriendDTO): string {
-    if (friend.isBusy) {
+    if (isFriendBusy(friend)) {
         return `${friend.name} is currently busy in another duel`;
     }
-    if (!friend.isOnline) {
+    if (!isFriendOnline(friend)) {
         return `${friend.name} is offline. Both players must be live to duel`;
     }
     return `Challenge ${friend.name} to 1v1 Duel`;
@@ -59,6 +59,14 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
     const { user } = useAuth();
     const [friends, setFriends] = useState<FriendDTO[]>([]);
     const [incomingRequests, setIncomingRequests] = useState<FriendRequestDTO[]>([]);
+
+    useEffect(() => {
+        void SocialService.pingPresence().catch(() => {});
+        const interval = setInterval(() => {
+            void SocialService.pingPresence().catch(() => {});
+        }, 30000);
+        return () => clearInterval(interval);
+    }, []);
     const [outgoingRequests, setOutgoingRequests] = useState<FriendRequestDTO[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -120,8 +128,8 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
         return () => clearTimeout(timer);
     }, [searchQuery, user?.id, user?.email]);
 
-    const onlineCount = useMemo(() => friends.filter(f => Boolean(f.isOnline)).length, [friends]);
-    const inDuelCount = useMemo(() => friends.filter(f => Boolean(f.isBusy)).length, [friends]);
+    const onlineCount = useMemo(() => friends.filter(isFriendOnline).length, [friends]);
+    const inDuelCount = useMemo(() => friends.filter(isFriendBusy).length, [friends]);
 
     // Filtered & Sorted Friends List
     const displayedFriends = useMemo(() => {
@@ -140,9 +148,9 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
 
         // 2. Status filter
         if (friendsFilter === 'ONLINE') {
-            list = list.filter(f => Boolean(f.isOnline));
+            list = list.filter(isFriendOnline);
         } else if (friendsFilter === 'IN_DUEL') {
-            list = list.filter(f => Boolean(f.isBusy));
+            list = list.filter(isFriendBusy);
         }
 
         // 3. Sort
@@ -306,7 +314,9 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
     };
 
     const renderFriendStatusBadge = (friend: FriendDTO) => {
-        if (friend.isBusy) {
+        const isOnline = isFriendOnline(friend);
+        const isBusy = isFriendBusy(friend);
+        if (isBusy) {
             return (
                 <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
@@ -314,7 +324,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                 </span>
             );
         }
-        if (friend.isOnline) {
+        if (isOnline) {
             return (
                 <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -679,23 +689,19 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                             {/* Discord-style Live Online Indicator */}
                                             <span
                                                 className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-[#111114] z-10 transition-all ${
-                                                    friend.isBusy
+                                                    isFriendBusy(friend)
                                                         ? 'bg-amber-500 ring-2 ring-amber-500/30'
-                                                        : friend.isOnline
+                                                        : isFriendOnline(friend)
                                                         ? 'bg-emerald-500 ring-2 ring-emerald-500/30'
                                                         : 'bg-zinc-400 dark:bg-zinc-600'
                                                 }`}
-                                                title={friend.isBusy ? 'In Duel' : friend.isOnline ? 'Online / Live Now' : 'Offline'}
+                                                title={isFriendBusy(friend) ? 'In Duel' : isFriendOnline(friend) ? 'Online / Live Now' : 'Offline'}
                                             >
-                                                {friend.isOnline && !friend.isBusy && (
+                                                {isFriendOnline(friend) && !isFriendBusy(friend) && (
                                                     <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60" />
                                                 )}
                                             </span>
-                                            {friend.streak > 0 && (
-                                                <div className="absolute -top-1 -right-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-0.5 rounded-full shadow-xs z-10">
-                                                    <StreakFlame className="w-3.5 h-3.5" />
-                                                </div>
-                                            )}
+                                            
                                         </div>
 
                                         <div className="min-w-0">
@@ -784,13 +790,13 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                     </Button>
                                     <Button
                                         size="sm"
-                                        disabled={!friend.isOnline || friend.isBusy}
+                                        disabled={!isFriendOnline(friend) || isFriendBusy(friend)}
                                         title={getDuelButtonTitle(friend)}
                                         className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                         onClick={() => onChallengePvp(friend.id, friend.name)}
                                     >
                                         <Swords className="w-3.5 h-3.5" />
-                                        <span>{friend.isBusy ? 'In Duel' : 'PVP Duel'}</span>
+                                        <span>{isFriendBusy(friend) ? 'In Duel' : 'PVP Duel'}</span>
                                     </Button>
                                 </div>
                             </div>

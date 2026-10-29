@@ -14,6 +14,7 @@ vi.mock('../../services/endpoints', () => ({
         rejectFriendRequest: vi.fn(),
         cancelFriendRequest: vi.fn(),
         searchStudents: vi.fn(),
+        pingPresence: vi.fn().mockResolvedValue({ data: { status: 'ACTIVE' } }),
     }
 }));
 

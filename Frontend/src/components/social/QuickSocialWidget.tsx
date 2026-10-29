@@ -12,6 +12,7 @@ import {
 import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
 import type { FriendDTO } from '@/types';
+import { isFriendOnline, isFriendBusy } from '../../lib/presenceHelper';
 
 interface QuickSocialWidgetProps {
     onOpenSocialHub: (tab?: 'friends' | 'pvp' | 'leaderboard') => void;
@@ -81,13 +82,13 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
     }, []);
 
     // Filter to friends who are currently live / online
-    const onlineFriends = useMemo(() => friends.filter(f => Boolean(f.isOnline)), [friends]);
+    const onlineFriends = useMemo(() => friends.filter(isFriendOnline), [friends]);
 
     // Active friends on top, then last active / offline friends below
     const sortedFriends = useMemo(() => {
         return [...friends].sort((a, b) => {
-            const aOnline = Boolean(a.isOnline);
-            const bOnline = Boolean(b.isOnline);
+            const aOnline = isFriendOnline(a);
+            const bOnline = isFriendOnline(b);
 
             // Active / Online friends always come first
             if (aOnline && !bOnline) return -1;
@@ -95,8 +96,10 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
 
             // Both online: prioritize free over busy, then by rating / solved
             if (aOnline && bOnline) {
-                if (!a.isBusy && b.isBusy) return -1;
-                if (a.isBusy && !b.isBusy) return 1;
+                const aBusy = isFriendBusy(a);
+                const bBusy = isFriendBusy(b);
+                if (!aBusy && bBusy) return -1;
+                if (aBusy && !bBusy) return 1;
                 return (b.currentContestRating || 0) - (a.currentContestRating || 0) || (b.totalSolved || 0) - (a.totalSolved || 0);
             }
 
@@ -155,11 +158,14 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
             <>
                 {/* Friends List: Active on top, offline below (limited to 5) */}
                 <div className="space-y-2">
-                    {displayedFriends.map((f) => (
+                    {displayedFriends.map((f) => {
+                        const isOnline = isFriendOnline(f);
+                        const isBusy = isFriendBusy(f);
+                        return (
                         <div
                             key={f.id}
                             className={`p-3 rounded-2xl border transition-all flex items-center justify-between group shadow-2xs ${
-                                f.isOnline
+                                isOnline
                                     ? 'bg-zinc-50/90 dark:bg-zinc-900/60 border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-500/40 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/50'
                                     : 'bg-zinc-50/50 dark:bg-[#141414]/50 border-zinc-200/60 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40'
                             }`}
@@ -167,7 +173,7 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                             <div className="flex items-center gap-3 min-w-0">
                                 <div className="relative shrink-0">
                                     <Avatar className={`w-9 h-9 border shadow-xs ${
-                                        f.isOnline
+                                        isOnline
                                             ? 'border-zinc-200 dark:border-zinc-700'
                                             : 'border-zinc-200/60 dark:border-zinc-800 opacity-80'
                                     }`}>
@@ -177,8 +183,8 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                                         </AvatarFallback>
                                     </Avatar>
                                     {/* Presence Indicator Dot */}
-                                    {f.isOnline ? (
-                                        f.isBusy ? (
+                                    {isOnline ? (
+                                        isBusy ? (
                                             <span
                                                 data-testid={`presence-dot-${f.id}`}
                                                 className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-amber-500 border-2 border-white dark:border-[#0c0c0e] ring-2 ring-amber-500/30"
@@ -206,8 +212,8 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                                         <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 tracking-tight truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                                             {f.name}
                                         </p>
-                                        {f.isOnline ? (
-                                            f.isBusy ? (
+                                        {isOnline ? (
+                                            isBusy ? (
                                                 <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                                                     In Duel
                                                 </span>
@@ -269,7 +275,7 @@ export function QuickSocialWidget({ onOpenSocialHub }: Readonly<QuickSocialWidge
                                 </Button>
                             )}
                         </div>
-                    ))}
+                    );})}
                 </div>
 
                 {/* If more than 5 total friends, show redirect button */}
