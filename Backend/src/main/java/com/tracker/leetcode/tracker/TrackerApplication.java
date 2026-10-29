@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class TrackerApplication {
 
 	static {
-		System.setProperty("java.net.preferIPv4Stack", "true");
 		System.setProperty("java.net.preferIPv4Addresses", "true");
 	}
 

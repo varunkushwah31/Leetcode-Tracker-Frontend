@@ -22,7 +22,7 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Memory tuning for Render's 512MB RAM free tier to prevent OOM kills
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true"
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError -Djava.net.preferIPv4Addresses=true"
 
 # Run the app
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

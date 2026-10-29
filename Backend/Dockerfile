@@ -22,12 +22,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 # Copy the built jar from Stage 1
 COPY --from=build /app/target/*.jar app.jar
 
-# Render assigns PORT dynamically; default to 8080 for local/docker-compose
+# Render/Fly assigns PORT dynamically; default to 8080 for local/docker-compose
 ENV PORT=8080
 EXPOSE 8080
 
-# Tune JVM memory for Render's 512MB RAM free tier to prevent OOM (exit code 137)
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
+# Tune JVM memory and prefer IPv4 addresses for outbound connections while keeping IPv6 DNS dual-stack enabled
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError -Djava.net.preferIPv4Addresses=true"
 
 # Run the app: Spring Boot automatically picks up environment variables
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
