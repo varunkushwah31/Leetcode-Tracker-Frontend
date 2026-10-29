@@ -347,7 +347,8 @@ public class SocialService {
                     .isBusy(isBusy)
                     .pvpRating(friend.getPvpRating() != null ? friend.getPvpRating() : 1200)
                     .pvpStreak(friend.getPvpStreak() != null ? friend.getPvpStreak() : 0)
-                    .cScore(studentMapper.calculateCScore(friend))
+                    .devScore(studentMapper.calculateDevScore(friend))
+                    .cScore(studentMapper.calculateDevScore(friend))
                     .build());
         }
     }
@@ -467,8 +468,10 @@ public class SocialService {
                 .userPvpWinsAgainstFriend(userWins)
                 .friendPvpWinsAgainstUser(friendWins)
                 .pvpDraws(draws)
-                .userCScore(studentMapper.calculateCScore(user))
-                .friendCScore(studentMapper.calculateCScore(friend))
+                .userDevScore(studentMapper.calculateDevScore(user))
+                .friendDevScore(studentMapper.calculateDevScore(friend))
+                .userCScore(studentMapper.calculateDevScore(user))
+                .friendCScore(studentMapper.calculateDevScore(friend))
                 .build();
     }
 
@@ -1208,7 +1211,8 @@ public class SocialService {
                     .isCurrentUser(s.getId().equals(currentStudentId))
                     .pvpRating(s.getPvpRating() != null ? s.getPvpRating() : 1200)
                     .pvpStreak(s.getPvpStreak() != null ? s.getPvpStreak() : 0)
-                    .cScore(studentMapper.calculateCScore(s))
+                    .devScore(studentMapper.calculateDevScore(s))
+                    .cScore(studentMapper.calculateDevScore(s))
                     .build();
         }).toList());
 
@@ -1216,8 +1220,10 @@ public class SocialService {
         String criterion = sortBy != null ? sortBy.toLowerCase() : "totalsolved";
         entries.sort((a, b) -> {
             switch (criterion) {
-                case "cscore","c-score":
-                    int cmpC = Integer.compare(b.getCScore() != null ? b.getCScore() : 500, a.getCScore() != null ? a.getCScore() : 500);
+                case "devscore","dev-score","cscore","c-score":
+                    int bScore = b.getDevScore() != null ? b.getDevScore() : (b.getCScore() != null ? b.getCScore() : 500);
+                    int aScore = a.getDevScore() != null ? a.getDevScore() : (a.getCScore() != null ? a.getCScore() : 500);
+                    int cmpC = Integer.compare(bScore, aScore);
                     if (cmpC != 0) return cmpC;
                     return Integer.compare(b.getTotalSolved(), a.getTotalSolved());
                 case "rating":

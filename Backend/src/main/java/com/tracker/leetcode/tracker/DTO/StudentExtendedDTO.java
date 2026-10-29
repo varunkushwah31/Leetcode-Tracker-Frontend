@@ -51,5 +51,6 @@ public class StudentExtendedDTO implements Serializable {
     private Integer pvpDraws;
     private Integer pvpRating;
     private Integer pvpStreak;
+    private Integer devScore;
     private Integer cScore;
 }

@@ -33,6 +33,7 @@ describe('FriendsListTab Component', () => {
         avatarUrl: 'https://example.com/bob.png',
         leetcodeUsername: 'bob_lc',
         codeforcesHandle: 'bob_cf',
+        devScore: 720,
         cScore: 720,
         totalSolved: 450,
         currentContestRating: 1650,
@@ -81,7 +82,7 @@ describe('FriendsListTab Component', () => {
         // Frontend confirmation dialog must open
         expect(screen.getByText('Remove from Friends List?')).toBeTruthy();
         expect(screen.getByText(/Are you sure you want to remove this peer\?/)).toBeTruthy();
-        expect(screen.getByText('720 C-Score')).toBeTruthy();
+        expect(screen.getByText('720 DevScore')).toBeTruthy();
         expect(screen.getByRole('button', { name: /Remove Friend/i })).toBeTruthy();
         expect(screen.getByRole('button', { name: /Cancel/i })).toBeTruthy();
 

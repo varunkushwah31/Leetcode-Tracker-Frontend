@@ -37,7 +37,7 @@ import { ActivityHeatmap } from '@/components/dashboard/student/ActivityHeatmap'
 import { ContestRatingsSection } from '@/components/dashboard/student/ContestRatingsSection';
 import { UnifiedContestHistory } from '@/components/dashboard/student/UnifiedContestHistory';
 import { formatProblemTitle, getProblemPlatform } from '@/lib/problemFormatter';
-import { getCScoreTier } from '../../lib/cScoreCalculator';
+import { getDevScoreTier } from '../../lib/devScoreCalculator';
 import { useAuth } from '../../hooks/useAuth';
 import type { FriendComparisonDTO, StudentExtendedDTO, SkillStat, Badge, RecentSubmission } from '@/types';
 
@@ -50,7 +50,7 @@ interface FriendDashboardModalProps {
 
 interface FriendProfileHeaderProps {
     profile: StudentExtendedDTO;
-    cScore: number;
+    devScore: number;
     totalSolved: number;
     lcSolved: number;
     cfSolved: number;
@@ -65,7 +65,7 @@ interface FriendProfileHeaderProps {
 
 function FriendProfileHeader({
     profile,
-    cScore,
+    devScore,
     totalSolved,
     lcSolved,
     cfSolved,
@@ -77,7 +77,7 @@ function FriendProfileHeader({
     pvpDraws,
     cardClasses
 }: Readonly<FriendProfileHeaderProps>) {
-    const cScoreTier = getCScoreTier(cScore);
+    const devScoreTier = getDevScoreTier(devScore);
     const hasLinkedAccount = Boolean(profile.leetcodeUsername || profile.codeforcesHandle);
 
     return (
@@ -144,10 +144,10 @@ function FriendProfileHeader({
                 {/* Stat Metric Summary Pill */}
                 <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6 bg-zinc-50/80 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
                     <div className="text-center min-w-18">
-                        <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">C-Score</p>
-                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#968fff]">{cScore}</p>
-                        <p className={`text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded border inline-block mt-0.5 ${cScoreTier.badgeClass}`}>
-                            {cScoreTier.tier}
+                        <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">DevScore</p>
+                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#968fff]">{devScore}</p>
+                        <p className={`text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded border inline-block mt-0.5 ${devScoreTier.badgeClass}`}>
+                            {devScoreTier.tier}
                         </p>
                     </div>
                     <div className="text-center min-w-17.5">
@@ -793,7 +793,7 @@ function FriendSubmissionsSection({ profile, cardClasses }: Readonly<FriendSubmi
 
 interface FriendCoderCardSectionProps {
     profile: StudentExtendedDTO;
-    cScore: number;
+    devScore: number;
     easyCount: number;
     medCount: number;
     hardCount: number;
@@ -809,7 +809,7 @@ interface FriendCoderCardSectionProps {
 
 function FriendCoderCardSection({
     profile,
-    cScore,
+    devScore,
     easyCount,
     medCount,
     hardCount,
@@ -823,13 +823,13 @@ function FriendCoderCardSection({
     onClose
 }: Readonly<FriendCoderCardSectionProps>) {
     const [copied, setCopied] = useState(false);
-    const tier = getCScoreTier(cScore);
-    const cScoreProgress = Math.min(Math.max(((cScore - 500) / 400) * 100, 0), 100);
+    const tier = getDevScoreTier(devScore);
+    const devScoreProgress = Math.min(Math.max(((devScore - 500) / 400) * 100, 0), 100);
 
     const handleCopySnapshot = async () => {
         const text = [
             `Coder Snapshot: ${profile.name}`,
-            `C-Score: ${cScore} (${tier.tier})`,
+            `DevScore: ${devScore} (${tier.tier})`,
             `Solved: ${totalSolved} (Easy: ${easyCount}, Med: ${medCount}, Hard: ${hardCount})`,
             `Contest Rating: ${maxRating > 0 ? maxRating : 'Unrated'} | 1v1 PvP Elo: ${profile.pvpRating ?? 1200}`,
             `Consistency Streak: ${profile.consistencyStreak || 0} Days`,
@@ -859,7 +859,7 @@ function FriendCoderCardSection({
                         </span>
                         <div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-[#5b4fff]">
-                                Codolio Certified Developer Card
+                                Verified Developer Card
                             </span>
                             <p className="text-xs text-zinc-500 font-medium">Digital Algorithmic Portfolio</p>
                         </div>
@@ -910,13 +910,13 @@ function FriendCoderCardSection({
                     </div>
                 </div>
 
-                {/* C-Score Composite Index Gauge Banner */}
+                {/* DevScore Composite Index Gauge Banner */}
                 <div className="p-5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                             <ChartLineUp className="w-5 h-5 text-[#5b4fff]" />
                             <span className="text-xs font-extrabold uppercase tracking-wider text-[#5b4fff]">
-                                Codolio C-Score Composite Index
+                                DevScore Composite Index
                             </span>
                         </div>
                         <span className={`text-xs font-extrabold px-3 py-1 rounded-xl border self-start sm:self-auto ${tier.badgeClass}`}>
@@ -926,13 +926,13 @@ function FriendCoderCardSection({
 
                     <div className="flex items-baseline gap-3">
                         <span className="text-4xl sm:text-5xl font-black text-zinc-900 dark:text-white">
-                            {cScore}
+                            {devScore}
                         </span>
                         <span className="text-xs text-zinc-500 font-semibold">/ 900 Index Scale</span>
                     </div>
 
                     <div className="space-y-1.5">
-                        <Progress value={cScoreProgress} className="h-3 bg-zinc-200 dark:bg-zinc-800" />
+                        <Progress value={devScoreProgress} className="h-3 bg-zinc-200 dark:bg-zinc-800" />
                         <div className="flex justify-between text-[10px] text-zinc-500 font-bold">
                             <span>Developing (500)</span>
                             <span>Proficient (560)</span>
@@ -1075,8 +1075,8 @@ interface FriendComparativeSectionProps {
     comparison: FriendComparisonDTO;
     profile: StudentExtendedDTO;
     cardClasses: string;
-    userCScore: number;
-    friendCScore: number;
+    userDevScore: number;
+    friendDevScore: number;
     userWins: number;
     friendWins: number;
     pvpDraws: number;
@@ -1089,8 +1089,8 @@ function FriendComparativeSection({
     comparison,
     profile,
     cardClasses,
-    userCScore,
-    friendCScore,
+    userDevScore,
+    friendDevScore,
     userWins,
     friendWins,
     pvpDraws,
@@ -1098,10 +1098,10 @@ function FriendComparativeSection({
     onClose,
     onSwitchToPeer
 }: Readonly<FriendComparativeSectionProps>) {
-    const userTier = getCScoreTier(userCScore);
-    const friendTier = getCScoreTier(friendCScore);
-    const cScoreDiff = Math.abs(userCScore - friendCScore);
-    const userLeadsCScore = userCScore >= friendCScore;
+    const userTier = getDevScoreTier(userDevScore);
+    const friendTier = getDevScoreTier(friendDevScore);
+    const devScoreDiff = Math.abs(userDevScore - friendDevScore);
+    const userLeadsDevScore = userDevScore >= friendDevScore;
 
     const mutualCount = comparison.mutualSolved?.length || 0;
     const friendOnlyCount = comparison.friendOnlySolved?.length || 0;
@@ -1124,7 +1124,7 @@ function FriendComparativeSection({
                             <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#5b4fff]">You</span>
                             <h3 className="text-base font-extrabold text-zinc-900 dark:text-white truncate">Your Standing</h3>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="font-black text-sm text-[#5b4fff]">{userCScore} C-Score</span>
+                                <span className="font-black text-sm text-[#5b4fff]">{userDevScore} DevScore</span>
                                 <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${userTier.badgeClass}`}>
                                     {userTier.tier}
                                 </span>
@@ -1158,7 +1158,7 @@ function FriendComparativeSection({
                             <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500">Friend</span>
                             <h3 className="text-base font-extrabold text-zinc-900 dark:text-white truncate">{profile.name}</h3>
                             <div className="flex items-center justify-start md:justify-end gap-1.5 mt-0.5">
-                                <span className="font-black text-sm text-zinc-800 dark:text-zinc-200">{friendCScore} C-Score</span>
+                                <span className="font-black text-sm text-zinc-800 dark:text-zinc-200">{friendDevScore} DevScore</span>
                                 <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${friendTier.badgeClass}`}>
                                     {friendTier.tier}
                                 </span>
@@ -1176,15 +1176,15 @@ function FriendComparativeSection({
 
             {/* Benchmarking Comparison Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Benchmark 1: C-Score Composite Gauge */}
+                {/* Benchmark 1: DevScore Composite Gauge */}
                 <Card className={cardClasses}>
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                         <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center justify-between">
                             <span className="flex items-center gap-2">
-                                <ChartLineUp className="w-4 h-4 text-[#5b4fff]" /> C-Score Composite Delta
+                                <ChartLineUp className="w-4 h-4 text-[#5b4fff]" /> DevScore Composite Delta
                             </span>
                             <span className="text-[11px] font-bold text-[#5b4fff]">
-                                {userLeadsCScore ? `+${cScoreDiff} in your favor` : `-${cScoreDiff} peer lead`}
+                                {userLeadsDevScore ? `+${devScoreDiff} in your favor` : `-${devScoreDiff} peer lead`}
                             </span>
                         </CardTitle>
                     </CardHeader>
@@ -1192,21 +1192,21 @@ function FriendComparativeSection({
                         <div className="space-y-1.5">
                             <div className="flex justify-between text-xs font-bold">
                                 <span>You ({userTier.tier})</span>
-                                <span className="font-semibold text-[#5b4fff]">{userCScore} pts</span>
+                                <span className="font-semibold text-[#5b4fff]">{userDevScore} pts</span>
                             </div>
-                            <Progress value={Math.min(Math.max(((userCScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
+                            <Progress value={Math.min(Math.max(((userDevScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
                         </div>
 
                         <div className="space-y-1.5">
                             <div className="flex justify-between text-xs font-bold">
                                 <span>{profile.name} ({friendTier.tier})</span>
-                                <span className="font-semibold text-zinc-700 dark:text-zinc-300">{friendCScore} pts</span>
+                                <span className="font-semibold text-zinc-700 dark:text-zinc-300">{friendDevScore} pts</span>
                             </div>
-                            <Progress value={Math.min(Math.max(((friendCScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
+                            <Progress value={Math.min(Math.max(((friendDevScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
                         </div>
 
                         <p className="text-[11px] text-zinc-500 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                            C-Score aggregates algorithm volume, difficulty weighting (Hard/Medium), contest ratings, and daily streaks.
+                            DevScore aggregates algorithm volume, difficulty weighting (Hard/Medium), contest ratings, and daily streaks.
                         </p>
                     </CardContent>
                 </Card>
@@ -1346,8 +1346,8 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
     const cfRating = (profile?.codeforcesRating && profile.codeforcesRating > 0) ? profile.codeforcesRating : 0;
     const maxRating = Math.max(lcRating, cfRating);
 
-    const userCScore = comparison?.userCScore ?? 500;
-    const friendCScore = comparison?.friendCScore ?? profile?.cScore ?? 500;
+    const userDevScore = comparison?.userDevScore ?? comparison?.userCScore ?? 500;
+    const friendDevScore = comparison?.friendDevScore ?? comparison?.friendCScore ?? profile?.devScore ?? profile?.cScore ?? 500;
 
     // Head-to-head calculations
     const userWins = comparison?.userPvpWinsAgainstFriend ?? 0;
@@ -1495,7 +1495,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                         {/* Top Banner (Identical to Mentor Student Details Banner) */}
                         <FriendProfileHeader
                             profile={profile}
-                            cScore={friendCScore}
+                            devScore={friendDevScore}
                             totalSolved={totalSolved}
                             lcSolved={lcSolved}
                             cfSolved={cfSolved}
@@ -1579,11 +1579,11 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                             </button>
                         </div>
 
-                        {/* SECTION 1: CODER CARD (CODOLIO DIGITAL PORTFOLIO SNAPSHOT) */}
+                        {/* SECTION 1: CODER CARD (DEVELOPER PORTFOLIO SNAPSHOT) */}
                         {activeSection === 'coder-card' && (
                             <FriendCoderCardSection
                                 profile={profile}
-                                cScore={friendCScore}
+                                devScore={friendDevScore}
                                 easyCount={easyCount}
                                 medCount={medCount}
                                 hardCount={hardCount}
@@ -1604,8 +1604,8 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                 comparison={comparison}
                                 profile={profile}
                                 cardClasses={cardClasses}
-                                userCScore={userCScore}
-                                friendCScore={friendCScore}
+                                userDevScore={userDevScore}
+                                friendDevScore={friendDevScore}
                                 userWins={userWins}
                                 friendWins={friendWins}
                                 pvpDraws={pvpDraws}

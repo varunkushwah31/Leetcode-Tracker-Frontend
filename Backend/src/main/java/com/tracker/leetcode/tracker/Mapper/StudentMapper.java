@@ -138,13 +138,18 @@ public class StudentMapper {
                 .pvpDraws(student.getPvpDraws() != null ? student.getPvpDraws() : 0)
                 .pvpRating(student.getPvpRating() != null ? student.getPvpRating() : 1200)
                 .pvpStreak(student.getPvpStreak() != null ? student.getPvpStreak() : 0)
-                .cScore(calculateCScore(student))
+                .devScore(calculateDevScore(student))
+                .cScore(calculateDevScore(student))
                 .build();
     }
 
     // --- Helper Methods ---
 
     public int calculateCScore(Student student) {
+        return calculateDevScore(student);
+    }
+
+    public int calculateDevScore(Student student) {
         if (student == null) return 500;
         int easy = 0;
         int medium = 0;

@@ -19,7 +19,7 @@ import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { StreakFlame } from '../ui/StreakFlame';
 import { SocialService } from '../../services/endpoints';
-import { getCScoreTier } from '../../lib/cScoreCalculator';
+import { getDevScoreTier } from '../../lib/devScoreCalculator';
 import type { FriendsLeaderboardEntryDTO } from '@/types';
 
 interface FriendsLeaderboardTabProps {
@@ -29,7 +29,7 @@ interface FriendsLeaderboardTabProps {
 
 export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Readonly<FriendsLeaderboardTabProps>) {
     const [entries, setEntries] = useState<FriendsLeaderboardEntryDTO[]>([]);
-    const [sortBy, setSortBy] = useState<'cScore' | 'totalSolved' | 'rating' | 'streak' | 'pvp'>('cScore');
+    const [sortBy, setSortBy] = useState<'devScore' | 'totalSolved' | 'rating' | 'streak' | 'pvp'>('devScore');
     const [isLoading, setIsLoading] = useState(true);
     const [searchFilter, setSearchFilter] = useState('');
 
@@ -63,8 +63,8 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
 
     const getPrimaryValue = (e: FriendsLeaderboardEntryDTO) => {
         switch (sortBy) {
-            case 'cScore':
-                return `${e.cScore ?? 500} C-Score · ${getCScoreTier(e.cScore).tier}`;
+            case 'devScore':
+                return `${e.devScore ?? e.cScore ?? 500} DevScore · ${getDevScoreTier(e.devScore ?? e.cScore).tier}`;
             case 'rating':
                 return `${Math.round(e.currentContestRating || 0)} Rating`;
             case 'streak':
@@ -104,14 +104,14 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                 <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-900/90 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 flex-wrap shadow-2xs">
                     <button
                         type="button"
-                        onClick={() => setSortBy('cScore')}
+                        onClick={() => setSortBy('devScore')}
                         className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-                            sortBy === 'cScore'
+                            sortBy === 'devScore'
                                 ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs font-black border border-emerald-500/30'
                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <ChartLineUp className="w-3.5 h-3.5 text-emerald-500" /> C-Score
+                        <ChartLineUp className="w-3.5 h-3.5 text-emerald-500" /> DevScore
                     </button>
                     <button
                         type="button"
@@ -586,7 +586,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                     <tr className="border-b border-zinc-200/80 dark:border-zinc-800/70 bg-zinc-50/70 dark:bg-zinc-900/40 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                                         <th className="py-3.5 px-5 w-16 text-center">Rank</th>
                                         <th className="py-3.5 px-5">Student / Peer</th>
-                                        <th className="py-3.5 px-5 text-center">C-Score</th>
+                                        <th className="py-3.5 px-5 text-center">DevScore</th>
                                         <th className="py-3.5 px-5 text-center">Total Solved</th>
                                         <th className="py-3.5 px-5 text-center">Contest Rating</th>
                                         <th className="py-3.5 px-5 text-center">Streak</th>
@@ -651,10 +651,10 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             <td className="py-4 px-5 text-center">
                                                 <div className="inline-flex flex-col items-center">
                                                     <span className="font-bold text-sm text-[#5b4fff] dark:text-[#968fff]">
-                                                        {e.cScore ?? 500}
+                                                        {e.devScore ?? e.cScore ?? 500}
                                                     </span>
-                                                    <span className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded border ${getCScoreTier(e.cScore).badgeClass}`}>
-                                                        {getCScoreTier(e.cScore).tier}
+                                                    <span className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded border ${getDevScoreTier(e.devScore ?? e.cScore).badgeClass}`}>
+                                                        {getDevScoreTier(e.devScore ?? e.cScore).tier}
                                                     </span>
                                                 </div>
                                             </td>

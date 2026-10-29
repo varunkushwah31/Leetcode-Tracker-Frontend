@@ -24,7 +24,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { SocialService } from '../../services/endpoints';
 import { useAuth } from '../../hooks/useAuth';
-import { getCScoreTier } from '../../lib/cScoreCalculator';
+import { getDevScoreTier } from '../../lib/devScoreCalculator';
 import type { FriendDTO, FriendRequestDTO, SocialSearchStudentDTO } from '@/types';
 
 interface FriendsListTabProps {
@@ -53,7 +53,7 @@ function getDuelButtonTitle(friend: FriendDTO): string {
 }
 
 type FriendFilterType = 'ALL' | 'ONLINE' | 'IN_DUEL';
-type FriendSortType = 'CSCORE' | 'SOLVED' | 'RATING' | 'STREAK';
+type FriendSortType = 'DEVSCORE' | 'SOLVED' | 'RATING' | 'STREAK';
 
 export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<FriendsListTabProps>) {
     const { user } = useAuth();
@@ -64,7 +64,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
 
     // Filter & Sort within Friends
     const [friendsFilter, setFriendsFilter] = useState<FriendFilterType>('ALL');
-    const [friendsSort, setFriendsSort] = useState<FriendSortType>('CSCORE');
+    const [friendsSort, setFriendsSort] = useState<FriendSortType>('DEVSCORE');
     const [friendSearchQuery, setFriendSearchQuery] = useState('');
 
     // Global Search / Discover peers state
@@ -148,8 +148,8 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
         // 3. Sort
         list.sort((a, b) => {
             // First by online if desired or pure metric
-            if (friendsSort === 'CSCORE') {
-                return (b.cScore ?? 500) - (a.cScore ?? 500);
+            if (friendsSort === 'DEVSCORE') {
+                return (b.devScore ?? b.cScore ?? 500) - (a.devScore ?? a.cScore ?? 500);
             }
             if (friendsSort === 'SOLVED') {
                 return (b.totalSolved || 0) - (a.totalSolved || 0);
@@ -615,8 +615,8 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 </div>
                             </SelectTrigger>
                             <SelectContent className="bg-white dark:bg-[#141417] border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-xl shadow-xl p-1 min-w-35 z-50">
-                                <SelectItem value="CSCORE" className="text-xs font-semibold rounded-lg cursor-pointer focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:text-zinc-900 dark:focus:text-white">
-                                    C-Score
+                                <SelectItem value="DEVSCORE" className="text-xs font-semibold rounded-lg cursor-pointer focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:text-zinc-900 dark:focus:text-white">
+                                    DevScore
                                 </SelectItem>
                                 <SelectItem value="SOLVED" className="text-xs font-semibold rounded-lg cursor-pointer focus:bg-zinc-100 dark:focus:bg-zinc-800 focus:text-zinc-900 dark:focus:text-white">
                                     Total Solved
@@ -726,16 +726,16 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                     </Button>
                                 </div>
 
-                                {/* C-Score & Core Metrics Grid */}
+                                {/* DevScore & Core Metrics Grid */}
                                 <div className="rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/60 p-3 space-y-2.5 shadow-2xs">
                                     <div className="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
                                         <div className="flex items-center gap-1.5">
                                             <ChartLineUp className="w-3.5 h-3.5 text-[#5b4fff]" />
-                                            <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">C-Score</span>
-                                            <span className="text-zinc-900 dark:text-zinc-100 font-bold text-sm ml-1">{friend.cScore ?? 500}</span>
+                                            <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">DevScore</span>
+                                            <span className="text-zinc-900 dark:text-zinc-100 font-bold text-sm ml-1">{friend.devScore ?? friend.cScore ?? 500}</span>
                                         </div>
-                                        <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${getCScoreTier(friend.cScore).badgeClass}`}>
-                                            {getCScoreTier(friend.cScore).tier}
+                                        <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${getDevScoreTier(friend.devScore ?? friend.cScore).badgeClass}`}>
+                                            {getDevScoreTier(friend.devScore ?? friend.cScore).tier}
                                         </span>
                                     </div>
 
@@ -864,7 +864,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
 
                             <div className="shrink-0 text-right">
                                 <span className="text-xs font-bold text-[#5b4fff] dark:text-[#968fff]">
-                                    {friendToRemove.cScore ?? 500} C-Score
+                                    {friendToRemove.devScore ?? friendToRemove.cScore ?? 500} DevScore
                                 </span>
                                 <p className="text-[10px] text-zinc-400 mt-0.5">
                                     {friendToRemove.totalSolved || 0} solved

@@ -46,6 +46,7 @@ const mockComparisonData: FriendComparisonDTO = {
         codeforcesRating: 1317,
         rank: '19071',
         consistencyStreak: 18,
+        devScore: 780,
         problemStats: [
             { difficulty: 'Easy', count: 332, beatsPercentage: 80 },
             { difficulty: 'Medium', count: 697, beatsPercentage: 75 },
@@ -71,6 +72,8 @@ const mockComparisonData: FriendComparisonDTO = {
     friendRating: 1931,
     userStreak: 5,
     friendStreak: 18,
+    userDevScore: 710,
+    friendDevScore: 780,
     userPvpWinsAgainstFriend: 2,
     friendPvpWinsAgainstUser: 1,
     pvpDraws: 0
@@ -188,7 +191,7 @@ describe('FriendDashboardModal Component', () => {
         expect(handleChallenge).toHaveBeenCalledWith('friend-1', 'Pranav Dhar Dwivedi');
     });
 
-    it('renders Codolio Coder Card with C-Score, tier, problem difficulty distribution, and copy snapshot', async () => {
+    it('renders Verified Developer Card with DevScore, tier, problem difficulty distribution, and copy snapshot', async () => {
         vi.mocked(SocialService.getFriendDashboard).mockResolvedValue({
             data: mockComparisonData
         } as unknown as AxiosResponse<FriendComparisonDTO>);
@@ -210,8 +213,8 @@ describe('FriendDashboardModal Component', () => {
         fireEvent.click(coderCardTab);
 
         await waitFor(() => {
-            expect(screen.getByText('Codolio Certified Developer Card')).toBeDefined();
-            expect(screen.getByText('Codolio C-Score Composite Index')).toBeDefined();
+            expect(screen.getByText('Verified Developer Card')).toBeDefined();
+            expect(screen.getByText('DevScore Composite Index')).toBeDefined();
             expect(screen.getByText('Algorithmic Difficulty Distribution')).toBeDefined();
             expect(screen.getByText('Copy Coder Snapshot')).toBeDefined();
         });
@@ -240,7 +243,7 @@ describe('FriendDashboardModal Component', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Head-to-Head Duel Record')).toBeDefined();
-            expect(screen.getByText(/C-Score Composite Delta/i)).toBeDefined();
+            expect(screen.getByText(/DevScore Composite Delta/i)).toBeDefined();
             expect(screen.getByText(/Problem Overlap & Catalog Gap/i)).toBeDefined();
             expect(screen.getByText('Launch 1v1 Challenge')).toBeDefined();
         });

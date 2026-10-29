@@ -33,6 +33,8 @@ public class FriendComparisonDTO implements Serializable {
     private int userPvpWinsAgainstFriend;
     private int friendPvpWinsAgainstUser;
     private int pvpDraws;
+    private int userDevScore;
+    private int friendDevScore;
     private int userCScore;
     private int friendCScore;
 }
