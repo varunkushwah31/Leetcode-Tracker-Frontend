@@ -49,7 +49,10 @@ export function ActivityHeatmap({
 }: Readonly<ActivityHeatmapProps>) {
     const [range, setRange] = useState<ActivityRange>(defaultRange);
     const [hoveredCell, setHoveredCell] = useState<{ day: HeatmapDay; x: number; y: number; placement: 'top' | 'bottom' } | null>(null);
+    const [selectedDay, setSelectedDay] = useState<HeatmapDay | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+    const activeDay = hoveredCell?.day || selectedDay;
 
     // 1. Process progressHistory map and streaks
     const { progressMap, totalSolvedAllTime, calculatedCurrentStreak, calculatedMaxStreak } = useMemo(() => {
@@ -250,12 +253,22 @@ export function ActivityHeatmap({
                         <CardTitle className="text-base font-bold text-zinc-900 dark:text-white tracking-tight">
                             {title || 'Activity Heatmap'}
                         </CardTitle>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                            <strong className="text-zinc-900 dark:text-white font-bold">{rangeSubmissions}</strong> submissions in the {rangeLabel}
-                            {range !== '1year' && totalSolvedAllTime > rangeSubmissions && (
-                                <span className="text-zinc-400 dark:text-zinc-500 ml-1">({totalSolvedAllTime} total all-time)</span>
-                            )}
-                        </p>
+                        {activeDay ? (
+                            <div className="flex items-center gap-2 mt-0.5 animate-in fade-in duration-150">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                                <span className="text-xs font-bold text-zinc-900 dark:text-white">{activeDay.formattedDate}:</span>
+                                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                    {activeDay.count === 0 ? 'No problems solved' : `${activeDay.count} ${activeDay.count === 1 ? 'problem' : 'problems'} solved`}
+                                </span>
+                            </div>
+                        ) : (
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                <strong className="text-zinc-900 dark:text-white font-bold">{rangeSubmissions}</strong> submissions in the {rangeLabel}
+                                {range !== '1year' && totalSolvedAllTime > rangeSubmissions && (
+                                    <span className="text-zinc-400 dark:text-zinc-500 ml-1">({totalSolvedAllTime} total all-time)</span>
+                                )}
+                            </p>
+                        )}
                     </div>
                 </div>
 
@@ -354,14 +367,18 @@ export function ActivityHeatmap({
                                             <div
                                                 key={day.dateKey}
                                                 tabIndex={day.isFuture ? -1 : 0}
+                                                role={day.isFuture ? undefined : "button"}
                                                 aria-label={day.isFuture ? undefined : `${day.formattedDate}: ${day.count} solved`}
-                                                title={day.isFuture ? undefined : `${day.formattedDate}: ${day.count === 0 ? 'No problems' : `${day.count} ${day.count === 1 ? 'problem' : 'problems'}`} solved`}
+                                                onClick={() => {
+                                                    if (day.isFuture) return;
+                                                    setSelectedDay(prev => prev?.dateKey === day.dateKey ? null : day);
+                                                }}
                                                 onMouseEnter={(e) => {
                                                     if (day.isFuture) return;
                                                     const rect = e.currentTarget.getBoundingClientRect();
-                                                    const placement = rect.top < 65 ? 'bottom' : 'top';
-                                                    const targetY = placement === 'top' ? rect.top - 6 : rect.bottom + 6;
-                                                    const targetX = Math.max(80, Math.min(window.innerWidth - 80, rect.left + rect.width / 2));
+                                                    const placement = rect.top < 85 ? 'bottom' : 'top';
+                                                    const targetY = placement === 'top' ? rect.top - 4 : rect.bottom + 4;
+                                                    const targetX = rect.left + rect.width / 2;
                                                     setHoveredCell({
                                                         day,
                                                         x: targetX,
@@ -373,7 +390,9 @@ export function ActivityHeatmap({
                                                 className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count, day.isFuture)} transition-transform duration-100 ${
                                                     day.isFuture
                                                         ? ''
-                                                        : 'hover:ring-2 hover:ring-emerald-400 dark:hover:ring-emerald-400 cursor-pointer hover:scale-125 hover:shadow-[0_0_8px_rgba(16,185,129,0.5)] relative hover:z-20'
+                                                        : `cursor-pointer relative hover:z-20 hover:scale-125 hover:ring-2 hover:ring-emerald-400 dark:hover:ring-emerald-400 ${
+                                                            selectedDay?.dateKey === day.dateKey ? 'ring-2 ring-emerald-500 scale-125 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : ''
+                                                        }`
                                                 }`}
                                             />
                                         ))}
@@ -384,20 +403,31 @@ export function ActivityHeatmap({
                     </div>
                 </div>
 
-                {/* Single Shared Floating Tooltip Overlay - Portaled directly to document.body to avoid card overflow-hidden & backdrop-filter clipping */}
+                {/* Single Shared Floating Tooltip Overlay - Anchored directly to cell with triangle pointer */}
                 {hoveredCell && typeof document !== 'undefined' && createPortal(
                     <div
                         className={`fixed z-[9999] pointer-events-none -translate-x-1/2 ${
                             hoveredCell.placement === 'top' ? '-translate-y-full' : 'translate-y-0'
-                        } bg-zinc-900/95 dark:bg-zinc-900/95 backdrop-blur-md text-white border border-zinc-700/80 dark:border-zinc-800 text-xs py-1.5 px-3 rounded-lg shadow-2xl animate-in fade-in zoom-in-95 duration-100`}
+                        } flex flex-col items-center drop-shadow-lg`}
                         style={{ left: hoveredCell.x, top: hoveredCell.y }}
                     >
-                        <p className="font-semibold text-zinc-100 whitespace-nowrap">{hoveredCell.day.formattedDate}</p>
-                        <p className="text-zinc-400 text-[11px] mt-0.5 whitespace-nowrap">
-                            {hoveredCell.day.count === 0
-                                ? 'No problems solved'
-                                : `${hoveredCell.day.count} ${hoveredCell.day.count === 1 ? 'problem' : 'problems'} solved`}
-                        </p>
+                        {/* Tooltip Content Box */}
+                        <div className="bg-zinc-900/95 dark:bg-zinc-900/95 backdrop-blur-md text-white border border-zinc-700/80 dark:border-zinc-800 text-xs py-1 px-2.5 rounded-lg shadow-xl text-center whitespace-nowrap">
+                            <p className="font-semibold text-zinc-100 text-[11px] leading-tight">{hoveredCell.day.formattedDate}</p>
+                            <p className="text-emerald-400 text-[10px] font-medium leading-tight mt-0.5">
+                                {hoveredCell.day.count === 0
+                                    ? 'No problems solved'
+                                    : `${hoveredCell.day.count} ${hoveredCell.day.count === 1 ? 'problem' : 'problems'} solved`}
+                            </p>
+                        </div>
+                        {/* Directional Triangle Pointer directly anchoring to cell */}
+                        <div
+                            className={`w-0 h-0 border-x-4 border-x-transparent ${
+                                hoveredCell.placement === 'top'
+                                    ? 'border-t-4 border-t-zinc-900 -mt-px'
+                                    : 'border-b-4 border-b-zinc-900 -order-1 -mb-px'
+                            }`}
+                        />
                     </div>,
                     document.body
                 )}
@@ -405,8 +435,14 @@ export function ActivityHeatmap({
                 {/* Legend & Synced Indicator Footer */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t border-zinc-200/80 dark:border-zinc-800/60 text-xs text-zinc-500 dark:text-zinc-400 mt-2">
                     <div className="flex items-center gap-2">
-                        <LightningIcon className="w-3.5 h-3.5 text-emerald-500" weight="fill" />
-                        <span className="text-[11px]">Synchronized daily submissions activity</span>
+                        <LightningIcon className="w-3.5 h-3.5 text-emerald-500 shrink-0" weight="fill" />
+                        {activeDay ? (
+                            <span className="text-[11px] text-zinc-700 dark:text-zinc-300">
+                                <strong className="text-zinc-900 dark:text-white font-semibold">{activeDay.formattedDate}</strong>: {activeDay.count === 0 ? 'No problems' : `${activeDay.count} ${activeDay.count === 1 ? 'problem' : 'problems'}`} solved
+                            </span>
+                        ) : (
+                            <span className="text-[11px]">Synchronized daily submissions activity</span>
+                        )}
                     </div>
                     <div className="flex items-center gap-1.5 text-[11px]">
                         <span>Less</span>
