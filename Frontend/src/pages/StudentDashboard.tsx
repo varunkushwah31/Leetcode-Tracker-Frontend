@@ -74,6 +74,9 @@ export function StudentDashboard() {
         try {
             const response = await StudentService.getDashboard();
             setDashboardData(response.data);
+            if (response.data?.avatarUrl) {
+                localStorage.setItem('userAvatar', response.data.avatarUrl);
+            }
         } catch (err: unknown) {
             setPageError(getErrorMessage(err, 'Failed to load dashboard.'));
         } finally {
@@ -101,6 +104,9 @@ export function StudentDashboard() {
                 const syncRes = await StudentService.syncProfile();
                 if (isMounted && syncRes.data) {
                     setDashboardData(syncRes.data);
+                    if (syncRes.data.avatarUrl) {
+                        localStorage.setItem('userAvatar', syncRes.data.avatarUrl);
+                    }
                 }
             } catch (err: unknown) {
                 console.warn('Background profile auto-fetch notice:', err);
@@ -121,6 +127,9 @@ export function StudentDashboard() {
         try {
             const response = await StudentService.syncProfile();
             setDashboardData(response.data);
+            if (response.data?.avatarUrl) {
+                localStorage.setItem('userAvatar', response.data.avatarUrl);
+            }
         } catch (err: unknown) {
             setSyncError(getErrorMessage(err, 'Failed to sync profiles.'));
         } finally {

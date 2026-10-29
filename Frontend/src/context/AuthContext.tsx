@@ -31,6 +31,7 @@ function isTokenExpired(token: string): boolean {
 function clearStoredAuth() {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('userAvatar');
 }
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {

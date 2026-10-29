@@ -34,6 +34,8 @@ import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { AmbientGlow } from '../components/ui/AmbientGlow';
 import { DottedBackground } from '../components/ui/DottedBackground';
 import { useAuth } from '../hooks/useAuth';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { StudentService } from '../services/endpoints';
 
 interface SampleStudent {
     id: string;
@@ -796,6 +798,24 @@ function AnalyticsTabContent({
 
 export function LandingPage() {
     const { user, isAuthenticated, logout } = useAuth();
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(() => localStorage.getItem('userAvatar'));
+
+    useEffect(() => {
+        if (isAuthenticated && user?.role === 'STUDENT') {
+            const cached = localStorage.getItem('userAvatar');
+            if (cached) {
+                setAvatarUrl(cached);
+            }
+            StudentService.getDashboard()
+                .then((res) => {
+                    if (res.data?.avatarUrl) {
+                        setAvatarUrl(res.data.avatarUrl);
+                        localStorage.setItem('userAvatar', res.data.avatarUrl);
+                    }
+                })
+                .catch(() => {});
+        }
+    }, [isAuthenticated, user?.role]);
     const [canvasTab, setCanvasTab] = useState<'leaderboard' | 'profile' | 'analytics'>('leaderboard');
     const [leaderboardSort, setLeaderboardSort] = useState<LeaderboardSortOption>('total');
     const [searchQuery, setSearchQuery] = useState('');
@@ -922,35 +942,30 @@ export function LandingPage() {
                         </Link>
 
                         {isAuthenticated ? (
-                            <div className="flex items-center gap-3">
-                                <Link 
-                                    to="/dashboard" 
-                                    className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/5 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all text-left group"
-                                    title="Go to Dashboard"
-                                >
-                                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#5b4fff] to-[#7928ca] text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0">
-                                        {(user?.name || 'U').substring(0, 2).toUpperCase()}
-                                    </div>
-                                    <div className="hidden lg:flex flex-col">
-                                        <span className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors max-w-[120px] truncate leading-tight">
-                                            {user?.name || 'Account'}
-                                        </span>
-                                        <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 leading-tight">
-                                            {user?.role === 'SUPER_ADMIN' ? 'Admin' : user?.role === 'MENTOR' ? 'Mentor' : user?.role === 'STUDENT' ? 'Student' : 'Member'}
-                                        </span>
-                                    </div>
-                                </Link>
+                            <div className="flex items-center gap-2.5">
                                 <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10 min-h-11 min-w-11" />
                                 <Link 
-                                    to="/dashboard" 
-                                    className="bg-linear-to-b from-[#5b4fff] to-[#4639e6] hover:from-[#6c61ff] hover:to-[#5044ea] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_0_24px_rgba(91,79,255,0.3)] text-white text-[14px] font-semibold px-4 py-2.5 rounded-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] hover:-translate-y-0.5 active:translate-y-0 min-h-11 flex items-center gap-1.5 shimmer-sweep interactive-press"
+                                    to="/dashboard"
+                                    className="flex items-center gap-2.5 p-1.5 pr-3.5 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 transition-all text-left outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] group min-h-11 shadow-xs hover:-translate-y-0.5 cursor-pointer"
+                                    title="Go to Dashboard"
                                 >
-                                    <span>Dashboard</span>
-                                    <ArrowRightIcon className="w-4 h-4" />
+                                    <Avatar className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700 shrink-0">
+                                        <AvatarImage src={avatarUrl || undefined} alt={user?.name} className="object-cover" />
+                                        <AvatarFallback className="bg-linear-to-br from-[#5b4fff] to-[#7928ca] text-white font-bold text-xs">
+                                            {(user?.name || 'U').substring(0, 2).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors max-w-[140px] truncate leading-tight">
+                                        {user?.name || 'Account'}
+                                    </span>
                                 </Link>
                                 <button
                                     type="button"
-                                    onClick={() => void logout()}
+                                    onClick={() => {
+                                        localStorage.removeItem('userAvatar');
+                                        setAvatarUrl(null);
+                                        void logout();
+                                    }}
                                     className="p-2.5 rounded-xl text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer min-h-11 min-w-11 flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                                     title="Sign Out"
                                     aria-label="Sign out"
@@ -983,10 +998,18 @@ export function LandingPage() {
                         {isAuthenticated ? (
                             <Link
                                 to="/dashboard"
-                                className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white text-xs font-semibold px-3 py-2.5 rounded-xl whitespace-nowrap shrink-0 transition-colors min-h-11 flex items-center gap-1.5"
+                                className="flex items-center gap-2 p-1.5 pr-2.5 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 text-xs font-semibold whitespace-nowrap shrink-0 transition-colors min-h-11 cursor-pointer"
+                                title="Go to Dashboard"
                             >
-                                <span>Dashboard</span>
-                                <ArrowRightIcon className="w-3.5 h-3.5" />
+                                <Avatar className="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-700 shrink-0">
+                                    <AvatarImage src={avatarUrl || undefined} alt={user?.name} className="object-cover" />
+                                    <AvatarFallback className="bg-linear-to-br from-[#5b4fff] to-[#7928ca] text-white font-bold text-[11px]">
+                                        {(user?.name || 'U').substring(0, 2).toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <span className="text-zinc-900 dark:text-white max-w-[90px] truncate">
+                                    {user?.name || 'Account'}
+                                </span>
                             </Link>
                         ) : (
                             <Link
@@ -1013,17 +1036,21 @@ export function LandingPage() {
                     <div className="md:hidden mt-3 pt-3 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-2">
                         {isAuthenticated && user && (
                             <div className="flex items-center gap-3 px-3 py-2.5 mb-1 rounded-xl bg-zinc-100/80 dark:bg-zinc-900/80 border border-zinc-200/70 dark:border-zinc-800/70">
-                                <div className="w-9 h-9 rounded-full bg-linear-to-br from-[#5b4fff] to-[#7928ca] text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0">
-                                    {(user.name || 'U').substring(0, 2).toUpperCase()}
-                                </div>
+                                <Avatar className="w-9 h-9 border border-zinc-200/80 dark:border-zinc-700/80 shrink-0">
+                                    <AvatarImage src={avatarUrl || undefined} alt={user.name} className="object-cover" />
+                                    <AvatarFallback className="bg-linear-to-br from-[#5b4fff] to-[#7928ca] text-white text-sm font-bold">
+                                        {(user.name || 'U').substring(0, 2).toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
                                 <div className="flex flex-col min-w-0 flex-1">
                                     <span className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
                                         {user.name}
                                     </span>
-                                    <span className="text-xs text-zinc-500 dark:text-zinc-400 capitalize">
-                                        {user.role === 'SUPER_ADMIN' ? 'Admin' : user.role === 'MENTOR' ? 'Mentor' : user.role === 'STUDENT' ? 'Student' : 'Member'}
-                                        {user.email && ` • ${user.email}`}
-                                    </span>
+                                    {user.email && (
+                                        <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                                            {user.email}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         )}
