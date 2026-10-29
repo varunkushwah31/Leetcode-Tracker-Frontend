@@ -60,6 +60,15 @@ export function DottedBackground({
             attributeFilter: ['class'],
         });
 
+        const isOverUI = (target: Element | null): boolean => {
+            if (!target) return false;
+            if (target === canvas || target === container) return false;
+            const uiMatch = target.closest(
+                'button, a, input, select, textarea, [role="button"], [role="tab"], [role="dialog"], [role="menu"], header, nav, footer, [data-slot], [data-card], .rounded-xl, .rounded-2xl, .rounded-3xl, .rounded-lg, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, .border-zinc-200, .dark\\:border-zinc-800, .bg-white, .dark\\:bg-zinc-900, .dark\\:bg-\\[\\#111111\\], .dark\\:bg-\\[\\#1a1a1a\\], .dark\\:bg-\\[\\#18181b\\], .dark\\:bg-\\[\\#141414\\]'
+            );
+            return Boolean(uiMatch && uiMatch !== container && !container?.contains(uiMatch));
+        };
+
         const handleMouseMove = (e: MouseEvent) => {
             if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
@@ -70,6 +79,14 @@ export function DottedBackground({
                 e.clientY <= rect.bottom;
 
             if (!isInside) {
+                isHovering = false;
+                return;
+            }
+
+            const target = typeof document.elementFromPoint === 'function'
+                ? document.elementFromPoint(e.clientX, e.clientY)
+                : null;
+            if (isOverUI(target)) {
                 isHovering = false;
                 return;
             }

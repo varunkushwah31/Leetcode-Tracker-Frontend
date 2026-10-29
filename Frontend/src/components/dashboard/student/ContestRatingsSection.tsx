@@ -47,7 +47,7 @@ export function ContestRatingsSection({
                 </div>
 
                 {/* Filter Pills */}
-                <div className="grid grid-cols-3 sm:flex items-center gap-1 bg-zinc-100 dark:bg-[#141414]/80 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800/80 w-full sm:w-auto shadow-xs dark:shadow-none">
+                <div className="grid grid-cols-3 sm:flex items-center gap-1 bg-zinc-100 dark:bg-[#141414] p-1 rounded-xl border border-zinc-200 dark:border-zinc-800/80 w-full sm:w-auto shadow-xs dark:shadow-none">
                     <button
                         type="button"
                         onClick={() => setActiveTab('all')}

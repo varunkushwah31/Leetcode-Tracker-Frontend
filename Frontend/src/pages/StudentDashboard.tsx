@@ -297,7 +297,7 @@ export function StudentDashboard() {
             <main
                 tabIndex={0}
                 aria-label="Student dashboard content"
-                className="max-w-360 mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 w-full focus:outline-none"
+                className="relative z-10 max-w-360 mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 w-full focus:outline-none"
             >
                 <ErrorBanner message={pageError} className="mb-6" />
                 <ErrorBanner message={syncError} className="mb-6" />
@@ -359,7 +359,7 @@ export function StudentDashboard() {
 
                         {/* Modular Focus Filters for Enhanced Scalability */}
                         <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
-                            <div className="flex items-center gap-1 p-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800 overflow-x-auto custom-scrollbar">
+                            <div className="flex items-center gap-1 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 overflow-x-auto custom-scrollbar shadow-xs">
                                 <button
                                     type="button"
                                     onClick={() => setActiveFilter('all')}

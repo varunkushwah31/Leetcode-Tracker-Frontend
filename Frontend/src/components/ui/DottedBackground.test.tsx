@@ -58,4 +58,18 @@ describe('DottedBackground component', () => {
         window.dispatchEvent(new MouseEvent('mousemove', { clientX: 600, clientY: 200 }));
         expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalled();
     });
+
+    it('does not zoom when mouse is hovering over a UI button or card element', () => {
+        const button = document.createElement('button');
+        button.textContent = 'Academic & Classrooms';
+        document.body.appendChild(button);
+
+        document.elementFromPoint = vi.fn().mockReturnValue(button);
+
+        render(<DottedBackground spacing={24} hoverRadius={75} />);
+        window.dispatchEvent(new MouseEvent('mousemove', { clientX: 600, clientY: 200 }));
+
+        expect(document.elementFromPoint).toHaveBeenCalledWith(600, 200);
+        document.body.removeChild(button);
+    });
 });
