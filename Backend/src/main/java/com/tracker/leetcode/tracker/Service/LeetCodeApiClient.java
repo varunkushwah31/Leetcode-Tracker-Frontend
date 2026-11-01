@@ -23,7 +23,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 @Slf4j
 @Component // Tells Spring to manage this class as a reusable tool
@@ -83,7 +83,7 @@ public class LeetCodeApiClient {
      */
     private void cacheDataForFallback(String key, Object data) {
         try {
-            redisTemplate.opsForValue().set(key, data, 7, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(key, data, Duration.ofDays(7));
             log.debug("Data cached in Redis for fallback: {}", key);
         } catch (Exception e) {
             log.warn("Failed to cache data for fallback: {}", e.getMessage());

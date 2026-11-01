@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -48,8 +48,7 @@ class TokenBlacklistServiceTest {
         verify(valueOperations, times(1)).set(
                 startsWith("blacklist:jwt:"),
                 eq("revoked"),
-                anyLong(),
-                eq(TimeUnit.MILLISECONDS)
+                any(Duration.class)
         );
     }
 

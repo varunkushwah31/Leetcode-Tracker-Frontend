@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+
 
 @Slf4j
 @Service
@@ -64,7 +64,7 @@ public class TokenBlacklistService {
         String redisKey = TOKEN_BLACKLIST_PREFIX + tokenHash;
 
         try {
-            stringRedisTemplate.opsForValue().set(redisKey, "revoked", remainingMillis, TimeUnit.MILLISECONDS);
+            stringRedisTemplate.opsForValue().set(redisKey, "revoked", Duration.ofMillis(remainingMillis));
             log.info("JWT token successfully blacklisted in Redis for {} ms (hash: {})", remainingMillis, tokenHash);
         } catch (Exception ex) {
             log.warn("Redis unavailable while blacklisting token. Using in-memory fallback store: {}", ex.getMessage());

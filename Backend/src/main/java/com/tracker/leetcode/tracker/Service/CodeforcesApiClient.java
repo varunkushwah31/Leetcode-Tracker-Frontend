@@ -20,7 +20,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,7 +103,7 @@ public class CodeforcesApiClient {
 
     private void cacheDataForFallback(String key, Object data) {
         try {
-            redisTemplate.opsForValue().set(key, data, 7, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(key, data, Duration.ofDays(7));
             log.debug("Data cached in Redis for fallback: {}", key);
         } catch (Exception e) {
             log.warn("Failed to cache Codeforces data for fallback: {}", e.getMessage());
