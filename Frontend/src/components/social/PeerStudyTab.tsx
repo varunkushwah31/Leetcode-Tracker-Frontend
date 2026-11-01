@@ -261,7 +261,7 @@ export function PeerStudyTab({ onChallengePvp }: Readonly<PeerStudyTabProps>) {
                             <div>
                                 <Button
                                     onClick={() => setCreateDialogOpen(true)}
-                                    className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl text-xs font-bold px-5 h-9.5 gap-2 shadow-sm hover:shadow-md hover:shadow-md transition-all cursor-pointer"
+                                    className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl text-xs font-bold px-5 h-9.5 gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer"
                                 >
                                     <Plus className="w-4 h-4" /> Start First Discussion
                                 </Button>

@@ -33,7 +33,7 @@ export function usePvpWebSocket(
     }, [onUpdateReceived]);
 
     // Serialize match IDs to stabilize effect dependency
-    const matchIdsKey = matchIds.filter(Boolean).sort().join(',');
+    const matchIdsKey = matchIds.filter(Boolean).sort((a, b) => a.localeCompare(b)).join(',');
 
     useEffect(() => {
         if (!matchIdsKey) return;

@@ -1404,7 +1404,7 @@ public class SocialService {
                 .build();
     }
 
-    private static int resolveDevScore(SocialLeaderboardDTO.LeaderboardEntry entry) {
+    private static int resolveDevScore(FriendsLeaderboardEntryDTO entry) {
         if (entry.getDevScore() != null) {
             return entry.getDevScore();
         }

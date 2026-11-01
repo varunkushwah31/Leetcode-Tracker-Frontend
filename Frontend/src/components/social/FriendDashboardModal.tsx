@@ -115,7 +115,7 @@ function FriendProfileHeader({
                                     href={`https://leetcode.com/${profile.leetcodeUsername}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white dark:hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-zinc-900/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                                    className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-zinc-900/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800"
                                 >
                                     LC: @{profile.leetcodeUsername} ({lcSolved} solved • {lcRating > 0 ? `${lcRating} rating` : 'Unrated'}) <ExternalLink className="h-3 w-3 ml-1.5" />
                                 </a>
@@ -517,7 +517,7 @@ function FriendPeerLearningSection({
                                 return (
                                     <div
                                         key={slug}
-                                        className="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800 flex items-center justify-between gap-2 hover:border-zinc-300 dark:border-zinc-700 hover:shadow-xs transition-all group"
+                                        className="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800 flex items-center justify-between gap-2 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xs transition-all group"
                                     >
                                         <a
                                             href={url}

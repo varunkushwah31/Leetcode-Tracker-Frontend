@@ -141,7 +141,7 @@ export function AdminOverview({ onBack }: Readonly<AdminOverviewProps>) {
         }
     };
 
-    const handleCreateMentor = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleCreateMentor = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         setAddMentorError(null);
 

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.time.Instant;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -50,8 +50,8 @@ public class JwtService {
         return Jwts.builder()
                 .claims(claims) // Modern syntax
                 .subject(userDetails.getUsername()) // Modern syntax
-                .issuedAt(Date.from(Instant.now())) // Modern syntax
-                .expiration(Date.from(Instant.now().plusMillis(jwtExpiration))) // Modern syntax
+                .issuedAt(java.util.Date.from(Instant.now())) // Modern syntax
+                .expiration(java.util.Date.from(Instant.now().plusMillis(jwtExpiration))) // Modern syntax
                 .signWith(getSignInKey()) // Automatically uses the best algorithm
                 .compact();
     }
@@ -114,12 +114,12 @@ public class JwtService {
     }
 
     public Instant extractExpiration(String token) {
-        Date expiration = extractClaim(token, Claims::getExpiration);
+        java.util.Date expiration = extractClaim(token, Claims::getExpiration);
         return expiration != null ? expiration.toInstant() : null;
     }
 
     public Instant extractIssuedAt(String token) {
-        Date issuedAt = extractClaim(token, Claims::getIssuedAt);
+        java.util.Date issuedAt = extractClaim(token, Claims::getIssuedAt);
         return issuedAt != null ? issuedAt.toInstant() : null;
     }
 }
