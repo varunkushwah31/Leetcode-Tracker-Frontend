@@ -79,6 +79,7 @@ describe('ActivityFeedTab Component', () => {
         expect(mockOnViewFriendDashboard).toHaveBeenCalledWith('user_prachi');
     });
 
+    
     it('handles reactions to an activity item cleanly', async () => {
         const mockActivities: FriendActivityDTO[] = [
             {
