@@ -394,10 +394,10 @@ export function ActivityHeatmap({
                                                     });
                                                 }}
                                                 onMouseLeave={() => setHoveredCell(null)}
-                                                className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count, day.isFuture)} transition-transform duration-100 ${
+                                                className={`w-3.5 h-3.5 rounded-[3px] ${getIntensityColor(day.count, day.isFuture)} transition-transform duration-150 ease-out ${
                                                     day.isFuture
                                                         ? ''
-                                                        : `cursor-pointer relative hover:z-20 hover:scale-125 hover:ring-2 hover:ring-emerald-400 dark:hover:ring-emerald-400 ${
+                                                        : `cursor-pointer relative hover:z-20 hover:scale-130 active:scale-110 hover:ring-2 hover:ring-emerald-400 dark:hover:ring-emerald-400 ${
                                                             selectedDay?.dateKey === day.dateKey ? 'ring-2 ring-emerald-500 scale-125 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : ''
                                                         }`
                                                 }`}
@@ -415,7 +415,7 @@ export function ActivityHeatmap({
                     <div
                         className={`fixed z-9999 pointer-events-none -translate-x-1/2 ${
                             hoveredCell.placement === 'top' ? '-translate-y-full' : 'translate-y-0'
-                        } flex flex-col items-center drop-shadow-lg`}
+                        } flex flex-col items-center drop-shadow-lg animate-in fade-in-0 zoom-in-95 duration-150`}
                         style={{ left: hoveredCell.x, top: hoveredCell.y }}
                     >
                         {/* Tooltip Content Box */}

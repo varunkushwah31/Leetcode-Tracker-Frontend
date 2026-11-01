@@ -251,7 +251,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                             {/* 4 Stat Tiles Grid */}
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-5">
                                 {/* LeetCode Rank */}
-                                <div className="p-4 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/80 border border-zinc-200/80 dark:border-zinc-800/60 transition-colors">
+                                <div className="p-4 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/80 border border-zinc-200/80 dark:border-zinc-800/60 transition-all micro-card hover:border-zinc-300 dark:hover:border-zinc-700">
                                     <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-2">
                                         <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">LeetCode Rank</span>
                                         <TrophyIcon className="w-4 h-4 text-amber-500" />
@@ -272,7 +272,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 </div>
 
                                 {/* Total Solved */}
-                                <div className="p-4 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/80 border border-zinc-200/80 dark:border-zinc-800/60 transition-colors">
+                                <div className="p-4 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/80 border border-zinc-200/80 dark:border-zinc-800/60 transition-all micro-card hover:border-zinc-300 dark:hover:border-zinc-700">
                                     <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-2">
                                         <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Total Solved</span>
                                         <span className="text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
@@ -296,7 +296,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 </div>
 
                                 {/* LeetCode Rating */}
-                                <div className="p-4 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/80 border border-zinc-200/80 dark:border-zinc-800/60 transition-colors">
+                                <div className="p-4 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/80 border border-zinc-200/80 dark:border-zinc-800/60 transition-all micro-card hover:border-zinc-300 dark:hover:border-zinc-700">
                                     <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-2">
                                         <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">LeetCode Rating</span>
                                         <ChartLineIcon className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
@@ -328,7 +328,7 @@ export function ProfileStats({ data, totalSolved, rating, onProfileUpdated }: Re
                                 </div>
 
                                 {/* Codeforces Rating */}
-                                <div className="p-4 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/80 border border-zinc-200/80 dark:border-zinc-800/60 transition-colors">
+                                <div className="p-4 rounded-xl bg-zinc-50/90 dark:bg-[#141414]/80 border border-zinc-200/80 dark:border-zinc-800/60 transition-all micro-card hover:border-zinc-300 dark:hover:border-zinc-700">
                                     <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-2">
                                         <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Codeforces Rating</span>
                                         <TerminalIcon className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />

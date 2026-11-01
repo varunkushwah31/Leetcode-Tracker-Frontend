@@ -106,7 +106,7 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
     };
 
     return (
-        <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200">
+        <Card className="relative bg-white dark:bg-[#0a0a0a]/60 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/50 shadow-sm dark:shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md micro-card">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/60">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">
@@ -190,14 +190,14 @@ export function DailyChallengeCard({ classroomId, recentSubmissions }: Readonly<
                             rel="noreferrer"
                         >
                             <Button
-                                className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all ${
+                                className={`h-9 px-4 rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all duration-200 micro-lift group ${
                                     isSolved
                                         ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
                                         : 'bg-[#5b4fff] hover:bg-[#4d40ef] text-white shadow-[#5b4fff]/20'
                                 }`}
                             >
                                 <span>{isSolved ? 'Review on LeetCode' : 'Solve on LeetCode'}</span>
-                                <ExternalLink className="w-3.5 h-3.5" />
+                                <ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                             </Button>
                         </a>
                     </div>

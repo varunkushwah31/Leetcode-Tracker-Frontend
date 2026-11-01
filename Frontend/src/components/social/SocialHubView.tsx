@@ -203,7 +203,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                         <button
                             type="button"
                             onClick={() => setActiveTab('friends')}
-                            className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group"
+                            className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group micro-lift"
                             title="View Friends Network"
                         >
                             <div className="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -220,7 +220,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('leaderboard')}
-                                className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group"
+                                className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group micro-lift"
                                 title="View Friends Leaderboard"
                             >
                                 <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -239,7 +239,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab('pvp')}
-                                    className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group"
+                                    className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group micro-lift"
                                     title="View PVP Duels & Career Record"
                                 >
                                     <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -290,7 +290,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                     <button
                         type="button"
                         onClick={() => setActiveTab('friends')}
-                        className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                        className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap active:scale-95 duration-200 micro-press ${
                             activeTab === 'friends'
                                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
@@ -316,7 +316,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                         <button
                             type="button"
                             onClick={() => setActiveTab('pvp')}
-                            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap active:scale-95 duration-200 micro-press ${
                                 activeTab === 'pvp'
                                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
@@ -337,7 +337,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                     <button
                         type="button"
                         onClick={() => setActiveTab('activity')}
-                        className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                        className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap active:scale-95 duration-200 micro-press ${
                             activeTab === 'activity'
                                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
@@ -350,7 +350,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                     <button
                         type="button"
                         onClick={() => setActiveTab('leaderboard')}
-                        className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                        className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap active:scale-95 duration-200 micro-press ${
                             activeTab === 'leaderboard'
                                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
@@ -364,7 +364,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                         <button
                             type="button"
                             onClick={() => setActiveTab('peer')}
-                            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap active:scale-95 duration-200 micro-press ${
                                 activeTab === 'peer'
                                     ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'

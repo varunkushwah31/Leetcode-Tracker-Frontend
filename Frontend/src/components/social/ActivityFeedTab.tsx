@@ -236,7 +236,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                         return (
                             <div
                                 key={act.id}
-                                className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all space-y-4"
+                                className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all space-y-4 micro-card"
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3.5 min-w-0">
@@ -326,13 +326,13 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                                     key={item.key}
                                                     onClick={() => handleReact(act.id, item.key)}
                                                     disabled={reactingActivityId === act.id}
-                                                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                                                    className={`group px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95 hover:scale-105 duration-200 ${
                                                         isSelected
-                                                            ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-bold scale-105 shadow-xs'
+                                                            ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-bold scale-105 shadow-xs animate-reaction-pop'
                                                             : 'bg-zinc-50 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                                     }`}
                                                 >
-                                                    <item.Icon className="w-3.5 h-3.5" />
+                                                    <item.Icon className="w-3.5 h-3.5 transition-transform duration-200 group-hover:scale-110" />
                                                     <span className="text-[11px] font-bold">{item.label}</span>
                                                     {count > 0 && <span className="text-[11px] tabular-nums font-bold">({count})</span>}
                                                 </button>
@@ -355,9 +355,9 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => onViewFriendDashboard(displayStudentId)}
-                                            className="text-xs h-8 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer rounded-xl font-bold"
+                                            className="text-xs h-8 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer rounded-xl font-bold group"
                                         >
-                                            {isNewFriend ? 'View Friend Profile →' : 'View Profile & Overlap →'}
+                                            <>{isNewFriend ? 'View Friend Profile' : 'View Profile & Overlap'} <span className="inline-block transition-transform duration-200 group-hover:translate-x-1 ml-0.5">→</span></>
                                         </Button>
                                     )}
                                 </div>

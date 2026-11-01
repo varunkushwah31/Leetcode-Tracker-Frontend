@@ -189,7 +189,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     */}
                     {topThree.length === 1 && topThree[0] && (
                         <div className="max-w-md mx-auto">
-                            <div className="p-7 rounded-3xl bg-linear-to-b from-amber-500/5 via-white to-white dark:from-amber-500/10 dark:via-[#111114] dark:to-[#111114] border-2 border-amber-500/40 shadow-xl shadow-amber-500/10 text-center space-y-4 relative overflow-hidden">
+                            <div className="p-7 rounded-3xl bg-linear-to-b from-amber-500/5 via-white to-white dark:from-amber-500/10 dark:via-[#111114] dark:to-[#111114] border-2 border-amber-500/40 shadow-xl shadow-amber-500/10 text-center space-y-4 relative overflow-hidden micro-card champion-podium-glow hover:-translate-y-1.5 transition-all duration-300">
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-black">
                                     <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rank 1 · Gold
                                 </div>
@@ -258,7 +258,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     {topThree.length === 2 && topThree[0] && topThree[1] && (
                         <div className="max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 items-end pt-2">
                             {/* 2nd Place Card (Silver) */}
-                            <div className="p-6 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-2xl border-2 border-zinc-300 dark:border-zinc-700 text-center space-y-3.5 shadow-md hover:border-zinc-400 transition-all">
+                            <div className="p-6 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-2xl border-2 border-zinc-300 dark:border-zinc-700 text-center space-y-3.5 shadow-md hover:border-zinc-400 transition-all micro-card hover:-translate-y-1 duration-300">
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 text-xs font-black">
                                     <Medal className="w-3.5 h-3.5 text-zinc-400" /> Rank 2 · Silver
                                 </div>
@@ -315,7 +315,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                             </div>
 
                             {/* 1st Place Card (Elevated Gold Champion) */}
-                            <div className="p-7 rounded-3xl bg-linear-to-b from-amber-500/5 via-white to-white dark:from-amber-500/10 dark:via-[#111114] dark:to-[#111114] border-2 border-amber-500/40 text-center space-y-4 shadow-xl shadow-amber-500/10 relative overflow-hidden">
+                            <div className="p-7 rounded-3xl bg-linear-to-b from-amber-500/5 via-white to-white dark:from-amber-500/10 dark:via-[#111114] dark:to-[#111114] border-2 border-amber-500/40 text-center space-y-4 shadow-xl shadow-amber-500/10 relative overflow-hidden micro-card champion-podium-glow hover:-translate-y-1.5 transition-all duration-300">
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-black">
                                     <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rank 1 · Gold
                                 </div>
@@ -382,7 +382,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                     {topThree.length >= 3 && topThree[0] && topThree[1] && topThree[2] && (
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-2 items-end">
                             {/* 2nd Place (Silver) */}
-                            <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-2xl border-2 border-zinc-300 dark:border-zinc-700 text-center space-y-3.5 shadow-md sm:order-1 hover:border-zinc-400 transition-all">
+                            <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-2xl border-2 border-zinc-300 dark:border-zinc-700 text-center space-y-3.5 shadow-md sm:order-1 hover:border-zinc-400 transition-all micro-card hover:-translate-y-1 duration-300">
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 text-xs font-black">
                                     <Medal className="w-3.5 h-3.5 text-zinc-400" /> Rank 2 · Silver
                                 </div>
@@ -439,7 +439,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                             </div>
 
                             {/* 1st Place (Gold Champion Pedestal) */}
-                            <div className="p-6 sm:p-7 rounded-3xl bg-linear-to-b from-amber-500/10 via-white to-white dark:from-amber-500/15 dark:via-[#111114] dark:to-[#111114] border-2 border-amber-500/50 text-center space-y-4 shadow-xl shadow-amber-500/15 sm:order-2 transition-all relative">
+                            <div className="p-6 sm:p-7 rounded-3xl bg-linear-to-b from-amber-500/10 via-white to-white dark:from-amber-500/15 dark:via-[#111114] dark:to-[#111114] border-2 border-amber-500/50 text-center space-y-4 shadow-xl shadow-amber-500/15 sm:order-2 transition-all relative micro-card champion-podium-glow hover:-translate-y-2 duration-300">
                                 <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/40 text-xs font-black">
                                     <Trophy className="w-3.5 h-3.5 text-amber-500" /> Rank 1 · Gold
                                 </div>
@@ -502,7 +502,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                             </div>
 
                             {/* 3rd Place (Bronze) */}
-                            <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-2xl border-2 border-orange-500/30 dark:border-orange-500/25 text-center space-y-3.5 shadow-md sm:order-3 hover:border-orange-500/50 transition-all">
+                            <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-2xl border-2 border-orange-500/30 dark:border-orange-500/25 text-center space-y-3.5 shadow-md sm:order-3 hover:border-orange-500/50 transition-all micro-card hover:-translate-y-1 duration-300">
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-700 dark:text-orange-400 border border-orange-500/25 text-xs font-black">
                                     <Medal className="w-3.5 h-3.5 text-orange-500" /> Rank 3 · Bronze
                                 </div>

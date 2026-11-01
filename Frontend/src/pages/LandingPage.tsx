@@ -942,7 +942,7 @@ export function LandingPage() {
                                 <ThemeToggle className="bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 border-zinc-200 dark:border-white/10 min-h-11 min-w-11" />
                                 <Link 
                                     to="/dashboard"
-                                    className="flex items-center gap-2.5 p-1.5 pr-3.5 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 transition-all text-left outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] group min-h-11 shadow-xs hover:-translate-y-0.5 cursor-pointer"
+                                    className="flex items-center gap-2.5 p-1.5 pr-3.5 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-white/5 dark:hover:bg-white/10 border border-zinc-200/80 dark:border-white/10 transition-all text-left outline-none focus-visible:ring-2 focus-visible:ring-[#5b4fff] group min-h-11 shadow-xs hover:-translate-y-0.5 active:scale-95 duration-200 cursor-pointer micro-lift"
                                     title="Go to Dashboard"
                                 >
                                     <Avatar className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700 shrink-0">
@@ -1230,49 +1230,49 @@ export function LandingPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setCanvasTab('leaderboard')}
-                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group active:scale-[0.98] duration-200 ${
                                                     canvasTab === 'leaderboard'
-                                                        ? 'bg-[#5b4fff] text-white shadow-sm'
+                                                        ? 'bg-[#5b4fff] text-white shadow-md shadow-[#5b4fff]/25 font-bold'
                                                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                                                 }`}
                                             >
                                                 <span className="flex items-center gap-2">
-                                                    <TrophyIcon className="w-4 h-4" weight="bold" />
+                                                    <TrophyIcon className="w-4 h-4 transition-transform group-hover:scale-110" weight="bold" />
                                                     Class Leaderboard
                                                 </span>
-                                                <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                                <ChevronRight className="w-3.5 h-3.5 opacity-70 transition-transform group-hover:translate-x-0.5" />
                                             </button>
 
                                             <button
                                                 type="button"
                                                 onClick={() => setCanvasTab('profile')}
-                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group active:scale-[0.98] duration-200 ${
                                                     canvasTab === 'profile'
-                                                        ? 'bg-[#5b4fff] text-white shadow-sm'
+                                                        ? 'bg-[#5b4fff] text-white shadow-md shadow-[#5b4fff]/25 font-bold'
                                                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                                                 }`}
                                             >
                                                 <span className="flex items-center gap-2">
-                                                    <UsersIcon className="w-4 h-4" weight="bold" />
+                                                    <UsersIcon className="w-4 h-4 transition-transform group-hover:scale-110" weight="bold" />
                                                     Student Profile
                                                 </span>
-                                                <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                                <ChevronRight className="w-3.5 h-3.5 opacity-70 transition-transform group-hover:translate-x-0.5" />
                                             </button>
 
                                             <button
                                                 type="button"
                                                 onClick={() => setCanvasTab('analytics')}
-                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer group active:scale-[0.98] duration-200 ${
                                                     canvasTab === 'analytics'
-                                                        ? 'bg-[#5b4fff] text-white shadow-sm'
+                                                        ? 'bg-[#5b4fff] text-white shadow-md shadow-[#5b4fff]/25 font-bold'
                                                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                                                 }`}
                                             >
                                                 <span className="flex items-center gap-2">
-                                                    <BrainIcon className="w-4 h-4" weight="bold" />
+                                                    <BrainIcon className="w-4 h-4 transition-transform group-hover:scale-110" weight="bold" />
                                                     Skill Mastery
                                                 </span>
-                                                <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                                <ChevronRight className="w-3.5 h-3.5 opacity-70 transition-transform group-hover:translate-x-0.5" />
                                             </button>
                                         </div>
                                     </div>

@@ -115,7 +115,7 @@ function FriendProfileHeader({
                                     href={`https://leetcode.com/${profile.leetcodeUsername}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-zinc-900/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                                    className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-zinc-900/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800 micro-lift active:scale-95"
                                 >
                                     LC: @{profile.leetcodeUsername} ({lcSolved} solved • {lcRating > 0 ? `${lcRating} rating` : 'Unrated'}) <ExternalLink className="h-3 w-3 ml-1.5" />
                                 </a>
@@ -129,7 +129,7 @@ function FriendProfileHeader({
                                     href={`https://codeforces.com/profile/${profile.codeforcesHandle}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition-colors inline-flex items-center text-xs font-medium bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20"
+                                    className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition-all inline-flex items-center text-xs font-medium bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20 micro-lift active:scale-95"
                                 >
                                     CF: @{profile.codeforcesHandle} ({cfSolved} solved • {cfRating > 0 ? `${cfRating} rating` : 'Unrated'}) <ExternalLink className="h-3 w-3 ml-1.5" />
                                 </a>
@@ -242,7 +242,7 @@ function FriendAnalyticsSection({
                         <div className="flex flex-wrap gap-2.5">
                             {profile.skills && profile.skills.length > 0 ? (
                                 profile.skills.toSorted((a: SkillStat, b: SkillStat) => b.problemsSolved - a.problemsSolved).slice(0, 15).map((skill: SkillStat) => (
-                                    <div key={skill.tagName} className="flex items-center bg-zinc-100/70 dark:bg-zinc-900/40 rounded-xl px-3 py-1.5 border border-zinc-200 dark:border-zinc-800/60 shadow-xs">
+                                    <div key={skill.tagName} className="flex items-center bg-zinc-100/70 dark:bg-zinc-900/40 rounded-xl px-3 py-1.5 border border-zinc-200 dark:border-zinc-800/60 shadow-xs hover:scale-105 active:scale-95 transition-transform duration-150 cursor-default select-none">
                                         <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mr-2.5">{skill.tagName}</span>
                                         <span className="text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded-md">{skill.problemsSolved}</span>
                                     </div>
@@ -267,7 +267,7 @@ function FriendAnalyticsSection({
                             </p>
                             <div className="flex flex-wrap gap-2">
                                 {skillGaps.map((gap) => (
-                                    <div key={gap.name} className="flex items-center bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-1.5 shadow-xs">
+                                    <div key={gap.name} className="flex items-center bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-1.5 shadow-xs hover:scale-105 active:scale-95 transition-transform duration-150 cursor-default select-none">
                                         <span className="text-xs font-semibold text-rose-700 dark:text-rose-300 mr-2">{gap.name}</span>
                                         <span className="text-[10px] font-extrabold bg-rose-500/20 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded-md">
                                             {gap.count} solves

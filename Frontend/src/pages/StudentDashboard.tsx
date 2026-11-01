@@ -279,8 +279,8 @@ export function StudentDashboard() {
                         <ThemeToggle className="h-8.5 w-8.5 sm:h-9 sm:w-9" />
 
                         <div className="w-px h-6 bg-zinc-200 dark:bg-zinc-800 hidden sm:block mx-1" />
-                        <div className="flex items-center gap-2 sm:gap-3">
-                            <Avatar className="w-8 h-8 sm:w-9 sm:h-9 border border-zinc-200 dark:border-zinc-700">
+                        <div className="flex items-center gap-2 sm:gap-3 p-1 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors duration-200 cursor-default select-none group">
+                            <Avatar className="w-8 h-8 sm:w-9 sm:h-9 border border-zinc-200 dark:border-zinc-700 group-hover:ring-2 group-hover:ring-[#5b4fff]/40 transition-all duration-200">
                                 <AvatarImage src={dashboardData?.avatarUrl} />
                                 <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs sm:text-sm">{user?.name?.substring(0, 2) || 'ST'}</AvatarFallback>
                             </Avatar>

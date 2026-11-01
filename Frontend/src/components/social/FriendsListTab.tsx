@@ -677,7 +677,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                         {displayedFriends.map((friend) => (
                             <div
                                 key={friend.id}
-                                className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
+                                className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group micro-card hover:-translate-y-1"
                             >
                                 {/* Friend Card Header */}
                                 <div className="flex items-start justify-between gap-3">
