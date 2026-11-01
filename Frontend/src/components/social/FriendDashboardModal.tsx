@@ -87,7 +87,7 @@ function FriendProfileHeader({
                 <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
                     <Avatar className="w-16 h-16 sm:w-24 sm:h-24 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-full shrink-0">
                         <AvatarImage src={profile.avatarUrl} />
-                        <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] dark:text-[#968fff] text-xl sm:text-3xl font-bold">
+                        <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xl sm:text-3xl font-bold">
                             {profile.name?.substring(0, 2).toUpperCase() || 'FR'}
                         </AvatarFallback>
                     </Avatar>
@@ -101,10 +101,10 @@ function FriendProfileHeader({
                             </span>
                             {hasLinkedAccount && (
                                 <span
-                                    className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/25"
+                                    className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
                                     title="Verified Coding Platform Sync"
                                 >
-                                    <ShieldCheck className="w-3.5 h-3.5 text-[#5b4fff] dark:text-[#968fff]" />
+                                    <ShieldCheck className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                                     <span>Verified Sync</span>
                                 </span>
                             )}
@@ -115,7 +115,7 @@ function FriendProfileHeader({
                                     href={`https://leetcode.com/${profile.leetcodeUsername}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-zinc-600 dark:text-zinc-400 hover:text-[#5b4fff] dark:hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-zinc-900/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                                    className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white dark:hover:text-[#b4afff] transition-colors inline-flex items-center text-xs font-medium bg-zinc-100 dark:bg-zinc-900/60 px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800"
                                 >
                                     LC: @{profile.leetcodeUsername} ({lcSolved} solved • {lcRating > 0 ? `${lcRating} rating` : 'Unrated'}) <ExternalLink className="h-3 w-3 ml-1.5" />
                                 </a>
@@ -146,7 +146,7 @@ function FriendProfileHeader({
                 <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6 bg-zinc-50/80 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/60 shadow-inner w-full xl:w-auto">
                     <div className="text-center min-w-18">
                         <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">DevScore</p>
-                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#968fff]">{devScore}</p>
+                        <p className="text-2xl font-bold tabular-nums text-zinc-900 dark:text-white">{devScore}</p>
                         <p className={`text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded border inline-block mt-0.5 ${devScoreTier.badgeClass}`}>
                             {devScoreTier.tier}
                         </p>
@@ -164,7 +164,7 @@ function FriendProfileHeader({
                     </div>
                     <div className="text-center min-w-20">
                         <p className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 mb-1">Rating</p>
-                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#b4afff]">{maxRating > 0 ? maxRating : 'Unrated'}</p>
+                        <p className="text-2xl font-bold tabular-nums text-zinc-900 dark:text-white">{maxRating > 0 ? maxRating : 'Unrated'}</p>
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcRating > 0 ? lcRating : 'Unrated'} • CF: {cfRating > 0 ? cfRating : 'Unrated'}</p>
                     </div>
                     <div className="text-center min-w-17.5">
@@ -235,7 +235,7 @@ function FriendAnalyticsSection({
                 <Card className={cardClasses}>
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                         <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center">
-                            <BrainCircuit className="w-5 h-5 mr-2 text-[#5b4fff]" /> Top Skills & Mastered Topics
+                            <BrainCircuit className="w-5 h-5 mr-2 text-zinc-500 dark:text-zinc-400" /> Top Skills & Mastered Topics
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
@@ -244,7 +244,7 @@ function FriendAnalyticsSection({
                                 profile.skills.toSorted((a: SkillStat, b: SkillStat) => b.problemsSolved - a.problemsSolved).slice(0, 15).map((skill: SkillStat) => (
                                     <div key={skill.tagName} className="flex items-center bg-zinc-100/70 dark:bg-zinc-900/40 rounded-xl px-3 py-1.5 border border-zinc-200 dark:border-zinc-800/60 shadow-xs">
                                         <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mr-2.5">{skill.tagName}</span>
-                                        <span className="text-[11px] font-bold bg-[#5b4fff]/10 dark:bg-[#5b4fff]/20 text-[#5b4fff] dark:text-[#b4afff] px-2 py-0.5 rounded-md">{skill.problemsSolved}</span>
+                                        <span className="text-[11px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded-md">{skill.problemsSolved}</span>
                                     </div>
                                 ))
                             ) : (
@@ -335,7 +335,7 @@ function FriendAnalyticsSection({
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                         <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center justify-between">
                             <span className="flex items-center gap-2">
-                                <Swords className="w-5 h-5 text-[#5b4fff]" /> Head-to-Head Duel Record
+                                <Swords className="w-5 h-5 text-zinc-500 dark:text-zinc-400" /> Head-to-Head Duel Record
                             </span>
                             {totalMatches > 0 && (
                                 <span className="text-xs font-semibold text-zinc-500">
@@ -366,7 +366,7 @@ function FriendAnalyticsSection({
                                     onClose();
                                     onChallengePvp(profile.id!, profile.name);
                                 }}
-                                className="w-full bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl font-bold py-2.5 text-xs shadow-md hover:shadow-lg hover:shadow-[#5b4fff]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                                className="w-full bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl font-bold py-2.5 text-xs shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
                             >
                                 <Swords className="w-4 h-4" /> Challenge to PVP Duel
                             </Button>
@@ -380,7 +380,7 @@ function FriendAnalyticsSection({
                 <Card className={`flex flex-col ${cardClasses}`}>
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                         <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center">
-                            <ClockIcon className="w-5 h-5 mr-2 text-[#5b4fff]" /> Recent Activity
+                            <ClockIcon className="w-5 h-5 mr-2 text-zinc-500 dark:text-zinc-400" /> Recent Activity
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="flex-1 p-0 px-6 pb-6 pt-6">
@@ -426,7 +426,7 @@ function FriendAnalyticsSection({
                         <CardContent className="pt-6">
                             <div className="grid grid-cols-3 gap-3">
                                 {profile.badges.slice(0, 9).map((badge: Badge) => (
-                                    <div key={`${badge.title}-${badge.icon}`} className="aspect-square bg-zinc-100/80 dark:bg-zinc-900/40 rounded-xl flex items-center justify-center border border-zinc-200 dark:border-zinc-800/60 p-2 shadow-xs hover:border-[#5b4fff]/40 transition-all group" title={badge.title}>
+                                    <div key={`${badge.title}-${badge.icon}`} className="aspect-square bg-zinc-100/80 dark:bg-zinc-900/40 rounded-xl flex items-center justify-center border border-zinc-200 dark:border-zinc-800/60 p-2 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group" title={badge.title}>
                                         <img src={badge.icon.startsWith('http') ? badge.icon : `https://leetcode.com${badge.icon}`} alt="badge" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
                                     </div>
                                 ))}
@@ -465,12 +465,12 @@ function FriendPeerLearningSection({
     return (
         <div className="space-y-6">
             <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-3">
-                <span className="p-2 rounded-xl bg-[#5b4fff] text-white shrink-0 mt-0.5">
+                <span className="p-2 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-white shrink-0 mt-0.5">
                     <Lightbulb className="w-4 h-4" />
                 </span>
                 <div>
                     <p className="inline">
-                        <strong className="font-extrabold text-[#5b4fff] dark:text-[#968fff]">
+                        <strong className="font-extrabold text-zinc-900 dark:text-zinc-100">
                             Peer-to-Peer Learning Insight:{' '}
                         </strong>
                         Compare what your friend has mastered that you have not solved yet. Click on any problem to practice directly or challenge your friend to a 1v1 duel!
@@ -493,12 +493,12 @@ function FriendPeerLearningSection({
                 <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2">
-                            <BookOpen className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" />
+                            <BookOpen className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />
                             <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white">
                                 Solved by {profile.name.split(' ')[0]} (Learn from Friend)
                             </CardTitle>
                         </div>
-                        <span className="bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/25 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                        <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
                             {filteredFriendOnly.length} questions to try
                         </span>
                     </div>
@@ -517,7 +517,7 @@ function FriendPeerLearningSection({
                                 return (
                                     <div
                                         key={slug}
-                                        className="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800 flex items-center justify-between gap-2 hover:border-[#5b4fff]/40 hover:shadow-xs transition-all group"
+                                        className="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800 flex items-center justify-between gap-2 hover:border-zinc-300 dark:border-zinc-700 hover:shadow-xs transition-all group"
                                     >
                                         <a
                                             href={url}
@@ -533,7 +533,7 @@ function FriendPeerLearningSection({
                                             }`}>
                                                 {platform === 'LeetCode' ? 'LC' : 'CF'}
                                             </span>
-                                            <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-[#5b4fff] truncate">
+                                            <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:hover:text-white truncate">
                                                 {title}
                                             </span>
                                         </a>
@@ -543,7 +543,7 @@ function FriendPeerLearningSection({
                                                 href={url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="p-1 text-zinc-400 hover:text-[#5b4fff] transition-colors"
+                                                className="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                                                 title="Open problem in new tab"
                                             >
                                                 <ExternalLink className="w-3.5 h-3.5" />
@@ -556,7 +556,7 @@ function FriendPeerLearningSection({
                                                         onClose();
                                                         onChallengePvp(profile.id!, profile.name, title, url);
                                                     }}
-                                                    className="h-7 px-2 text-[10px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer"
+                                                    className="h-7 px-2 text-[10px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg cursor-pointer"
                                                 >
                                                     Duel
                                                 </Button>
@@ -605,7 +605,7 @@ function FriendPeerLearningSection({
                                             href={url}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="flex items-center gap-2 min-w-0 flex-1 hover:text-[#5b4fff]"
+                                            className="flex items-center gap-2 min-w-0 flex-1 hover:text-zinc-900 dark:hover:text-white"
                                         >
                                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
@@ -620,7 +620,7 @@ function FriendPeerLearningSection({
                                                 href={url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="text-zinc-400 hover:text-[#5b4fff] p-1"
+                                                className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1"
                                                 title="Open problem in new tab"
                                             >
                                                 <ExternalLink className="w-3.5 h-3.5" />
@@ -633,7 +633,7 @@ function FriendPeerLearningSection({
                                                         onClose();
                                                         onChallengePvp(profile.id!, profile.name, title, url);
                                                     }}
-                                                    className="h-7 px-2 text-[10px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer"
+                                                    className="h-7 px-2 text-[10px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg cursor-pointer"
                                                 >
                                                     Duel
                                                 </Button>
@@ -682,7 +682,7 @@ function FriendPeerLearningSection({
                                             href={url}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="flex items-center gap-2 min-w-0 flex-1 hover:text-[#5b4fff]"
+                                            className="flex items-center gap-2 min-w-0 flex-1 hover:text-zinc-900 dark:hover:text-white"
                                         >
                                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
                                                 platform === 'LeetCode'
@@ -700,7 +700,7 @@ function FriendPeerLearningSection({
                                                 href={url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="text-zinc-400 hover:text-[#5b4fff] p-1"
+                                                className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1"
                                                 title="Open problem in new tab"
                                             >
                                                 <ExternalLink className="w-3.5 h-3.5" />
@@ -713,7 +713,7 @@ function FriendPeerLearningSection({
                                                         onClose();
                                                         onChallengePvp(profile.id!, profile.name, title, url);
                                                     }}
-                                                    className="h-7 px-2 text-[10px] font-bold text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-lg cursor-pointer"
+                                                    className="h-7 px-2 text-[10px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg cursor-pointer"
                                                 >
                                                     Duel
                                                 </Button>
@@ -741,7 +741,7 @@ function FriendSubmissionsSection({ profile, cardClasses }: Readonly<FriendSubmi
             <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center">
-                        <ClockIcon className="w-5 h-5 mr-2 text-[#5b4fff]" /> Verified Submissions Catalog
+                        <ClockIcon className="w-5 h-5 mr-2 text-zinc-700 dark:text-zinc-300" /> Verified Submissions Catalog
                     </CardTitle>
                     <span className="text-xs text-zinc-400 font-medium">
                         {profile.recentSubmissions?.length || 0} Total Logged Submissions
@@ -772,7 +772,7 @@ function FriendSubmissionsSection({ profile, cardClasses }: Readonly<FriendSubmi
                                                     href={targetUrl}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className="text-xs font-bold text-zinc-900 dark:text-white hover:text-[#5b4fff] transition-colors truncate block"
+                                                    className="text-xs font-bold text-zinc-900 dark:text-white hover:text-zinc-900 dark:hover:text-white transition-colors truncate block"
                                                 >
                                                     {title}
                                                 </a>
@@ -859,11 +859,11 @@ function FriendCoderCardSection({
                 {/* Card Top Strip: Watermark & Verification */}
                 <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/80 pb-5">
                     <div className="flex items-center gap-2">
-                        <span className="p-2 rounded-xl bg-[#5b4fff]/15 text-[#5b4fff]">
+                        <span className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                             <IdCard className="w-5 h-5" />
                         </span>
                         <div>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-[#5b4fff]">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-300">
                                 Verified Developer Card
                             </span>
                             <p className="text-xs text-zinc-500 font-medium">Digital Algorithmic Portfolio</p>
@@ -878,9 +878,9 @@ function FriendCoderCardSection({
                 {/* Profile Identity Row */}
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                     <div className="relative">
-                        <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-3 border-[#5b4fff]/40 shadow-xl ring-4 ring-[#5b4fff]/10">
+                        <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-3 border-zinc-300 dark:border-zinc-700 shadow-xl ring-4 ring-zinc-200/50 dark:ring-zinc-800/50">
                             <AvatarImage src={profile.avatarUrl} />
-                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] text-2xl font-bold">
+                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-2xl font-bold">
                                 {profile.name?.substring(0, 2).toUpperCase() || 'FR'}
                             </AvatarFallback>
                         </Avatar>
@@ -919,8 +919,8 @@ function FriendCoderCardSection({
                 <div className="p-5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                            <ChartLineUp className="w-5 h-5 text-[#5b4fff]" />
-                            <span className="text-xs font-extrabold uppercase tracking-wider text-[#5b4fff]">
+                            <ChartLineUp className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
+                            <span className="text-xs font-extrabold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
                                 DevScore Composite Index
                             </span>
                         </div>
@@ -964,14 +964,14 @@ function FriendCoderCardSection({
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center justify-center gap-1">
                             <Trophy className="w-3.5 h-3.5 text-amber-500" /> Peak Rating
                         </p>
-                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#968fff] tracking-tight mt-1">
+                        <p className="text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-100 tracking-tight mt-1">
                             {maxRating > 0 ? maxRating : 'Unrated'}
                         </p>
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">LC: {lcRating || 'N/A'} · CF: {cfRating || 'N/A'}</p>
                     </div>
                     <div className="p-4 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">1v1 PvP Elo</p>
-                        <p className="text-2xl font-bold tabular-nums text-[#5b4fff] dark:text-[#968fff] tracking-tight mt-1">
+                        <p className="text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-100 tracking-tight mt-1">
                             {profile.pvpRating ?? 1200}
                         </p>
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">{profile.pvpWins || 0}W - {profile.pvpLosses || 0}L</p>
@@ -1019,7 +1019,7 @@ function FriendCoderCardSection({
                 {profile.skills && profile.skills.length > 0 && (
                     <div className="space-y-2.5">
                         <h4 className="text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                            <BrainCircuit className="w-4 h-4 text-[#5b4fff]" /> Top Algorithmic Competencies
+                            <BrainCircuit className="w-4 h-4 text-zinc-700 dark:text-zinc-300" /> Top Algorithmic Competencies
                         </h4>
                         <div className="flex flex-wrap gap-2">
                             {profile.skills
@@ -1031,7 +1031,7 @@ function FriendCoderCardSection({
                                         className="px-3 py-1 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-bold text-zinc-800 dark:text-zinc-200 shadow-xs flex items-center gap-1.5"
                                     >
                                         <span>{skill.tagName}</span>
-                                        <span className="text-[10px] text-[#5b4fff] font-bold">({skill.problemsSolved})</span>
+                                        <span className="text-[10px] text-zinc-700 dark:text-zinc-300 font-bold">({skill.problemsSolved})</span>
                                     </span>
                                 ))}
                         </div>
@@ -1064,7 +1064,7 @@ function FriendCoderCardSection({
                                 onClose();
                                 onChallengePvp(profile.id!, profile.name);
                             }}
-                            className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-9 px-4 cursor-pointer gap-2 shadow-xs"
+                            className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl text-xs font-bold h-9 px-4 cursor-pointer gap-2 shadow-xs"
                         >
                             <Swords className="w-4 h-4" />
                             <span>Challenge in 1v1 Arena</span>
@@ -1120,16 +1120,16 @@ function FriendComparativeSection({
                 <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
                     {/* You */}
                     <div className="flex items-center gap-4">
-                        <Avatar className="w-14 h-14 border-2 border-[#5b4fff] shadow-md shrink-0">
-                            <AvatarFallback className="bg-[#5b4fff]/15 text-[#5b4fff] font-bold">
+                        <Avatar className="w-14 h-14 border-2 border-zinc-800 dark:border-zinc-200 shadow-md shrink-0">
+                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold">
                                 You
                             </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#5b4fff]">You</span>
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">You</span>
                             <h3 className="text-base font-extrabold text-zinc-900 dark:text-white truncate">Your Standing</h3>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="font-black text-sm text-[#5b4fff]">{userDevScore} DevScore</span>
+                                <span className="font-black text-sm text-zinc-900 dark:text-white">{userDevScore} DevScore</span>
                                 <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${userTier.badgeClass}`}>
                                     {userTier.tier}
                                 </span>
@@ -1139,7 +1139,7 @@ function FriendComparativeSection({
 
                     {/* VS Arena Token */}
                     <div className="text-center space-y-1.5 py-2 px-4 rounded-2xl bg-white/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs">
-                        <div className="w-9 h-9 rounded-full bg-[#5b4fff] text-white flex items-center justify-center mx-auto shadow-md">
+                        <div className="w-9 h-9 rounded-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center mx-auto shadow-md">
                             <Swords className="w-4 h-4" />
                         </div>
                         <p className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-wider">
@@ -1171,7 +1171,7 @@ function FriendComparativeSection({
                         </div>
                         <Avatar className="w-14 h-14 border-2 border-zinc-300 dark:border-zinc-700 shadow-md shrink-0 order-1 md:order-2">
                             <AvatarImage src={profile.avatarUrl} />
-                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] font-bold">
+                            <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold">
                                 {profile.name?.substring(0, 2).toUpperCase() || 'FR'}
                             </AvatarFallback>
                         </Avatar>
@@ -1186,9 +1186,9 @@ function FriendComparativeSection({
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                         <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center justify-between">
                             <span className="flex items-center gap-2">
-                                <ChartLineUp className="w-4 h-4 text-[#5b4fff]" /> DevScore Composite Delta
+                                <ChartLineUp className="w-4 h-4 text-zinc-500 dark:text-zinc-400" /> DevScore Composite Delta
                             </span>
-                            <span className="text-[11px] font-bold text-[#5b4fff]">
+                            <span className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200">
                                 {userLeadsDevScore ? `+${devScoreDiff} in your favor` : `-${devScoreDiff} peer lead`}
                             </span>
                         </CardTitle>
@@ -1197,7 +1197,7 @@ function FriendComparativeSection({
                         <div className="space-y-1.5">
                             <div className="flex justify-between text-xs font-bold">
                                 <span>You ({userTier.tier})</span>
-                                <span className="font-semibold text-[#5b4fff]">{userDevScore} pts</span>
+                                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{userDevScore} pts</span>
                             </div>
                             <Progress value={Math.min(Math.max(((userDevScore - 500) / 400) * 100, 5), 100)} className="h-2.5 bg-zinc-200 dark:bg-zinc-800" />
                         </div>
@@ -1221,7 +1221,7 @@ function FriendComparativeSection({
                     <CardHeader className="border-b border-zinc-200/80 dark:border-zinc-800/60 pb-4">
                         <CardTitle className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center justify-between">
                             <span className="flex items-center gap-2">
-                                <BookOpen className="w-4 h-4 text-[#5b4fff]" /> Problem Overlap & Catalog Gap
+                                <BookOpen className="w-4 h-4 text-zinc-500 dark:text-zinc-400" /> Problem Overlap & Catalog Gap
                             </span>
                             <span className="text-[11px] font-bold text-zinc-500">
                                 {totalCatalog} Total Explored
@@ -1235,9 +1235,9 @@ function FriendComparativeSection({
                                 <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{mutualCount}</p>
                                 <p className="text-[9px] text-zinc-500 mt-0.5">Both Solved</p>
                             </div>
-                            <div className="p-3 rounded-xl bg-[#5b4fff]/10 border border-[#5b4fff]/25">
-                                <p className="text-[10px] font-bold text-[#5b4fff] dark:text-[#968fff]">Friend Only</p>
-                                <p className="text-xl font-black text-[#5b4fff] dark:text-[#968fff] mt-1">{friendOnlyCount}</p>
+                            <div className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                                <p className="text-[10px] font-bold text-zinc-700 dark:text-zinc-300">Friend Only</p>
+                                <p className="text-xl font-black text-zinc-900 dark:text-white mt-1">{friendOnlyCount}</p>
                                 <p className="text-[9px] text-zinc-500 mt-0.5">Learn from Peer</p>
                             </div>
                             <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25">
@@ -1256,7 +1256,7 @@ function FriendComparativeSection({
                                     size="sm"
                                     variant="outline"
                                     onClick={onSwitchToPeer}
-                                    className="h-7 text-[11px] font-bold rounded-lg cursor-pointer text-[#5b4fff] border-[#5b4fff]/30 hover:bg-[#5b4fff]/10"
+                                    className="h-7 text-[11px] font-bold rounded-lg cursor-pointer text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                 >
                                     Explore Gap List
                                 </Button>
@@ -1271,7 +1271,7 @@ function FriendComparativeSection({
             {/* Duel History & Action Prompt */}
             <div className="p-5 rounded-2xl bg-zinc-100/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <span className="p-2.5 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] shrink-0">
+                    <span className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 shrink-0">
                         <Scales className="w-5 h-5" />
                     </span>
                     <div>
@@ -1290,7 +1290,7 @@ function FriendComparativeSection({
                             onClose();
                             onChallengePvp(profile.id!, profile.name);
                         }}
-                        className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-9 px-4 cursor-pointer gap-2 shadow-xs shrink-0"
+                        className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl text-xs font-bold h-9 px-4 cursor-pointer gap-2 shadow-xs shrink-0"
                     >
                         <Swords className="w-4 h-4" />
                         <span>Launch 1v1 Challenge</span>
@@ -1441,7 +1441,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                         onClick={onClose}
                         className="bg-white dark:bg-[#18181b] border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all rounded-xl shadow-xs dark:shadow-md flex items-center gap-2 px-4 py-2 text-sm font-medium hover:-translate-x-0.5 cursor-pointer"
                     >
-                        <ArrowLeftIcon className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" weight="bold" />
+                        <ArrowLeftIcon className="w-4 h-4 text-zinc-900 dark:text-zinc-100" weight="bold" />
                         <span>Back to Friends Hub</span>
                     </Button>
 
@@ -1452,7 +1452,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                     onClose();
                                     onChallengePvp(profile.id!, profile.name);
                                 }}
-                                className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-semibold h-9 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5"
+                                className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl text-xs font-semibold h-9 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5"
                             >
                                 <Swords className="w-4 h-4 mr-1" />
                                 Challenge to Duel
@@ -1477,7 +1477,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                 {isLoading && (
                     <div className="py-24 flex items-center justify-center">
                         <div className="flex flex-col items-center">
-                            <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff] mb-4" />
+                            <Loader2 className="w-10 h-10 animate-spin text-zinc-500 mb-4" />
                             <p className="text-zinc-400 font-medium tracking-wide text-sm">Fetching friend profile...</p>
                         </div>
                     </div>
@@ -1523,9 +1523,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                 type="button"
                                 onClick={() => setActiveSection('coder-card')}
                                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-                                    activeSection === 'coder-card'
-                                        ? 'bg-[#5b4fff] text-white shadow-xs'
-                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60'
+                                    activeSection === 'coder-card' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60 border border-transparent'
                                 }`}
                             >
                                 <IdCard className="w-4 h-4" />
@@ -1535,9 +1533,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                 type="button"
                                 onClick={() => setActiveSection('compare')}
                                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-                                    activeSection === 'compare'
-                                        ? 'bg-[#5b4fff] text-white shadow-xs'
-                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60'
+                                    activeSection === 'compare' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60 border border-transparent'
                                 }`}
                             >
                                 <Scales className="w-4 h-4" />
@@ -1547,9 +1543,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                 type="button"
                                 onClick={() => setActiveSection('analytics')}
                                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-                                    activeSection === 'analytics'
-                                        ? 'bg-[#5b4fff] text-white shadow-xs'
-                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60'
+                                    activeSection === 'analytics' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60 border border-transparent'
                                 }`}
                             >
                                 <ChartLineIcon className="w-4 h-4" />
@@ -1560,16 +1554,14 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                 type="button"
                                 onClick={() => setActiveSection('peer')}
                                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-                                    activeSection === 'peer'
-                                        ? 'bg-[#5b4fff] text-white shadow-xs'
-                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60'
+                                    activeSection === 'peer' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60 border border-transparent'
                                 }`}
                             >
                                 <GraduationCap className="w-4 h-4" />
                                 <span>Peer Learning & Overlap</span>
                                 {comparison?.friendOnlySolved && comparison.friendOnlySolved.length > 0 && (
                                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
-                                        activeSection === 'peer' ? 'bg-white/20 text-white' : 'bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff]'
+                                        activeSection === 'peer' ? 'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
                                     }`}>
                                         {comparison.friendOnlySolved.length} new
                                     </span>
@@ -1580,9 +1572,7 @@ export function FriendDashboardModal({ friendId, open, onClose, onChallengePvp }
                                 type="button"
                                 onClick={() => setActiveSection('submissions')}
                                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-                                    activeSection === 'submissions'
-                                        ? 'bg-[#5b4fff] text-white shadow-xs'
-                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60'
+                                    activeSection === 'submissions' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-100/80 dark:bg-zinc-900/60 border border-transparent'
                                 }`}
                             >
                                 <ClockIcon className="w-4 h-4" />

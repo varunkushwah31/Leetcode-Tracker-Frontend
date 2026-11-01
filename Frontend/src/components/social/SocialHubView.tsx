@@ -169,13 +169,13 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
             {/* Social Hub Command Center Hero Bar */}
             <div className="relative overflow-hidden rounded-3xl bg-white/90 dark:bg-[#0c0c0e]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm dark:shadow-xl p-5 sm:p-6 transition-all duration-300">
                 {/* Decorative Subtle Gradient Glow Overlay */}
-                <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-linear-to-br from-[#5b4fff]/10 via-[#968fff]/5 to-transparent blur-3xl dark:from-[#5b4fff]/15" />
+                <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-linear-to-br from-zinc-500/5 via-zinc-400/5 to-transparent blur-3xl" />
                 <div className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-linear-to-tr from-amber-500/5 via-rose-500/5 to-transparent blur-3xl" />
 
                 <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                     {/* Title, Badge & Subtitle */}
                     <div className="flex items-start sm:items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-[#5b4fff] to-[#4335e6] text-white flex items-center justify-center shadow-md shadow-[#5b4fff]/25 shrink-0 ring-4 ring-[#5b4fff]/10">
+                        <div className="w-12 h-12 rounded-2xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center shadow-md shadow-zinc-900/10 dark:shadow-white/5 shrink-0 border border-zinc-800 dark:border-zinc-200 ring-4 ring-zinc-200/50 dark:ring-zinc-800/50">
                             {SHOW_PVP_DUELS ? <Swords className="w-6 h-6" /> : <Users className="w-6 h-6" />}
                         </div>
 
@@ -184,8 +184,8 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                                 <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
                                     {SHOW_PVP_DUELS ? 'Social Hub & Competitive Arena' : 'Social Hub & Community'}
                                 </h1>
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/20">
-                                    <Lightning className="w-3 h-3 text-[#5b4fff] dark:text-[#968fff]" />
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                                    <Lightning className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />
                                     {SHOW_PVP_DUELS ? 'Live Arena' : 'Community Hub'}
                                 </span>
                             </div>
@@ -206,7 +206,7 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             className="px-3.5 py-2 rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/60 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-2.5 text-xs transition-all cursor-pointer shadow-2xs group"
                             title="View Friends Network"
                         >
-                            <div className="w-6 h-6 rounded-lg bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <div className="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <Users className="w-3.5 h-3.5" />
                             </div>
                             <div className="text-left">
@@ -285,21 +285,22 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                 </div>
 
                 {/* Segmented Tab Navigation Bar */}
-                <div className="relative z-10 mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
+                <div className="relative z-10 mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
+                    <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 overflow-x-auto custom-scrollbar shadow-xs">
                     <button
                         type="button"
                         onClick={() => setActiveTab('friends')}
                         className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                             activeTab === 'friends'
-                                ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
                         }`}
                     >
-                        <Users className="w-4 h-4" />
+                        <Users className={`w-4 h-4 ${activeTab === 'friends' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
                         <span>Friends Network</span>
                         {friendsCount > 0 && (
                             <span className={`px-1.5 py-0.2 rounded-full text-[10px] tabular-nums font-bold ${
-                                activeTab === 'friends' ? 'bg-white/20 text-white' : 'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                                activeTab === 'friends' ? 'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100' : 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                             }`}>
                                 {friendsCount}
                             </span>
@@ -317,11 +318,11 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             onClick={() => setActiveTab('pvp')}
                             className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                                 activeTab === 'pvp'
-                                    ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
-                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
                             }`}
                         >
-                            <Swords className="w-4 h-4" />
+                            <Swords className={`w-4 h-4 ${activeTab === 'pvp' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
                             <span>PVP Duels</span>
                             {activeDuelsCount > 0 && (
                                 <span className={`px-2 py-0.2 rounded-full text-[10px] tabular-nums font-bold ${
@@ -338,11 +339,11 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                         onClick={() => setActiveTab('activity')}
                         className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                             activeTab === 'activity'
-                                ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
                         }`}
                     >
-                        <Activity className="w-4 h-4" />
+                        <Activity className={`w-4 h-4 ${activeTab === 'activity' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
                         <span>Activity Feed</span>
                     </button>
 
@@ -351,11 +352,11 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                         onClick={() => setActiveTab('leaderboard')}
                         className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                             activeTab === 'leaderboard'
-                                ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
-                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
                         }`}
                     >
-                        <Trophy className="w-4 h-4" />
+                        <Trophy className={`w-4 h-4 ${activeTab === 'leaderboard' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
                         <span>Friends Leaderboard</span>
                     </button>
 
@@ -365,14 +366,15 @@ export function SocialHubView({ initialTab = 'friends' }: Readonly<SocialHubView
                             onClick={() => setActiveTab('peer')}
                             className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                                 activeTab === 'peer'
-                                    ? 'bg-[#5b4fff] text-white shadow-sm shadow-[#5b4fff]/25 ring-2 ring-[#5b4fff]/20'
-                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs font-bold border border-zinc-200/70 dark:border-zinc-700/60'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent'
                             }`}
                         >
-                            <BookOpen className="w-4 h-4" />
+                            <BookOpen className={`w-4 h-4 ${activeTab === 'peer' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400'}`} />
                             <span>Peer Learning Hub</span>
                         </button>
                     )}
+                    </div>
                 </div>
             </div>
 

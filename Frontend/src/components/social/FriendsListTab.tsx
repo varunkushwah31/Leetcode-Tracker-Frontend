@@ -252,7 +252,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
 
     const renderSearchIndicator = () => {
         if (isSearching) {
-            return <Loader2 className="w-4 h-4 text-[#5b4fff] animate-spin absolute right-4 top-1/2 -translate-y-1/2" />;
+            return <Loader2 className="w-4 h-4 text-zinc-500 animate-spin absolute right-4 top-1/2 -translate-y-1/2" />;
         }
         if (searchQuery) {
             return (
@@ -299,7 +299,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
         return (
             <Button
                 size="sm"
-                className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl shadow-xs px-3 cursor-pointer"
+                className="h-8 text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl shadow-xs px-3 cursor-pointer"
                 onClick={() => handleSendRequest(searchUser.id)}
                 disabled={actionLoadingId === searchUser.id}
             >
@@ -379,7 +379,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center py-24 gap-3">
-                <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
+                <Loader2 className="w-10 h-10 animate-spin text-zinc-500" />
                 <p className="text-xs font-bold text-zinc-500">Loading your friends network...</p>
             </div>
         );
@@ -410,7 +410,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
             <div className="p-5 sm:p-6 rounded-3xl bg-white/90 dark:bg-[#0c0c0e]/85 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 shadow-sm relative overflow-hidden space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-[#5b4fff]/10 dark:bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff]">
+                        <div className="p-2.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
                             <UserPlus className="w-5 h-5" />
                         </div>
                         <div>
@@ -425,7 +425,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
 
                     {outgoingRequests.length > 0 && (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/60 self-start sm:self-auto shadow-2xs">
-                            <Send className="w-3.5 h-3.5 text-[#5b4fff]" />
+                            <Send className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                             <span><strong>{outgoingRequests.length}</strong> request{outgoingRequests.length > 1 ? 's' : ''} sent</span>
                         </span>
                     )}
@@ -438,7 +438,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                         placeholder="Search peers by name, handle, or email..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 pr-10 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 h-10 text-xs rounded-xl shadow-2xs focus-visible:ring-[#5b4fff]/30 transition-all"
+                        className="pl-10 pr-10 bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 h-10 text-xs rounded-xl shadow-2xs focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 transition-all"
                     />
                     {renderSearchIndicator()}
                 </div>
@@ -451,7 +451,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 <div className="flex items-center gap-3.5 min-w-0">
                                     <Avatar className="w-10 h-10 border border-zinc-200 dark:border-zinc-700 shrink-0 shadow-xs">
                                         <AvatarImage src={user.avatarUrl} />
-                                        <AvatarFallback className="bg-[#5b4fff]/10 text-[#5b4fff] text-xs font-bold">
+                                        <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold">
                                             {user.name.substring(0, 2)}
                                         </AvatarFallback>
                                     </Avatar>
@@ -542,7 +542,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                 {/* Friends Section Header & Filtering Toolbar */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
                             <Users className="w-4 h-4" />
                         </div>
                         <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -619,7 +619,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                         >
                             <SelectTrigger
                                 size="sm"
-                                className="h-8 px-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-colors gap-1.5 shadow-none focus-visible:ring-1 focus-visible:ring-[#5b4fff] cursor-pointer"
+                                className="h-8 px-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-colors gap-1.5 shadow-none focus-visible:ring-1 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600 cursor-pointer"
                                 aria-label="Sort friends by"
                             >
                                 <div className="flex items-center gap-1.5">
@@ -647,7 +647,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
 
                 {friends.length === 0 ? (
                     <div className="p-12 sm:p-16 rounded-3xl bg-white dark:bg-[#111114]/90 backdrop-blur-3xl border border-dashed border-zinc-300 dark:border-zinc-800 text-center space-y-4 shadow-xs">
-                        <div className="w-14 h-14 rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center mx-auto shadow-inner">
+                        <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 flex items-center justify-center mx-auto shadow-inner">
                             <Users className="w-7 h-7" />
                         </div>
                         <div className="space-y-1.5 max-w-md mx-auto">
@@ -663,7 +663,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 const inputEl = document.querySelector('input[placeholder*="Search peers"]') as HTMLInputElement;
                                 inputEl?.focus();
                             }}
-                            className="bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl text-xs font-bold h-9.5 px-4 shadow-sm cursor-pointer"
+                            className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl text-xs font-bold h-9.5 px-4 shadow-sm cursor-pointer"
                         >
                             <Search className="w-3.5 h-3.5 mr-1.5" /> Search & Add Peers
                         </Button>
@@ -677,13 +677,13 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                         {displayedFriends.map((friend) => (
                             <div
                                 key={friend.id}
-                                className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 hover:border-[#5b4fff]/50 hover:shadow-xl hover:shadow-[#5b4fff]/5 transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
+                                className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#111114]/90 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
                             >
                                 {/* Friend Card Header */}
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3.5 min-w-0">
                                         <div className="relative shrink-0">
-                                            <Avatar className="w-13 h-13 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm ring-2 ring-[#5b4fff]/10">
+                                            <Avatar className="w-13 h-13 border-2 border-zinc-200 dark:border-zinc-700 shadow-sm ring-2 ring-zinc-200/60 dark:ring-zinc-800/80">
                                                 <AvatarImage src={friend.avatarUrl} className="object-cover" />
                                                 <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-sm">
                                                     {friend.name.substring(0, 2)}
@@ -712,7 +712,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                                 <button
                                                     type="button"
                                                     onClick={() => onViewDashboard(friend.id)}
-                                                    className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight truncate group-hover:text-[#5b4fff] transition-colors text-left block cursor-pointer"
+                                                    className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors text-left block cursor-pointer"
                                                 >
                                                     {friend.name}
                                                 </button>
@@ -739,7 +739,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 <div className="rounded-2xl bg-zinc-50/90 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800/60 p-3 space-y-2.5 shadow-2xs">
                                     <div className="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
                                         <div className="flex items-center gap-1.5">
-                                            <ChartLineUp className="w-3.5 h-3.5 text-[#5b4fff]" />
+                                            <ChartLineUp className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                                             <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">DevScore</span>
                                             <span className="text-zinc-900 dark:text-zinc-100 font-bold text-sm ml-1">{friend.devScore ?? friend.cScore ?? 500}</span>
                                         </div>
@@ -770,7 +770,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                 {SHOW_PVP_DUELS && (
                                 <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 px-1">
                                     <span className="flex items-center gap-1 font-medium">
-                                        <Swords className="w-3.5 h-3.5 text-[#5b4fff]" />
+                                        <Swords className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                                         <span>vs You:</span>
                                     </span>
                                     <span className="font-semibold">
@@ -799,7 +799,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                                 size="sm"
                                                 disabled={!isFriendOnline(friend) || isFriendBusy(friend)}
                                                 title={getDuelButtonTitle(friend)}
-                                                className="h-9 text-xs font-bold rounded-xl bg-[#5b4fff] hover:bg-[#4d40ef] text-white cursor-pointer gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#5b4fff]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="h-9 text-xs font-bold rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 cursor-pointer gap-1.5 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                                 onClick={() => onChallengePvp(friend.id, friend.name)}
                                             >
                                                 <Swords className="w-3.5 h-3.5" />
@@ -822,8 +822,8 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
 
                         {/* Companion "Grow Your Network" Card */}
                         {friends.length < 3 && (
-                            <div className="p-6 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800/90 hover:border-[#5b4fff]/40 dark:hover:border-[#5b4fff]/40 transition-colors flex flex-col justify-between items-center text-center space-y-4 bg-zinc-50/50 dark:bg-zinc-900/20">
-                                <div className="w-12 h-12 rounded-2xl bg-[#5b4fff]/10 text-[#5b4fff] flex items-center justify-center mt-2 shadow-inner">
+                            <div className="p-6 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800/90 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors flex flex-col justify-between items-center text-center space-y-4 bg-zinc-50/50 dark:bg-zinc-900/20">
+                                <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center mt-2 shadow-inner">
                                     <UserPlus className="w-6 h-6" />
                                 </div>
                                 <div className="space-y-1">
@@ -842,9 +842,9 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                                         const inputEl = document.querySelector('input[type="text"]') as HTMLInputElement;
                                         inputEl?.focus();
                                     }}
-                                    className="h-9 px-4 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:border-[#5b4fff] cursor-pointer gap-1.5"
+                                    className="h-9 px-4 text-xs font-bold rounded-xl border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600 cursor-pointer gap-1.5"
                                 >
-                                    <Search className="w-3.5 h-3.5 text-[#5b4fff]" /> Find Peers
+                                    <Search className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" /> Find Peers
                                 </Button>
                             </div>
                         )}
@@ -872,7 +872,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                             <div className="flex items-center gap-3 min-w-0">
                                 <Avatar className="w-10 h-10 border border-zinc-200 dark:border-zinc-700 shrink-0">
                                     <AvatarImage src={friendToRemove.avatarUrl} />
-                                    <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-[#5b4fff] font-bold text-xs">
+                                    <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs">
                                         {friendToRemove.name?.substring(0, 2).toUpperCase() || 'FR'}
                                     </AvatarFallback>
                                 </Avatar>
@@ -887,7 +887,7 @@ export function FriendsListTab({ onViewDashboard, onChallengePvp }: Readonly<Fri
                             </div>
 
                             <div className="shrink-0 text-right">
-                                <span className="text-xs font-bold text-[#5b4fff] dark:text-[#968fff]">
+                                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                                     {friendToRemove.devScore ?? friendToRemove.cScore ?? 500} DevScore
                                 </span>
                                 <p className="text-[10px] text-zinc-400 mt-0.5">

@@ -22,14 +22,14 @@ export function getDevScoreTier(score = 500): DevScoreTier {
     if (score >= 680) {
         return {
             tier: 'Expert',
-            badgeClass: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30',
+            badgeClass: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700',
             description: 'Proven algorithmic skill with strong contest performance'
         };
     }
     if (score >= 620) {
         return {
             tier: 'Advanced',
-            badgeClass: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30',
+            badgeClass: 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700',
             description: 'Consistent problem solver with solid contest foundations'
         };
     }

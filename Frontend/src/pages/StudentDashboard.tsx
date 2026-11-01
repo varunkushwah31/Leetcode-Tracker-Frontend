@@ -173,7 +173,7 @@ export function StudentDashboard() {
             <div className="flex min-h-screen items-center justify-center bg-[#f1f3f7] dark:bg-[#0a0a0a] relative overflow-hidden">
                 <DottedBackground />
                 <div className="flex flex-col items-center space-y-4 relative z-10">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
+                    <Loader2 className="w-10 h-10 animate-spin text-zinc-500" />
                     <p className="font-medium text-zinc-600 dark:text-zinc-400">Loading your stats...</p>
                 </div>
             </div>
@@ -242,7 +242,7 @@ export function StudentDashboard() {
                                         : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                 }`}
                             >
-                                <Users className={`w-3.5 h-3.5 ${mainTab === 'social' ? 'text-[#5b4fff]' : ''}`} /> {SHOW_PVP_DUELS ? 'Social Hub & PVP' : 'Social Hub'}
+                                <Users className="w-3.5 h-3.5" /> {SHOW_PVP_DUELS ? 'Social Hub & PVP' : 'Social Hub'}
                             </button>
                         </div>
                     </div>
@@ -258,12 +258,12 @@ export function StudentDashboard() {
                             title="Sync Profile"
                             aria-label="Sync Profile"
                         >
-                            {isSyncing ? <Loader2 className="w-4 h-4 animate-spin text-[#5b4fff]" /> : <Activity className="w-4 h-4 text-[#5b4fff] dark:text-[#968fff]" />}
+                            {isSyncing ? <Loader2 className="w-4 h-4 animate-spin text-zinc-500" /> : <Activity className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />}
                         </Button>
 
                         {/* Desktop Action Buttons */}
                         <Button variant="outline" className="hidden sm:flex border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer text-xs font-semibold h-10 px-3.5" onClick={handleExportReport} disabled={isExporting}>
-                            {isExporting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-zinc-500" /> : <Download className="w-4 h-4 mr-1.5 text-[#5b4fff] dark:text-[#968fff]" />}
+                            {isExporting ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-zinc-500" /> : <Download className="w-4 h-4 mr-1.5 text-zinc-500 dark:text-zinc-400" />}
                             <span>Export Report (CSV)</span>
                         </Button>
 
@@ -272,7 +272,7 @@ export function StudentDashboard() {
                             <span>Sync Profile</span>
                         </Button>
 
-                        <Link to="/contact" className="hidden md:inline-flex items-center text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-[#5b4fff] transition-colors">
+                        <Link to="/contact" className="hidden md:inline-flex items-center text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
                             Help
                         </Link>
 
@@ -319,9 +319,9 @@ export function StudentDashboard() {
 
                 {/* Onboarding Banner for students registering via OAuth without handles */}
                 {dashboardData && !dashboardData.leetcodeUsername && !dashboardData.codeforcesHandle && (
-                    <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-indigo-50/90 dark:bg-[#5b4fff]/10 border border-indigo-200/80 dark:border-[#5b4fff]/20 text-zinc-900 dark:text-zinc-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="flex items-start sm:items-center gap-3">
-                            <div className="p-2.5 rounded-xl bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] shrink-0 mt-0.5 sm:mt-0">
+                            <div className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 shrink-0 mt-0.5 sm:mt-0">
                                 <CodeIcon className="w-5 h-5" weight="bold" />
                             </div>
                             <div>
@@ -356,7 +356,7 @@ export function StudentDashboard() {
                                 : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
                         }`}
                     >
-                        <Users className={`w-3.5 h-3.5 ${mainTab === 'social' ? 'text-[#5b4fff]' : ''}`} /> {SHOW_PVP_DUELS ? 'Social Hub & PVP' : 'Social Hub'}
+                        <Users className="w-3.5 h-3.5" /> {SHOW_PVP_DUELS ? 'Social Hub & PVP' : 'Social Hub'}
                     </button>
                 </div>
 
@@ -624,7 +624,7 @@ export function StudentDashboard() {
 
             {/* Footer with Contact Us */}
             <footer className="max-w-360 w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-zinc-200 dark:border-zinc-800 mt-auto flex justify-center">
-                <a href="/contact" className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-[#5b4fff] transition-colors">
+                <a href="/contact" className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
                     Need Help? Contact Us
                 </a>
             </footer>

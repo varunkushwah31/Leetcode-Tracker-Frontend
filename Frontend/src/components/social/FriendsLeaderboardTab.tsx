@@ -157,7 +157,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
-                        <Swords className="w-3.5 h-3.5 text-[#5b4fff]" /> PVP Duels
+                        <Swords className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" /> PVP Duels
                     </button>
                     )}
                 </div>
@@ -165,7 +165,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
 
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-3">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#5b4fff]" />
+                    <Loader2 className="w-10 h-10 animate-spin text-zinc-500" />
                     <p className="text-xs font-bold text-zinc-500">Updating leaderboard standings...</p>
                 </div>
             ) : entries.length === 0 ? (
@@ -224,7 +224,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             variant="outline"
                                             size="sm"
                                             onClick={() => onViewDashboard(topThree[0].studentId)}
-                                            className="h-8.5 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            className="h-8.5 text-xs font-bold border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 shadow-xs rounded-xl cursor-pointer"
                                             title="View standing notice"
                                         >
                                             <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
@@ -243,7 +243,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
-                                                    className="h-8.5 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1.5"
+                                                    className="h-8.5 text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl cursor-pointer shadow-xs gap-1.5"
                                                 >
                                                     <Swords className="w-3.5 h-3.5" /> Duel
                                                 </Button>
@@ -270,7 +270,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                 </Avatar>
                                 <div>
                                     <p className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
-                                        {topThree[1].name} {topThree[1].isCurrentUser && <span className="text-[#5b4fff] font-bold text-xs ml-1">(You)</span>}
+                                        {topThree[1].name} {topThree[1].isCurrentUser && <span className="text-zinc-500 dark:text-zinc-400 font-bold text-xs ml-1">(You)</span>}
                                     </p>
                                     <p className="text-xs text-zinc-400 truncate mt-0.5">
                                         @{topThree[1].leetcodeUsername || topThree[1].codeforcesHandle || 'coder'}
@@ -285,7 +285,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             variant="outline"
                                             size="sm"
                                             onClick={() => onViewDashboard(topThree[1].studentId)}
-                                            className="h-8.5 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            className="h-8.5 text-xs font-bold border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 shadow-xs rounded-xl cursor-pointer"
                                             title="View standing notice"
                                         >
                                             <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
@@ -304,7 +304,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[1].studentId, topThree[1].name)}
-                                                    className="h-8.5 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                    className="h-8.5 text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl cursor-pointer shadow-xs gap-1"
                                                 >
                                                     <Swords className="w-3 h-3" /> Duel
                                                 </Button>
@@ -333,7 +333,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         <Star className="w-4 h-4 text-amber-500 shrink-0" weight="fill" />
                                     </div>
                                     {topThree[0].isCurrentUser && (
-                                        <span className="text-[#5b4fff] text-xs font-bold">(You)</span>
+                                        <span className="text-zinc-500 dark:text-zinc-400 text-xs font-bold">(You)</span>
                                     )}
                                     <p className="text-xs text-zinc-500 truncate mt-0.5">
                                         @{topThree[0].leetcodeUsername || topThree[0].codeforcesHandle || 'champion'}
@@ -348,7 +348,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             variant="outline"
                                             size="sm"
                                             onClick={() => onViewDashboard(topThree[0].studentId)}
-                                            className="h-8.5 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            className="h-8.5 text-xs font-bold border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 shadow-xs rounded-xl cursor-pointer"
                                             title="View standing notice"
                                         >
                                             <Eye className="w-3.5 h-3.5 mr-1.5" /> Your Standing
@@ -367,7 +367,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
-                                                    className="h-8.5 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                    className="h-8.5 text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl cursor-pointer shadow-xs gap-1"
                                                 >
                                                     <Swords className="w-3 h-3" /> Duel
                                                 </Button>
@@ -394,7 +394,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                 </Avatar>
                                 <div>
                                     <p className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
-                                        {topThree[1].name} {topThree[1].isCurrentUser && <span className="text-[#5b4fff] text-xs font-bold">(You)</span>}
+                                        {topThree[1].name} {topThree[1].isCurrentUser && <span className="text-zinc-500 dark:text-zinc-400 text-xs font-bold">(You)</span>}
                                     </p>
                                     <p className="text-xs text-zinc-400 truncate mt-0.5">
                                         @{topThree[1].leetcodeUsername || topThree[1].codeforcesHandle || 'coder'}
@@ -409,7 +409,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             variant="outline"
                                             size="sm"
                                             onClick={() => onViewDashboard(topThree[1].studentId)}
-                                            className="h-8 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            className="h-8 text-xs font-bold border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 shadow-xs rounded-xl cursor-pointer"
                                             title="View standing notice"
                                         >
                                             <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
@@ -428,7 +428,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[1].studentId, topThree[1].name)}
-                                                    className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                    className="h-8 text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl cursor-pointer shadow-xs gap-1"
                                                 >
                                                     <Swords className="w-3 h-3" /> Duel
                                                 </Button>
@@ -457,7 +457,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                         <Star className="w-4 h-4 text-amber-500 shrink-0" weight="fill" />
                                     </div>
                                     {topThree[0].isCurrentUser && (
-                                        <span className="text-[#5b4fff] text-xs font-bold">(You)</span>
+                                        <span className="text-zinc-500 dark:text-zinc-400 text-xs font-bold">(You)</span>
                                     )}
                                     <p className="text-xs text-zinc-500 truncate mt-0.5">
                                         @{topThree[0].leetcodeUsername || topThree[0].codeforcesHandle || 'champion'}
@@ -472,7 +472,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             variant="outline"
                                             size="sm"
                                             onClick={() => onViewDashboard(topThree[0].studentId)}
-                                            className="h-8.5 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            className="h-8.5 text-xs font-bold border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 shadow-xs rounded-xl cursor-pointer"
                                             title="View standing notice"
                                         >
                                             <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
@@ -491,7 +491,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[0].studentId, topThree[0].name)}
-                                                    className="h-8.5 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                    className="h-8.5 text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl cursor-pointer shadow-xs gap-1"
                                                 >
                                                     <Swords className="w-3 h-3" /> Duel
                                                 </Button>
@@ -514,7 +514,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                 </Avatar>
                                 <div>
                                     <p className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
-                                        {topThree[2].name} {topThree[2].isCurrentUser && <span className="text-[#5b4fff] text-xs font-bold">(You)</span>}
+                                        {topThree[2].name} {topThree[2].isCurrentUser && <span className="text-zinc-500 dark:text-zinc-400 text-xs font-bold">(You)</span>}
                                     </p>
                                     <p className="text-xs text-zinc-400 truncate mt-0.5">
                                         @{topThree[2].leetcodeUsername || topThree[2].codeforcesHandle || 'coder'}
@@ -529,7 +529,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             variant="outline"
                                             size="sm"
                                             onClick={() => onViewDashboard(topThree[2].studentId)}
-                                            className="h-8 text-xs font-bold border-[#5b4fff]/40 bg-[#5b4fff]/10 text-[#5b4fff] dark:text-[#968fff] hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer"
+                                            className="h-8 text-xs font-bold border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 shadow-xs rounded-xl cursor-pointer"
                                             title="View standing notice"
                                         >
                                             <Eye className="w-3.5 h-3.5 mr-1" /> Your Standing
@@ -548,7 +548,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onChallengePvp(topThree[2].studentId, topThree[2].name)}
-                                                    className="h-8 text-xs font-bold bg-[#5b4fff] hover:bg-[#4d40ef] text-white rounded-xl cursor-pointer shadow-xs gap-1"
+                                                    className="h-8 text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 rounded-xl cursor-pointer shadow-xs gap-1"
                                                 >
                                                     <Swords className="w-3 h-3" /> Duel
                                                 </Button>
@@ -565,7 +565,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                         {/* Table Search & Filter Bar */}
                         <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/50 dark:bg-zinc-900/30">
                             <div className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-[#5b4fff]" />
+                                <Users className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                                 <span className="text-xs font-extrabold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
                                     Network Standings ({filteredEntries.length})
                                 </span>
@@ -603,7 +603,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                             key={e.studentId}
                                             className={`transition-colors ${
                                                 e.isCurrentUser
-                                                    ? 'bg-[#5b4fff]/5 dark:bg-[#5b4fff]/10 font-bold border-l-4 border-l-[#5b4fff]'
+                                                    ? 'bg-zinc-100/70 dark:bg-zinc-800/40 font-bold border-l-4 border-l-zinc-900 dark:border-l-zinc-100'
                                                     : 'hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40'
                                             }`}
                                         >
@@ -639,7 +639,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                                 {e.name}
                                                             </span>
                                                             {e.isCurrentUser && (
-                                                                <Badge className="bg-[#5b4fff]/15 text-[#5b4fff] dark:text-[#968fff] border border-[#5b4fff]/25 text-[9px] font-bold px-1.5 py-0">
+                                                                <Badge className="bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-600 text-[9px] font-bold px-1.5 py-0">
                                                                     You
                                                                 </Badge>
                                                             )}
@@ -653,7 +653,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
 
                                             <td className="py-4 px-5 text-center">
                                                 <div className="inline-flex flex-col items-center">
-                                                    <span className="font-bold text-sm text-[#5b4fff] dark:text-[#968fff]">
+                                                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
                                                         {e.devScore ?? e.cScore ?? 500}
                                                     </span>
                                                     <span className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded border ${getDevScoreTier(e.devScore ?? e.cScore).badgeClass}`}>
@@ -714,7 +714,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => onViewDashboard(e.studentId)}
-                                                        className="h-8 px-3 text-xs font-bold text-[#5b4fff] bg-[#5b4fff]/10 hover:bg-[#5b4fff]/20 rounded-xl cursor-pointer gap-1.5"
+                                                        className="h-8 px-3 text-xs font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 rounded-xl cursor-pointer gap-1.5"
                                                         title="View standing notice"
                                                     >
                                                         <Eye className="w-3.5 h-3.5" />
@@ -726,7 +726,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => onViewDashboard(e.studentId)}
-                                                            className="h-8 px-2.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-[#5b4fff] hover:bg-[#5b4fff]/10 rounded-xl cursor-pointer gap-1.5"
+                                                            className="h-8 px-2.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl cursor-pointer gap-1.5"
                                                         >
                                                             <Eye className="w-3.5 h-3.5" />
                                                             <span>Profile</span>
@@ -736,7 +736,7 @@ export function FriendsLeaderboardTab({ onViewDashboard, onChallengePvp }: Reado
                                                                 variant="outline"
                                                                 size="sm"
                                                                 onClick={() => onChallengePvp(e.studentId, e.name)}
-                                                                className="h-8 px-2.5 text-xs font-semibold border-zinc-200 dark:border-zinc-700 hover:border-[#5b4fff] hover:text-[#5b4fff] text-zinc-700 dark:text-zinc-300 rounded-xl cursor-pointer gap-1"
+                                                                className="h-8 px-2.5 text-xs font-semibold border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-900 dark:hover:text-white text-zinc-700 dark:text-zinc-300 rounded-xl cursor-pointer gap-1"
                                                             >
                                                                 <Swords className="w-3 h-3" />
                                                                 <span>Duel</span>
