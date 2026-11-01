@@ -802,10 +802,6 @@ export function LandingPage() {
 
     useEffect(() => {
         if (isAuthenticated && user?.role === 'STUDENT') {
-            const cached = localStorage.getItem('userAvatar');
-            if (cached) {
-                setAvatarUrl(cached);
-            }
             StudentService.getDashboard()
                 .then((res) => {
                     if (res.data?.avatarUrl) {
@@ -955,7 +951,7 @@ export function LandingPage() {
                                             {(user?.name || 'U').substring(0, 2).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <span className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors max-w-[140px] truncate leading-tight">
+                                    <span className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors max-w-35 truncate leading-tight">
                                         {user?.name || 'Account'}
                                     </span>
                                 </Link>
@@ -1007,7 +1003,7 @@ export function LandingPage() {
                                         {(user?.name || 'U').substring(0, 2).toUpperCase()}
                                     </AvatarFallback>
                                 </Avatar>
-                                <span className="text-zinc-900 dark:text-white max-w-[90px] truncate">
+                                <span className="text-zinc-900 dark:text-white max-w-22.5 truncate">
                                     {user?.name || 'Account'}
                                 </span>
                             </Link>

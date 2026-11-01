@@ -526,7 +526,7 @@ export function MentorDashboard() {
             {/* Main Content */}
             <main
                 ref={mainContentRef}
-                tabIndex={0}
+
                 aria-label="Mentor dashboard content"
                 className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative bg-[#f1f3f7] dark:bg-[#0a0a0a] flex flex-col w-full min-w-0 focus:outline-none"
             >

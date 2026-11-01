@@ -17,6 +17,10 @@ WORKDIR /app
 # Copy the built jar from Stage 1
 COPY --from=build /app/target/*.jar app.jar
 
+# Run as non-root user for security best practices
+RUN groupadd -r appuser && useradd -r -g appuser appuser && chown -R appuser:appuser /app
+USER appuser
+
 # Render assigns PORT dynamically; default to 8080
 ENV PORT=8080
 EXPOSE 8080

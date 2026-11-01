@@ -100,7 +100,7 @@ export function ClassroomList({
                                     <div className="w-full bg-zinc-200 dark:bg-zinc-800/80 rounded-full h-1.5 mt-2.5 overflow-hidden">
                                         <div
                                             className={`h-full rounded-full transition-all duration-300 ${
-                                                pct === 100 ? 'bg-emerald-500' : isSelected ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-emerald-600 dark:bg-emerald-500'
+                                                pct === 100 ? 'bg-emerald-500' : 'bg-emerald-600 dark:bg-emerald-500'
                                             }`}
                                             style={{ width: `${pct}%` }}
                                         />

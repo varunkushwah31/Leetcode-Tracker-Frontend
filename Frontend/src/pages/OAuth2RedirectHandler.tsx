@@ -20,7 +20,7 @@ export const OAuth2RedirectHandler: React.FC = () => {
 
     if (error) {
       const decodedError = decodeURIComponent(error);
-      navigate('/login', {
+      void navigate('/login', {
         replace: true,
         state: { error: decodedError }
       });
@@ -28,7 +28,7 @@ export const OAuth2RedirectHandler: React.FC = () => {
     }
 
     if (!token) {
-      navigate('/login', {
+      void navigate('/login', {
         replace: true,
         state: { error: 'No authentication token received from social login.' }
       });
@@ -42,10 +42,10 @@ export const OAuth2RedirectHandler: React.FC = () => {
         role: (role as Role) || undefined,
       });
 
-      navigate('/dashboard', { replace: true });
+      void navigate('/dashboard', { replace: true });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to finalize social authentication.';
-      navigate('/login', {
+      void navigate('/login', {
         replace: true,
         state: { error: message }
       });

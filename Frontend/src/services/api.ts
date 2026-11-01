@@ -99,7 +99,8 @@ function extractErrorMessage(error: AxiosError<{ message?: string; validationErr
         if (data && typeof data === 'object' && data.message) {
             return data.message;
         }
-        return `Rate limit exceeded. Please wait ${retryAfter ? `${retryAfter} seconds` : 'a few moments'} before trying again.`;
+        const waitTime = retryAfter ? `${retryAfter} seconds` : 'a few moments';
+        return `Rate limit exceeded. Please wait ${waitTime} before trying again.`;
     }
 
     // Structured server error response
@@ -147,9 +148,14 @@ async function handle401Refresh(originalRequest: RetryableRequest) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
         
-        const currentPath = typeof window !== 'undefined'
-            ? (window.location.pathname.replace(/\/+$/, '') || '/')
-            : '';
+        const rawPath = typeof window !== 'undefined' ? window.location.pathname : '';
+        let currentPath = rawPath;
+        while (currentPath.endsWith('/') && currentPath.length > 1) {
+            currentPath = currentPath.slice(0, -1);
+        }
+        if (!currentPath && typeof window !== 'undefined') {
+            currentPath = '/';
+        }
         const isAuthPage = currentPath === '/login' || currentPath === '/register';
 
         if (typeof window !== 'undefined' && !isAuthPage && !isAuthEndpoint(originalRequest.url)) {

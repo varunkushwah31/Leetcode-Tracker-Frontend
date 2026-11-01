@@ -21,7 +21,7 @@ export function formatProblemTitle(rawSlug?: string | null): string {
     if (!slug) return 'Untitled Problem';
 
     // 1. Detect Codeforces problem ID format (e.g. "282a", "1915C", "71A")
-    if (/^\d{1,5}[a-zA-Z]\d?$/i.test(slug)) {
+    if (/^\d{1,5}[a-z]\d?$/i.test(slug)) {
         return slug.toUpperCase();
     }
 
@@ -46,7 +46,7 @@ export function formatProblemTitle(rawSlug?: string | null): string {
     // 3. CamelCase or PascalCase (e.g. "TwoSum", "findTargetIndices")
     const camelSplit = slug
         .replace(/([a-z])([A-Z])/g, '$1 $2')
-        .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+        .replace(/([A-Z])(?=[A-Z][a-z])/g, '$1 ');
     if (camelSplit.includes(' ')) {
         return camelSplit
             .split(' ')
@@ -75,7 +75,7 @@ export function getProblemPlatform(rawSlug?: string | null): { platform: 'LeetCo
     const slug = rawSlug.trim();
 
     // Codeforces check: e.g. "282a", "1915C"
-    const cfMatch = slug.match(/^(\d{1,5})([a-zA-Z]\d?)$/i);
+    const cfMatch = /^(\d{1,5})([a-z]\d?)$/i.exec(slug);
     if (cfMatch) {
         const contestId = cfMatch[1];
         const problemIndex = cfMatch[2].toUpperCase();
@@ -86,7 +86,13 @@ export function getProblemPlatform(rawSlug?: string | null): { platform: 'LeetCo
     }
 
     // LeetCode slug
-    const cleanLcSlug = slug.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
+    let cleanLcSlug = slug.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    while (cleanLcSlug.startsWith('-')) {
+        cleanLcSlug = cleanLcSlug.slice(1);
+    }
+    while (cleanLcSlug.endsWith('-')) {
+        cleanLcSlug = cleanLcSlug.slice(0, -1);
+    }
     return {
         platform: 'LeetCode',
         url: `https://leetcode.com/problems/${cleanLcSlug}/`

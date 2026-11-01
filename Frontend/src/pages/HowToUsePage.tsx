@@ -141,7 +141,7 @@ https://codeforces.com/profile/petr`;
                                         {(user?.name || 'U').substring(0, 2).toUpperCase()}
                                     </div>
                                     <div className="hidden lg:flex flex-col">
-                                        <span className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors max-w-[120px] truncate leading-tight">
+                                        <span className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-[#5b4fff] dark:group-hover:text-[#968fff] transition-colors max-w-30 truncate leading-tight">
                                             {user?.name || 'Account'}
                                         </span>
                                         <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 leading-tight">

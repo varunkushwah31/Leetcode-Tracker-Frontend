@@ -485,7 +485,7 @@ public class SocialService {
 
     private String toKebabSlug(String text) {
         if (text == null || text.isBlank()) return "";
-        return text.trim().toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
+        return text.trim().toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("(^-)|(-$)", "");
     }
 
     private Map<String, String> extractSolvedCatalog(Student student) {
@@ -1229,8 +1229,8 @@ public class SocialService {
         entries.sort((a, b) -> {
             switch (criterion) {
                 case "devscore","dev-score","cscore","c-score":
-                    int bScore = b.getDevScore() != null ? b.getDevScore() : (b.getCScore() != null ? b.getCScore() : 500);
-                    int aScore = a.getDevScore() != null ? a.getDevScore() : (a.getCScore() != null ? a.getCScore() : 500);
+                    int bScore = resolveDevScore(b);
+                    int aScore = resolveDevScore(a);
                     int cmpC = Integer.compare(bScore, aScore);
                     if (cmpC != 0) return cmpC;
                     return Integer.compare(b.getTotalSolved(), a.getTotalSolved());
@@ -1402,5 +1402,15 @@ public class SocialService {
                 .userLiked(userLiked)
                 .createdAt(p.getCreatedAt())
                 .build();
+    }
+
+    private static int resolveDevScore(SocialLeaderboardDTO.LeaderboardEntry entry) {
+        if (entry.getDevScore() != null) {
+            return entry.getDevScore();
+        }
+        if (entry.getCScore() != null) {
+            return entry.getCScore();
+        }
+        return 500;
     }
 }

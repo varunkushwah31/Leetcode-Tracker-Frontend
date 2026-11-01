@@ -8,7 +8,10 @@ export type OAuthProvider = 'google' | 'github';
 export function getOAuth2AuthorizationUrl(provider: OAuthProvider): string {
     const oauthBase = import.meta.env.VITE_OAUTH_BASE_URL;
     if (oauthBase && typeof oauthBase === 'string' && oauthBase.trim()) {
-        const cleanBase = oauthBase.trim().replace(/\/+$/, '');
+        let cleanBase = oauthBase.trim();
+        while (cleanBase.endsWith('/')) {
+            cleanBase = cleanBase.slice(0, -1);
+        }
         return `${cleanBase}/oauth2/authorization/${provider}`;
     }
 

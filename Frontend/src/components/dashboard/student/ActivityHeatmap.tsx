@@ -373,6 +373,13 @@ export function ActivityHeatmap({
                                                     if (day.isFuture) return;
                                                     setSelectedDay(prev => prev?.dateKey === day.dateKey ? null : day);
                                                 }}
+                                                onKeyDown={(e) => {
+                                                    if (day.isFuture) return;
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        setSelectedDay(prev => prev?.dateKey === day.dateKey ? null : day);
+                                                    }
+                                                }}
                                                 onMouseEnter={(e) => {
                                                     if (day.isFuture) return;
                                                     const rect = e.currentTarget.getBoundingClientRect();
@@ -406,7 +413,7 @@ export function ActivityHeatmap({
                 {/* Single Shared Floating Tooltip Overlay - Anchored directly to cell with triangle pointer */}
                 {hoveredCell && typeof document !== 'undefined' && createPortal(
                     <div
-                        className={`fixed z-[9999] pointer-events-none -translate-x-1/2 ${
+                        className={`fixed z-9999 pointer-events-none -translate-x-1/2 ${
                             hoveredCell.placement === 'top' ? '-translate-y-full' : 'translate-y-0'
                         } flex flex-col items-center drop-shadow-lg`}
                         style={{ left: hoveredCell.x, top: hoveredCell.y }}

@@ -465,14 +465,14 @@ function FriendPeerLearningSection({
     return (
         <div className="space-y-6">
             <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-3">
-                <span className="p-2 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-white shrink-0 mt-0.5">
+                <span className="p-2 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shrink-0 mt-0.5">
                     <Lightbulb className="w-4 h-4" />
                 </span>
                 <div>
                     <p className="inline">
                         <strong className="font-extrabold text-zinc-900 dark:text-zinc-100">
-                            Peer-to-Peer Learning Insight:{' '}
-                        </strong>
+                            Peer-to-Peer Learning Insight:
+                        </strong>{' '}
                         Compare what your friend has mastered that you have not solved yet. Click on any problem to practice directly or challenge your friend to a 1v1 duel!
                     </p>
                 </div>

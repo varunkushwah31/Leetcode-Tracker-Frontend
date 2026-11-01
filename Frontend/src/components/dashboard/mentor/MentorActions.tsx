@@ -773,7 +773,7 @@ export function MentorActions({ mentorId, selectedClassroom, learningPaths, onRe
                                                     onChange={e => {
                                                         const val = e.target.value;
                                                         const newQs = [...pathQuestions];
-                                                        newQs[idx].daysToComplete = val === '' ? ('' as any) : Math.max(1, Number.parseInt(val) || 1);
+                                                        newQs[idx].daysToComplete = val === '' ? 0 : Math.max(1, Number.parseInt(val, 10) || 1);
                                                         setPathQuestions(newQs);
                                                     }}
                                                     onBlur={() => {

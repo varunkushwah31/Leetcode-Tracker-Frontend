@@ -57,7 +57,7 @@ export function ContactPage() {
         if (!trimmedName || trimmedName.length < 2) {
             return 'Please provide your full name (at least 2 characters).';
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
         if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
             return 'Please enter a valid email address.';
         }
@@ -70,7 +70,7 @@ export function ContactPage() {
         return null;
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
 

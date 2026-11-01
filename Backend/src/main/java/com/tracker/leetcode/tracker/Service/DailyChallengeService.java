@@ -116,7 +116,7 @@ public class DailyChallengeService {
             if (cacheManager != null) {
                 Cache cache = cacheManager.getCache("global-potd");
                 if (cache != null) {
-                    cache.evict("today");
+                    cache.evict(CACHE_KEY_TODAY);
                 }
             }
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class DailyChallengeService {
     }
 
     private ClassroomPotdTicker resolveClassroomTicker(Classroom classroom, String titleSlug, String title) {
-        String cacheKey = classroom.getId() + ":" + (titleSlug != null ? titleSlug.trim().toLowerCase() : "today");
+        String cacheKey = classroom.getId() + ":" + (titleSlug != null ? titleSlug.trim().toLowerCase() : CACHE_KEY_TODAY);
 
         if (cacheManager != null) {
             Cache cache = cacheManager.getCache("classroom-potd-ticker");

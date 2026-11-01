@@ -13,6 +13,17 @@ export function isCodeforcesUrl(input: string): boolean {
     return /(?:codeforces\.com|codeforces\.org|codeforces\.net)/i.test(input);
 }
 
+function stripHandleAffixes(raw: string): string {
+    let clean = raw;
+    while (clean.startsWith('@') || clean.startsWith('/')) {
+        clean = clean.slice(1);
+    }
+    while (clean.endsWith('/')) {
+        clean = clean.slice(0, -1);
+    }
+    return clean.trim();
+}
+
 /**
  * Extracts canonical LeetCode username from a profile URL or raw username.
  * Supports:
@@ -31,13 +42,13 @@ export function extractLeetcodeUsername(input: string | null | undefined): strin
     trimmed = trimmed.split('?')[0].split('#')[0].trim();
 
     // Check for LeetCode profile URL pattern
-    const urlMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?leetcode\.(?:com|cn)\/(?:u\/|profile\/)?([a-zA-Z0-9_-]+)\/?/i);
-    if (urlMatch && urlMatch[1]) {
+    const urlMatch = /(?:https?:\/\/)?(?:www\.)?leetcode\.(?:com|cn)\/(?:u\/|profile\/)?([a-z0-9_-]+)\/?/i.exec(trimmed);
+    if (urlMatch?.[1]) {
         return urlMatch[1].trim();
     }
 
     // Strip leading @ or slashes
-    return trimmed.replace(/^[@/]+/, '').replace(/\/+$/, '').trim();
+    return stripHandleAffixes(trimmed);
 }
 
 /**
@@ -57,13 +68,13 @@ export function extractCodeforcesHandle(input: string | null | undefined): strin
     trimmed = trimmed.split('?')[0].split('#')[0].trim();
 
     // Check for Codeforces profile URL pattern
-    const urlMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?codeforces\.(?:com|org|net)\/(?:profile\/)?([a-zA-Z0-9_.-]+)\/?/i);
-    if (urlMatch && urlMatch[1]) {
+    const urlMatch = /(?:https?:\/\/)?(?:www\.)?codeforces\.(?:com|org|net)\/(?:profile\/)?([a-z0-9_.-]+)\/?/i.exec(trimmed);
+    if (urlMatch?.[1]) {
         return urlMatch[1].trim();
     }
 
     // Strip leading @ or slashes
-    return trimmed.replace(/^[@/]+/, '').replace(/\/+$/, '').trim();
+    return stripHandleAffixes(trimmed);
 }
 
 /**
@@ -113,13 +124,13 @@ export function parseProblemInput(
     platform: 'LEETCODE' | 'CODEFORCES' = 'LEETCODE'
 ): { slug: string; detectedPlatform: 'LEETCODE' | 'CODEFORCES'; problemNumber?: string } {
     const trimmed = (input || '').trim();
-    const cfMatch = trimmed.match(/(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([A-Za-z0-9]+)/i);
+    const cfMatch = /(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([a-z0-9]+)/i.exec(trimmed);
     if (cfMatch) {
         const pNum = `${cfMatch[1]}${cfMatch[2].toUpperCase()}`;
         return { slug: pNum, detectedPlatform: 'CODEFORCES', problemNumber: pNum };
     }
 
-    const lcMatch = trimmed.match(/problems\/([a-zA-Z0-9_-]+)/i);
+    const lcMatch = /problems\/([a-z0-9_-]+)/i.exec(trimmed);
     if (lcMatch) {
         return { slug: lcMatch[1].toLowerCase(), detectedPlatform: 'LEETCODE' };
     }
@@ -140,24 +151,24 @@ export function extractTitleFromUrlOrSlug(
     input: string,
     platform?: 'LEETCODE' | 'CODEFORCES'
 ): string {
-    if (!input || !input.trim()) return '';
+    if (!input?.trim()) return '';
     const trimmed = input.trim();
 
     // 1. Codeforces URL or Problem ID
-    const cfMatch = trimmed.match(/(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([A-Za-z0-9]+)/i);
+    const cfMatch = /(?:problemset\/problem|contest|gym)\/(\d+)\/(?:problem\/)?([a-z0-9]+)/i.exec(trimmed);
     if (cfMatch) {
         return `Problem ${cfMatch[1]}${cfMatch[2].toUpperCase()}`;
     }
     if (platform === 'CODEFORCES') {
         const cleanCF = trimmed.replace('/', '').toUpperCase();
-        const cfIdMatch = cleanCF.match(/^(\d+)([A-Z0-9]+)$/);
+        const cfIdMatch = /^(\d+)([A-Z][A-Z0-9]*)$/.exec(cleanCF);
         if (cfIdMatch) {
             return `Problem ${cfIdMatch[1]}${cfIdMatch[2]}`;
         }
     }
 
     // 2. LeetCode URL or Slug
-    const lcMatch = trimmed.match(/problems\/([a-zA-Z0-9_-]+)/i);
+    const lcMatch = /problems\/([a-z0-9_-]+)/i.exec(trimmed);
     const slug = lcMatch ? lcMatch[1] : (platform !== 'CODEFORCES' && !trimmed.startsWith('http') ? trimmed : '');
 
     if (slug) {

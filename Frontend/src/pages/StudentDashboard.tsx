@@ -310,7 +310,7 @@ export function StudentDashboard() {
             </header>
 
             <main
-                tabIndex={0}
+
                 aria-label="Student dashboard content"
                 className="relative z-10 max-w-360 mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 w-full focus:outline-none"
             >

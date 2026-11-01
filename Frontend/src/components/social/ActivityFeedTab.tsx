@@ -148,7 +148,7 @@ export function ActivityFeedTab({ onViewFriendDashboard }: Readonly<ActivityFeed
                             </h3>
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                Live Stream
+                                <span>Live Stream</span>
                             </span>
                         </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
