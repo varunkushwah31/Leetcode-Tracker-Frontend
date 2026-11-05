@@ -19,6 +19,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         return { hasError: true };
     }
 
+
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         console.error("ErrorBoundary caught an unhandled error:", error, errorInfo);
     }
